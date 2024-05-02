@@ -1,0 +1,12 @@
+[package]
+name = "glues-core"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies.gluesql]
+git = "https://github.com/gluesql/gluesql.git"
+rev = "608976b"
+default_features = false
+features = ["memory-storage"]

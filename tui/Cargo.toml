@@ -1,0 +1,13 @@
+[package]
+name = "glues"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+glues-core.workspace = true
+cursive = "0.20.0"
+cursive_tree_view = "0.8.0"
+futures = "0.3.30"
+async-io = "2.3.2"

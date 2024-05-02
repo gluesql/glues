@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = [
+  "tui",
+  "core",
+]
+default-members = [
+  "tui",
+  "core",
+]
+
+[workspace.package]
+authors = ["Taehoon Moon <taehoon.moon@outlook.com>"]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+glues-core = { path = "./core" }
