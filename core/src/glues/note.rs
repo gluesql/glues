@@ -60,19 +60,22 @@ impl Glues {
             .unwrap();
     }
 
-    pub async fn remove_note(&mut self, note_id: NoteId) {
-        table("Note")
+    pub async fn remove_note(&mut self, note_id: NoteId) -> String {
+        let r = table("Note")
             .delete()
-            .filter(col("id").eq(note_id))
+            .filter(col("id").eq(uuid(note_id)))
             .execute(&mut self.glue)
-            .await
-            .unwrap();
+            .await;
+        if let Err(e) = r {
+            return e.to_string();
+        }
+        "nice".to_owned()
     }
 
     pub async fn update_note_content(&mut self, note_id: NoteId, content: String) {
         table("Note")
             .update()
-            .filter(col("id").eq(note_id))
+            .filter(col("id").eq(uuid(note_id)))
             .set("content", content)
             .set("updated_at", now())
             .execute(&mut self.glue)
@@ -83,7 +86,7 @@ impl Glues {
     pub async fn rename_note(&mut self, note_id: NoteId, name: String) {
         table("Note")
             .update()
-            .filter(col("id").eq(note_id))
+            .filter(col("id").eq(uuid(note_id)))
             .set("name", name)
             .set("updated_at", now())
             .execute(&mut self.glue)
@@ -94,7 +97,7 @@ impl Glues {
     pub async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) {
         table("Note")
             .update()
-            .filter(col("id").eq(note_id))
+            .filter(col("id").eq(uuid(note_id)))
             .set("directory_id", directory_id)
             .set("updated_at", now())
             .execute(&mut self.glue)
