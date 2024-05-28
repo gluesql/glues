@@ -1,7 +1,7 @@
-pub mod data;
 mod glues;
-mod node;
 mod schema;
-mod types;
+
+pub mod data;
+pub mod types;
 
 pub use glues::Glues;

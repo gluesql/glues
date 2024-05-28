@@ -1,11 +1,10 @@
 use cursive::{
     view::{Nameable, Resizable},
     views::{PaddedView, TextView},
-    View,
-    Cursive,
+    Cursive, View,
 };
 
-pub fn editor(siv: &mut Cursive) -> impl View {
+pub fn editor(_siv: &mut Cursive) -> impl View {
     PaddedView::lrtb(
         1,
         1,
