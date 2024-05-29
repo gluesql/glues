@@ -1,5 +1,5 @@
 use {
-    crate::{cursive_ext::CursiveExt, logger::*},
+    crate::traits::*,
     cursive::{
         align::HAlign,
         views::{Button, CircularFocus, Dialog, DummyView, LinearLayout, TextView},

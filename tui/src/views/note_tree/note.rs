@@ -1,7 +1,7 @@
 mod more_actions;
 
 use {
-    crate::{cursive_ext::CursiveExt, logger::*},
+    crate::traits::*,
     cursive::{
         event::EventResult,
         view::{Nameable, Resizable},

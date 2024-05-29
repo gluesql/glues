@@ -1,5 +1,8 @@
 use {
-    crate::components::{alert::render_alert, confirm::render_confirm},
+    crate::{
+        components::{alert::render_alert, confirm::render_confirm},
+        traits::*,
+    },
     cursive::{
         Cursive,
         {view::View, views::ViewRef},
@@ -23,11 +26,11 @@ pub trait CursiveExt {
 
 impl CursiveExt for Cursive {
     fn glues(&mut self) -> &mut Glues {
-        self.user_data::<Glues>().expect("Glues must exist")
+        self.user_data::<Glues>().log_expect("Glues must exist")
     }
 
     fn find<V: View>(&mut self, id: &str) -> ViewRef<V> {
-        self.find_name(id).expect("View with {id} must exist")
+        self.find_name(id).log_expect("View with {id} must exist")
     }
 
     fn confirm<F>(&mut self, message: String, on_confirm: F)

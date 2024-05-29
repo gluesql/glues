@@ -2,7 +2,7 @@ mod directory;
 mod note;
 
 use {
-    crate::{cursive_ext::CursiveExt, logger::*},
+    crate::traits::*,
     cursive::{
         align::HAlign,
         view::Resizable,

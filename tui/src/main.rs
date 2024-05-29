@@ -3,6 +3,13 @@ mod cursive_ext;
 mod logger;
 mod views;
 
+mod traits {
+    pub use crate::{
+        cursive_ext::CursiveExt,
+        logger::{LogExpectExt, LogFutureUnwrapExt, LogUnwrapExt},
+    };
+}
+
 use {
     cursive::{
         views::{CircularFocus, LinearLayout},
@@ -10,7 +17,8 @@ use {
     },
     futures::executor::block_on,
     glues_core::Glues,
-    logger::*,
+    logger::log,
+    traits::*,
     views::{editor::editor, note_tree::render_note_tree},
 };
 

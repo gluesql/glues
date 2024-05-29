@@ -1,6 +1,6 @@
 use {
     super::render_note,
-    crate::{cursive_ext::CursiveExt, logger::*},
+    crate::traits::*,
     cursive::{
         event::EventResult,
         view::Nameable,
