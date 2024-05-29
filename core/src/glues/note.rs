@@ -2,42 +2,41 @@ use {
     crate::{
         data::Note,
         types::{DirectoryId, NoteId},
-        Glues,
+        Error, Glues, Result,
     },
     gluesql::core::ast_builder::{col, function::now, table, text, uuid, Execute},
     std::ops::Deref,
+    uuid::Uuid,
 };
 
 // fetch
 impl Glues {
-    pub async fn fetch_note_content(&mut self, note_id: NoteId) -> String {
+    pub async fn fetch_note_content(&mut self, note_id: NoteId) -> Result<String> {
         let content = table("Note")
             .select()
             .filter(col("id").eq(uuid(note_id)))
             .project(col("content"))
             .execute(&mut self.glue)
-            .await
-            .expect("error case 1")
+            .await?
             .select()
-            .expect("error case 2")
+            .ok_or(Error::Wip("error case 2".to_owned()))?
             .next()
-            .expect("error case 3")
+            .ok_or(Error::Wip("error case 3".to_owned()))?
             .get("content")
             .map(Deref::deref)
-            .expect("error case 4")
+            .ok_or(Error::Wip("error case 4".to_owned()))?
             .into();
 
-        content
+        Ok(content)
     }
 
-    pub async fn fetch_notes(&mut self, directory_id: DirectoryId) -> Vec<Note> {
+    pub async fn fetch_notes(&mut self, directory_id: DirectoryId) -> Result<Vec<Note>> {
         let notes = table("Note")
             .select()
             .filter(col("directory_id").eq(uuid(directory_id.clone())))
             .project(vec!["id", "name"])
             .execute(&mut self.glue)
-            .await
-            .unwrap()
+            .await?
             .select()
             .unwrap()
             .map(|payload| Note {
@@ -47,29 +46,30 @@ impl Glues {
             })
             .collect();
 
-        notes
+        Ok(notes)
     }
 
-    pub async fn add_note(&mut self, directory_id: DirectoryId, name: String) {
+    pub async fn add_note(&mut self, directory_id: DirectoryId, name: String) -> Result<()> {
+        let id = Uuid::new_v4().to_string();
+
         table("Note")
             .insert()
-            .columns(vec!["directory_id", "name"])
-            .values(vec![vec![uuid(directory_id), text(name)]])
+            .columns(vec!["id", "directory_id", "name"])
+            .values(vec![vec![uuid(id.clone()), uuid(directory_id), text(name)]])
             .execute(&mut self.glue)
-            .await
-            .unwrap();
+            .await?;
+
+        Ok(())
     }
 
-    pub async fn remove_note(&mut self, note_id: NoteId) -> String {
-        let r = table("Note")
+    pub async fn remove_note(&mut self, note_id: NoteId) -> Result<()> {
+        table("Note")
             .delete()
             .filter(col("id").eq(uuid(note_id)))
             .execute(&mut self.glue)
-            .await;
-        if let Err(e) = r {
-            return e.to_string();
-        }
-        "nice".to_owned()
+            .await?;
+
+        Ok(())
     }
 
     pub async fn update_note_content(&mut self, note_id: NoteId, content: String) {

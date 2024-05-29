@@ -1,19 +1,18 @@
 use {
-    crate::{data::Directory, types::DirectoryId, Glues},
+    crate::{data::Directory, types::DirectoryId, Glues, Result},
     gluesql::core::ast_builder::{col, function::now, table, text, uuid, Execute},
     std::ops::Deref,
     uuid::Uuid,
 };
 
 impl Glues {
-    pub async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Directory {
+    pub async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Result<Directory> {
         let directory = table("Directory")
             .select()
             .filter(col("id").eq(uuid(directory_id)))
             .project(vec!["id", "parent_id", "name"])
             .execute(&mut self.glue)
-            .await
-            .unwrap()
+            .await?
             .select()
             .unwrap()
             .next()
@@ -24,17 +23,16 @@ impl Glues {
             })
             .unwrap();
 
-        directory
+        Ok(directory)
     }
 
-    pub async fn fetch_directories(&mut self, parent_id: DirectoryId) -> Vec<Directory> {
+    pub async fn fetch_directories(&mut self, parent_id: DirectoryId) -> Result<Vec<Directory>> {
         let directories = table("Directory")
             .select()
             .filter(col("parent_id").eq(uuid(parent_id.clone())))
             .project(vec!["id", "name"])
             .execute(&mut self.glue)
-            .await
-            .unwrap()
+            .await?
             .select()
             .unwrap()
             .map(|payload| Directory {
@@ -44,10 +42,14 @@ impl Glues {
             })
             .collect();
 
-        directories
+        Ok(directories)
     }
 
-    pub async fn add_directory(&mut self, parent_id: DirectoryId, name: String) -> DirectoryId {
+    pub async fn add_directory(
+        &mut self,
+        parent_id: DirectoryId,
+        name: String,
+    ) -> Result<DirectoryId> {
         let id = Uuid::new_v4().to_string();
 
         table("Directory")
@@ -55,39 +57,49 @@ impl Glues {
             .columns(vec!["id", "parent_id", "name"])
             .values(vec![vec![uuid(id.clone()), uuid(parent_id), text(name)]])
             .execute(&mut self.glue)
-            .await
-            .unwrap();
+            .await?;
 
-        id
+        Ok(id)
     }
 
-    pub async fn remove_directory(&mut self, directory_id: DirectoryId) {
+    pub async fn remove_directory(&mut self, directory_id: DirectoryId) -> Result<()> {
         table("Directory")
             .delete()
             .filter(col("id").eq(uuid(directory_id)))
             .execute(&mut self.glue)
-            .await
-            .unwrap();
+            .await?;
+
+        Ok(())
     }
 
-    pub async fn move_directory(&mut self, directory_id: DirectoryId, parent_id: DirectoryId) {
+    pub async fn move_directory(
+        &mut self,
+        directory_id: DirectoryId,
+        parent_id: DirectoryId,
+    ) -> Result<()> {
         table("Directory")
             .update()
             .filter(col("directory_id").eq(uuid(directory_id)))
             .set("parent_id", parent_id)
             .execute(&mut self.glue)
-            .await
-            .unwrap();
+            .await?;
+
+        Ok(())
     }
 
-    pub async fn rename_directory(&mut self, directory_id: DirectoryId, name: String) {
+    pub async fn rename_directory(
+        &mut self,
+        directory_id: DirectoryId,
+        name: String,
+    ) -> Result<()> {
         table("Directory")
             .update()
             .filter(col("directory_id").eq(uuid(directory_id)))
             .set("name", name)
             .set("updated_at", now())
             .execute(&mut self.glue)
-            .await
-            .unwrap();
+            .await?;
+
+        Ok(())
     }
 }

@@ -16,7 +16,7 @@ pub async fn setup(glue: &mut Glue<MemoryStorage>) {
 
     table("Note")
         .create_table()
-        .add_column("id UUID PRIMARY KEY DEFAULT GENERATE_UUID()")
+        .add_column("id UUID PRIMARY KEY")
         .add_column("name TEXT NOT NULL")
         .add_column("directory_id UUID NOT NULL")
         .add_column("created_at TIMESTAMP NOT NULL DEFAULT NOW()")

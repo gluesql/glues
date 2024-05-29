@@ -6,10 +6,6 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+gluesql.workspace = true
+thiserror = "1.0.61"
 uuid = { version = "1.8.0", features = ["v4"] }
-
-[dependencies.gluesql]
-git = "https://github.com/gluesql/gluesql.git"
-rev = "608976b"
-default_features = false
-features = ["memory-storage"]
