@@ -2,7 +2,7 @@ mod directory;
 mod note;
 
 use {
-    crate::cursive_ext::CursiveExt,
+    crate::{cursive_ext::CursiveExt, logger::*},
     cursive::{
         align::HAlign,
         view::Resizable,
@@ -13,10 +13,10 @@ use {
     note::render_note,
 };
 
-pub async fn render_note_tree(siv: &mut Cursive) -> impl View {
+pub fn render_note_tree(siv: &mut Cursive) -> impl View {
     let root_id = siv.glues().root_id.clone();
-    let notes = siv.glues().fetch_notes(root_id.clone()).await;
-    let directories = siv.glues().fetch_directories(root_id.clone()).await;
+    let notes = siv.glues().fetch_notes(root_id.clone()).log_unwrap();
+    let directories = siv.glues().fetch_directories(root_id.clone()).log_unwrap();
 
     let mut layout = LinearLayout::vertical();
 

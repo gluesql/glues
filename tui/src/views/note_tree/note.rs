@@ -1,8 +1,7 @@
 mod more_actions;
 
 use {
-    crate::cursive_ext::CursiveExt,
-    async_io::block_on,
+    crate::{cursive_ext::CursiveExt, logger::*},
     cursive::{
         event::EventResult,
         view::{Nameable, Resizable},
@@ -31,8 +30,7 @@ pub fn render_note(note: Note) -> impl View {
 
 fn on_item_click(id: String) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv| {
-        let content = siv.glues().fetch_note_content(id.clone());
-        let content = block_on(content);
+        let content = siv.glues().fetch_note_content(id.clone()).log_unwrap();
 
         let mut editor = siv.find::<TextView>("temp_text");
         editor.set_content(content);

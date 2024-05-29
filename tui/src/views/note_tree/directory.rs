@@ -1,7 +1,6 @@
 use {
     super::render_note,
-    crate::cursive_ext::CursiveExt,
-    async_io::block_on,
+    crate::{cursive_ext::CursiveExt, logger::*},
     cursive::{
         event::EventResult,
         view::Nameable,
@@ -39,8 +38,11 @@ pub fn render_directory(siv: &mut Cursive, directory: Directory) -> impl View {
 }
 
 fn render_items(siv: &mut Cursive, directory_id: DirectoryId) -> impl View {
-    let directories = block_on(siv.glues().fetch_directories(directory_id.clone()));
-    let notes = block_on(siv.glues().fetch_notes(directory_id.clone()));
+    let directories = siv
+        .glues()
+        .fetch_directories(directory_id.clone())
+        .log_unwrap();
+    let notes = siv.glues().fetch_notes(directory_id.clone()).log_unwrap();
     let mut layout = LinearLayout::vertical();
 
     for child in directories {

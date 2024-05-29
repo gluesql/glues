@@ -1,6 +1,5 @@
 use {
-    crate::cursive_ext::CursiveExt,
-    async_io::block_on,
+    crate::{cursive_ext::CursiveExt, logger::*},
     cursive::{
         align::HAlign,
         views::{Button, CircularFocus, Dialog, DummyView, LinearLayout, TextView},
@@ -45,9 +44,8 @@ fn on_remove_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
         move |siv| {
             let note_id = note_id.clone();
 
-            let wow = block_on(siv.glues().remove_note(note_id));
-
-            siv.alert(wow, |_| {});
+            siv.glues().remove_note(note_id).log_unwrap();
+            siv.alert("Removed!".to_string(), |_| {});
         }
     }
 
