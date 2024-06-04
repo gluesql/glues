@@ -17,25 +17,27 @@ pub trait CursiveExt {
 
     fn confirm<F>(&mut self, message: String, on_confirm: F)
     where
-        F: Fn(&mut Cursive) + Send + 'static;
+        F: Fn(&mut Cursive) + 'static;
 
     fn alert<F>(&mut self, message: String, on_close: F)
     where
-        F: Fn(&mut Cursive) + Send + 'static;
+        F: Fn(&mut Cursive) + 'static;
 }
 
 impl CursiveExt for Cursive {
     fn glues(&mut self) -> &mut Glues {
-        self.user_data::<Glues>().log_expect("Glues must exist")
+        self.user_data::<Glues>()
+            .log_expect("[CursiveExt::glues] Glues must exist")
     }
 
     fn find<V: View>(&mut self, id: &str) -> ViewRef<V> {
-        self.find_name(id).log_expect("View with {id} must exist")
+        let msg = format!("[CursiveExt::find] {id} must exist");
+        self.find_name(id).log_expect(&msg)
     }
 
     fn confirm<F>(&mut self, message: String, on_confirm: F)
     where
-        F: Fn(&mut Cursive) + Send + 'static,
+        F: Fn(&mut Cursive) + 'static,
     {
         let dialog = render_confirm(&message, on_confirm);
         self.add_layer(dialog);
@@ -43,7 +45,7 @@ impl CursiveExt for Cursive {
 
     fn alert<F>(&mut self, message: String, on_close: F)
     where
-        F: Fn(&mut Cursive) + Send + 'static,
+        F: Fn(&mut Cursive) + 'static,
     {
         let dialog = render_alert(&message, on_close);
         self.add_layer(dialog);
