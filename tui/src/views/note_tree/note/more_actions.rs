@@ -1,17 +1,18 @@
 use {
-    crate::traits::*,
+    crate::{actions, traits::*},
     cursive::{
         align::HAlign,
         views::{Button, CircularFocus, Dialog, DummyView, LinearLayout, TextView},
         Cursive, With,
     },
-    glues_core::{data::Note, types::NoteId},
+    glues_core::data::Note,
+    std::rc::Rc,
 };
 
 pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
     let label = TextView::new(format!("'{}'", &note.name)).h_align(HAlign::Center);
-    let remove_button = Button::new("Remove", on_remove_click(note));
-    let rename_button = Button::new("Rename", |_siv| {});
+    let remove_button = Button::new("Remove", on_remove_click(note.clone()));
+    let rename_button = Button::new("Rename", on_rename_click(note));
     let cancel_button = Button::new("Cancel", |siv| {
         siv.pop_layer();
     });
@@ -33,21 +34,23 @@ pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
 }
 
 fn on_remove_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
-    let callback = move |siv: &mut Cursive| {
+    let note = Rc::new(note);
+
+    move |siv: &mut Cursive| {
+        let note = Rc::clone(&note);
         let message = format!("Removes '{}'", &note.name);
 
         siv.pop_layer();
-        siv.confirm(message, on_confirm(note.id.clone()));
-    };
-
-    fn on_confirm(note_id: NoteId) -> impl for<'a> Fn(&'a mut Cursive) {
-        move |siv| {
-            let note_id = note_id.clone();
-
-            siv.glues().remove_note(note_id).log_unwrap();
-            siv.alert("Removed!".to_string(), |_| {});
-        }
+        siv.confirm(message, move |siv| {
+            actions::remove_note(siv, &note);
+        });
     }
+}
 
-    callback
+fn on_rename_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
+    move |siv: &mut Cursive| {
+        siv.pop_layer();
+
+        actions::rename_note(siv, &note);
+    }
 }

@@ -1,6 +1,6 @@
 use {
     super::render_note,
-    crate::traits::*,
+    crate::{traits::*, Node},
     cursive::{
         event::EventResult,
         view::Nameable,
@@ -22,10 +22,9 @@ pub fn render_directory(siv: &mut Cursive, directory: Directory) -> impl View {
             })
         });
 
-    let caret_id = format!("caret/{0}", directory.id);
-    let item = LinearLayout::horizontal()
-        .child(TextView::new(get_caret(opened)).with_name(caret_id))
-        .child(button);
+    let caret = TextView::new(get_caret(opened))
+        .with_name(Node::note_tree().directory(&directory.id).caret().name());
+    let item = LinearLayout::horizontal().child(caret).child(button);
 
     let mut container = LinearLayout::vertical().child(item);
     if opened {
@@ -34,7 +33,8 @@ pub fn render_directory(siv: &mut Cursive, directory: Directory) -> impl View {
         container.add_child(layout);
     }
 
-    container.with_name(format!("container/{0}", directory.id))
+    let nid = Node::note_tree().directory(&directory.id).name();
+    container.with_name(nid)
 }
 
 fn render_items(siv: &mut Cursive, directory_id: DirectoryId) -> impl View {
@@ -53,32 +53,36 @@ fn render_items(siv: &mut Cursive, directory_id: DirectoryId) -> impl View {
         layout.add_child(render_note(child));
     }
 
+    let nid = Node::note_tree()
+        .directory(&directory_id)
+        .note_list()
+        .name();
+    let layout = layout.with_name(nid);
+
     PaddedView::lrtb(1, 0, 0, 0, layout)
 }
 
 fn on_item_click(directory_id: DirectoryId) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv| {
         let opened = siv.glues().check_opened(&directory_id);
-
-        {
-            let container_id = format!("container/{0}", &directory_id);
-            let mut container = siv.find::<LinearLayout>(&container_id);
-
-            if opened {
-                siv.glues().close_directory(&directory_id);
-
-                container.remove_child(1);
-            } else {
-                siv.glues().open_directory(directory_id.clone());
-
-                let items = render_items(siv, directory_id.clone());
-                container.add_child(items);
-            }
-        }
-
-        let caret_id = format!("caret/{0}", directory_id);
-        siv.find::<TextView>(&caret_id)
+        let directory_node = Node::note_tree().directory(&directory_id);
+        directory_node
+            .caret()
+            .find(siv)
             .set_content(get_caret(!opened));
+
+        let mut container = directory_node.find(siv);
+
+        if opened {
+            siv.glues().close_directory(&directory_id);
+
+            container.remove_child(1);
+        } else {
+            siv.glues().open_directory(directory_id.clone());
+
+            let items = render_items(siv, directory_id.clone());
+            container.add_child(items);
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 mod more_actions;
 
 use {
-    crate::traits::*,
+    crate::{traits::*, Node},
     cursive::{
         event::EventResult,
         view::{Nameable, Resizable},
@@ -13,10 +13,9 @@ use {
 };
 
 pub fn render_note(note: Note) -> impl View {
-    let actions_id = get_actions_id(&note.id);
-
     let button = Button::new_raw(note.name.clone(), on_item_click(note.id.clone()));
-    let more_actions = Button::new_raw("", on_more_click(note.clone())).with_name(actions_id);
+    let more_actions = Button::new_raw("", on_more_click(note.clone()))
+        .with_name(Node::note_tree().note(&note.id).more_button().name());
 
     LinearLayout::horizontal()
         .child(TextView::new("◦ "))
@@ -25,7 +24,8 @@ pub fn render_note(note: Note) -> impl View {
         .child(more_actions)
         .wrap_with(FocusTracker::new)
         .on_focus(on_item_focus(note.id.clone()))
-        .on_focus_lost(on_item_focus_lost(note.id))
+        .on_focus_lost(on_item_focus_lost(note.id.clone()))
+        .with_name(Node::note_tree().note(&note.id).name())
 }
 
 fn on_item_click(id: String) -> impl for<'a> Fn(&'a mut Cursive) {
@@ -47,24 +47,28 @@ fn on_more_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
 
 fn on_item_focus(id: String) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventResult {
     move |_| {
-        let actions_id = get_actions_id(&id);
+        let id = id.clone();
 
         EventResult::with_cb(move |siv| {
-            siv.find::<Button>(&actions_id).set_label("More");
+            Node::note_tree()
+                .note(&id)
+                .more_button()
+                .find(siv)
+                .set_label("More");
         })
     }
 }
 
 fn on_item_focus_lost(id: String) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventResult {
     move |_| {
-        let actions_id = get_actions_id(&id);
+        let id = id.clone();
 
         EventResult::with_cb(move |siv| {
-            siv.find::<Button>(&actions_id).set_label_raw("");
+            Node::note_tree()
+                .note(&id)
+                .more_button()
+                .find(siv)
+                .set_label_raw("");
         })
     }
-}
-
-fn get_actions_id(id: &str) -> String {
-    format!("{id}/actions")
 }

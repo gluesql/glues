@@ -1,13 +1,12 @@
+mod actions;
 mod components;
 mod cursive_ext;
 mod logger;
+mod node;
 mod views;
 
 mod traits {
-    pub use crate::{
-        cursive_ext::CursiveExt,
-        logger::{LogExpectExt, LogFutureUnwrapExt, LogUnwrapExt},
-    };
+    pub(crate) use crate::{cursive_ext::CursiveExt, logger::*, node::LeafNode};
 }
 
 use {
@@ -18,6 +17,7 @@ use {
     futures::executor::block_on,
     glues_core::Glues,
     logger::log,
+    node::Node,
     traits::*,
     views::{editor::editor, note_tree::render_note_tree},
 };
