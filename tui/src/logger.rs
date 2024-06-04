@@ -67,6 +67,7 @@ impl<V> LogExpectExt<V> for Option<V> {
     }
 }
 
+#[allow(dead_code)]
 pub trait LogUnwrapExt<V> {
     fn log_unwrap(self) -> V;
 }
