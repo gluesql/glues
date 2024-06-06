@@ -1,4 +1,8 @@
-use {super::NoteNode, crate::node::LeafNode, cursive::views::Button};
+use {
+    super::NoteNode,
+    crate::node::{NodePath, ViewFinder},
+    cursive::views::Button,
+};
 
 pub struct NameButtonNode<'a> {
     parent: &'a NoteNode<'a>,
@@ -10,7 +14,7 @@ impl<'a> NameButtonNode<'a> {
     }
 }
 
-impl<'a> LeafNode<Button> for NameButtonNode<'a> {
+impl<'a> NodePath for NameButtonNode<'a> {
     fn get_path(&self) -> Vec<&str> {
         let mut path = self.parent.get_path();
 
@@ -18,3 +22,5 @@ impl<'a> LeafNode<Button> for NameButtonNode<'a> {
         path
     }
 }
+
+impl<'a> ViewFinder<Button> for NameButtonNode<'a> {}

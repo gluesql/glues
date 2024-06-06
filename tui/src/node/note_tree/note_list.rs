@@ -1,20 +1,26 @@
-use {crate::node::LeafNode, cursive::views::LinearLayout};
+use {
+    super::NoteTreeNode,
+    crate::node::{NodePath, ViewFinder},
+    cursive::views::LinearLayout,
+};
 
 pub struct NoteListNode {
-    path: Vec<&'static str>,
+    parent: NoteTreeNode,
 }
 
 impl NoteListNode {
-    pub fn new(path: Vec<&'static str>) -> Self {
-        Self { path }
+    pub fn new(parent: NoteTreeNode) -> Self {
+        Self { parent }
     }
 }
 
-impl LeafNode<LinearLayout> for NoteListNode {
+impl NodePath for NoteListNode {
     fn get_path(&self) -> Vec<&str> {
-        let mut path = self.path.clone();
+        let mut path = self.parent.get_path();
 
         path.push("note_list");
         path
     }
 }
+
+impl ViewFinder<LinearLayout> for NoteListNode {}

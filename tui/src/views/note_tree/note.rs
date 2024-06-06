@@ -27,7 +27,7 @@ pub fn render_note(note: Note) -> impl View {
         .wrap_with(FocusTracker::new)
         .on_focus(on_item_focus(note.id.clone()))
         .on_focus_lost(on_item_focus_lost(note.id.clone()))
-        .with_name(Node::note_tree().note(&note.id).name())
+        .with_name(note_node.name())
 }
 
 fn on_item_click(id: String) -> impl for<'a> Fn(&'a mut Cursive) {

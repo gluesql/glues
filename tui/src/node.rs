@@ -15,9 +15,11 @@ impl Node {
     }
 }
 
-pub(crate) trait LeafNode<V: View> {
+pub(crate) trait NodePath {
     fn get_path(&self) -> Vec<&str>;
+}
 
+pub(crate) trait ViewFinder<V: View>: NodePath {
     fn name(&self) -> String {
         self.get_path().join("/")
     }

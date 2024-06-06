@@ -1,4 +1,8 @@
-use {super::DirectoryNode, crate::node::LeafNode, cursive::views::LinearLayout};
+use {
+    super::DirectoryNode,
+    crate::node::{NodePath, ViewFinder},
+    cursive::views::LinearLayout,
+};
 
 pub struct NoteListNode<'a> {
     parent: &'a DirectoryNode<'a>,
@@ -10,7 +14,7 @@ impl<'a> NoteListNode<'a> {
     }
 }
 
-impl<'a> LeafNode<LinearLayout> for NoteListNode<'a> {
+impl<'a> NodePath for NoteListNode<'a> {
     fn get_path(&self) -> Vec<&str> {
         let mut path = self.parent.get_path();
 
@@ -18,3 +22,5 @@ impl<'a> LeafNode<LinearLayout> for NoteListNode<'a> {
         path
     }
 }
+
+impl<'a> ViewFinder<LinearLayout> for NoteListNode<'a> {}

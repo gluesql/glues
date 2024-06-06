@@ -2,20 +2,25 @@ mod caret;
 mod note_list;
 
 use {
-    crate::node::LeafNode, caret::CaretNode, cursive::views::LinearLayout,
-    glues_core::types::DirectoryId, note_list::NoteListNode,
+    super::NoteTreeNode,
+    crate::node::{NodePath, ViewFinder},
+    caret::CaretNode,
+    cursive::views::LinearLayout,
+    glues_core::types::DirectoryId,
+    note_list::NoteListNode,
 };
 
 pub struct DirectoryNode<'a> {
-    path: Vec<&'a str>,
+    parent: NoteTreeNode,
+    directory_id: &'a DirectoryId,
 }
 
 impl<'a> DirectoryNode<'a> {
-    pub fn new(mut path: Vec<&'a str>, directory_id: &'a DirectoryId) -> Self {
-        path.push("directory");
-        path.push(directory_id);
-
-        DirectoryNode { path }
+    pub fn new(parent: NoteTreeNode, directory_id: &'a DirectoryId) -> Self {
+        DirectoryNode {
+            parent,
+            directory_id,
+        }
     }
 
     pub fn caret(&'a self) -> CaretNode<'a> {
@@ -27,8 +32,14 @@ impl<'a> DirectoryNode<'a> {
     }
 }
 
-impl<'a> LeafNode<LinearLayout> for DirectoryNode<'a> {
+impl<'a> NodePath for DirectoryNode<'a> {
     fn get_path(&self) -> Vec<&str> {
-        self.path.clone()
+        let mut path = self.parent.get_path();
+
+        path.push("directory");
+        path.push(self.directory_id);
+        path
     }
 }
+
+impl<'a> ViewFinder<LinearLayout> for DirectoryNode<'a> {}

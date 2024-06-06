@@ -2,20 +2,22 @@ mod more_button;
 mod name_button;
 
 use {
-    crate::node::LeafNode, cursive::views::LinearLayout, glues_core::types::NoteId,
-    more_button::MoreButtonNode, name_button::NameButtonNode,
+    super::NoteTreeNode,
+    crate::node::{NodePath, ViewFinder},
+    cursive::views::LinearLayout,
+    glues_core::types::NoteId,
+    more_button::MoreButtonNode,
+    name_button::NameButtonNode,
 };
 
 pub struct NoteNode<'a> {
-    path: Vec<&'a str>,
+    parent: NoteTreeNode,
+    note_id: &'a String,
 }
 
 impl<'a> NoteNode<'a> {
-    pub fn new(mut path: Vec<&'a str>, note_id: &'a NoteId) -> Self {
-        path.push("note");
-        path.push(note_id);
-
-        NoteNode { path }
+    pub fn new(parent: NoteTreeNode, note_id: &'a NoteId) -> Self {
+        NoteNode { parent, note_id }
     }
 
     pub fn name_button(&'a self) -> NameButtonNode<'a> {
@@ -27,8 +29,14 @@ impl<'a> NoteNode<'a> {
     }
 }
 
-impl<'a> LeafNode<LinearLayout> for NoteNode<'a> {
+impl<'a> NodePath for NoteNode<'a> {
     fn get_path(&self) -> Vec<&str> {
-        self.path.clone()
+        let mut path = self.parent.get_path();
+        path.push("note");
+        path.push(self.note_id);
+
+        path
     }
 }
+
+impl<'a> ViewFinder<LinearLayout> for NoteNode<'a> {}
