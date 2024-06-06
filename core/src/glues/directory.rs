@@ -94,8 +94,8 @@ impl Glues {
     ) -> Result<()> {
         table("Directory")
             .update()
-            .filter(col("directory_id").eq(uuid(directory_id)))
-            .set("name", name)
+            .filter(col("id").eq(uuid(directory_id)))
+            .set("name", text(name))
             .set("updated_at", now())
             .execute(&mut self.glue)
             .await?;

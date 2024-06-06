@@ -10,6 +10,7 @@ pub async fn setup(glue: &mut Glue<MemoryStorage>) {
         .add_column("parent_id UUID NULL")
         .add_column("name TEXT NOT NULL")
         .add_column("created_at TIMESTAMP NOT NULL DEFAULT NOW()")
+        .add_column("updated_at TIMESTAMP NOT NULL DEFAULT NOW()")
         .execute(glue)
         .await
         .expect("Creating Directory failed");
