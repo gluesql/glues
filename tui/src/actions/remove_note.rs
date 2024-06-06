@@ -15,10 +15,14 @@ pub fn remove_note(siv: &mut Cursive, note: &Note) {
     siv.glues().remove_note(note.id.clone()).log_unwrap();
 
     // ui - directory
-    let mut container = Node::note_tree()
-        .directory(&note.directory_id)
-        .note_list()
-        .find(siv);
+    let mut container = if siv.glues().root_id == note.directory_id {
+        Node::note_tree().note_list().find(siv)
+    } else {
+        Node::note_tree()
+            .directory(&note.directory_id)
+            .note_list()
+            .find(siv)
+    };
 
     let i = container
         .find_child_from_name(&Node::note_tree().note(&note.id).name())

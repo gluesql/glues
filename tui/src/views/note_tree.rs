@@ -2,10 +2,10 @@ mod directory;
 mod note;
 
 use {
-    crate::traits::*,
+    crate::{node::Node, traits::*},
     cursive::{
         align::HAlign,
-        view::Resizable,
+        view::{Nameable, Resizable},
         views::{LinearLayout, PaddedView, Panel},
         Cursive, View,
     },
@@ -28,7 +28,9 @@ pub fn render_note_tree(siv: &mut Cursive) -> impl View {
         layout.add_child(render_note(data));
     }
 
-    let layout = layout.min_width(40);
+    let layout = layout
+        .with_name(Node::note_tree().note_list().name())
+        .min_width(40);
     let padded_view = PaddedView::lrtb(1, 1, 0, 1, layout);
 
     Panel::new(padded_view)
