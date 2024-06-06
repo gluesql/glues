@@ -1,6 +1,6 @@
 use {
     crate::{
-        components::{alert::render_alert, confirm::render_confirm},
+        components::{alert::render_alert, confirm::render_confirm, prompt::render_prompt},
         traits::*,
     },
     cursive::{
@@ -22,6 +22,10 @@ pub trait CursiveExt {
     fn alert<F>(&mut self, message: String, on_close: F)
     where
         F: Fn(&mut Cursive) + 'static;
+
+    fn prompt<F>(&mut self, message: &str, on_submit: F)
+    where
+        F: Fn(&mut Cursive, &str) + Clone + 'static;
 }
 
 impl CursiveExt for Cursive {
@@ -48,6 +52,14 @@ impl CursiveExt for Cursive {
         F: Fn(&mut Cursive) + 'static,
     {
         let dialog = render_alert(&message, on_close);
+        self.add_layer(dialog);
+    }
+
+    fn prompt<F>(&mut self, message: &str, on_submit: F)
+    where
+        F: Fn(&mut Cursive, &str) + Clone + 'static,
+    {
+        let dialog = render_prompt(message, on_submit);
         self.add_layer(dialog);
     }
 }
