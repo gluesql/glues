@@ -83,15 +83,16 @@ impl Glues {
             .unwrap();
     }
 
-    pub async fn rename_note(&mut self, note_id: NoteId, name: String) {
+    pub async fn rename_note(&mut self, note_id: NoteId, name: String) -> Result<()> {
         table("Note")
             .update()
             .filter(col("id").eq(uuid(note_id)))
-            .set("name", name)
+            .set("name", text(name))
             .set("updated_at", now())
             .execute(&mut self.glue)
-            .await
-            .unwrap();
+            .await?;
+
+        Ok(())
     }
 
     pub async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) {
