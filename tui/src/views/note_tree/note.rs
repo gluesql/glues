@@ -13,9 +13,11 @@ use {
 };
 
 pub fn render_note(note: Note) -> impl View {
-    let button = Button::new_raw(note.name.clone(), on_item_click(note.id.clone()));
-    let more_actions = Button::new_raw("", on_more_click(note.clone()))
-        .with_name(Node::note_tree().note(&note.id).more_button().name());
+    let note_node = Node::note_tree().note(&note.id);
+    let button = Button::new_raw(note.name.clone(), on_item_click(note.id.clone()))
+        .with_name(note_node.name_button().name());
+    let more_actions =
+        Button::new_raw("", on_more_click(note.clone())).with_name(note_node.more_button().name());
 
     LinearLayout::horizontal()
         .child(TextView::new("◦ "))

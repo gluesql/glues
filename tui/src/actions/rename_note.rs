@@ -1,15 +1,27 @@
 use {
-    crate::{logger::log, traits::*},
+    crate::{logger::log, traits::*, Node},
     cursive::Cursive,
     glues_core::data::Note,
 };
 
-pub fn rename_note(siv: &mut Cursive, note: &Note) {
+pub fn rename_note(siv: &mut Cursive, note: &Note, new_name: &str) {
     let msg = format!(
-        "[actions::rename_note] TODO directory_id: {}, note_id: {}",
-        note.directory_id, note.id,
+        "[actions::rename_note] note_id: {}, rename to {}",
+        note.directory_id, new_name,
     );
     log(&msg);
 
-    siv.alert("WIP".to_owned(), |_| {});
+    // data
+    siv.glues()
+        .rename_note(note.id.clone(), new_name.to_owned())
+        .log_unwrap();
+
+    // ui
+    Node::note_tree()
+        .note(&note.id)
+        .name_button()
+        .find(siv)
+        .set_label_raw(new_name);
+
+    // siv.alert("WIP".to_owned(), |_| {});
 }

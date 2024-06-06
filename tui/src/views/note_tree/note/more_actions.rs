@@ -48,9 +48,15 @@ fn on_remove_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
 }
 
 fn on_rename_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
-    move |siv: &mut Cursive| {
-        siv.pop_layer();
+    let note = Rc::new(note);
 
-        actions::rename_note(siv, &note);
+    move |siv: &mut Cursive| {
+        let note = Rc::clone(&note);
+        let message = "New name?";
+
+        siv.pop_layer();
+        siv.prompt(message, move |siv, note_name| {
+            actions::rename_note(siv, &note, note_name);
+        });
     }
 }
