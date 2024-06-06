@@ -1,4 +1,6 @@
 mod caret;
+mod more_button;
+mod name_button;
 mod note_list;
 
 use {
@@ -7,6 +9,8 @@ use {
     caret::CaretNode,
     cursive::views::LinearLayout,
     glues_core::types::DirectoryId,
+    more_button::MoreButtonNode,
+    name_button::NameButtonNode,
     note_list::NoteListNode,
 };
 
@@ -25,6 +29,14 @@ impl<'a> DirectoryNode<'a> {
 
     pub fn caret(&'a self) -> CaretNode<'a> {
         CaretNode::new(self)
+    }
+
+    pub fn name_button(&'a self) -> NameButtonNode<'a> {
+        NameButtonNode::new(self)
+    }
+
+    pub fn more_button(&'a self) -> MoreButtonNode<'a> {
+        MoreButtonNode::new(self)
     }
 
     pub fn note_list(&'a self) -> NoteListNode<'a> {

@@ -7,7 +7,7 @@ use {
 pub fn rename_note(siv: &mut Cursive, note: &Note, new_name: &str) {
     let msg = format!(
         "[actions::rename_note] note_id: {}, rename to {}",
-        note.directory_id, new_name,
+        note.id, new_name,
     );
     log(&msg);
 
@@ -22,6 +22,4 @@ pub fn rename_note(siv: &mut Cursive, note: &Note, new_name: &str) {
         .name_button()
         .find(siv)
         .set_label_raw(new_name);
-
-    // siv.alert("WIP".to_owned(), |_| {});
 }
