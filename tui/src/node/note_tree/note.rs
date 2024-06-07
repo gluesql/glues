@@ -3,8 +3,7 @@ mod name_button;
 
 use {
     super::NoteTreeNode,
-    crate::node::{NodePath, ViewFinder},
-    cursive::views::LinearLayout,
+    crate::node::{NodePath, ViewNamed},
     glues_core::types::NoteId,
     more_button::MoreButtonNode,
     name_button::NameButtonNode,
@@ -39,4 +38,4 @@ impl<'a> NodePath for NoteNode<'a> {
     }
 }
 
-impl<'a> ViewFinder<LinearLayout> for NoteNode<'a> {}
+impl<'a> ViewNamed for NoteNode<'a> {}

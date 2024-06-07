@@ -6,7 +6,11 @@ mod node;
 mod views;
 
 mod traits {
-    pub(crate) use crate::{cursive_ext::CursiveExt, logger::*, node::ViewFinder};
+    pub(crate) use crate::{
+        cursive_ext::CursiveExt,
+        logger::*,
+        node::{ViewFinder, ViewNamed},
+    };
 }
 
 use {

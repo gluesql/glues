@@ -1,10 +1,9 @@
 mod note_tree;
 
-use note_tree::NoteTreeNode;
-
 use {
     crate::traits::CursiveExt,
     cursive::{view::View, views::ViewRef, Cursive},
+    note_tree::NoteTreeNode,
 };
 
 pub struct Node {}
@@ -17,6 +16,12 @@ impl Node {
 
 pub(crate) trait NodePath {
     fn get_path(&self) -> Vec<&str>;
+}
+
+pub(crate) trait ViewNamed: NodePath {
+    fn name(&self) -> String {
+        self.get_path().join("/")
+    }
 }
 
 pub(crate) trait ViewFinder<V: View>: NodePath {
