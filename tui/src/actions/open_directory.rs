@@ -7,9 +7,9 @@ use {
 pub fn open_directory(siv: &mut Cursive, directory_id: &DirectoryId) {
     siv.glues().open_directory(directory_id.clone());
 
-    let item_list = render_item_list(siv, directory_id.clone());
-    Node::note_tree()
-        .directory(directory_id)
+    let directory_node = Node::note_tree().directory(directory_id);
+    directory_node.caret().find(siv).set_content("▾ ");
+    directory_node
         .find(siv)
-        .add_child(item_list);
+        .add_child(render_item_list(siv, directory_id.clone()));
 }

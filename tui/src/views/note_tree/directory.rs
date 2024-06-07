@@ -47,14 +47,7 @@ pub fn render_directory(siv: &mut Cursive, directory: Directory) -> impl View {
 
 fn on_item_click(directory_id: DirectoryId) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv| {
-        let opened = siv.glues().check_opened(&directory_id);
-        Node::note_tree()
-            .directory(&directory_id)
-            .caret()
-            .find(siv)
-            .set_content(get_caret(!opened));
-
-        if opened {
+        if siv.glues().check_opened(&directory_id) {
             actions::close_directory(siv, &directory_id);
         } else {
             actions::open_directory(siv, &directory_id);
