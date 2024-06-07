@@ -1,5 +1,5 @@
-mod directory;
-mod note;
+pub mod directory;
+pub mod note;
 
 use {
     crate::{node::Node, traits::*},

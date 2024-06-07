@@ -49,17 +49,22 @@ impl Glues {
         Ok(notes)
     }
 
-    pub async fn add_note(&mut self, directory_id: DirectoryId, name: String) -> Result<()> {
+    pub async fn add_note(&mut self, directory_id: DirectoryId, name: String) -> Result<Note> {
         let id = Uuid::new_v4().to_string();
+        let note = Note {
+            id: id.clone(),
+            directory_id: directory_id.clone(),
+            name: name.clone(),
+        };
 
         table("Note")
             .insert()
             .columns(vec!["id", "directory_id", "name"])
-            .values(vec![vec![uuid(id.clone()), uuid(directory_id), text(name)]])
+            .values(vec![vec![uuid(id), uuid(directory_id), text(name)]])
             .execute(&mut self.glue)
             .await?;
 
-        Ok(())
+        Ok(note)
     }
 
     pub async fn remove_note(&mut self, note_id: NoteId) -> Result<()> {
