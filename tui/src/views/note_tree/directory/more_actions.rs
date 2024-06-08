@@ -13,6 +13,10 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
     let directory = Rc::new(directory);
     let label = TextView::new(format!("'{}'", &directory.name)).h_align(HAlign::Center);
     let add_note_button = Button::new("Add Note", on_add_note_click(Rc::clone(&directory)));
+    let add_directory_button = Button::new(
+        "Add Directory",
+        on_add_directory_click(Rc::clone(&directory)),
+    );
     let rename_button = Button::new("Rename", on_rename_click(directory));
     let cancel_button = Button::new("Cancel", |siv| {
         siv.pop_layer();
@@ -22,6 +26,7 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
         .child(label)
         .child(DummyView)
         .child(add_note_button)
+        .child(add_directory_button)
         .child(rename_button)
         .child(DummyView)
         .child(cancel_button);
@@ -54,6 +59,18 @@ fn on_add_note_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursiv
         siv.pop_layer();
         siv.prompt(message, move |siv, note_name| {
             actions::add_note(siv, &directory.id, note_name);
+        });
+    }
+}
+
+fn on_add_directory_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {
+    move |siv: &mut Cursive| {
+        let directory = Rc::clone(&directory);
+        let message = "Directory name?";
+
+        siv.pop_layer();
+        siv.prompt(message, move |siv, directory_name| {
+            actions::add_directory(siv, &directory.id, directory_name);
         });
     }
 }

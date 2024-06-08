@@ -1,3 +1,4 @@
+mod add_directory;
 mod add_note;
 mod close_directory;
 mod open_directory;
@@ -5,6 +6,7 @@ mod remove_note;
 mod rename_directory;
 mod rename_note;
 
+pub use add_directory::add_directory;
 pub use add_note::add_note;
 pub use close_directory::close_directory;
 pub use open_directory::open_directory;

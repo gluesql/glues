@@ -36,7 +36,8 @@ fn main() {
 
     let directory_id = glues
         .add_directory(glues.root_id.clone(), "Directory 01".to_owned())
-        .log_unwrap();
+        .log_unwrap()
+        .id;
 
     let sample_notes = [
         ("Sample 001", glues.root_id.clone()),

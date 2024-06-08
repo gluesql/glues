@@ -49,8 +49,13 @@ impl Glues {
         &mut self,
         parent_id: DirectoryId,
         name: String,
-    ) -> Result<DirectoryId> {
+    ) -> Result<Directory> {
         let id = Uuid::new_v4().to_string();
+        let directory = Directory {
+            id: id.clone(),
+            parent_id: parent_id.clone(),
+            name: name.clone(),
+        };
 
         table("Directory")
             .insert()
@@ -59,7 +64,7 @@ impl Glues {
             .execute(&mut self.glue)
             .await?;
 
-        Ok(id)
+        Ok(directory)
     }
 
     pub async fn remove_directory(&mut self, directory_id: DirectoryId) -> Result<()> {
