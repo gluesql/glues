@@ -23,7 +23,7 @@ use {
     logger::log,
     node::Node,
     traits::*,
-    views::{editor::editor, note_tree::render_note_tree},
+    views::{editor::editor, menubar::menubar, note_tree::render_note_tree},
 };
 
 fn main() {
@@ -60,7 +60,8 @@ fn main() {
         .child(render_note_tree(&mut siv))
         .child(editor(&mut siv))
         .wrap_with(CircularFocus::new);
-    siv.add_fullscreen_layer(layout);
+    siv.add_layer(layout);
 
+    menubar(&mut siv);
     siv.run();
 }
