@@ -17,7 +17,8 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
         "Add Directory",
         on_add_directory_click(Rc::clone(&directory)),
     );
-    let rename_button = Button::new("Rename", on_rename_click(directory));
+    let rename_button = Button::new("Rename", on_rename_click(Rc::clone(&directory)));
+    let remove_button = Button::new("Remove", on_remove_click(directory));
     let cancel_button = Button::new("Cancel", |siv| {
         siv.pop_layer();
     });
@@ -28,6 +29,7 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
         .child(add_note_button)
         .child(add_directory_button)
         .child(rename_button)
+        .child(remove_button)
         .child(DummyView)
         .child(cancel_button);
 
@@ -47,6 +49,18 @@ fn on_rename_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive)
         siv.pop_layer();
         siv.prompt(message, move |siv, directory_name| {
             actions::rename_directory(siv, &directory, directory_name);
+        });
+    }
+}
+
+fn on_remove_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {
+    move |siv: &mut Cursive| {
+        let directory = Rc::clone(&directory);
+        let message = format!("Removes {}", directory.name);
+
+        siv.pop_layer();
+        siv.confirm(message, move |siv| {
+            actions::remove_directory(siv, &directory);
         });
     }
 }

@@ -710,6 +710,7 @@ dependencies = [
 name = "glues-core"
 version = "0.1.0"
 dependencies = [
+ "async-recursion",
  "gluesql",
  "thiserror",
  "uuid",

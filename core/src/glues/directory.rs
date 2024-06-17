@@ -1,5 +1,6 @@
 use {
     crate::{data::Directory, types::DirectoryId, Glues, Result},
+    async_recursion::async_recursion,
     gluesql::core::ast_builder::{col, function::now, table, text, uuid, Execute},
     std::ops::Deref,
     uuid::Uuid,
@@ -67,7 +68,19 @@ impl Glues {
         Ok(directory)
     }
 
+    #[async_recursion(?Send)]
     pub async fn remove_directory(&mut self, directory_id: DirectoryId) -> Result<()> {
+        table("Note")
+            .delete()
+            .filter(col("directory_id").eq(uuid(directory_id.clone())))
+            .execute(&mut self.glue)
+            .await?;
+
+        let directories = self.fetch_directories(directory_id.clone()).await?;
+        for directory in directories {
+            self.remove_directory(directory.id).await?;
+        }
+
         table("Directory")
             .delete()
             .filter(col("id").eq(uuid(directory_id)))
