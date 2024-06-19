@@ -36,4 +36,5 @@ pub fn render_note_tree(siv: &mut Cursive) -> impl View {
     Panel::new(padded_view)
         .title("Notes")
         .title_position(HAlign::Left)
+        .full_height()
 }

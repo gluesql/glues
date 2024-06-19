@@ -10,6 +10,6 @@ pub fn editor(_siv: &mut Cursive) -> impl View {
         1,
         1,
         1,
-        TextView::new("editor").with_name("temp_text").full_screen(),
+        TextView::new("editor").with_name("temp_text").full_width(),
     )
 }
