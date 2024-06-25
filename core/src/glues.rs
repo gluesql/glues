@@ -2,20 +2,25 @@ mod directory;
 mod note;
 mod note_tree;
 
-use note_tree::NoteTree;
-
 use {
-    crate::{schema::setup, types::DirectoryId},
+    crate::{
+        schema::setup,
+        state::{EntryState, State},
+        types::DirectoryId,
+        Event, Result,
+    },
     gluesql::{
         core::ast_builder::{col, table, text, Execute},
         prelude::{Glue, MemoryStorage},
     },
+    note_tree::NoteTree,
     std::ops::Deref,
 };
 
 pub struct Glues {
     glue: Glue<MemoryStorage>,
     pub root_id: DirectoryId,
+    pub state: State,
     note_tree: NoteTree,
 }
 
@@ -57,6 +62,11 @@ impl Glues {
             glue,
             root_id,
             note_tree,
+            state: State::Entry(EntryState),
         }
+    }
+
+    pub async fn dispatch(&mut self, event: Event) -> Result<()> {
+        State::consume(self, event).await
     }
 }

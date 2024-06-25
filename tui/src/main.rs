@@ -15,18 +15,16 @@ mod traits {
 
 use {
     cursive::{
-        view::Resizable,
-        views::{CircularFocus, LinearLayout, PaddedView, StackView},
-        Cursive, With,
+        view::{Nameable, Resizable},
+        views::{DummyView, LinearLayout, PaddedView, StackView},
+        Cursive,
     },
     futures::executor::block_on,
     glues_core::Glues,
     logger::log,
     node::Node,
     traits::*,
-    views::{
-        editor::editor, menubar::menubar, note_tree::render_note_tree, statusbar::render_statusbar,
-    },
+    views::{menubar::menubar, statusbar::render_statusbar},
 };
 
 fn main() {
@@ -60,12 +58,9 @@ fn main() {
     siv.set_user_data(glues);
     siv.add_global_callback('a', Cursive::toggle_debug_console);
 
-    let layout = LinearLayout::horizontal()
-        .child(render_note_tree(&mut siv))
-        .child(editor(&mut siv))
-        .wrap_with(CircularFocus::new);
-    let mut stack_view = StackView::new();
-    stack_view.add_layer(layout);
+    let stack_view = StackView::new()
+        .transparent_layer(DummyView.full_height())
+        .with_name(Node::body().name());
     let padded_view = PaddedView::lrtb(0, 1, 0, 1, stack_view);
 
     let statusbar = render_statusbar(&mut siv);

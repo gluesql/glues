@@ -7,12 +7,14 @@ use {
     },
 };
 
-pub fn render_statusbar(_siv: &mut Cursive) -> impl View {
+pub fn render_statusbar(siv: &mut Cursive) -> impl View {
     let statusbar_node = Node::statusbar();
 
-    let description = TextView::new("WIP - description for current status")
+    let description = siv.glues().state.describe();
+    let description = TextView::new(description)
         .with_name(statusbar_node.description().name())
         .full_width();
+
     let actions =
         TextView::new("WIP - possible actions").with_name(statusbar_node.actions().name());
 

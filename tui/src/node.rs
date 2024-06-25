@@ -1,8 +1,10 @@
+mod body;
 mod note_tree;
 mod statusbar;
 
 use {
     crate::traits::CursiveExt,
+    body::BodyNode,
     cursive::{view::View, views::ViewRef, Cursive},
     note_tree::NoteTreeNode,
     statusbar::StatusbarNode,
@@ -11,12 +13,16 @@ use {
 pub struct Node {}
 
 impl Node {
+    pub fn body() -> BodyNode {
+        BodyNode
+    }
+
     pub fn note_tree() -> NoteTreeNode {
-        NoteTreeNode {}
+        NoteTreeNode
     }
 
     pub fn statusbar() -> StatusbarNode {
-        StatusbarNode {}
+        StatusbarNode
     }
 }
 
