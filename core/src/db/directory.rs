@@ -1,12 +1,13 @@
 use {
-    crate::{data::Directory, types::DirectoryId, Glues, Result},
+    super::Db,
+    crate::{data::Directory, types::DirectoryId, Result},
     async_recursion::async_recursion,
     gluesql::core::ast_builder::{col, function::now, table, text, uuid, Execute},
     std::ops::Deref,
     uuid::Uuid,
 };
 
-impl Glues {
+impl Db {
     pub async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Result<Directory> {
         let directory = table("Directory")
             .select()

@@ -36,6 +36,7 @@ fn main() {
     let mut glues = block_on(Glues::new());
 
     let directory_id = glues
+        .db
         .add_directory(glues.root_id.clone(), "Directory 01".to_owned())
         .log_unwrap()
         .id;
@@ -49,7 +50,10 @@ fn main() {
     ];
 
     for (name, directory_id) in sample_notes {
-        glues.add_note(directory_id, name.to_owned()).log_unwrap();
+        glues
+            .db
+            .add_note(directory_id, name.to_owned())
+            .log_unwrap();
     }
 
     log("added sample notes & directories");

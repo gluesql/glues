@@ -12,7 +12,7 @@ pub fn remove_note(siv: &mut Cursive, note: &Note) {
     log(&msg);
 
     // data
-    siv.glues().remove_note(note.id.clone()).log_unwrap();
+    siv.glues().db.remove_note(note.id.clone()).log_unwrap();
 
     // ui - directory
     let mut container = if siv.glues().root_id == note.directory_id {

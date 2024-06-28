@@ -1,8 +1,9 @@
 use {
+    super::Db,
     crate::{
         data::Note,
         types::{DirectoryId, NoteId},
-        Error, Glues, Result,
+        Error, Result,
     },
     gluesql::core::ast_builder::{col, function::now, table, text, uuid, Execute},
     std::ops::Deref,
@@ -10,7 +11,7 @@ use {
 };
 
 // fetch
-impl Glues {
+impl Db {
     pub async fn fetch_note_content(&mut self, note_id: NoteId) -> Result<String> {
         let content = table("Note")
             .select()

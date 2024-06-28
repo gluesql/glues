@@ -13,6 +13,7 @@ pub fn rename_note(siv: &mut Cursive, note: &Note, new_name: &str) {
 
     // data
     siv.glues()
+        .db
         .rename_note(note.id.clone(), new_name.to_owned())
         .log_unwrap();
 

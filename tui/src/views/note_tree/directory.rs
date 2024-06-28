@@ -9,7 +9,9 @@ use {
         views::{Button, DummyView, FocusTracker, LinearLayout, TextView},
         Cursive, View, With,
     },
-    glues_core::{data::Directory, state::note_tree::DirectoryItem, types::DirectoryId},
+    glues_core::{
+        data::Directory, state::note_tree::DirectoryItem, state::State, types::DirectoryId,
+    },
     item_list::render_item_list,
     more_actions::render_more_actions,
     std::rc::Rc,
@@ -18,7 +20,9 @@ use {
 pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
     let directory = item.directory.clone();
     let directory_node = Node::note_tree().directory(&directory.id);
-    let opened = siv.glues().check_opened(&directory.id);
+
+    // let opened = siv.glues().db.check_opened(&directory.id);
+    let opened = item.children.is_some();
 
     let directory_id = directory.id.clone();
     let button = Button::new_raw(directory.name.clone(), on_item_click(directory_id))
@@ -49,7 +53,17 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
 
 fn on_item_click(directory_id: DirectoryId) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv| {
-        if siv.glues().check_opened(&directory_id) {
+        let opened = match &siv.glues().state {
+            State::NoteTree(state) => state.check_opened(&directory_id),
+            state => {
+                let msg = format!("state not allowed: {}", state.describe());
+
+                log(&msg);
+                panic!("{msg}");
+            }
+        };
+
+        if opened {
             actions::close_directory(siv, &directory_id);
         } else {
             actions::open_directory(siv, &directory_id);

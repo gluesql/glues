@@ -13,6 +13,7 @@ pub fn rename_directory(siv: &mut Cursive, directory: &Directory, new_name: &str
 
     // data
     siv.glues()
+        .db
         .rename_directory(directory.id.clone(), new_name.to_owned())
         .log_unwrap();
 

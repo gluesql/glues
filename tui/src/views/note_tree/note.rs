@@ -33,7 +33,7 @@ pub fn render_note(note: Note) -> impl View {
 
 fn on_item_click(id: String) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv| {
-        let content = siv.glues().fetch_note_content(id.clone()).log_unwrap();
+        let content = siv.glues().db.fetch_note_content(id.clone()).log_unwrap();
 
         let mut editor = siv.find::<TextView>("temp_text");
         editor.set_content(content);

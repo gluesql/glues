@@ -5,7 +5,7 @@ use {
 };
 
 pub fn open_directory(siv: &mut Cursive, directory_id: &DirectoryId) {
-    siv.glues().open_directory(directory_id.clone());
+    siv.glues().db.open_directory(directory_id.clone());
 
     let directory_node = Node::note_tree().directory(directory_id);
     directory_node.caret().find(siv).set_content("▾ ");

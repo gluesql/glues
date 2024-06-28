@@ -13,6 +13,7 @@ pub fn remove_directory(siv: &mut Cursive, directory: &Directory) {
 
     // data
     siv.glues()
+        .db
         .remove_directory(directory.id.clone())
         .log_unwrap();
 
