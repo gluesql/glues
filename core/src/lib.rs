@@ -2,10 +2,10 @@ mod error;
 mod event;
 mod glues;
 mod schema;
-mod state;
 mod transition;
 
 pub mod data;
+pub mod state;
 pub mod types;
 
 pub use error::Error;

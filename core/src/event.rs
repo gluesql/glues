@@ -1,10 +1,10 @@
-use crate::types::{DirectoryId, NoteId};
+use crate::{data::Note, state::note_tree::DirectoryItem};
 
 pub enum Event {
     Initialize,
 
-    SelectNote(NoteId),
-    SelectDirectory(DirectoryId),
+    SelectNote(Note),
+    SelectDirectory(DirectoryItem),
     /*
     AddNote {
         directory_id: DirectoryId,

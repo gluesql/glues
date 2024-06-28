@@ -6,7 +6,7 @@ use {
         views::{LinearLayout, PaddedView},
         Cursive, View,
     },
-    glues_core::types::DirectoryId,
+    glues_core::{state::note_tree::DirectoryItem, types::DirectoryId},
 };
 
 pub fn render_item_list(siv: &mut Cursive, directory_id: DirectoryId) -> impl View {
@@ -18,7 +18,12 @@ pub fn render_item_list(siv: &mut Cursive, directory_id: DirectoryId) -> impl Vi
     let mut layout = LinearLayout::vertical();
 
     for child in directories {
-        layout.add_child(render_directory(siv, child));
+        let directory_item = DirectoryItem {
+            directory: child,
+            children: None,
+        };
+
+        layout.add_child(render_directory(siv, directory_item));
     }
 
     for child in notes {

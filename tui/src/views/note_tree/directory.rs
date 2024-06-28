@@ -9,12 +9,14 @@ use {
         views::{Button, DummyView, FocusTracker, LinearLayout, TextView},
         Cursive, View, With,
     },
-    glues_core::{data::Directory, types::DirectoryId},
+    glues_core::{data::Directory, state::note_tree::DirectoryItem, types::DirectoryId},
     item_list::render_item_list,
     more_actions::render_more_actions,
+    std::rc::Rc,
 };
 
-pub fn render_directory(siv: &mut Cursive, directory: Directory) -> impl View {
+pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
+    let directory = item.directory.clone();
     let directory_node = Node::note_tree().directory(&directory.id);
     let opened = siv.glues().check_opened(&directory.id);
 
@@ -32,7 +34,7 @@ pub fn render_directory(siv: &mut Cursive, directory: Directory) -> impl View {
         .child(DummyView.fixed_width(2))
         .child(more_actions)
         .wrap_with(FocusTracker::new)
-        .on_focus(on_item_focus(directory.id.clone()))
+        .on_focus(on_item_focus(item))
         .on_focus_lost(on_item_focus_lost(directory.id.clone()));
 
     let mut container = LinearLayout::vertical().child(item);
@@ -71,11 +73,17 @@ fn get_caret(opened: bool) -> &'static str {
     }
 }
 
-fn on_item_focus(id: String) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventResult {
+fn on_item_focus(item: DirectoryItem) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventResult {
+    let item = Rc::new(item);
+
     move |_| {
-        let id = id.clone();
+        let item = Rc::clone(&item);
+        let id = item.directory.id.clone();
 
         EventResult::with_cb(move |siv| {
+            let item = item.as_ref().clone();
+            actions::select_directory(siv, item);
+
             Node::note_tree()
                 .directory(&id)
                 .more_button()

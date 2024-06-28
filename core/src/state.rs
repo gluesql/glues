@@ -1,5 +1,5 @@
 mod entry;
-mod note_tree;
+pub mod note_tree;
 
 use crate::{event::Event, Glues, Result};
 

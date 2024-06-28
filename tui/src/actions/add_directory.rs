@@ -1,7 +1,7 @@
 use {
     crate::{actions, traits::*, views::note_tree::directory::render_directory, Node},
     cursive::Cursive,
-    glues_core::types::DirectoryId,
+    glues_core::{state::note_tree::DirectoryItem, types::DirectoryId},
 };
 
 pub fn add_directory(siv: &mut Cursive, parent_id: &DirectoryId, directory_name: &str) {
@@ -22,7 +22,11 @@ pub fn add_directory(siv: &mut Cursive, parent_id: &DirectoryId, directory_name:
             Node::note_tree().directory(parent_id).note_list().find(siv)
         };
 
-        container.add_child(render_directory(siv, directory));
+        let directory_item = DirectoryItem {
+            directory,
+            children: None,
+        };
+        container.add_child(render_directory(siv, directory_item));
     }
 
     siv.cb_sink()

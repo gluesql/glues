@@ -34,7 +34,7 @@ impl Glues {
         table("Directory")
             .insert()
             .columns("name")
-            .values(vec![vec![text("root")]])
+            .values(vec![vec![text("Notes")]])
             .execute(&mut glue)
             .await
             .unwrap();
