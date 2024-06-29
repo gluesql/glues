@@ -9,8 +9,8 @@ pub struct EntryState;
 impl EntryState {
     pub async fn consume(glues: &mut Glues, event: Event) -> Result<()> {
         match (&glues.state, event) {
-            (State::Entry(_), Event::Initialize) => {
-                glues.state = State::NoteTree(NoteTreeState::new(glues).await?);
+            (State::EntryState(_), Event::Initialize) => {
+                glues.state = NoteTreeState::new(glues).await?.into();
                 Ok(())
             }
             _ => Err(Error::Wip("todo: EntryState::consume".to_owned())),

@@ -1,7 +1,7 @@
 use crate::{
     data::{Directory, Note},
     event::Event,
-    state::State,
+    state::GetInner,
     types::DirectoryId,
     Error, Glues, Result,
 };
@@ -56,56 +56,69 @@ impl NoteTreeState {
 
     pub async fn consume(glues: &mut Glues, event: Event) -> Result<()> {
         // let db = &mut glues.db;
+        let state: &mut NoteTreeState = glues.state.get_inner_mut()?;
 
-        match (&mut glues.state, event) {
-            (State::NoteTree(ref mut state), Event::SelectNote(note)) => {
+        match event {
+            Event::SelectNote(note) => {
                 state.selected = Selected::Note(note);
             }
-            (State::NoteTree(ref mut state), Event::SelectDirectory(directory_item)) => {
+            Event::SelectDirectory(directory_item) => {
                 state.selected = Selected::Directory(directory_item);
             }
-            /*
-            (State::NoteTree(ref mut state), Event::OpenDirectory(directory)) => {
-                let item = match state.find_directory_item(&directory.id) {
-                    Some(item) => item,
-                    None => {
-                        return Err(Error::Wip("todo: asdfasdf".to_owned()));
-                    }
-                };
-
-                if item.children.is_none() {
-                    let notes = db.fetch_notes(directory.id.clone()).await?;
-                    let directories = db
-                        .fetch_directories(directory.id.clone())
-                        .await?
-                        .into_iter()
-                        .map(|directory| DirectoryItem {
-                            directory,
-                            children: None,
-                        })
-                        .collect();
-
-                    item.children = Some(DirectoryItemChildren { notes, directories });
-                }
-
-                let (notes, directories) = match &mut item.children {
-                    Some(children) => (&children.notes, &children.directories),
-                    None => {
-                        panic!("...?");
-                    }
-                };
-
-                Ok(Transition::OpenDirectory {
-                    notes: notes.as_slice(),
-                    directories: directories.as_slice(),
-                })
-            }
-            (State::NoteTree(_), Event::CloseDirectory(_directory_item)) => {
-                Ok(Transition::CloseDirectory)
-            }
-            */
             _ => return Err(Error::Wip("todo: NoteTree::consume".to_owned())),
         };
+
+        /*
+            match (&mut glues.state, event) {
+                (State::NoteTreeState(ref mut state), Event::SelectNote(note)) => {
+                    state.selected = Selected::Note(note);
+                }
+                (State::NoteTreeState(ref mut state), Event::SelectDirectory(directory_item)) => {
+                    state.selected = Selected::Directory(directory_item);
+                }
+                /*
+                (State::NoteTree(ref mut state), Event::OpenDirectory(directory)) => {
+                    let item = match state.find_directory_item(&directory.id) {
+                        Some(item) => item,
+                        None => {
+                            return Err(Error::Wip("todo: asdfasdf".to_owned()));
+                        }
+                    };
+
+                    if item.children.is_none() {
+                        let notes = db.fetch_notes(directory.id.clone()).await?;
+                        let directories = db
+                            .fetch_directories(directory.id.clone())
+                            .await?
+                            .into_iter()
+                            .map(|directory| DirectoryItem {
+                                directory,
+                                children: None,
+                            })
+                            .collect();
+
+                        item.children = Some(DirectoryItemChildren { notes, directories });
+                    }
+
+                    let (notes, directories) = match &mut item.children {
+                        Some(children) => (&children.notes, &children.directories),
+                        None => {
+                            panic!("...?");
+                        }
+                    };
+
+                    Ok(Transition::OpenDirectory {
+                        notes: notes.as_slice(),
+                        directories: directories.as_slice(),
+                    })
+                }
+                (State::NoteTree(_), Event::CloseDirectory(_directory_item)) => {
+                    Ok(Transition::CloseDirectory)
+                }
+                */
+                _ => return Err(Error::Wip("todo: NoteTree::consume".to_owned())),
+            };
+        */
 
         Ok(())
     }

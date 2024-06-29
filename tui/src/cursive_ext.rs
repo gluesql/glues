@@ -7,11 +7,22 @@ use {
         Cursive,
         {view::View, views::ViewRef},
     },
-    glues_core::Glues,
+    glues_core::{
+        state::{GetInner, State},
+        Glues,
+    },
 };
 
 pub trait CursiveExt {
     fn glues(&mut self) -> &mut Glues;
+
+    fn state<T>(&mut self) -> &T
+    where
+        State: GetInner<T>;
+
+    fn state_mut<T>(&mut self) -> &mut T
+    where
+        State: GetInner<T>;
 
     fn find<V: View>(&mut self, id: &str) -> ViewRef<V>;
 
@@ -32,6 +43,20 @@ impl CursiveExt for Cursive {
     fn glues(&mut self) -> &mut Glues {
         self.user_data::<Glues>()
             .log_expect("[CursiveExt::glues] Glues must exist")
+    }
+
+    fn state<T>(&mut self) -> &T
+    where
+        State: GetInner<T>,
+    {
+        self.glues().state.get_inner().log_unwrap()
+    }
+
+    fn state_mut<T>(&mut self) -> &mut T
+    where
+        State: GetInner<T>,
+    {
+        self.glues().state.get_inner_mut().log_unwrap()
     }
 
     fn find<V: View>(&mut self, id: &str) -> ViewRef<V> {

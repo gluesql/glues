@@ -10,7 +10,9 @@ use {
         Cursive, View, With,
     },
     glues_core::{
-        data::Directory, state::note_tree::DirectoryItem, state::State, types::DirectoryId,
+        data::Directory,
+        state::note_tree::{DirectoryItem, NoteTreeState},
+        types::DirectoryId,
     },
     item_list::render_item_list,
     more_actions::render_more_actions,
@@ -53,17 +55,7 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
 
 fn on_item_click(directory_id: DirectoryId) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv| {
-        let opened = match &siv.glues().state {
-            State::NoteTree(state) => state.check_opened(&directory_id),
-            state => {
-                let msg = format!("state not allowed: {}", state.describe());
-
-                log(&msg);
-                panic!("{msg}");
-            }
-        };
-
-        if opened {
+        if siv.state::<NoteTreeState>().check_opened(&directory_id) {
             actions::close_directory(siv, &directory_id);
         } else {
             actions::open_directory(siv, &directory_id);

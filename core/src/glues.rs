@@ -49,7 +49,7 @@ impl Glues {
         Self {
             db,
             root_id,
-            state: State::Entry(EntryState),
+            state: EntryState.into(),
         }
     }
 

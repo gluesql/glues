@@ -1,13 +1,16 @@
-use crate::data::{Directory, Note};
+use crate::{data::Note, state::note_tree::DirectoryItem};
 
 pub enum Transition<'a> {
     Initialize,
 
     SelectNote,
-    SelectDirectory {
+    SelectDirectory,
+
+    OpenDirectory {
         notes: &'a [Note],
-        directories: &'a [Directory],
+        directories: &'a [DirectoryItem],
     },
+    CloseDirectory,
     /*
     AddNote {
         directory_id: DirectoryId,
