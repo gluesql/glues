@@ -1,7 +1,6 @@
 use crate::{
     data::{Directory, Note},
     event::Event,
-    state::GetInner,
     types::DirectoryId,
     Error, Glues, Result,
 };
@@ -54,17 +53,35 @@ impl NoteTreeState {
         })
     }
 
-    pub async fn consume(glues: &mut Glues, event: Event) -> Result<()> {
+    pub fn select_note(&mut self, note: Note) {
+        self.selected = Selected::Note(note);
+    }
+
+    pub fn select_directory(&mut self, directory_item: DirectoryItem) {
+        self.selected = Selected::Directory(directory_item);
+    }
+
+    pub fn check_opened(&self, directory_id: &DirectoryId) -> bool {
+        if &self.root.directory.id == directory_id {
+            return true;
+        }
+
+        let children = match &self.root.children {
+            Some(ref children) => children,
+            None => return false,
+        };
+
+        children
+            .directories
+            .iter()
+            .any(|item| &item.directory.id == directory_id)
+    }
+
+    pub async fn consume(_glues: &mut Glues, event: Event) -> Result<()> {
         // let db = &mut glues.db;
-        let state: &mut NoteTreeState = glues.state.get_inner_mut()?;
+        // let state: &mut NoteTreeState = glues.state.get_inner_mut()?;
 
         match event {
-            Event::SelectNote(note) => {
-                state.selected = Selected::Note(note);
-            }
-            Event::SelectDirectory(directory_item) => {
-                state.selected = Selected::Directory(directory_item);
-            }
             _ => return Err(Error::Wip("todo: NoteTree::consume".to_owned())),
         };
 
@@ -119,8 +136,6 @@ impl NoteTreeState {
                 _ => return Err(Error::Wip("todo: NoteTree::consume".to_owned())),
             };
         */
-
-        Ok(())
     }
 
     pub fn describe(&self) -> String {
@@ -131,22 +146,6 @@ impl NoteTreeState {
                 ..
             }) => format!("Directory '{name}' selected"),
         }
-    }
-
-    pub fn check_opened(&self, directory_id: &DirectoryId) -> bool {
-        if &self.root.directory.id == directory_id {
-            return true;
-        }
-
-        let children = match &self.root.children {
-            Some(ref children) => children,
-            None => return false,
-        };
-
-        children
-            .directories
-            .iter()
-            .any(|item| &item.directory.id == directory_id)
     }
 
     fn _find_directory_item(&mut self, directory_id: &DirectoryId) -> Option<&mut DirectoryItem> {

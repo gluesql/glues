@@ -1,7 +1,6 @@
 use crate::{
-    event::Event,
     state::{note_tree::NoteTreeState, State},
-    Error, Glues, Result,
+    Error, Event, Glues, Result,
 };
 
 pub struct EntryState;
