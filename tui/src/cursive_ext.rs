@@ -9,7 +9,8 @@ use {
     },
     glues_core::{
         state::{GetInner, State},
-        Glues,
+        transition::GetTransition,
+        Event, Glues, Transition,
     },
 };
 
@@ -23,6 +24,10 @@ pub trait CursiveExt {
     fn state_mut<T>(&mut self) -> &mut T
     where
         State: GetInner<T>;
+
+    fn dispatch<'a, T>(&'a mut self, event: Event) -> T
+    where
+        Transition<'a>: GetTransition<T>;
 
     fn find<V: View>(&mut self, id: &str) -> ViewRef<V>;
 
@@ -57,6 +62,17 @@ impl CursiveExt for Cursive {
         State: GetInner<T>,
     {
         self.glues().state.get_inner_mut().log_unwrap()
+    }
+
+    fn dispatch<'a, T>(&'a mut self, event: Event) -> T
+    where
+        Transition<'a>: GetTransition<T>,
+    {
+        self.glues()
+            .dispatch(event)
+            .log_unwrap()
+            .get_transition()
+            .log_unwrap()
     }
 
     fn find<V: View>(&mut self, id: &str) -> ViewRef<V> {

@@ -8,7 +8,7 @@ use {
 pub fn initialize(siv: &mut Cursive) {
     log("[actions::initialize] hi");
 
-    siv.glues().dispatch(Event::Initialize).log_unwrap();
+    siv.dispatch::<()>(Event::Initialize);
 
     let note_sheet = render_note_sheet(siv);
     Node::body().find(siv).add_layer(note_sheet);

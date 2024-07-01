@@ -23,29 +23,31 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
     let directory = item.directory.clone();
     let directory_node = Node::note_tree().directory(&directory.id);
 
-    // let opened = siv.glues().db.check_opened(&directory.id);
-    let opened = item.children.is_some();
-
     let directory_id = directory.id.clone();
     let button = Button::new_raw(directory.name.clone(), on_item_click(directory_id))
         .with_name(directory_node.name_button().name());
 
-    let caret = TextView::new(get_caret(opened))
+    let caret = TextView::new(get_caret(item.children.is_some()))
         .with_name(Node::note_tree().directory(&directory.id).caret().name());
     let more_actions = Button::new_raw("", on_more_click(directory.clone()))
         .with_name(directory_node.more_button().name());
-    let item = LinearLayout::horizontal()
+    let content = LinearLayout::horizontal()
         .child(caret)
         .child(button)
         .child(DummyView.fixed_width(2))
         .child(more_actions)
         .wrap_with(FocusTracker::new)
-        .on_focus(on_item_focus(item))
+        .on_focus(on_item_focus(item.clone()))
         .on_focus_lost(on_item_focus_lost(directory.id.clone()));
 
-    let mut container = LinearLayout::vertical().child(item);
-    if opened {
-        let layout = render_item_list(siv, directory.id.clone());
+    let mut container = LinearLayout::vertical().child(content);
+    if let Some(children) = item.children {
+        let layout = render_item_list(
+            siv,
+            directory.id.clone(),
+            children.directories,
+            children.notes,
+        );
 
         container.add_child(layout);
     }

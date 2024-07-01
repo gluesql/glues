@@ -1,7 +1,7 @@
 mod entry;
 pub mod note_tree;
 
-use crate::{event::Event, Error, Glues, Result};
+use crate::{Error, Event, Glues, Result, Transition};
 
 pub use {entry::EntryState, note_tree::NoteTreeState};
 
@@ -11,7 +11,7 @@ pub enum State {
 }
 
 impl State {
-    pub async fn consume(glues: &mut Glues, event: Event) -> Result<()> {
+    pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
         match event {
             Event::Initialize => EntryState::consume(glues, event).await,
             _ => NoteTreeState::consume(glues, event).await,

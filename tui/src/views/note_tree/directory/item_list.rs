@@ -6,28 +6,18 @@ use {
         views::{LinearLayout, PaddedView},
         Cursive, View,
     },
-    glues_core::{state::note_tree::DirectoryItem, types::DirectoryId},
+    glues_core::{data::Note, state::note_tree::DirectoryItem, types::DirectoryId},
 };
 
-pub fn render_item_list(siv: &mut Cursive, directory_id: DirectoryId) -> impl View {
-    let directories = siv
-        .glues()
-        .db
-        .fetch_directories(directory_id.clone())
-        .log_unwrap();
-    let notes = siv
-        .glues()
-        .db
-        .fetch_notes(directory_id.clone())
-        .log_unwrap();
+pub fn render_item_list(
+    siv: &mut Cursive,
+    directory_id: DirectoryId,
+    directories: Vec<DirectoryItem>,
+    notes: Vec<Note>,
+) -> impl View {
     let mut layout = LinearLayout::vertical();
 
-    for child in directories {
-        let directory_item = DirectoryItem {
-            directory: child,
-            children: None,
-        };
-
+    for directory_item in directories {
         layout.add_child(render_directory(siv, directory_item));
     }
 

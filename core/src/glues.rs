@@ -4,7 +4,7 @@ use {
         schema::setup,
         state::{EntryState, State},
         types::DirectoryId,
-        Event, Result,
+        Event, Result, Transition,
     },
     gluesql::core::ast_builder::{col, table, text, Execute},
     std::ops::Deref,
@@ -53,7 +53,7 @@ impl Glues {
         }
     }
 
-    pub async fn dispatch(&mut self, event: Event) -> Result<()> {
+    pub async fn dispatch(&mut self, event: Event) -> Result<Transition> {
         State::consume(self, event).await
     }
 }

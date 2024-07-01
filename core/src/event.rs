@@ -1,10 +1,10 @@
-use crate::data::Directory;
+use crate::types::DirectoryId;
 
 pub enum Event {
     Initialize,
 
-    OpenDirectory(Directory),
-    CloseDirectory(Directory),
+    OpenDirectory(DirectoryId),
+    CloseDirectory(DirectoryId),
     /*
     AddNote {
         directory_id: DirectoryId,
