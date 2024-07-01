@@ -16,7 +16,6 @@ use {
     },
     item_list::render_item_list,
     more_actions::render_more_actions,
-    std::rc::Rc,
 };
 
 pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
@@ -37,7 +36,7 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
         .child(DummyView.fixed_width(2))
         .child(more_actions)
         .wrap_with(FocusTracker::new)
-        .on_focus(on_item_focus(item.clone()))
+        .on_focus(on_item_focus(directory.id.clone(), directory.name.clone()))
         .on_focus_lost(on_item_focus_lost(directory.id.clone()));
 
     let mut container = LinearLayout::vertical().child(content);
@@ -81,16 +80,16 @@ fn get_caret(opened: bool) -> &'static str {
     }
 }
 
-fn on_item_focus(item: DirectoryItem) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventResult {
-    let item = Rc::new(item);
-
+fn on_item_focus(
+    id: DirectoryId,
+    name: String,
+) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventResult {
     move |_| {
-        let item = Rc::clone(&item);
-        let id = item.directory.id.clone();
+        let id = id.clone();
+        let name = name.clone();
 
         EventResult::with_cb(move |siv| {
-            let item = item.as_ref().clone();
-            actions::select_directory(siv, item);
+            actions::select_directory(siv, id.clone(), name.clone());
 
             Node::note_tree()
                 .directory(&id)

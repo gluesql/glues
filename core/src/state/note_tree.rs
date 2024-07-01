@@ -53,7 +53,7 @@ impl DirectoryItem {
 
 pub enum Selected {
     Note(Note),
-    Directory(DirectoryItem),
+    Directory { id: DirectoryId, name: String },
 }
 
 impl NoteTreeState {
@@ -77,7 +77,10 @@ impl NoteTreeState {
         };
 
         Ok(NoteTreeState {
-            selected: Selected::Directory(root.clone()),
+            selected: Selected::Directory {
+                id: root.directory.id.clone(),
+                name: root.directory.name.clone(),
+            },
             root,
         })
     }
@@ -86,8 +89,8 @@ impl NoteTreeState {
         self.selected = Selected::Note(note);
     }
 
-    pub fn select_directory(&mut self, directory_item: DirectoryItem) {
-        self.selected = Selected::Directory(directory_item);
+    pub fn select_directory(&mut self, id: DirectoryId, name: String) {
+        self.selected = Selected::Directory { id, name };
     }
 
     pub fn check_opened(&self, directory_id: &DirectoryId) -> bool {
@@ -155,10 +158,7 @@ impl NoteTreeState {
     pub fn describe(&self) -> String {
         match &self.selected {
             Selected::Note(Note { name, .. }) => format!("Note '{name}' selected"),
-            Selected::Directory(DirectoryItem {
-                directory: Directory { name, .. },
-                ..
-            }) => format!("Directory '{name}' selected"),
+            Selected::Directory { name, .. } => format!("Directory '{name}' selected"),
         }
     }
 }
