@@ -1,11 +1,9 @@
-mod more_button;
 mod name_button;
 
 use {
     super::NoteTreeNode,
     crate::node::{NodePath, ViewNamed},
     glues_core::types::NoteId,
-    more_button::MoreButtonNode,
     name_button::NameButtonNode,
 };
 
@@ -21,10 +19,6 @@ impl<'a> NoteNode<'a> {
 
     pub fn name_button(&'a self) -> NameButtonNode<'a> {
         NameButtonNode::new(self)
-    }
-
-    pub fn more_button(&'a self) -> MoreButtonNode<'a> {
-        MoreButtonNode::new(self)
     }
 }
 

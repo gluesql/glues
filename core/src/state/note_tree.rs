@@ -1,14 +1,24 @@
 use crate::{
     data::{Directory, Note},
+    event::KeyEvent,
     state::GetInner,
-    transition::OpenDirectory,
+    transition::{OpenDirectory, ShowDirectoryActionsDialog, ShowNoteActionsDialog},
     types::DirectoryId,
     Error, Event, Glues, Result, Transition,
 };
 
 pub struct NoteTreeState {
-    pub selected: Selected,
     pub root: DirectoryItem,
+
+    pub inner_state: InnerState,
+}
+
+pub enum InnerState {
+    NoteSelected(Note),
+    NoteMoreActions(Note),
+
+    DirectorySelected { id: DirectoryId, name: String },
+    DirectoryMoreActions { id: DirectoryId, name: String },
 }
 
 #[derive(Clone)]
@@ -51,11 +61,6 @@ impl DirectoryItem {
     }
 }
 
-pub enum Selected {
-    Note(Note),
-    Directory { id: DirectoryId, name: String },
-}
-
 impl NoteTreeState {
     pub async fn new(glues: &mut Glues) -> Result<Self> {
         let db = &mut glues.db;
@@ -77,7 +82,7 @@ impl NoteTreeState {
         };
 
         Ok(NoteTreeState {
-            selected: Selected::Directory {
+            inner_state: InnerState::DirectorySelected {
                 id: root.directory.id.clone(),
                 name: root.directory.name.clone(),
             },
@@ -86,11 +91,11 @@ impl NoteTreeState {
     }
 
     pub fn select_note(&mut self, note: Note) {
-        self.selected = Selected::Note(note);
+        self.inner_state = InnerState::NoteSelected(note);
     }
 
     pub fn select_directory(&mut self, id: DirectoryId, name: String) {
-        self.selected = Selected::Directory { id, name };
+        self.inner_state = InnerState::DirectorySelected { id, name };
     }
 
     pub fn check_opened(&self, directory_id: &DirectoryId) -> bool {
@@ -107,8 +112,11 @@ impl NoteTreeState {
         let db = &mut glues.db;
         let state: &mut NoteTreeState = glues.state.get_inner_mut()?;
 
-        match event {
-            Event::OpenDirectory(directory_id) => {
+        match (&state.inner_state, event) {
+            (
+                InnerState::DirectorySelected { .. } | InnerState::NoteSelected(_),
+                Event::OpenDirectory(directory_id),
+            ) => {
                 let item = state
                     .root
                     .find_mut(&directory_id)
@@ -136,29 +144,77 @@ impl NoteTreeState {
                     }
                 };
 
-                Ok(OpenDirectory {
+                return Ok(OpenDirectory {
                     notes: notes.as_slice(),
                     directories: directories.as_slice(),
                 }
-                .into())
+                .into());
             }
-            Event::CloseDirectory(directory_id) => {
+            (
+                InnerState::DirectorySelected { .. } | InnerState::NoteSelected(_),
+                Event::CloseDirectory(directory_id),
+            ) => {
                 state
                     .root
                     .find_mut(&directory_id)
                     .ok_or(Error::Wip("todo: asdfasdf".to_owned()))?
                     .children = None;
-
-                Ok(Transition::CloseDirectory)
             }
-            _ => Err(Error::Wip("todo: NoteTree::consume".to_owned())),
-        }
+            (InnerState::NoteSelected(ref note), Event::Key(KeyEvent::M)) => {
+                let note = note.clone();
+                state.inner_state = InnerState::NoteMoreActions(note.clone());
+
+                return Ok(ShowNoteActionsDialog { note }.into());
+            }
+            (InnerState::DirectorySelected { id, name }, Event::Key(KeyEvent::M)) => {
+                let id = id.clone();
+                let name = name.clone();
+
+                state.inner_state = InnerState::DirectoryMoreActions {
+                    id: id.clone(),
+                    name: name.clone(),
+                };
+
+                // TODO: only name field should be used
+                let directory = Directory {
+                    id,
+                    name,
+                    parent_id: "".to_owned(),
+                };
+
+                return Ok(ShowDirectoryActionsDialog { directory }.into());
+            }
+            (InnerState::NoteMoreActions(ref note), Event::CloseNoteActionsDialog) => {
+                state.inner_state = InnerState::NoteSelected(note.clone());
+            }
+            (InnerState::DirectoryMoreActions { id, name }, Event::CloseDirectoryActionsDialog) => {
+                state.inner_state = InnerState::DirectorySelected {
+                    id: id.clone(),
+                    name: name.clone(),
+                };
+            }
+            (_, Event::Key(_)) => {}
+            _ => return Err(Error::Wip("todo: NoteTree::consume".to_owned())),
+        };
+
+        Ok(Transition::None)
     }
 
     pub fn describe(&self) -> String {
-        match &self.selected {
-            Selected::Note(Note { name, .. }) => format!("Note '{name}' selected"),
-            Selected::Directory { name, .. } => format!("Directory '{name}' selected"),
+        match &self.inner_state {
+            InnerState::NoteSelected(Note { name, .. }) => format!("Note '{name}' selected"),
+            InnerState::DirectorySelected { name, .. } => format!("Directory '{name}' selected"),
+            InnerState::NoteMoreActions(_) => "Note actions dialog".to_owned(),
+            InnerState::DirectoryMoreActions { .. } => "Directory actions dialog".to_owned(),
+        }
+    }
+
+    pub fn shortcuts(&self) -> Vec<String> {
+        match &self.inner_state {
+            InnerState::NoteSelected(_) | InnerState::DirectorySelected { .. } => {
+                vec!["[M] More actions".to_owned()]
+            }
+            _ => vec![],
         }
     }
 }

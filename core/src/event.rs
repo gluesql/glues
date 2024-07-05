@@ -5,6 +5,14 @@ pub enum Event {
 
     OpenDirectory(DirectoryId),
     CloseDirectory(DirectoryId),
+
+    Key(KeyEvent),
+
+    ShowNoteActionsDialog,
+    CloseNoteActionsDialog,
+
+    ShowDirectoryActionsDialog,
+    CloseDirectoryActionsDialog,
     /*
     AddNote {
         directory_id: DirectoryId,
@@ -18,4 +26,15 @@ pub enum Event {
     RenameNote,
     RenameDirectory,
     */
+}
+
+pub enum KeyEvent {
+    Q,
+    M,
+}
+
+impl From<KeyEvent> for Event {
+    fn from(event: KeyEvent) -> Self {
+        Self::Key(event)
+    }
 }

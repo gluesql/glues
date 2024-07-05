@@ -1,7 +1,7 @@
-mod actions;
 mod description;
+mod shortcuts;
 
-use {crate::node::NodePath, actions::ActionsNode, description::DescriptionNode};
+use {crate::node::NodePath, description::DescriptionNode, shortcuts::ShortcutsNode};
 
 pub struct StatusbarNode;
 
@@ -10,8 +10,8 @@ impl StatusbarNode {
         DescriptionNode::new(self)
     }
 
-    pub fn actions(&self) -> ActionsNode<'_> {
-        ActionsNode::new(self)
+    pub fn shortcuts(&self) -> ShortcutsNode<'_> {
+        ShortcutsNode::new(self)
     }
 }
 

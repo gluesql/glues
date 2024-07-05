@@ -1,5 +1,6 @@
 use {
     crate::{
+        actions::update_statusbar,
         components::{alert::render_alert, confirm::render_confirm, prompt::render_prompt},
         traits::*,
     },
@@ -68,6 +69,12 @@ impl CursiveExt for Cursive {
     where
         Transition<'a>: GetTransition<T>,
     {
+        self.cb_sink()
+            .send(Box::new(move |siv| {
+                update_statusbar(siv);
+            }))
+            .log_unwrap();
+
         self.glues()
             .dispatch(event)
             .log_unwrap()

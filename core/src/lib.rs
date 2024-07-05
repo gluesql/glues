@@ -10,7 +10,7 @@ pub mod transition;
 pub mod types;
 
 pub use error::Error;
-pub use event::Event;
+pub use event::{Event, KeyEvent};
 pub use glues::Glues;
 pub use transition::Transition;
 

@@ -3,6 +3,7 @@ mod components;
 mod cursive_ext;
 mod logger;
 mod node;
+mod transitions;
 mod views;
 
 mod traits {
@@ -20,7 +21,7 @@ use {
         Cursive,
     },
     futures::executor::block_on,
-    glues_core::Glues,
+    glues_core::{Event, Glues, KeyEvent, Transition},
     logger::log,
     node::Node,
     traits::*,
@@ -61,6 +62,9 @@ fn main() {
     let mut siv = cursive::default();
     siv.set_user_data(glues);
     siv.add_global_callback('a', Cursive::toggle_debug_console);
+    siv.add_global_callback('m', |siv| {
+        handle_event(siv, KeyEvent::M.into());
+    });
 
     let stack_view = StackView::new()
         .transparent_layer(DummyView.full_height())
@@ -77,4 +81,22 @@ fn main() {
 
     menubar(&mut siv);
     siv.run();
+}
+
+fn handle_event(siv: &mut Cursive, event: Event) {
+    let transition = siv.glues().dispatch(event).log_unwrap();
+
+    match transition {
+        Transition::ShowNoteActionsDialog(payload) => {
+            transitions::show_note_actions(siv, payload.note);
+        }
+        Transition::ShowDirectoryActionsDialog(payload) => {
+            transitions::show_directory_actions(siv, payload.directory);
+        }
+        _ => {
+            log("todo");
+        }
+    };
+
+    actions::update_statusbar(siv);
 }

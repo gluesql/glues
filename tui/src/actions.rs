@@ -22,3 +22,4 @@ pub use rename_directory::rename_directory;
 pub use rename_note::rename_note;
 pub use select_directory::select_directory;
 pub use select_note::select_note;
+pub use sub_actions::update_statusbar;

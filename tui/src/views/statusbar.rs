@@ -15,10 +15,12 @@ pub fn render_statusbar(siv: &mut Cursive) -> impl View {
         .with_name(statusbar_node.description().name())
         .full_width();
 
-    let actions =
-        TextView::new("WIP - possible actions").with_name(statusbar_node.actions().name());
+    let shortcuts = siv.glues().state.shortcuts().join(", ");
+    let shortcuts = TextView::new(shortcuts).with_name(statusbar_node.shortcuts().name());
 
-    let layout = LinearLayout::horizontal().child(description).child(actions);
+    let layout = LinearLayout::horizontal()
+        .child(description)
+        .child(shortcuts);
     let padded_view = PaddedView::lrtb(2, 2, 0, 0, layout);
 
     Layer::new(padded_view).full_width()

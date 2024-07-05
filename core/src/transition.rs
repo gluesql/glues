@@ -1,10 +1,17 @@
-use crate::{data::Note, state::note_tree::DirectoryItem, Error, Result};
+use crate::{
+    data::{Directory, Note},
+    state::note_tree::DirectoryItem,
+    Error, Result,
+};
 
 pub enum Transition<'a> {
-    Initialize,
+    None,
 
     OpenDirectory(OpenDirectory<'a>),
     CloseDirectory,
+
+    ShowNoteActionsDialog(ShowNoteActionsDialog),
+    ShowDirectoryActionsDialog(ShowDirectoryActionsDialog),
     /*
     AddNote {
         directory_id: DirectoryId,
@@ -23,6 +30,14 @@ pub enum Transition<'a> {
 pub struct OpenDirectory<'a> {
     pub notes: &'a [Note],
     pub directories: &'a [DirectoryItem],
+}
+
+pub struct ShowNoteActionsDialog {
+    pub note: Note,
+}
+
+pub struct ShowDirectoryActionsDialog {
+    pub directory: Directory,
 }
 
 pub trait GetTransition<T> {
@@ -49,5 +64,41 @@ impl<'a> GetTransition<OpenDirectory<'a>> for Transition<'a> {
 impl<'a> From<OpenDirectory<'a>> for Transition<'a> {
     fn from(v: OpenDirectory<'a>) -> Self {
         Self::OpenDirectory(v)
+    }
+}
+
+impl<'a> GetTransition<ShowNoteActionsDialog> for Transition<'a> {
+    fn get_transition(self) -> Result<ShowNoteActionsDialog> {
+        match self {
+            Self::ShowNoteActionsDialog(v) => Ok(v),
+            _ => Err(Error::Wip(
+                "Transition::get_transition for transition::ShowNoteActionsDialog failed"
+                    .to_owned(),
+            )),
+        }
+    }
+}
+
+impl<'a> From<ShowNoteActionsDialog> for Transition<'a> {
+    fn from(v: ShowNoteActionsDialog) -> Self {
+        Self::ShowNoteActionsDialog(v)
+    }
+}
+
+impl<'a> GetTransition<ShowDirectoryActionsDialog> for Transition<'a> {
+    fn get_transition(self) -> Result<ShowDirectoryActionsDialog> {
+        match self {
+            Self::ShowDirectoryActionsDialog(v) => Ok(v),
+            _ => Err(Error::Wip(
+                "Transition::get_transition for transition::ShowDirectoryActionsDialog failed"
+                    .to_owned(),
+            )),
+        }
+    }
+}
+
+impl<'a> From<ShowDirectoryActionsDialog> for Transition<'a> {
+    fn from(v: ShowDirectoryActionsDialog) -> Self {
+        Self::ShowDirectoryActionsDialog(v)
     }
 }

@@ -12,9 +12,9 @@ pub enum State {
 
 impl State {
     pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
-        match event {
-            Event::Initialize => EntryState::consume(glues, event).await,
-            _ => NoteTreeState::consume(glues, event).await,
+        match &glues.state {
+            State::EntryState(_) => EntryState::consume(glues, event).await,
+            State::NoteTreeState(_) => NoteTreeState::consume(glues, event).await,
         }
     }
 
@@ -22,6 +22,13 @@ impl State {
         match self {
             Self::EntryState(state) => state.describe(),
             Self::NoteTreeState(state) => state.describe(),
+        }
+    }
+
+    pub fn shortcuts(&self) -> Vec<String> {
+        match self {
+            Self::EntryState(state) => state.shortcuts(),
+            Self::NoteTreeState(state) => state.shortcuts(),
         }
     }
 }
