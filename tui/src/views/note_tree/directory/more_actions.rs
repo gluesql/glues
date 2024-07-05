@@ -5,7 +5,7 @@ use {
         views::{Button, CircularFocus, Dialog, DummyView, LinearLayout, TextView},
         Cursive, With,
     },
-    glues_core::data::Directory,
+    glues_core::{data::Directory, Event},
     std::rc::Rc,
 };
 
@@ -20,6 +20,7 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
     let rename_button = Button::new("Rename", on_rename_click(Rc::clone(&directory)));
     let remove_button = Button::new("Remove", on_remove_click(directory));
     let cancel_button = Button::new("Cancel", |siv| {
+        siv.dispatch::<()>(Event::CloseDirectoryActionsDialog);
         siv.pop_layer();
     });
 
