@@ -83,23 +83,3 @@ fn main() {
     menubar(&mut siv);
     siv.run();
 }
-
-/*
-fn handle_event(siv: &mut Cursive, event: Event) {
-    let transition = siv.glues().dispatch(event).log_unwrap();
-
-    match transition {
-        Transition::ShowNoteActionsDialog(payload) => {
-            transitions::show_note_actions(siv, payload.note);
-        }
-        Transition::ShowDirectoryActionsDialog(payload) => {
-            transitions::show_directory_actions(siv, payload.directory);
-        }
-        _ => {
-            log("todo");
-        }
-    };
-
-    actions::update_statusbar(siv);
-}
-*/
