@@ -13,7 +13,7 @@ pub enum Transition {
         notes: Vec<Note>,
         directories: Vec<DirectoryItem>,
     },
-    CloseDirectory,
+    CloseDirectory(DirectoryId),
 
     RenameNote {
         id: NoteId,

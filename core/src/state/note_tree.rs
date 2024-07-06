@@ -151,6 +151,8 @@ impl NoteTreeState {
                     .find_mut(&directory_id)
                     .ok_or(Error::Wip("todo: asdfasdf".to_owned()))?
                     .children = None;
+
+                return Ok(Transition::CloseDirectory(directory_id.clone()));
             }
             (InnerState::NoteSelected(ref note), Event::Key(KeyEvent::M)) => {
                 let note = note.clone();
