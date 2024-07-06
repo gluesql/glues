@@ -1,4 +1,4 @@
-use crate::types::DirectoryId;
+use crate::{data::Note, types::DirectoryId};
 
 pub enum Event {
     Initialize,
@@ -7,6 +7,9 @@ pub enum Event {
     CloseDirectory(DirectoryId),
 
     Key(KeyEvent),
+
+    SelectNote(Note),
+    SelectDirectory { id: DirectoryId, name: String },
 
     ShowNoteActionsDialog,
     CloseNoteActionsDialog,

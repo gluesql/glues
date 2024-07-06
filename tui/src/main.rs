@@ -21,10 +21,11 @@ use {
         Cursive,
     },
     futures::executor::block_on,
-    glues_core::{Event, Glues, KeyEvent, Transition},
+    glues_core::{Glues, KeyEvent},
     logger::log,
     node::Node,
     traits::*,
+    transitions::handle_event,
     views::{menubar::menubar, statusbar::render_statusbar},
 };
 
@@ -83,6 +84,7 @@ fn main() {
     siv.run();
 }
 
+/*
 fn handle_event(siv: &mut Cursive, event: Event) {
     let transition = siv.glues().dispatch(event).log_unwrap();
 
@@ -100,3 +102,4 @@ fn handle_event(siv: &mut Cursive, event: Event) {
 
     actions::update_statusbar(siv);
 }
+*/

@@ -1,14 +1,14 @@
 pub mod more_actions;
 
 use {
-    crate::{actions, traits::*, Node},
+    crate::{traits::*, Node},
     cursive::{
         event::EventResult,
         view::Nameable,
         views::{Button, FocusTracker, LinearLayout, TextView},
         Cursive, View, With,
     },
-    glues_core::data::Note,
+    glues_core::{data::Note, Event},
     std::rc::Rc,
 };
 
@@ -42,7 +42,8 @@ fn on_item_focus(note: Note) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventRe
 
         EventResult::with_cb(move |siv| {
             let note = note.as_ref().clone();
-            actions::select_note(siv, note);
+
+            siv.dispatch2(Event::SelectNote(note));
         })
     }
 }

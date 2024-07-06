@@ -3,6 +3,7 @@ use {
         actions::update_statusbar,
         components::{alert::render_alert, confirm::render_confirm, prompt::render_prompt},
         traits::*,
+        transitions::handle_event,
     },
     cursive::{
         Cursive,
@@ -29,6 +30,8 @@ pub trait CursiveExt {
     fn dispatch<'a, T>(&'a mut self, event: Event) -> T
     where
         Transition<'a>: GetTransition<T>;
+
+    fn dispatch2(&mut self, event: Event);
 
     fn find<V: View>(&mut self, id: &str) -> ViewRef<V>;
 
@@ -80,6 +83,10 @@ impl CursiveExt for Cursive {
             .log_unwrap()
             .get_transition()
             .log_unwrap()
+    }
+
+    fn dispatch2(&mut self, event: Event) {
+        handle_event(self, event);
     }
 
     fn find<V: View>(&mut self, id: &str) -> ViewRef<V> {

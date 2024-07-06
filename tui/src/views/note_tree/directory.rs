@@ -12,6 +12,7 @@ use {
     glues_core::{
         state::note_tree::{DirectoryItem, NoteTreeState},
         types::DirectoryId,
+        Event,
     },
     item_list::render_item_list,
 };
@@ -75,7 +76,10 @@ fn on_item_focus(
         let name = name.clone();
 
         EventResult::with_cb(move |siv| {
-            actions::select_directory(siv, id.clone(), name.clone());
+            siv.dispatch2(Event::SelectDirectory {
+                id: id.clone(),
+                name: name.clone(),
+            });
         })
     }
 }

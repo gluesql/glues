@@ -7,8 +7,6 @@ mod remove_directory;
 mod remove_note;
 mod rename_directory;
 mod rename_note;
-mod select_directory;
-mod select_note;
 mod sub_actions;
 
 pub use add_directory::add_directory;
@@ -20,6 +18,4 @@ pub use remove_directory::remove_directory;
 pub use remove_note::remove_note;
 pub use rename_directory::rename_directory;
 pub use rename_note::rename_note;
-pub use select_directory::select_directory;
-pub use select_note::select_note;
 pub use sub_actions::update_statusbar;

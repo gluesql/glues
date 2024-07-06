@@ -90,14 +90,6 @@ impl NoteTreeState {
         })
     }
 
-    pub fn select_note(&mut self, note: Note) {
-        self.inner_state = InnerState::NoteSelected(note);
-    }
-
-    pub fn select_directory(&mut self, id: DirectoryId, name: String) {
-        self.inner_state = InnerState::DirectorySelected { id, name };
-    }
-
     pub fn check_opened(&self, directory_id: &DirectoryId) -> bool {
         matches!(
             self.root.find(directory_id),
@@ -192,6 +184,18 @@ impl NoteTreeState {
                     id: id.clone(),
                     name: name.clone(),
                 };
+            }
+            (
+                InnerState::DirectorySelected { .. } | InnerState::NoteSelected(_),
+                Event::SelectNote(note),
+            ) => {
+                state.inner_state = InnerState::NoteSelected(note.clone());
+            }
+            (
+                InnerState::DirectorySelected { .. } | InnerState::NoteSelected(_),
+                Event::SelectDirectory { id, name },
+            ) => {
+                state.inner_state = InnerState::DirectorySelected { id, name };
             }
             (_, Event::Key(_)) => {}
             _ => return Err(Error::Wip("todo: NoteTree::consume".to_owned())),
