@@ -1,6 +1,5 @@
 mod directory;
 mod note;
-mod note_tree;
 
 use gluesql::prelude::{Glue, MemoryStorage};
 
