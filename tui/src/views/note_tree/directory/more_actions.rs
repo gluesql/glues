@@ -17,7 +17,15 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
         "Add Directory",
         on_add_directory_click(Rc::clone(&directory)),
     );
-    let rename_button = Button::new("Rename", on_rename_click(Rc::clone(&directory)));
+    let rename_button = Button::new("Rename", |siv| {
+        let message = "New name?";
+
+        siv.pop_layer();
+        siv.prompt(message, |siv, directory_name| {
+            siv.dispatch2(Event::RenameDirectory(directory_name.to_owned()));
+        });
+    }
+);
     let remove_button = Button::new("Remove", on_remove_click(directory));
     let cancel_button = Button::new("Cancel", |siv| {
         siv.dispatch::<()>(Event::CloseDirectoryActionsDialog);
@@ -40,18 +48,6 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
         .padding_lrtb(3, 3, 1, 1)
         .wrap_with(CircularFocus::new)
         .wrap_tab()
-}
-
-fn on_rename_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {
-    move |siv: &mut Cursive| {
-        let directory = Rc::clone(&directory);
-        let message = "New name?";
-
-        siv.pop_layer();
-        siv.prompt(message, move |siv, directory_name| {
-            actions::rename_directory(siv, &directory, directory_name);
-        });
-    }
 }
 
 fn on_remove_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {

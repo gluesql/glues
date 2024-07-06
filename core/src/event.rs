@@ -12,6 +12,7 @@ pub enum Event {
     SelectDirectory { id: DirectoryId, name: String },
 
     RenameNote(String),
+    RenameDirectory(String),
 
     ShowNoteActionsDialog,
     CloseNoteActionsDialog,
