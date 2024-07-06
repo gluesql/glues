@@ -1,10 +1,11 @@
 use {
-    crate::actions,
+    crate::traits::*,
     cursive::{
         event::Key,
         menu::{Item, Tree},
         Cursive,
     },
+    glues_core::Event,
 };
 
 pub fn menubar(siv: &mut Cursive) {
@@ -13,7 +14,7 @@ pub fn menubar(siv: &mut Cursive) {
             "Glues",
             Tree::new()
                 .leaf("New Notes", |siv| {
-                    actions::initialize(siv);
+                    siv.dispatch2(Event::Initialize);
                 })
                 .leaf("Quit", |siv| siv.quit()),
         )

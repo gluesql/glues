@@ -8,7 +8,7 @@ impl EntryState {
             Event::Initialize => {
                 glues.state = NoteTreeState::new(glues).await?.into();
 
-                Ok(Transition::None)
+                Ok(Transition::Initialize)
             }
             Event::Key(_) => Ok(Transition::None),
             _ => Err(Error::Wip("todo: EntryState::consume".to_owned())),

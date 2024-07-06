@@ -7,6 +7,7 @@ use crate::{
 
 pub enum Transition {
     None,
+    Initialize,
 
     OpenDirectory {
         id: DirectoryId,

@@ -1,4 +1,5 @@
 mod close_directory;
+mod initialize;
 mod open_directory;
 mod rename_directory;
 mod rename_note;
@@ -6,6 +7,7 @@ mod show_directory_actions;
 mod show_note_actions;
 
 use close_directory::close_directory;
+use initialize::initialize;
 use open_directory::open_directory;
 use rename_directory::rename_directory;
 use rename_note::rename_note;
@@ -22,6 +24,9 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
     let transition = siv.glues().dispatch(event).log_unwrap();
 
     match transition {
+        Transition::Initialize => {
+            initialize(siv);
+        }
         Transition::ShowNoteActionsDialog(payload) => {
             show_note_actions(siv, payload.note);
         }
