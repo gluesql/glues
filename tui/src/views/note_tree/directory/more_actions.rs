@@ -24,8 +24,7 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
         siv.prompt(message, |siv, directory_name| {
             siv.dispatch2(Event::RenameDirectory(directory_name.to_owned()));
         });
-    }
-);
+    });
     let remove_button = Button::new("Remove", on_remove_click(directory));
     let cancel_button = Button::new("Cancel", |siv| {
         siv.dispatch::<()>(Event::CloseDirectoryActionsDialog);

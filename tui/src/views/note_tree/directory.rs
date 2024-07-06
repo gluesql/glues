@@ -54,7 +54,8 @@ fn on_item_click(directory_id: DirectoryId) -> impl for<'a> Fn(&'a mut Cursive) 
         if siv.state::<NoteTreeState>().check_opened(&directory_id) {
             actions::close_directory(siv, &directory_id);
         } else {
-            actions::open_directory(siv, &directory_id);
+            siv.dispatch2(Event::OpenDirectory(directory_id.clone()))
+            // actions::open_directory(siv, &directory_id);
         }
     }
 }

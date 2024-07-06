@@ -1,8 +1,10 @@
+mod open_directory;
 mod rename_directory;
 mod rename_note;
 mod show_directory_actions;
 mod show_note_actions;
 
+use open_directory::open_directory;
 use rename_directory::rename_directory;
 use rename_note::rename_note;
 use show_directory_actions::show_directory_actions;
@@ -29,6 +31,13 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
         }
         Transition::RenameDirectory { id, name } => {
             rename_directory(siv, id, name);
+        }
+        Transition::OpenDirectory {
+            id,
+            notes,
+            directories,
+        } => {
+            open_directory(siv, id, notes, directories);
         }
         _ => {
             log("todo");

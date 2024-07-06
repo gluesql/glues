@@ -27,9 +27,9 @@ pub trait CursiveExt {
     where
         State: GetInner<T>;
 
-    fn dispatch<'a, T>(&'a mut self, event: Event) -> T
+    fn dispatch<T>(&mut self, event: Event) -> T
     where
-        Transition<'a>: GetTransition<T>;
+        Transition: GetTransition<T>;
 
     fn dispatch2(&mut self, event: Event);
 
@@ -68,9 +68,9 @@ impl CursiveExt for Cursive {
         self.glues().state.get_inner_mut().log_unwrap()
     }
 
-    fn dispatch<'a, T>(&'a mut self, event: Event) -> T
+    fn dispatch<T>(&mut self, event: Event) -> T
     where
-        Transition<'a>: GetTransition<T>,
+        Transition: GetTransition<T>,
     {
         self.cb_sink()
             .send(Box::new(move |siv| {

@@ -2,7 +2,7 @@ use crate::{
     data::{Directory, Note},
     event::KeyEvent,
     state::GetInner,
-    transition::{OpenDirectory, ShowDirectoryActionsDialog, ShowNoteActionsDialog},
+    transition::{ShowDirectoryActionsDialog, ShowNoteActionsDialog},
     types::DirectoryId,
     Error, Event, Glues, Result, Transition,
 };
@@ -136,11 +136,11 @@ impl NoteTreeState {
                     }
                 };
 
-                return Ok(OpenDirectory {
-                    notes: notes.as_slice(),
-                    directories: directories.as_slice(),
-                }
-                .into());
+                return Ok(Transition::OpenDirectory {
+                    id: directory_id.clone(),
+                    notes: notes.clone(),
+                    directories: directories.clone(),
+                });
             }
             (
                 InnerState::DirectorySelected { .. } | InnerState::NoteSelected(_),

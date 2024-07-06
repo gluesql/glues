@@ -5,14 +5,24 @@ use crate::{
     Error, Result,
 };
 
-pub enum Transition<'a> {
+pub enum Transition {
     None,
 
-    OpenDirectory(OpenDirectory<'a>),
+    OpenDirectory {
+        id: DirectoryId,
+        notes: Vec<Note>,
+        directories: Vec<DirectoryItem>,
+    },
     CloseDirectory,
 
-    RenameNote { id: NoteId, name: String },
-    RenameDirectory { id: DirectoryId, name: String },
+    RenameNote {
+        id: NoteId,
+        name: String,
+    },
+    RenameDirectory {
+        id: DirectoryId,
+        name: String,
+    },
 
     ShowNoteActionsDialog(ShowNoteActionsDialog),
     ShowDirectoryActionsDialog(ShowDirectoryActionsDialog),
@@ -31,11 +41,6 @@ pub enum Transition<'a> {
     */
 }
 
-pub struct OpenDirectory<'a> {
-    pub notes: &'a [Note],
-    pub directories: &'a [DirectoryItem],
-}
-
 pub struct ShowNoteActionsDialog {
     pub note: Note,
 }
@@ -48,30 +53,13 @@ pub trait GetTransition<T> {
     fn get_transition(self) -> Result<T>;
 }
 
-impl<'a> GetTransition<()> for Transition<'a> {
+impl GetTransition<()> for Transition {
     fn get_transition(self) -> Result<()> {
         Ok(())
     }
 }
 
-impl<'a> GetTransition<OpenDirectory<'a>> for Transition<'a> {
-    fn get_transition(self) -> Result<OpenDirectory<'a>> {
-        match self {
-            Self::OpenDirectory(v) => Ok(v),
-            _ => Err(Error::Wip(
-                "Transition::get_transition for transition::OpenDirectory failed".to_owned(),
-            )),
-        }
-    }
-}
-
-impl<'a> From<OpenDirectory<'a>> for Transition<'a> {
-    fn from(v: OpenDirectory<'a>) -> Self {
-        Self::OpenDirectory(v)
-    }
-}
-
-impl<'a> GetTransition<ShowNoteActionsDialog> for Transition<'a> {
+impl GetTransition<ShowNoteActionsDialog> for Transition {
     fn get_transition(self) -> Result<ShowNoteActionsDialog> {
         match self {
             Self::ShowNoteActionsDialog(v) => Ok(v),
@@ -83,13 +71,13 @@ impl<'a> GetTransition<ShowNoteActionsDialog> for Transition<'a> {
     }
 }
 
-impl<'a> From<ShowNoteActionsDialog> for Transition<'a> {
+impl From<ShowNoteActionsDialog> for Transition {
     fn from(v: ShowNoteActionsDialog) -> Self {
         Self::ShowNoteActionsDialog(v)
     }
 }
 
-impl<'a> GetTransition<ShowDirectoryActionsDialog> for Transition<'a> {
+impl GetTransition<ShowDirectoryActionsDialog> for Transition {
     fn get_transition(self) -> Result<ShowDirectoryActionsDialog> {
         match self {
             Self::ShowDirectoryActionsDialog(v) => Ok(v),
@@ -101,7 +89,7 @@ impl<'a> GetTransition<ShowDirectoryActionsDialog> for Transition<'a> {
     }
 }
 
-impl<'a> From<ShowDirectoryActionsDialog> for Transition<'a> {
+impl From<ShowDirectoryActionsDialog> for Transition {
     fn from(v: ShowDirectoryActionsDialog) -> Self {
         Self::ShowDirectoryActionsDialog(v)
     }
