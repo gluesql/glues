@@ -6,7 +6,6 @@ mod open_directory;
 mod remove_directory;
 mod remove_note;
 mod rename_directory;
-mod rename_note;
 mod sub_actions;
 
 pub use add_directory::add_directory;
@@ -17,5 +16,4 @@ pub use open_directory::open_directory;
 pub use remove_directory::remove_directory;
 pub use remove_note::remove_note;
 pub use rename_directory::rename_directory;
-pub use rename_note::rename_note;
 pub use sub_actions::update_statusbar;

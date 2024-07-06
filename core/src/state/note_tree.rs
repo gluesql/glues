@@ -197,6 +197,14 @@ impl NoteTreeState {
             ) => {
                 state.inner_state = InnerState::DirectorySelected { id, name };
             }
+            (InnerState::NoteMoreActions(ref note), Event::RenameNote(new_name)) => {
+                let id = note.id.clone();
+                db.rename_note(id.clone(), new_name.clone()).await?;
+
+                state.inner_state = InnerState::NoteSelected(note.clone());
+
+                return Ok(Transition::RenameNote { id, name: new_name });
+            }
             (_, Event::Key(_)) => {}
             _ => return Err(Error::Wip("todo: NoteTree::consume".to_owned())),
         };

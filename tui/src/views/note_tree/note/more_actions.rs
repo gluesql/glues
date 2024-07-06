@@ -12,7 +12,14 @@ use {
 pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
     let label = TextView::new(format!("'{}'", &note.name)).h_align(HAlign::Center);
     let remove_button = Button::new("Remove", on_remove_click(note.clone()));
-    let rename_button = Button::new("Rename", on_rename_click(note));
+    let rename_button = Button::new("Rename", |siv| {
+        let message = "New name?";
+
+        siv.pop_layer();
+        siv.prompt(message, move |siv, note_name| {
+            siv.dispatch2(Event::RenameNote(note_name.to_owned()));
+        });
+    });
     let cancel_button = Button::new("Cancel", |siv| {
         siv.dispatch::<()>(Event::CloseNoteActionsDialog);
         siv.pop_layer();
@@ -44,20 +51,6 @@ fn on_remove_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
         siv.pop_layer();
         siv.confirm(message, move |siv| {
             actions::remove_note(siv, &note);
-        });
-    }
-}
-
-fn on_rename_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
-    let note = Rc::new(note);
-
-    move |siv: &mut Cursive| {
-        let note = Rc::clone(&note);
-        let message = "New name?";
-
-        siv.pop_layer();
-        siv.prompt(message, move |siv, note_name| {
-            actions::rename_note(siv, &note, note_name);
         });
     }
 }

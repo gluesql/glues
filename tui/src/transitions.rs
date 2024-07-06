@@ -1,8 +1,10 @@
+mod rename_note;
 mod show_directory_actions;
 mod show_note_actions;
 
-pub use show_directory_actions::show_directory_actions;
-pub use show_note_actions::show_note_actions;
+use rename_note::rename_note;
+use show_directory_actions::show_directory_actions;
+use show_note_actions::show_note_actions;
 
 use {
     crate::{actions, traits::*},
@@ -19,6 +21,9 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
         }
         Transition::ShowDirectoryActionsDialog(payload) => {
             show_directory_actions(siv, payload.directory);
+        }
+        Transition::RenameNote { id, name } => {
+            rename_note(siv, id, name);
         }
         _ => {
             log("todo");

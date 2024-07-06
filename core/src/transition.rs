@@ -1,6 +1,7 @@
 use crate::{
     data::{Directory, Note},
     state::note_tree::DirectoryItem,
+    types::NoteId,
     Error, Result,
 };
 
@@ -9,6 +10,8 @@ pub enum Transition<'a> {
 
     OpenDirectory(OpenDirectory<'a>),
     CloseDirectory,
+
+    RenameNote { id: NoteId, name: String },
 
     ShowNoteActionsDialog(ShowNoteActionsDialog),
     ShowDirectoryActionsDialog(ShowDirectoryActionsDialog),
