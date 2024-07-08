@@ -32,5 +32,5 @@ pub fn render_item_list(
             .name(),
     );
 
-    PaddedView::lrtb(1, 0, 0, 0, layout)
+    PaddedView::lrtb(2, 0, 0, 0, layout)
 }
