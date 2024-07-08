@@ -207,6 +207,15 @@ impl NoteTreeState {
 
                 return Ok(Transition::RenameNote { id, name: new_name });
             }
+            (InnerState::NoteMoreActions(ref note), Event::RemoveNote) => {
+                let note = note.clone();
+
+                db.remove_note(note.id.clone()).await?;
+
+                state.inner_state = InnerState::NoteSelected(note.clone());
+
+                return Ok(Transition::RemoveNote(note));
+            }
             (InnerState::DirectoryMoreActions { id, .. }, Event::RenameDirectory(new_name)) => {
                 let id = id.clone();
                 db.rename_directory(id.clone(), new_name.clone()).await?;

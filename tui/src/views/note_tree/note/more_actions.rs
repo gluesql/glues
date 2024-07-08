@@ -1,5 +1,5 @@
 use {
-    crate::{actions, traits::*},
+    crate::traits::*,
     cursive::{
         align::HAlign,
         views::{Button, CircularFocus, Dialog, DummyView, LinearLayout, TextView},
@@ -50,7 +50,7 @@ fn on_remove_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
 
         siv.pop_layer();
         siv.confirm(message, move |siv| {
-            actions::remove_note(siv, &note);
+            siv.dispatch2(Event::RemoveNote);
         });
     }
 }

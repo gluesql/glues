@@ -14,6 +14,8 @@ pub enum Event {
     RenameNote(String),
     RenameDirectory(String),
 
+    RemoveNote,
+
     ShowNoteActionsDialog,
     CloseNoteActionsDialog,
 

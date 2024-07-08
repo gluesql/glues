@@ -25,6 +25,8 @@ pub enum Transition {
         name: String,
     },
 
+    RemoveNote(Note),
+
     ShowNoteActionsDialog(ShowNoteActionsDialog),
     ShowDirectoryActionsDialog(ShowDirectoryActionsDialog),
     /*
