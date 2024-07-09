@@ -1,4 +1,7 @@
-use crate::{data::Note, types::DirectoryId};
+use crate::{
+    data::{Directory, Note},
+    types::DirectoryId,
+};
 
 pub enum Event {
     Initialize,
@@ -9,7 +12,7 @@ pub enum Event {
     Key(KeyEvent),
 
     SelectNote(Note),
-    SelectDirectory { id: DirectoryId, name: String },
+    SelectDirectory(Directory),
 
     RenameNote(String),
     RenameDirectory(String),

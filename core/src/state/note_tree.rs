@@ -17,8 +17,8 @@ pub enum InnerState {
     NoteSelected(Note),
     NoteMoreActions(Note),
 
-    DirectorySelected { id: DirectoryId, name: String },
-    DirectoryMoreActions { id: DirectoryId, name: String },
+    DirectorySelected(Directory),
+    DirectoryMoreActions(Directory),
 }
 
 #[derive(Clone)]
@@ -82,10 +82,7 @@ impl NoteTreeState {
         };
 
         Ok(NoteTreeState {
-            inner_state: InnerState::DirectorySelected {
-                id: root.directory.id.clone(),
-                name: root.directory.name.clone(),
-            },
+            inner_state: InnerState::DirectorySelected(root.directory.clone()),
             root,
         })
     }
@@ -106,7 +103,7 @@ impl NoteTreeState {
 
         match (&state.inner_state, event) {
             (
-                InnerState::DirectorySelected { .. } | InnerState::NoteSelected(_),
+                InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
                 Event::OpenDirectory(directory_id),
             ) => {
                 let item = state
@@ -143,7 +140,7 @@ impl NoteTreeState {
                 });
             }
             (
-                InnerState::DirectorySelected { .. } | InnerState::NoteSelected(_),
+                InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
                 Event::CloseDirectory(directory_id),
             ) => {
                 state
@@ -160,44 +157,33 @@ impl NoteTreeState {
 
                 return Ok(ShowNoteActionsDialog { note }.into());
             }
-            (InnerState::DirectorySelected { id, name }, Event::Key(KeyEvent::M)) => {
-                let id = id.clone();
-                let name = name.clone();
+            (InnerState::DirectorySelected(ref directory), Event::Key(KeyEvent::M)) => {
+                let directory = directory.clone();
 
-                state.inner_state = InnerState::DirectoryMoreActions {
-                    id: id.clone(),
-                    name: name.clone(),
-                };
-
-                // TODO: only name field should be used
-                let directory = Directory {
-                    id,
-                    name,
-                    parent_id: "".to_owned(),
-                };
+                state.inner_state = InnerState::DirectoryMoreActions(directory.clone());
 
                 return Ok(ShowDirectoryActionsDialog { directory }.into());
             }
             (InnerState::NoteMoreActions(ref note), Event::CloseNoteActionsDialog) => {
                 state.inner_state = InnerState::NoteSelected(note.clone());
             }
-            (InnerState::DirectoryMoreActions { id, name }, Event::CloseDirectoryActionsDialog) => {
-                state.inner_state = InnerState::DirectorySelected {
-                    id: id.clone(),
-                    name: name.clone(),
-                };
+            (
+                InnerState::DirectoryMoreActions(ref directory),
+                Event::CloseDirectoryActionsDialog,
+            ) => {
+                state.inner_state = InnerState::DirectorySelected(directory.clone());
             }
             (
-                InnerState::DirectorySelected { .. } | InnerState::NoteSelected(_),
+                InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
                 Event::SelectNote(note),
             ) => {
-                state.inner_state = InnerState::NoteSelected(note.clone());
+                state.inner_state = InnerState::NoteSelected(note);
             }
             (
-                InnerState::DirectorySelected { .. } | InnerState::NoteSelected(_),
-                Event::SelectDirectory { id, name },
+                InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
+                Event::SelectDirectory(directory),
             ) => {
-                state.inner_state = InnerState::DirectorySelected { id, name };
+                state.inner_state = InnerState::DirectorySelected(directory);
             }
             (InnerState::NoteMoreActions(ref note), Event::RenameNote(new_name)) => {
                 let id = note.id.clone();
@@ -219,22 +205,20 @@ impl NoteTreeState {
             (InnerState::NoteMoreActions(ref note), Event::Cancel) => {
                 state.inner_state = InnerState::NoteSelected(note.clone());
             }
-            (InnerState::DirectoryMoreActions { id, .. }, Event::RenameDirectory(new_name)) => {
-                let id = id.clone();
-                db.rename_directory(id.clone(), new_name.clone()).await?;
+            (InnerState::DirectoryMoreActions(ref directory), Event::RenameDirectory(new_name)) => {
+                let directory = directory.clone();
+                db.rename_directory(directory.id.clone(), new_name.clone())
+                    .await?;
 
-                state.inner_state = InnerState::DirectorySelected {
-                    id: id.clone(),
-                    name: new_name.clone(),
-                };
+                state.inner_state = InnerState::DirectorySelected(directory.clone());
 
-                return Ok(Transition::RenameDirectory { id, name: new_name });
+                return Ok(Transition::RenameDirectory {
+                    id: directory.id,
+                    name: new_name,
+                });
             }
-            (InnerState::DirectoryMoreActions { id, name }, Event::Cancel) => {
-                state.inner_state = InnerState::DirectorySelected {
-                    id: id.clone(),
-                    name: name.clone(),
-                };
+            (InnerState::DirectoryMoreActions(ref directory), Event::Cancel) => {
+                state.inner_state = InnerState::DirectorySelected(directory.clone());
             }
             (_, Event::Key(_)) => {}
             _ => return Err(Error::Wip("todo: NoteTree::consume".to_owned())),
@@ -246,9 +230,11 @@ impl NoteTreeState {
     pub fn describe(&self) -> String {
         match &self.inner_state {
             InnerState::NoteSelected(Note { name, .. }) => format!("Note '{name}' selected"),
-            InnerState::DirectorySelected { name, .. } => format!("Directory '{name}' selected"),
+            InnerState::DirectorySelected(Directory { name, .. }) => {
+                format!("Directory '{name}' selected")
+            }
             InnerState::NoteMoreActions(_) => "Note actions dialog".to_owned(),
-            InnerState::DirectoryMoreActions { .. } => "Directory actions dialog".to_owned(),
+            InnerState::DirectoryMoreActions(_) => "Directory actions dialog".to_owned(),
         }
     }
 

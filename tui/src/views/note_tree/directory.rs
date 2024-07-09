@@ -10,6 +10,7 @@ use {
         Cursive, View, With,
     },
     glues_core::{
+        data::Directory,
         state::note_tree::{DirectoryItem, NoteTreeState},
         types::DirectoryId,
         Event,
@@ -32,7 +33,7 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
         .child(button)
         .child(DummyView.fixed_width(2))
         .wrap_with(FocusTracker::new)
-        .on_focus(on_item_focus(directory.id.clone(), directory.name.clone()));
+        .on_focus(on_item_focus(directory.clone()));
 
     let mut container = LinearLayout::vertical().child(content);
     if let Some(children) = item.children {
@@ -67,19 +68,12 @@ fn get_caret(opened: bool) -> &'static str {
     }
 }
 
-fn on_item_focus(
-    id: DirectoryId,
-    name: String,
-) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventResult {
+fn on_item_focus(directory: Directory) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventResult {
     move |_| {
-        let id = id.clone();
-        let name = name.clone();
+        let directory = directory.clone();
 
         EventResult::with_cb(move |siv| {
-            siv.dispatch2(Event::SelectDirectory {
-                id: id.clone(),
-                name: name.clone(),
-            });
+            siv.dispatch2(Event::SelectDirectory(directory.clone()));
         })
     }
 }
