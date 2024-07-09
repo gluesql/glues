@@ -43,7 +43,7 @@ fn on_item_focus(note: Note) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventRe
         EventResult::with_cb(move |siv| {
             let note = note.as_ref().clone();
 
-            siv.dispatch2(Event::SelectNote(note));
+            siv.dispatch(Event::SelectNote(note));
         })
     }
 }

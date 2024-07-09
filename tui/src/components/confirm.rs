@@ -18,7 +18,7 @@ where
             on_confirm(siv);
         })
         .button("Cancel", |siv| {
-            siv.dispatch2(Event::Cancel);
+            siv.dispatch(Event::Cancel);
             siv.pop_layer();
         })
         .padding_lrtb(3, 3, 1, 1)

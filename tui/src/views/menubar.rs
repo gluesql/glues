@@ -14,7 +14,7 @@ pub fn menubar(siv: &mut Cursive) {
             "Glues",
             Tree::new()
                 .leaf("New Notes", |siv| {
-                    siv.dispatch2(Event::Initialize);
+                    siv.dispatch(Event::Initialize);
                 })
                 .leaf("Quit", |siv| siv.quit()),
         )

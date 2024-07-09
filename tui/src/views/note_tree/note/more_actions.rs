@@ -17,11 +17,11 @@ pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
 
         siv.pop_layer();
         siv.prompt(message, move |siv, note_name| {
-            siv.dispatch2(Event::RenameNote(note_name.to_owned()));
+            siv.dispatch(Event::RenameNote(note_name.to_owned()));
         });
     });
     let cancel_button = Button::new("Cancel", |siv| {
-        siv.dispatch2(Event::CloseNoteActionsDialog);
+        siv.dispatch(Event::CloseNoteActionsDialog);
         siv.pop_layer();
     });
 
@@ -50,7 +50,7 @@ fn on_remove_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
 
         siv.pop_layer();
         siv.confirm(message, move |siv| {
-            siv.dispatch2(Event::RemoveNote);
+            siv.dispatch(Event::RemoveNote);
         });
     }
 }

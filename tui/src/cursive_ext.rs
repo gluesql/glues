@@ -25,7 +25,7 @@ pub trait CursiveExt {
     where
         State: GetInner<T>;
 
-    fn dispatch2(&mut self, event: Event);
+    fn dispatch(&mut self, event: Event);
 
     fn find<V: View>(&mut self, id: &str) -> ViewRef<V>;
 
@@ -62,7 +62,7 @@ impl CursiveExt for Cursive {
         self.glues().state.get_inner_mut().log_unwrap()
     }
 
-    fn dispatch2(&mut self, event: Event) {
+    fn dispatch(&mut self, event: Event) {
         handle_event(self, event);
     }
 

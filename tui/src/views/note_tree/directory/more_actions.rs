@@ -19,12 +19,12 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
 
         siv.pop_layer();
         siv.prompt(message, |siv, directory_name| {
-            siv.dispatch2(Event::RenameDirectory(directory_name.to_owned()));
+            siv.dispatch(Event::RenameDirectory(directory_name.to_owned()));
         });
     });
     let remove_button = Button::new("Remove", on_remove_click(directory));
     let cancel_button = Button::new("Cancel", |siv| {
-        siv.dispatch2(Event::CloseDirectoryActionsDialog);
+        siv.dispatch(Event::CloseDirectoryActionsDialog);
         siv.pop_layer();
     });
 
@@ -52,7 +52,7 @@ fn on_remove_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive)
         let message = format!("Removes {}", directory.name);
 
         siv.pop_layer();
-        siv.confirm(message, move |siv| siv.dispatch2(Event::RemoveDirectory));
+        siv.confirm(message, move |siv| siv.dispatch(Event::RemoveDirectory));
     }
 }
 
@@ -61,7 +61,7 @@ fn on_add_note_click(siv: &mut Cursive) {
 
     siv.pop_layer();
     siv.prompt(message, move |siv, note_name| {
-        siv.dispatch2(Event::AddNote(note_name.to_owned()));
+        siv.dispatch(Event::AddNote(note_name.to_owned()));
     });
 }
 
@@ -70,6 +70,6 @@ fn on_add_directory_click(siv: &mut Cursive) {
 
     siv.pop_layer();
     siv.prompt(message, move |siv, directory_name| {
-        siv.dispatch2(Event::AddDirectory(directory_name.to_owned()));
+        siv.dispatch(Event::AddDirectory(directory_name.to_owned()));
     });
 }

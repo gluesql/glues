@@ -13,7 +13,7 @@ pub fn add_directory(siv: &mut Cursive, directory: Directory) {
         .state::<NoteTreeState>()
         .check_opened(&directory.parent_id)
     {
-        siv.dispatch2(Event::OpenDirectory(directory.parent_id.clone()));
+        siv.dispatch(Event::OpenDirectory(directory.parent_id.clone()));
     } else {
         let mut container = Node::note_tree()
             .directory(&directory.parent_id)

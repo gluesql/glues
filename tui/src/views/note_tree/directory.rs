@@ -53,9 +53,9 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
 fn on_item_click(directory_id: DirectoryId) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv| {
         if siv.state::<NoteTreeState>().check_opened(&directory_id) {
-            siv.dispatch2(Event::CloseDirectory(directory_id.clone()))
+            siv.dispatch(Event::CloseDirectory(directory_id.clone()))
         } else {
-            siv.dispatch2(Event::OpenDirectory(directory_id.clone()))
+            siv.dispatch(Event::OpenDirectory(directory_id.clone()))
         }
     }
 }
@@ -73,7 +73,7 @@ fn on_item_focus(directory: Directory) -> impl for<'a> Fn(&'a mut LinearLayout) 
         let directory = directory.clone();
 
         EventResult::with_cb(move |siv| {
-            siv.dispatch2(Event::SelectDirectory(directory.clone()));
+            siv.dispatch(Event::SelectDirectory(directory.clone()));
         })
     }
 }
