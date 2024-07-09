@@ -5,6 +5,7 @@ use {
         views::{Dialog, EditView, LinearLayout, TextView},
         Cursive,
     },
+    glues_core::Event,
 };
 
 const EDIT_VIEW_NAME: &str = "edit_view_name";
@@ -36,6 +37,7 @@ where
             siv.pop_layer();
         })
         .button("Cancel", |siv| {
+            siv.dispatch2(Event::Cancel);
             siv.pop_layer();
         })
         .padding_lrtb(3, 3, 1, 1)

@@ -21,6 +21,8 @@ pub enum Event {
 
     ShowDirectoryActionsDialog,
     CloseDirectoryActionsDialog,
+
+    Cancel,
     /*
     AddNote {
         directory_id: DirectoryId,
