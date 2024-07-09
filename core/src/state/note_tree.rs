@@ -217,6 +217,14 @@ impl NoteTreeState {
                     name: new_name,
                 });
             }
+            (InnerState::DirectoryMoreActions(ref directory), Event::RemoveDirectory) => {
+                let directory = directory.clone();
+                db.remove_directory(directory.id.clone()).await?;
+
+                state.inner_state = InnerState::DirectorySelected(directory.clone());
+
+                return Ok(Transition::RemoveDirectory(directory));
+            }
             (InnerState::DirectoryMoreActions(ref directory), Event::Cancel) => {
                 state.inner_state = InnerState::DirectorySelected(directory.clone());
             }

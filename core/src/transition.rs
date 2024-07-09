@@ -26,6 +26,7 @@ pub enum Transition {
     },
 
     RemoveNote(Note),
+    RemoveDirectory(Directory),
 
     ShowNoteActionsDialog(ShowNoteActionsDialog),
     ShowDirectoryActionsDialog(ShowDirectoryActionsDialog),

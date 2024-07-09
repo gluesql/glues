@@ -55,9 +55,7 @@ fn on_remove_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive)
         let message = format!("Removes {}", directory.name);
 
         siv.pop_layer();
-        siv.confirm(message, move |siv| {
-            actions::remove_directory(siv, &directory);
-        });
+        siv.confirm(message, move |siv| siv.dispatch2(Event::RemoveDirectory));
     }
 }
 
