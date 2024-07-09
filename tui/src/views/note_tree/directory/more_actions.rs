@@ -12,7 +12,7 @@ use {
 pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
     let directory = Rc::new(directory);
     let label = TextView::new(format!("'{}'", &directory.name)).h_align(HAlign::Center);
-    let add_note_button = Button::new("Add Note", on_add_note_click(Rc::clone(&directory)));
+    let add_note_button = Button::new("Add Note", on_add_note_click);
     let add_directory_button = Button::new(
         "Add Directory",
         on_add_directory_click(Rc::clone(&directory)),
@@ -59,16 +59,13 @@ fn on_remove_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive)
     }
 }
 
-fn on_add_note_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {
-    move |siv: &mut Cursive| {
-        let directory = Rc::clone(&directory);
-        let message = "Note name?";
+fn on_add_note_click(siv: &mut Cursive) {
+    let message = "Note name?";
 
-        siv.pop_layer();
-        siv.prompt(message, move |siv, note_name| {
-            actions::add_note(siv, &directory.id, note_name);
-        });
-    }
+    siv.pop_layer();
+    siv.prompt(message, move |siv, note_name| {
+        siv.dispatch2(Event::AddNote(note_name.to_owned()));
+    });
 }
 
 fn on_add_directory_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {

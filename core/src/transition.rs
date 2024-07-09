@@ -22,13 +22,11 @@ pub enum Transition {
     RemoveNote(Note),
     RemoveDirectory(Directory),
 
+    AddNote(Note),
+
     ShowNoteActionsDialog(ShowNoteActionsDialog),
     ShowDirectoryActionsDialog(ShowDirectoryActionsDialog),
     /*
-    AddNote {
-        directory_id: DirectoryId,
-        name: String,
-    },
     AddDirectory,
     */
 }

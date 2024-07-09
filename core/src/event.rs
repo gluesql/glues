@@ -27,11 +27,9 @@ pub enum Event {
     CloseDirectoryActionsDialog,
 
     Cancel,
+
+    AddNote(String),
     /*
-    AddNote {
-        directory_id: DirectoryId,
-        name: String,
-    },
     AddDirectory,
     */
 }
