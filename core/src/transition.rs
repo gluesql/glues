@@ -23,12 +23,10 @@ pub enum Transition {
     RemoveDirectory(Directory),
 
     AddNote(Note),
+    AddDirectory(Directory),
 
     ShowNoteActionsDialog(ShowNoteActionsDialog),
     ShowDirectoryActionsDialog(ShowDirectoryActionsDialog),
-    /*
-    AddDirectory,
-    */
 }
 
 pub struct ShowNoteActionsDialog {

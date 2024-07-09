@@ -1,3 +1,4 @@
+mod add_directory;
 mod add_note;
 mod close_directory;
 mod initialize;
@@ -9,6 +10,7 @@ mod rename_note;
 mod show_directory_actions;
 mod show_note_actions;
 
+use add_directory::add_directory;
 use add_note::add_note;
 use close_directory::close_directory;
 use initialize::initialize;
@@ -40,6 +42,7 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
         Transition::AddNote(note) => add_note(siv, note),
         Transition::RenameDirectory(directory) => rename_directory(siv, directory),
         Transition::RemoveDirectory(directory) => remove_directory(siv, directory),
+        Transition::AddDirectory(directory) => add_directory(siv, directory),
         Transition::OpenDirectory {
             id,
             notes,

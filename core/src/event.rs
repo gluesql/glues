@@ -29,9 +29,7 @@ pub enum Event {
     Cancel,
 
     AddNote(String),
-    /*
-    AddDirectory,
-    */
+    AddDirectory(String),
 }
 
 pub enum KeyEvent {

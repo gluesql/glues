@@ -229,9 +229,57 @@ impl NoteTreeState {
                 let directory = directory.clone();
                 let note = db.add_note(directory.id.clone(), note_name).await?;
 
+                let item = state
+                    .root
+                    .find_mut(&directory.id)
+                    .ok_or(Error::Wip("todo: failed to find".to_owned()))?;
+
+                if let DirectoryItem {
+                    children: Some(ref mut children),
+                    ..
+                } = item
+                {
+                    let notes = db.fetch_notes(directory.id.clone()).await?;
+                    children.notes = notes;
+                }
+
                 state.inner_state = InnerState::NoteSelected(note.clone());
 
                 return Ok(Transition::AddNote(note));
+            }
+            (
+                InnerState::DirectoryMoreActions(ref directory),
+                Event::AddDirectory(directory_name),
+            ) => {
+                let parent_id = directory.id.clone();
+                let directory = db.add_directory(parent_id.clone(), directory_name).await?;
+
+                let item = state
+                    .root
+                    .find_mut(&parent_id)
+                    .ok_or(Error::Wip("todo: failed to find {parent_id}".to_owned()))?;
+
+                if let DirectoryItem {
+                    children: Some(ref mut children),
+                    ..
+                } = item
+                {
+                    let directories = db
+                        .fetch_directories(parent_id)
+                        .await?
+                        .into_iter()
+                        .map(|directory| DirectoryItem {
+                            directory,
+                            children: None,
+                        })
+                        .collect();
+
+                    children.directories = directories;
+                }
+
+                state.inner_state = InnerState::DirectorySelected(directory.clone());
+
+                return Ok(Transition::AddDirectory(directory));
             }
             (InnerState::DirectoryMoreActions(ref directory), Event::Cancel) => {
                 state.inner_state = InnerState::DirectorySelected(directory.clone());

@@ -1,5 +1,5 @@
 use {
-    crate::{actions, traits::*},
+    crate::traits::*,
     cursive::{
         align::HAlign,
         views::{Button, CircularFocus, Dialog, DummyView, LinearLayout, TextView},
@@ -13,10 +13,7 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
     let directory = Rc::new(directory);
     let label = TextView::new(format!("'{}'", &directory.name)).h_align(HAlign::Center);
     let add_note_button = Button::new("Add Note", on_add_note_click);
-    let add_directory_button = Button::new(
-        "Add Directory",
-        on_add_directory_click(Rc::clone(&directory)),
-    );
+    let add_directory_button = Button::new("Add Directory", on_add_directory_click);
     let rename_button = Button::new("Rename", |siv| {
         let message = "New name?";
 
@@ -68,14 +65,11 @@ fn on_add_note_click(siv: &mut Cursive) {
     });
 }
 
-fn on_add_directory_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {
-    move |siv: &mut Cursive| {
-        let directory = Rc::clone(&directory);
-        let message = "Directory name?";
+fn on_add_directory_click(siv: &mut Cursive) {
+    let message = "Directory name?";
 
-        siv.pop_layer();
-        siv.prompt(message, move |siv, directory_name| {
-            actions::add_directory(siv, &directory.id, directory_name);
-        });
-    }
+    siv.pop_layer();
+    siv.prompt(message, move |siv, directory_name| {
+        siv.dispatch2(Event::AddDirectory(directory_name.to_owned()));
+    });
 }
