@@ -33,10 +33,8 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
 
     match transition {
         Transition::Initialize => initialize(siv),
-        Transition::ShowNoteActionsDialog(payload) => show_note_actions(siv, payload.note),
-        Transition::ShowDirectoryActionsDialog(payload) => {
-            show_directory_actions(siv, payload.directory)
-        }
+        Transition::ShowNoteActionsDialog(note) => show_note_actions(siv, note),
+        Transition::ShowDirectoryActionsDialog(directory) => show_directory_actions(siv, directory),
         Transition::RenameNote(note) => rename_note(siv, note),
         Transition::RemoveNote(note) => remove_note(siv, note),
         Transition::AddNote(note) => add_note(siv, note),

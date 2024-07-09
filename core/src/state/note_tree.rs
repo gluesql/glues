@@ -2,7 +2,6 @@ use crate::{
     data::{Directory, Note},
     event::KeyEvent,
     state::GetInner,
-    transition::{ShowDirectoryActionsDialog, ShowNoteActionsDialog},
     types::DirectoryId,
     Error, Event, Glues, Result, Transition,
 };
@@ -155,14 +154,14 @@ impl NoteTreeState {
                 let note = note.clone();
                 state.inner_state = InnerState::NoteMoreActions(note.clone());
 
-                return Ok(ShowNoteActionsDialog { note }.into());
+                return Ok(Transition::ShowNoteActionsDialog(note));
             }
             (InnerState::DirectorySelected(ref directory), Event::Key(KeyEvent::M)) => {
                 let directory = directory.clone();
 
                 state.inner_state = InnerState::DirectoryMoreActions(directory.clone());
 
-                return Ok(ShowDirectoryActionsDialog { directory }.into());
+                return Ok(Transition::ShowDirectoryActionsDialog(directory));
             }
             (InnerState::NoteMoreActions(ref note), Event::CloseNoteActionsDialog) => {
                 state.inner_state = InnerState::NoteSelected(note.clone());

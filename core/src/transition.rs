@@ -24,26 +24,6 @@ pub enum Transition {
     AddNote(Note),
     AddDirectory(Directory),
 
-    ShowNoteActionsDialog(ShowNoteActionsDialog),
-    ShowDirectoryActionsDialog(ShowDirectoryActionsDialog),
-}
-
-pub struct ShowNoteActionsDialog {
-    pub note: Note,
-}
-
-pub struct ShowDirectoryActionsDialog {
-    pub directory: Directory,
-}
-
-impl From<ShowNoteActionsDialog> for Transition {
-    fn from(v: ShowNoteActionsDialog) -> Self {
-        Self::ShowNoteActionsDialog(v)
-    }
-}
-
-impl From<ShowDirectoryActionsDialog> for Transition {
-    fn from(v: ShowDirectoryActionsDialog) -> Self {
-        Self::ShowDirectoryActionsDialog(v)
-    }
+    ShowNoteActionsDialog(Note),
+    ShowDirectoryActionsDialog(Directory),
 }
