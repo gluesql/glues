@@ -24,7 +24,7 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
     });
     let remove_button = Button::new("Remove", on_remove_click(directory));
     let cancel_button = Button::new("Cancel", |siv| {
-        siv.dispatch::<()>(Event::CloseDirectoryActionsDialog);
+        siv.dispatch2(Event::CloseDirectoryActionsDialog);
         siv.pop_layer();
     });
 

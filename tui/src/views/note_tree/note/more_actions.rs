@@ -21,7 +21,7 @@ pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
         });
     });
     let cancel_button = Button::new("Cancel", |siv| {
-        siv.dispatch::<()>(Event::CloseNoteActionsDialog);
+        siv.dispatch2(Event::CloseNoteActionsDialog);
         siv.pop_layer();
     });
 

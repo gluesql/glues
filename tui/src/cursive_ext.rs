@@ -1,6 +1,5 @@
 use {
     crate::{
-        actions::update_statusbar,
         components::{alert::render_alert, confirm::render_confirm, prompt::render_prompt},
         traits::*,
         transitions::handle_event,
@@ -11,8 +10,7 @@ use {
     },
     glues_core::{
         state::{GetInner, State},
-        transition::GetTransition,
-        Event, Glues, Transition,
+        Event, Glues,
     },
 };
 
@@ -26,10 +24,6 @@ pub trait CursiveExt {
     fn state_mut<T>(&mut self) -> &mut T
     where
         State: GetInner<T>;
-
-    fn dispatch<T>(&mut self, event: Event) -> T
-    where
-        Transition: GetTransition<T>;
 
     fn dispatch2(&mut self, event: Event);
 
@@ -66,23 +60,6 @@ impl CursiveExt for Cursive {
         State: GetInner<T>,
     {
         self.glues().state.get_inner_mut().log_unwrap()
-    }
-
-    fn dispatch<T>(&mut self, event: Event) -> T
-    where
-        Transition: GetTransition<T>,
-    {
-        self.cb_sink()
-            .send(Box::new(move |siv| {
-                update_statusbar(siv);
-            }))
-            .log_unwrap();
-
-        self.glues()
-            .dispatch(event)
-            .log_unwrap()
-            .get_transition()
-            .log_unwrap()
     }
 
     fn dispatch2(&mut self, event: Event) {
