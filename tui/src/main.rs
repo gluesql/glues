@@ -1,4 +1,3 @@
-mod actions;
 mod components;
 mod cursive_ext;
 mod logger;

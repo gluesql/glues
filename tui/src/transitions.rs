@@ -23,7 +23,7 @@ use show_directory_actions::show_directory_actions;
 use show_note_actions::show_note_actions;
 
 use {
-    crate::{actions, traits::*},
+    crate::{traits::*, Node},
     cursive::Cursive,
     glues_core::{Event, Transition},
 };
@@ -54,5 +54,20 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
         }
     };
 
-    actions::update_statusbar(siv);
+    update_statusbar(siv);
+}
+
+fn update_statusbar(siv: &mut Cursive) {
+    let statusbar_node = Node::statusbar();
+
+    let description = siv.glues().state.describe();
+    statusbar_node
+        .description()
+        .find(siv)
+        .set_content(&description);
+
+    let shortcuts = siv.glues().state.shortcuts().join(", ");
+    statusbar_node.shortcuts().find(siv).set_content(&shortcuts);
+
+    log(&format!("[state] {description} / {shortcuts}"));
 }
