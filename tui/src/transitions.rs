@@ -28,22 +28,14 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
     let transition = siv.glues().dispatch(event).log_unwrap();
 
     match transition {
-        Transition::Initialize => {
-            initialize(siv);
-        }
-        Transition::ShowNoteActionsDialog(payload) => {
-            show_note_actions(siv, payload.note);
-        }
+        Transition::Initialize => initialize(siv),
+        Transition::ShowNoteActionsDialog(payload) => show_note_actions(siv, payload.note),
         Transition::ShowDirectoryActionsDialog(payload) => {
-            show_directory_actions(siv, payload.directory);
+            show_directory_actions(siv, payload.directory)
         }
-        Transition::RenameNote { id, name } => {
-            rename_note(siv, id, name);
-        }
+        Transition::RenameNote { id, name } => rename_note(siv, id, name),
         Transition::RemoveNote(note) => remove_note(siv, note),
-        Transition::RenameDirectory { id, name } => {
-            rename_directory(siv, id, name);
-        }
+        Transition::RenameDirectory { id, name } => rename_directory(siv, id, name),
         Transition::RemoveDirectory(directory) => remove_directory(siv, directory),
         Transition::OpenDirectory {
             id,
@@ -52,9 +44,7 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
         } => {
             open_directory(siv, id, notes, directories);
         }
-        Transition::CloseDirectory(id) => {
-            close_directory(siv, id);
-        }
+        Transition::CloseDirectory(id) => close_directory(siv, id),
         _ => {
             log("todo");
         }
