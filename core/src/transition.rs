@@ -1,7 +1,7 @@
 use crate::{
     data::{Directory, Note},
     state::note_tree::DirectoryItem,
-    types::{DirectoryId, NoteId},
+    types::DirectoryId,
     Error, Result,
 };
 
@@ -16,14 +16,8 @@ pub enum Transition {
     },
     CloseDirectory(DirectoryId),
 
-    RenameNote {
-        id: NoteId,
-        name: String,
-    },
-    RenameDirectory {
-        id: DirectoryId,
-        name: String,
-    },
+    RenameNote(Note),
+    RenameDirectory(Directory),
 
     RemoveNote(Note),
     RemoveDirectory(Directory),
@@ -36,12 +30,6 @@ pub enum Transition {
         name: String,
     },
     AddDirectory,
-
-    RemoveNote,
-    RemoveDirectory,
-
-    RenameNote,
-    RenameDirectory,
     */
 }
 

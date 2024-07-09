@@ -1,20 +1,20 @@
 use {
     crate::{logger::log, traits::*, Node},
     cursive::Cursive,
-    glues_core::types::NoteId,
+    glues_core::data::Note,
 };
 
-pub fn rename_note(siv: &mut Cursive, id: NoteId, new_name: String) {
+pub fn rename_note(siv: &mut Cursive, note: Note) {
     let msg = format!(
         "[transition::rename_note] note_id: {}, rename to {}",
-        id, new_name,
+        note.id, note.name,
     );
     log(&msg);
 
     // ui
     Node::note_tree()
-        .note(&id)
+        .note(&note.id)
         .name_button()
         .find(siv)
-        .set_label_raw(new_name);
+        .set_label_raw(note.name);
 }

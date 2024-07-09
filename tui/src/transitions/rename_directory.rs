@@ -1,20 +1,20 @@
 use {
     crate::{logger::log, traits::*, Node},
     cursive::Cursive,
-    glues_core::types::DirectoryId,
+    glues_core::data::Directory,
 };
 
-pub fn rename_directory(siv: &mut Cursive, id: DirectoryId, new_name: String) {
+pub fn rename_directory(siv: &mut Cursive, directory: Directory) {
     let msg = format!(
         "[transition::rename_directory] directory_id: {}, rename to {}",
-        id, new_name,
+        directory.id, directory.name,
     );
     log(&msg);
 
     // ui
     Node::note_tree()
-        .directory(&id)
+        .directory(&directory.id)
         .name_button()
         .find(siv)
-        .set_label_raw(new_name);
+        .set_label_raw(directory.name);
 }

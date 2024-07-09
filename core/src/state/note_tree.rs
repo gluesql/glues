@@ -186,12 +186,13 @@ impl NoteTreeState {
                 state.inner_state = InnerState::DirectorySelected(directory);
             }
             (InnerState::NoteMoreActions(ref note), Event::RenameNote(new_name)) => {
-                let id = note.id.clone();
-                db.rename_note(id.clone(), new_name.clone()).await?;
+                let mut note = note.clone();
+                db.rename_note(note.id.clone(), new_name.clone()).await?;
 
+                note.name = new_name;
                 state.inner_state = InnerState::NoteSelected(note.clone());
 
-                return Ok(Transition::RenameNote { id, name: new_name });
+                return Ok(Transition::RenameNote(note));
             }
             (InnerState::NoteMoreActions(ref note), Event::RemoveNote) => {
                 let note = note.clone();
@@ -206,16 +207,15 @@ impl NoteTreeState {
                 state.inner_state = InnerState::NoteSelected(note.clone());
             }
             (InnerState::DirectoryMoreActions(ref directory), Event::RenameDirectory(new_name)) => {
-                let directory = directory.clone();
+                let mut directory = directory.clone();
+
                 db.rename_directory(directory.id.clone(), new_name.clone())
                     .await?;
 
+                directory.name = new_name;
                 state.inner_state = InnerState::DirectorySelected(directory.clone());
 
-                return Ok(Transition::RenameDirectory {
-                    id: directory.id,
-                    name: new_name,
-                });
+                return Ok(Transition::RenameDirectory(directory));
             }
             (InnerState::DirectoryMoreActions(ref directory), Event::RemoveDirectory) => {
                 let directory = directory.clone();

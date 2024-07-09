@@ -33,12 +33,6 @@ pub enum Event {
         name: String,
     },
     AddDirectory,
-
-    RemoveNote,
-    RemoveDirectory,
-
-    RenameNote,
-    RenameDirectory,
     */
 }
 
