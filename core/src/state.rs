@@ -7,14 +7,14 @@ pub use {entry::EntryState, note_tree::NoteTreeState};
 
 pub enum State {
     EntryState(EntryState),
-    NoteTreeState(note_tree::NoteTreeState),
+    NoteTreeState(NoteTreeState),
 }
 
 impl State {
     pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
         match &glues.state {
             State::EntryState(_) => EntryState::consume(glues, event).await,
-            State::NoteTreeState(_) => NoteTreeState::consume(glues, event).await,
+            State::NoteTreeState(_) => note_tree::consume(glues, event).await,
         }
     }
 

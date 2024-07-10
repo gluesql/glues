@@ -1,3 +1,6 @@
+mod directory;
+mod note;
+
 use crate::{
     data::{Directory, Note},
     event::KeyEvent,
@@ -96,200 +99,6 @@ impl NoteTreeState {
         )
     }
 
-    pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
-        let db = &mut glues.db;
-        let state: &mut NoteTreeState = glues.state.get_inner_mut()?;
-
-        match (&state.inner_state, event) {
-            (
-                InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
-                Event::OpenDirectory(directory_id),
-            ) => {
-                let item = state
-                    .root
-                    .find_mut(&directory_id)
-                    .ok_or(Error::Wip("todo: asdfasdf".to_owned()))?;
-
-                if item.children.is_none() {
-                    let notes = db.fetch_notes(directory_id.clone()).await?;
-                    let directories = db
-                        .fetch_directories(directory_id.clone())
-                        .await?
-                        .into_iter()
-                        .map(|directory| DirectoryItem {
-                            directory,
-                            children: None,
-                        })
-                        .collect();
-
-                    item.children = Some(DirectoryItemChildren { notes, directories });
-                }
-
-                let (notes, directories) = match &mut item.children {
-                    Some(children) => (&children.notes, &children.directories),
-                    None => {
-                        panic!("...?");
-                    }
-                };
-
-                return Ok(Transition::OpenDirectory {
-                    id: directory_id.clone(),
-                    notes: notes.clone(),
-                    directories: directories.clone(),
-                });
-            }
-            (
-                InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
-                Event::CloseDirectory(directory_id),
-            ) => {
-                state
-                    .root
-                    .find_mut(&directory_id)
-                    .ok_or(Error::Wip("todo: asdfasdf".to_owned()))?
-                    .children = None;
-
-                return Ok(Transition::CloseDirectory(directory_id.clone()));
-            }
-            (InnerState::NoteSelected(ref note), Event::Key(KeyEvent::M)) => {
-                let note = note.clone();
-                state.inner_state = InnerState::NoteMoreActions(note.clone());
-
-                return Ok(Transition::ShowNoteActionsDialog(note));
-            }
-            (InnerState::DirectorySelected(ref directory), Event::Key(KeyEvent::M)) => {
-                let directory = directory.clone();
-
-                state.inner_state = InnerState::DirectoryMoreActions(directory.clone());
-
-                return Ok(Transition::ShowDirectoryActionsDialog(directory));
-            }
-            (InnerState::NoteMoreActions(ref note), Event::CloseNoteActionsDialog) => {
-                state.inner_state = InnerState::NoteSelected(note.clone());
-            }
-            (
-                InnerState::DirectoryMoreActions(ref directory),
-                Event::CloseDirectoryActionsDialog,
-            ) => {
-                state.inner_state = InnerState::DirectorySelected(directory.clone());
-            }
-            (
-                InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
-                Event::SelectNote(note),
-            ) => {
-                state.inner_state = InnerState::NoteSelected(note);
-            }
-            (
-                InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
-                Event::SelectDirectory(directory),
-            ) => {
-                state.inner_state = InnerState::DirectorySelected(directory);
-            }
-            (InnerState::NoteMoreActions(ref note), Event::RenameNote(new_name)) => {
-                let mut note = note.clone();
-                db.rename_note(note.id.clone(), new_name.clone()).await?;
-
-                note.name = new_name;
-                state.inner_state = InnerState::NoteSelected(note.clone());
-
-                return Ok(Transition::RenameNote(note));
-            }
-            (InnerState::NoteMoreActions(ref note), Event::RemoveNote) => {
-                let note = note.clone();
-
-                db.remove_note(note.id.clone()).await?;
-
-                state.inner_state = InnerState::NoteSelected(note.clone());
-
-                return Ok(Transition::RemoveNote(note));
-            }
-            (InnerState::NoteMoreActions(ref note), Event::Cancel) => {
-                state.inner_state = InnerState::NoteSelected(note.clone());
-            }
-            (InnerState::DirectoryMoreActions(ref directory), Event::RenameDirectory(new_name)) => {
-                let mut directory = directory.clone();
-
-                db.rename_directory(directory.id.clone(), new_name.clone())
-                    .await?;
-
-                directory.name = new_name;
-                state.inner_state = InnerState::DirectorySelected(directory.clone());
-
-                return Ok(Transition::RenameDirectory(directory));
-            }
-            (InnerState::DirectoryMoreActions(ref directory), Event::RemoveDirectory) => {
-                let directory = directory.clone();
-                db.remove_directory(directory.id.clone()).await?;
-
-                state.inner_state = InnerState::DirectorySelected(directory.clone());
-
-                return Ok(Transition::RemoveDirectory(directory));
-            }
-            (InnerState::DirectoryMoreActions(ref directory), Event::AddNote(note_name)) => {
-                let directory = directory.clone();
-                let note = db.add_note(directory.id.clone(), note_name).await?;
-
-                let item = state
-                    .root
-                    .find_mut(&directory.id)
-                    .ok_or(Error::Wip("todo: failed to find".to_owned()))?;
-
-                if let DirectoryItem {
-                    children: Some(ref mut children),
-                    ..
-                } = item
-                {
-                    let notes = db.fetch_notes(directory.id.clone()).await?;
-                    children.notes = notes;
-                }
-
-                state.inner_state = InnerState::NoteSelected(note.clone());
-
-                return Ok(Transition::AddNote(note));
-            }
-            (
-                InnerState::DirectoryMoreActions(ref directory),
-                Event::AddDirectory(directory_name),
-            ) => {
-                let parent_id = directory.id.clone();
-                let directory = db.add_directory(parent_id.clone(), directory_name).await?;
-
-                let item = state
-                    .root
-                    .find_mut(&parent_id)
-                    .ok_or(Error::Wip("todo: failed to find {parent_id}".to_owned()))?;
-
-                if let DirectoryItem {
-                    children: Some(ref mut children),
-                    ..
-                } = item
-                {
-                    let directories = db
-                        .fetch_directories(parent_id)
-                        .await?
-                        .into_iter()
-                        .map(|directory| DirectoryItem {
-                            directory,
-                            children: None,
-                        })
-                        .collect();
-
-                    children.directories = directories;
-                }
-
-                state.inner_state = InnerState::DirectorySelected(directory.clone());
-
-                return Ok(Transition::AddDirectory(directory));
-            }
-            (InnerState::DirectoryMoreActions(ref directory), Event::Cancel) => {
-                state.inner_state = InnerState::DirectorySelected(directory.clone());
-            }
-            (_, Event::Key(_)) => {}
-            _ => return Err(Error::Wip("todo: NoteTree::consume".to_owned())),
-        };
-
-        Ok(Transition::None)
-    }
-
     pub fn describe(&self) -> String {
         match &self.inner_state {
             InnerState::NoteSelected(Note { name, .. }) => format!("Note '{name}' selected"),
@@ -308,5 +117,65 @@ impl NoteTreeState {
             }
             _ => vec![],
         }
+    }
+}
+
+pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
+    let db = &mut glues.db;
+    let state: &mut NoteTreeState = glues.state.get_inner_mut()?;
+
+    match (event, &state.inner_state) {
+        (
+            Event::OpenDirectory(directory_id),
+            InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
+        ) => directory::open(db, state, directory_id).await,
+        (
+            Event::CloseDirectory(directory_id),
+            InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
+        ) => directory::close(state, directory_id),
+        (Event::Key(KeyEvent::M), InnerState::NoteSelected(ref note)) => {
+            note::show_actions_dialog(state, note.clone())
+        }
+        (Event::Key(KeyEvent::M), InnerState::DirectorySelected(ref directory)) => {
+            directory::show_actions_dialog(state, directory.clone())
+        }
+        (Event::CloseNoteActionsDialog, InnerState::NoteMoreActions(ref note)) => {
+            note::select(state, note.clone())
+        }
+        (Event::CloseDirectoryActionsDialog, InnerState::DirectoryMoreActions(ref directory)) => {
+            directory::select(state, directory.clone())
+        }
+        (
+            Event::SelectNote(note),
+            InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
+        ) => note::select(state, note),
+        (
+            Event::SelectDirectory(directory),
+            InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
+        ) => directory::select(state, directory),
+        (Event::RenameNote(new_name), InnerState::NoteMoreActions(ref note)) => {
+            note::rename(db, state, note.clone(), new_name).await
+        }
+        (Event::RemoveNote, InnerState::NoteMoreActions(ref note)) => {
+            note::remove(db, state, note.clone()).await
+        }
+        (Event::RenameDirectory(new_name), InnerState::DirectoryMoreActions(ref directory)) => {
+            directory::rename(db, state, directory.clone(), new_name).await
+        }
+        (Event::RemoveDirectory, InnerState::DirectoryMoreActions(ref directory)) => {
+            directory::remove(db, state, directory.clone()).await
+        }
+        (Event::AddNote(note_name), InnerState::DirectoryMoreActions(ref directory)) => {
+            note::add(db, state, directory.clone(), note_name).await
+        }
+        (Event::AddDirectory(directory_name), InnerState::DirectoryMoreActions(ref directory)) => {
+            directory::add(db, state, directory.clone(), directory_name).await
+        }
+        (Event::Cancel, InnerState::NoteMoreActions(ref note)) => note::select(state, note.clone()),
+        (Event::Cancel, InnerState::DirectoryMoreActions(ref directory)) => {
+            directory::select(state, directory.clone())
+        }
+        (Event::Key(_), _) => Ok(Transition::None),
+        _ => Err(Error::Wip("todo: NoteTree::consume".to_owned())),
     }
 }
