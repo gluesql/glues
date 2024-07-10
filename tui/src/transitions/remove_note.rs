@@ -1,15 +1,15 @@
 use {
-    crate::{logger::log, traits::*, Node},
+    crate::{traits::*, Node},
     cursive::Cursive,
     glues_core::data::Note,
 };
 
 pub fn remove_note(siv: &mut Cursive, note: Note) {
-    let msg = format!(
+    log!(
         "[transitions::remove_note] directory_id: {}, note_id: {}",
-        note.directory_id, note.id,
+        note.directory_id,
+        note.id,
     );
-    log(&msg);
 
     let mut container = Node::note_tree()
         .directory(&note.directory_id)

@@ -1,15 +1,15 @@
 use {
-    crate::{logger::log, traits::*, Node},
+    crate::{traits::*, Node},
     cursive::Cursive,
     glues_core::data::Directory,
 };
 
 pub fn rename_directory(siv: &mut Cursive, directory: Directory) {
-    let msg = format!(
+    log!(
         "[transition::rename_directory] directory_id: {}, rename to {}",
-        directory.id, directory.name,
+        directory.id,
+        directory.name,
     );
-    log(&msg);
 
     // ui
     Node::note_tree()

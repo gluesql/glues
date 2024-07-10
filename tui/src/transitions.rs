@@ -50,7 +50,7 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
         }
         Transition::CloseDirectory(id) => close_directory(siv, id),
         _ => {
-            log("todo");
+            log!("todo");
         }
     };
 
@@ -69,5 +69,5 @@ fn update_statusbar(siv: &mut Cursive) {
     let shortcuts = siv.glues().state.shortcuts().join(", ");
     statusbar_node.shortcuts().find(siv).set_content(&shortcuts);
 
-    log(&format!("[state] {description} / {shortcuts}"));
+    log!("[state] {description} / {shortcuts}");
 }

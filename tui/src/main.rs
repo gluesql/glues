@@ -1,5 +1,6 @@
 mod components;
 mod cursive_ext;
+#[macro_use]
 mod logger;
 mod node;
 mod transitions;
@@ -21,7 +22,6 @@ use {
     },
     futures::executor::block_on,
     glues_core::{Glues, KeyEvent},
-    logger::log,
     node::Node,
     traits::*,
     transitions::handle_event,
@@ -32,7 +32,7 @@ fn main() {
     cursive::logger::init();
     logger::init();
 
-    log("logger initialized");
+    log!("logger initialized");
 
     let mut glues = block_on(Glues::new());
 
@@ -57,7 +57,7 @@ fn main() {
             .log_unwrap();
     }
 
-    log("added sample notes & directories");
+    log!("added sample notes & directories");
 
     let mut siv = cursive::default();
     siv.set_user_data(glues);

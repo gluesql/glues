@@ -1,15 +1,15 @@
 use {
-    crate::{logger::log, traits::*, Node},
+    crate::{traits::*, Node},
     cursive::Cursive,
     glues_core::data::Directory,
 };
 
 pub fn remove_directory(siv: &mut Cursive, directory: Directory) {
-    let msg = format!(
+    log!(
         "[transitions::remove_directory] directory_id: {} / {}",
-        directory.id, directory.name
+        directory.id,
+        directory.name
     );
-    log(&msg);
 
     // ui - directory
     let mut container = Node::note_tree()

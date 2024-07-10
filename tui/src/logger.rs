@@ -52,6 +52,13 @@ pub fn log(message: &str) {
     })
 }
 
+#[macro_export]
+macro_rules! log {
+    ($($arg:tt)*) => {
+        log(&format!($($arg)*));
+    };
+}
+
 pub trait LogExpectExt<V> {
     fn log_expect(self, message: &str) -> V;
 }
@@ -61,7 +68,7 @@ impl<V> LogExpectExt<V> for Option<V> {
         if let Some(v) = self {
             v
         } else {
-            log(message);
+            log!("{message}");
             panic!("{message}");
         }
     }
@@ -81,7 +88,7 @@ where
             Ok(v) => v,
             Err(e) => {
                 let e = e.to_string();
-                log(&e);
+                log!("{e}");
                 panic!("{e}");
             }
         }
@@ -102,7 +109,7 @@ where
             Ok(v) => v,
             Err(e) => {
                 let e = e.to_string();
-                log(&e);
+                log!("{e}");
                 panic!("{e}");
             }
         }
