@@ -30,6 +30,8 @@ pub enum Event {
 
     AddNote(String),
     AddDirectory(String),
+
+    EditNote,
 }
 
 pub enum KeyEvent {

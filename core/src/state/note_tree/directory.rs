@@ -1,5 +1,5 @@
 use {
-    super::{DirectoryItem, DirectoryItemChildren, InnerState, NoteTreeState},
+    super::{BrowsingState, DirectoryItem, DirectoryItemChildren, NoteTreeState},
     crate::{data::Directory, db::Db, types::DirectoryId, Error, Result, Transition},
 };
 
@@ -56,13 +56,13 @@ pub(super) fn show_actions_dialog(
     state: &mut NoteTreeState,
     directory: Directory,
 ) -> Result<Transition> {
-    state.inner_state = InnerState::DirectoryMoreActions(directory.clone());
+    state.inner_state = BrowsingState::DirectoryMoreActions(directory.clone()).into();
 
     Ok(Transition::ShowDirectoryActionsDialog(directory))
 }
 
 pub(super) fn select(state: &mut NoteTreeState, directory: Directory) -> Result<Transition> {
-    state.inner_state = InnerState::DirectorySelected(directory);
+    state.inner_state = BrowsingState::DirectorySelected(directory).into();
 
     Ok(Transition::None)
 }
@@ -77,7 +77,7 @@ pub(super) async fn rename(
         .await?;
 
     directory.name = new_name;
-    state.inner_state = InnerState::DirectorySelected(directory.clone());
+    state.inner_state = BrowsingState::DirectorySelected(directory.clone()).into();
 
     Ok(Transition::RenameDirectory(directory))
 }
@@ -89,7 +89,7 @@ pub(super) async fn remove(
 ) -> Result<Transition> {
     db.remove_directory(directory.id.clone()).await?;
 
-    state.inner_state = InnerState::DirectorySelected(directory.clone());
+    state.inner_state = BrowsingState::DirectorySelected(directory.clone()).into();
 
     Ok(Transition::RemoveDirectory(directory))
 }
@@ -126,7 +126,7 @@ pub(super) async fn add(
         children.directories = directories;
     }
 
-    state.inner_state = InnerState::DirectorySelected(directory.clone());
+    state.inner_state = BrowsingState::DirectorySelected(directory.clone()).into();
 
     Ok(Transition::AddDirectory(directory))
 }

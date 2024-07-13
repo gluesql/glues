@@ -16,11 +16,30 @@ pub struct NoteTreeState {
 }
 
 pub enum InnerState {
+    Browsing(BrowsingState),
+
+    Editing {
+        browsing_state: BrowsingState,
+        note: Note,
+        content: String,
+    },
+}
+
+#[derive(Clone)]
+pub enum BrowsingState {
     NoteSelected(Note),
     NoteMoreActions(Note),
 
     DirectorySelected(Directory),
     DirectoryMoreActions(Directory),
+}
+
+use {BrowsingState::*, InnerState::*};
+
+impl From<BrowsingState> for InnerState {
+    fn from(state: BrowsingState) -> Self {
+        InnerState::Browsing(state)
+    }
 }
 
 #[derive(Clone)]
@@ -84,7 +103,7 @@ impl NoteTreeState {
         };
 
         Ok(NoteTreeState {
-            inner_state: InnerState::DirectorySelected(root.directory.clone()),
+            inner_state: Browsing(DirectorySelected(root.directory.clone())),
             root,
         })
     }
@@ -101,18 +120,19 @@ impl NoteTreeState {
 
     pub fn describe(&self) -> String {
         match &self.inner_state {
-            InnerState::NoteSelected(Note { name, .. }) => format!("Note '{name}' selected"),
-            InnerState::DirectorySelected(Directory { name, .. }) => {
+            Browsing(NoteSelected(Note { name, .. })) => format!("Note '{name}' selected"),
+            Browsing(DirectorySelected(Directory { name, .. })) => {
                 format!("Directory '{name}' selected")
             }
-            InnerState::NoteMoreActions(_) => "Note actions dialog".to_owned(),
-            InnerState::DirectoryMoreActions(_) => "Directory actions dialog".to_owned(),
+            Browsing(NoteMoreActions(_)) => "Note actions dialog".to_owned(),
+            Browsing(DirectoryMoreActions(_)) => "Directory actions dialog".to_owned(),
+            Editing { .. } => "TODO".to_owned(),
         }
     }
 
     pub fn shortcuts(&self) -> Vec<String> {
         match &self.inner_state {
-            InnerState::NoteSelected(_) | InnerState::DirectorySelected { .. } => {
+            Browsing(NoteSelected(_)) | Browsing(DirectorySelected { .. }) => {
                 vec!["[M] More actions".to_owned()]
             }
             _ => vec![],
@@ -127,52 +147,54 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
     match (event, &state.inner_state) {
         (
             Event::OpenDirectory(directory_id),
-            InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
+            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)),
         ) => directory::open(db, state, directory_id).await,
         (
             Event::CloseDirectory(directory_id),
-            InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
+            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)),
         ) => directory::close(state, directory_id),
-        (Event::Key(KeyEvent::M), InnerState::NoteSelected(ref note)) => {
+        (Event::Key(KeyEvent::M), Browsing(NoteSelected(ref note))) => {
             note::show_actions_dialog(state, note.clone())
         }
-        (Event::Key(KeyEvent::M), InnerState::DirectorySelected(ref directory)) => {
+        (Event::Key(KeyEvent::M), Browsing(DirectorySelected(ref directory))) => {
             directory::show_actions_dialog(state, directory.clone())
         }
-        (Event::CloseNoteActionsDialog, InnerState::NoteMoreActions(ref note)) => {
+        (Event::CloseNoteActionsDialog, Browsing(NoteMoreActions(ref note))) => {
             note::select(state, note.clone())
         }
-        (Event::CloseDirectoryActionsDialog, InnerState::DirectoryMoreActions(ref directory)) => {
+        (Event::CloseDirectoryActionsDialog, Browsing(DirectoryMoreActions(ref directory))) => {
             directory::select(state, directory.clone())
         }
-        (
-            Event::SelectNote(note),
-            InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
-        ) => note::select(state, note),
+        (Event::SelectNote(note), Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_))) => {
+            note::select(state, note)
+        }
         (
             Event::SelectDirectory(directory),
-            InnerState::DirectorySelected(_) | InnerState::NoteSelected(_),
+            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)),
         ) => directory::select(state, directory),
-        (Event::RenameNote(new_name), InnerState::NoteMoreActions(ref note)) => {
+        (Event::RenameNote(new_name), Browsing(NoteMoreActions(ref note))) => {
             note::rename(db, state, note.clone(), new_name).await
         }
-        (Event::RemoveNote, InnerState::NoteMoreActions(ref note)) => {
+        (Event::RemoveNote, Browsing(NoteMoreActions(ref note))) => {
             note::remove(db, state, note.clone()).await
         }
-        (Event::RenameDirectory(new_name), InnerState::DirectoryMoreActions(ref directory)) => {
+        (Event::RenameDirectory(new_name), Browsing(DirectoryMoreActions(ref directory))) => {
             directory::rename(db, state, directory.clone(), new_name).await
         }
-        (Event::RemoveDirectory, InnerState::DirectoryMoreActions(ref directory)) => {
+        (Event::RemoveDirectory, Browsing(DirectoryMoreActions(ref directory))) => {
             directory::remove(db, state, directory.clone()).await
         }
-        (Event::AddNote(note_name), InnerState::DirectoryMoreActions(ref directory)) => {
+        (Event::AddNote(note_name), Browsing(DirectoryMoreActions(ref directory))) => {
             note::add(db, state, directory.clone(), note_name).await
         }
-        (Event::AddDirectory(directory_name), InnerState::DirectoryMoreActions(ref directory)) => {
+        (Event::AddDirectory(directory_name), Browsing(DirectoryMoreActions(ref directory))) => {
             directory::add(db, state, directory.clone(), directory_name).await
         }
-        (Event::Cancel, InnerState::NoteMoreActions(ref note)) => note::select(state, note.clone()),
-        (Event::Cancel, InnerState::DirectoryMoreActions(ref directory)) => {
+        (Event::EditNote, Browsing(NoteSelected(ref note))) => {
+            note::edit(db, state, note.clone()).await
+        }
+        (Event::Cancel, Browsing(NoteMoreActions(ref note))) => note::select(state, note.clone()),
+        (Event::Cancel, Browsing(DirectoryMoreActions(ref directory))) => {
             directory::select(state, directory.clone())
         }
         (Event::Key(_), _) => Ok(Transition::None),

@@ -26,4 +26,9 @@ pub enum Transition {
 
     ShowNoteActionsDialog(Note),
     ShowDirectoryActionsDialog(Directory),
+
+    EditNote {
+        note: Note,
+        content: String,
+    },
 }

@@ -1,5 +1,5 @@
 use {
-    super::{DirectoryItem, InnerState, NoteTreeState},
+    super::{BrowsingState, DirectoryItem, NoteTreeState},
     crate::{
         data::{Directory, Note},
         db::Db,
@@ -8,13 +8,13 @@ use {
 };
 
 pub(super) fn show_actions_dialog(state: &mut NoteTreeState, note: Note) -> Result<Transition> {
-    state.inner_state = InnerState::NoteMoreActions(note.clone());
+    state.inner_state = BrowsingState::NoteMoreActions(note.clone()).into();
 
     Ok(Transition::ShowNoteActionsDialog(note))
 }
 
 pub(super) fn select(state: &mut NoteTreeState, note: Note) -> Result<Transition> {
-    state.inner_state = InnerState::NoteSelected(note);
+    state.inner_state = BrowsingState::NoteSelected(note).into();
 
     Ok(Transition::None)
 }
@@ -28,7 +28,7 @@ pub(super) async fn rename(
     db.rename_note(note.id.clone(), new_name.clone()).await?;
 
     note.name = new_name;
-    state.inner_state = InnerState::NoteSelected(note.clone());
+    state.inner_state = BrowsingState::NoteSelected(note.clone()).into();
 
     Ok(Transition::RenameNote(note))
 }
@@ -40,7 +40,7 @@ pub(super) async fn remove(
 ) -> Result<Transition> {
     db.remove_note(note.id.clone()).await?;
 
-    state.inner_state = InnerState::NoteSelected(note.clone());
+    state.inner_state = BrowsingState::NoteSelected(note.clone()).into();
 
     Ok(Transition::RemoveNote(note))
 }
@@ -67,7 +67,15 @@ pub(super) async fn add(
         children.notes = notes;
     }
 
-    state.inner_state = InnerState::NoteSelected(note.clone());
+    state.inner_state = BrowsingState::NoteSelected(note.clone()).into();
 
     Ok(Transition::AddNote(note))
+}
+
+pub(super) async fn edit(
+    _db: &mut Db,
+    _state: &mut NoteTreeState,
+    _note: Note,
+) -> Result<Transition> {
+    panic!();
 }
