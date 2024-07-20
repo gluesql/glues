@@ -17,12 +17,27 @@ pub struct NoteTreeState {
 
 pub enum InnerState {
     Browsing(BrowsingState),
+    Editing(EditingState),
+}
 
-    Editing {
-        browsing_state: BrowsingState,
-        note: Note,
-        content: String,
-    },
+#[derive(Clone, Copy)]
+pub enum EditingMode {
+    View,
+    Edit,
+}
+
+#[derive(Clone)]
+pub struct EditingState {
+    mode: EditingMode,
+    browsing_state: BrowsingState,
+    note: Note,
+    content: String,
+}
+
+impl From<EditingState> for InnerState {
+    fn from(state: EditingState) -> Self {
+        InnerState::Editing(state)
+    }
 }
 
 #[derive(Clone)]
@@ -126,7 +141,8 @@ impl NoteTreeState {
             }
             Browsing(NoteMoreActions(_)) => "Note actions dialog".to_owned(),
             Browsing(DirectoryMoreActions(_)) => "Directory actions dialog".to_owned(),
-            Editing { .. } => "TODO".to_owned(),
+            Editing(EditingState { mode: EditingMode::View, .. }) => "editing - view".to_owned(),
+            Editing(EditingState { mode: EditingMode::Edit, .. }) => "editing - edit".to_owned(),
         }
     }
 
@@ -134,6 +150,12 @@ impl NoteTreeState {
         match &self.inner_state {
             Browsing(NoteSelected(_)) | Browsing(DirectorySelected { .. }) => {
                 vec!["[M] More actions".to_owned()]
+            }
+            Editing(EditingState { mode: EditingMode::View, .. }) => {
+                vec!["[E] Edit mode".to_owned()]
+            }
+            Editing(EditingState { mode: EditingMode::Edit, .. }) => {
+                vec!["[Esc] View mode".to_owned()]
             }
             _ => vec![],
         }
@@ -165,12 +187,14 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
         (Event::CloseDirectoryActionsDialog, Browsing(DirectoryMoreActions(ref directory))) => {
             directory::select(state, directory.clone())
         }
-        (Event::SelectNote(note), Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_))) => {
+        (Event::SelectNote(note),
+            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)) | Editing(EditingState { mode: EditingMode::View, .. })
+        ) => {
             note::select(state, note)
         }
         (
             Event::SelectDirectory(directory),
-            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)),
+            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)) | Editing(EditingState { mode: EditingMode::View, .. }),
         ) => directory::select(state, directory),
         (Event::RenameNote(new_name), Browsing(NoteMoreActions(ref note))) => {
             note::rename(db, state, note.clone(), new_name).await
@@ -190,14 +214,23 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
         (Event::AddDirectory(directory_name), Browsing(DirectoryMoreActions(ref directory))) => {
             directory::add(db, state, directory.clone(), directory_name).await
         }
-        (Event::EditNote, Browsing(NoteSelected(ref note))) => {
-            note::edit(db, state, note.clone()).await
+        (Event::OpenNote, Browsing(s @ NoteSelected(ref note))) => {
+            note::open(db, state, s.clone(), note.clone()).await
+        }
+        (Event::Key(KeyEvent::E), Editing(s @ EditingState { mode: EditingMode::View, .. })) => {
+            note::edit(state, s.clone()).await
+        }
+        (Event::Key(KeyEvent::Esc), Editing(s @ EditingState {
+            mode: EditingMode::Edit,
+            ..
+        })) => {
+            note::view(state, s.clone()).await
         }
         (Event::Cancel, Browsing(NoteMoreActions(ref note))) => note::select(state, note.clone()),
         (Event::Cancel, Browsing(DirectoryMoreActions(ref directory))) => {
             directory::select(state, directory.clone())
         }
-        (Event::Key(_), _) => Ok(Transition::None),
+        (event @ Event::Key(_), _) => Ok(Transition::Inedible(event)),
         _ => Err(Error::Wip("todo: NoteTree::consume".to_owned())),
     }
 }

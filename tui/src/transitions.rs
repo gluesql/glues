@@ -1,31 +1,37 @@
 mod add_directory;
 mod add_note;
 mod close_directory;
+mod edit_mode;
 mod initialize;
 mod open_directory;
+mod open_note;
 mod remove_directory;
 mod remove_note;
 mod rename_directory;
 mod rename_note;
 mod show_directory_actions;
 mod show_note_actions;
+mod view_mode;
 
 use add_directory::add_directory;
 use add_note::add_note;
 use close_directory::close_directory;
+use edit_mode::edit_mode;
 use initialize::initialize;
 use open_directory::open_directory;
+use open_note::open_note;
 use remove_directory::remove_directory;
 use remove_note::remove_note;
 use rename_directory::rename_directory;
 use rename_note::rename_note;
 use show_directory_actions::show_directory_actions;
 use show_note_actions::show_note_actions;
+use view_mode::view_mode;
 
 use {
     crate::{traits::*, Node},
     cursive::Cursive,
-    glues_core::{Event, Transition},
+    glues_core::{Event, KeyEvent, Transition},
 };
 
 pub fn handle_event(siv: &mut Cursive, event: Event) {
@@ -49,6 +55,18 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
             open_directory(siv, id, notes, directories);
         }
         Transition::CloseDirectory(id) => close_directory(siv, id),
+        Transition::OpenNote { note, content } => {
+            open_note(siv, note, content);
+        }
+        Transition::EditMode => {
+            edit_mode(siv);
+        }
+        Transition::ViewMode(note) => {
+            view_mode(siv, note);
+        }
+        Transition::Inedible(Event::Key(KeyEvent::Esc)) => {
+            siv.select_menubar();
+        }
         _ => {
             log!("todo");
         }

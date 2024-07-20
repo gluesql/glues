@@ -16,6 +16,7 @@ mod traits {
 
 use {
     cursive::{
+        event::Key,
         view::{Nameable, Resizable},
         views::{DummyView, LinearLayout, PaddedView, StackView},
         Cursive,
@@ -64,6 +65,12 @@ fn main() {
     siv.add_global_callback('a', Cursive::toggle_debug_console);
     siv.add_global_callback('m', |siv| {
         handle_event(siv, KeyEvent::M.into());
+    });
+    siv.add_global_callback('e', |siv| {
+        handle_event(siv, KeyEvent::E.into());
+    });
+    siv.add_global_callback(Key::Esc, |siv| {
+        handle_event(siv, KeyEvent::Esc.into());
     });
 
     let stack_view = StackView::new()

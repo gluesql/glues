@@ -10,7 +10,7 @@ impl EntryState {
 
                 Ok(Transition::Initialize)
             }
-            Event::Key(_) => Ok(Transition::None),
+            Event::Key(_) => Ok(Transition::Inedible(event)),
             _ => Err(Error::Wip("todo: EntryState::consume".to_owned())),
         }
     }

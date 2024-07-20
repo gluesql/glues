@@ -2,11 +2,13 @@ use crate::{
     data::{Directory, Note},
     state::note_tree::DirectoryItem,
     types::DirectoryId,
+    Event,
 };
 
 pub enum Transition {
     None,
     Initialize,
+    Inedible(Event),
 
     OpenDirectory {
         id: DirectoryId,
@@ -27,8 +29,10 @@ pub enum Transition {
     ShowNoteActionsDialog(Note),
     ShowDirectoryActionsDialog(Directory),
 
-    EditNote {
+    OpenNote {
         note: Note,
         content: String,
     },
+    EditMode,
+    ViewMode(Note),
 }

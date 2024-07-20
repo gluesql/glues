@@ -1,7 +1,6 @@
 use {
     crate::traits::*,
     cursive::{
-        event::Key,
         menu::{Item, Tree},
         Cursive,
     },
@@ -21,6 +20,5 @@ pub fn menubar(siv: &mut Cursive) {
         .add_delimiter()
         .item(Item::leaf("[ESC] to focus", |_| {}).disabled());
 
-    siv.add_global_callback(Key::Esc, |s| s.select_menubar());
     siv.set_autohide_menu(false);
 }

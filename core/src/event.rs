@@ -31,12 +31,14 @@ pub enum Event {
     AddNote(String),
     AddDirectory(String),
 
-    EditNote,
+    OpenNote,
 }
 
 pub enum KeyEvent {
     Q,
     M,
+    E,
+    Esc,
 }
 
 impl From<KeyEvent> for Event {
