@@ -1,8 +1,5 @@
 use {
-    super::{
-        BrowsingState, DirectoryItem, Editing, EditingMode, EditingState, NoteTreeState,
-        SelectedItem,
-    },
+    super::{DirectoryItem, Editing, InnerState, NoteTreeState, SelectedItem},
     crate::{
         data::{Directory, Note},
         db::Db,
@@ -11,14 +8,14 @@ use {
 };
 
 pub(super) fn show_actions_dialog(state: &mut NoteTreeState, note: Note) -> Result<Transition> {
-    state.inner_state = BrowsingState::NoteMoreActions.into();
+    state.inner_state = InnerState::NoteMoreActions;
 
     Ok(Transition::ShowNoteActionsDialog(note))
 }
 
 pub(super) fn select(state: &mut NoteTreeState, note: Note) -> Result<Transition> {
     state.selected = SelectedItem::Note(note);
-    state.inner_state = BrowsingState::NoteSelected.into();
+    state.inner_state = InnerState::NoteSelected;
 
     Ok(Transition::None)
 }
@@ -33,7 +30,7 @@ pub(super) async fn rename(
 
     note.name = new_name;
     state.selected = SelectedItem::Note(note.clone());
-    state.inner_state = BrowsingState::NoteSelected.into();
+    state.inner_state = InnerState::NoteSelected;
 
     Ok(Transition::RenameNote(note))
 }
@@ -74,7 +71,7 @@ pub(super) async fn add(
     }
 
     state.selected = SelectedItem::Note(note.clone());
-    state.inner_state = BrowsingState::NoteSelected.into();
+    state.inner_state = InnerState::NoteSelected;
 
     Ok(Transition::AddNote(note))
 }
@@ -86,33 +83,21 @@ pub(super) async fn open(db: &mut Db, state: &mut NoteTreeState, note: Note) -> 
         note: note.clone(),
         content: content.clone(),
     });
-    state.inner_state = EditingState {
-        mode: EditingMode::View,
-    }
-    .into();
+    state.inner_state = InnerState::EditingViewMode;
 
     Ok(Transition::OpenNote { note, content })
 }
 
-pub(super) async fn edit(
-    state: &mut NoteTreeState,
-    mut editing_state: EditingState,
-) -> Result<Transition> {
-    editing_state.mode = EditingMode::Edit;
-
-    state.inner_state = editing_state.into();
+pub(super) async fn edit(state: &mut NoteTreeState) -> Result<Transition> {
+    state.inner_state = InnerState::EditingEditMode;
 
     Ok(Transition::EditMode)
 }
 
-pub(super) async fn view(
-    state: &mut NoteTreeState,
-    mut editing_state: EditingState,
-) -> Result<Transition> {
+pub(super) async fn view(state: &mut NoteTreeState) -> Result<Transition> {
     let note = state.get_editing()?.note.clone();
-    editing_state.mode = EditingMode::View;
 
-    state.inner_state = editing_state.into();
+    state.inner_state = InnerState::EditingViewMode;
 
     Ok(Transition::ViewMode(note))
 }
