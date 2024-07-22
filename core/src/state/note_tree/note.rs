@@ -1,5 +1,8 @@
 use {
-    super::{BrowsingState, DirectoryItem, EditingMode, EditingState, NoteTreeState, SelectedItem},
+    super::{
+        BrowsingState, DirectoryItem, Editing, EditingMode, EditingState, NoteTreeState,
+        SelectedItem,
+    },
     crate::{
         data::{Directory, Note},
         db::Db,
@@ -76,19 +79,15 @@ pub(super) async fn add(
     Ok(Transition::AddNote(note))
 }
 
-pub(super) async fn open(
-    db: &mut Db,
-    state: &mut NoteTreeState,
-    browsing_state: BrowsingState,
-    note: Note,
-) -> Result<Transition> {
+pub(super) async fn open(db: &mut Db, state: &mut NoteTreeState, note: Note) -> Result<Transition> {
     let content = db.fetch_note_content(note.id.clone()).await?;
 
-    state.inner_state = EditingState {
-        mode: EditingMode::View,
-        browsing_state,
+    state.editing = Some(Editing {
         note: note.clone(),
         content: content.clone(),
+    });
+    state.inner_state = EditingState {
+        mode: EditingMode::View,
     }
     .into();
 
@@ -110,7 +109,7 @@ pub(super) async fn view(
     state: &mut NoteTreeState,
     mut editing_state: EditingState,
 ) -> Result<Transition> {
-    let note = editing_state.note.clone();
+    let note = state.get_editing()?.note.clone();
     editing_state.mode = EditingMode::View;
 
     state.inner_state = editing_state.into();

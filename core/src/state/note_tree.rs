@@ -12,8 +12,14 @@ use crate::{
 pub struct NoteTreeState {
     pub root: DirectoryItem,
     pub selected: SelectedItem,
+    pub editing: Option<Editing>,
 
     pub inner_state: InnerState,
+}
+
+pub struct Editing {
+    note: Note,
+    content: String,
 }
 
 pub enum SelectedItem {
@@ -36,9 +42,6 @@ pub enum EditingMode {
 #[derive(Clone)]
 pub struct EditingState {
     mode: EditingMode,
-    browsing_state: BrowsingState,
-    note: Note,
-    content: String,
 }
 
 impl From<EditingState> for InnerState {
@@ -129,6 +132,7 @@ impl NoteTreeState {
             inner_state: Browsing(DirectorySelected),
             root,
             selected,
+            editing: None,
         })
     }
 
@@ -158,11 +162,9 @@ impl NoteTreeState {
             }
             Editing(EditingState {
                 mode: EditingMode::View,
-                ..
             }) => "editing - view".to_owned(),
             Editing(EditingState {
                 mode: EditingMode::Edit,
-                ..
             }) => "editing - edit".to_owned(),
         })
     }
@@ -174,13 +176,11 @@ impl NoteTreeState {
             }
             Editing(EditingState {
                 mode: EditingMode::View,
-                ..
             }) => {
                 vec!["[E] Edit mode".to_owned()]
             }
             Editing(EditingState {
                 mode: EditingMode::Edit,
-                ..
             }) => {
                 vec!["[Esc] View mode".to_owned()]
             }
@@ -200,6 +200,12 @@ impl NoteTreeState {
             SelectedItem::Directory(ref directory) => Ok(directory),
             _ => Err(Error::Wip("selected directory not found".to_owned())),
         }
+    }
+
+    pub fn get_editing(&self) -> Result<&Editing> {
+        self.editing
+            .as_ref()
+            .ok_or_else(|| Error::Wip("editing is none".to_owned()))
     }
 }
 
@@ -242,7 +248,6 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
             | Browsing(NoteSelected)
             | Editing(EditingState {
                 mode: EditingMode::View,
-                ..
             }),
         ) => note::select(state, note),
         (
@@ -251,7 +256,6 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
             | Browsing(NoteSelected)
             | Editing(EditingState {
                 mode: EditingMode::View,
-                ..
             }),
         ) => directory::select(state, directory),
         (Event::RenameNote(new_name), Browsing(NoteMoreActions)) => {
@@ -284,17 +288,16 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
 
             directory::add(db, state, directory, directory_name).await
         }
-        (Event::OpenNote, Browsing(s @ NoteSelected)) => {
+        (Event::OpenNote, Browsing(NoteSelected)) => {
             let note = state.get_selected_note()?.clone();
 
-            note::open(db, state, s.clone(), note).await
+            note::open(db, state, note).await
         }
         (
             Event::Key(KeyEvent::E),
             Editing(
                 s @ EditingState {
                     mode: EditingMode::View,
-                    ..
                 },
             ),
         ) => note::edit(state, s.clone()).await,
@@ -303,7 +306,6 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
             Editing(
                 s @ EditingState {
                     mode: EditingMode::Edit,
-                    ..
                 },
             ),
         ) => note::view(state, s.clone()).await,
