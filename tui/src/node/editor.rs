@@ -29,4 +29,4 @@ impl NodePath for EditorNode {
     }
 }
 
-impl<'a> ViewFinder<StackView> for EditorNode {}
+impl ViewFinder<StackView> for EditorNode {}
