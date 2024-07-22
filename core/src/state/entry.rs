@@ -15,8 +15,8 @@ impl EntryState {
         }
     }
 
-    pub fn describe(&self) -> String {
-        "Entry".to_owned()
+    pub fn describe(&self) -> Result<String> {
+        Ok("Entry".to_owned())
     }
 
     pub fn shortcuts(&self) -> Vec<String> {

@@ -18,7 +18,7 @@ impl State {
         }
     }
 
-    pub fn describe(&self) -> String {
+    pub fn describe(&self) -> Result<String> {
         match self {
             Self::EntryState(state) => state.describe(),
             Self::NoteTreeState(state) => state.describe(),

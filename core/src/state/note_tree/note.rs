@@ -1,5 +1,5 @@
 use {
-    super::{BrowsingState, DirectoryItem, NoteTreeState, EditingMode, EditingState},
+    super::{BrowsingState, DirectoryItem, EditingMode, EditingState, NoteTreeState, SelectedItem},
     crate::{
         data::{Directory, Note},
         db::Db,
@@ -8,13 +8,14 @@ use {
 };
 
 pub(super) fn show_actions_dialog(state: &mut NoteTreeState, note: Note) -> Result<Transition> {
-    state.inner_state = BrowsingState::NoteMoreActions(note.clone()).into();
+    state.inner_state = BrowsingState::NoteMoreActions.into();
 
     Ok(Transition::ShowNoteActionsDialog(note))
 }
 
 pub(super) fn select(state: &mut NoteTreeState, note: Note) -> Result<Transition> {
-    state.inner_state = BrowsingState::NoteSelected(note).into();
+    state.selected = SelectedItem::Note(note);
+    state.inner_state = BrowsingState::NoteSelected.into();
 
     Ok(Transition::None)
 }
@@ -28,7 +29,8 @@ pub(super) async fn rename(
     db.rename_note(note.id.clone(), new_name.clone()).await?;
 
     note.name = new_name;
-    state.inner_state = BrowsingState::NoteSelected(note.clone()).into();
+    state.selected = SelectedItem::Note(note.clone());
+    state.inner_state = BrowsingState::NoteSelected.into();
 
     Ok(Transition::RenameNote(note))
 }
@@ -40,7 +42,8 @@ pub(super) async fn remove(
 ) -> Result<Transition> {
     db.remove_note(note.id.clone()).await?;
 
-    state.inner_state = BrowsingState::NoteSelected(note.clone()).into();
+    // TODO
+    state.selected = SelectedItem::None;
 
     Ok(Transition::RemoveNote(note))
 }
@@ -67,7 +70,8 @@ pub(super) async fn add(
         children.notes = notes;
     }
 
-    state.inner_state = BrowsingState::NoteSelected(note.clone()).into();
+    state.selected = SelectedItem::Note(note.clone());
+    state.inner_state = BrowsingState::NoteSelected.into();
 
     Ok(Transition::AddNote(note))
 }
@@ -85,7 +89,8 @@ pub(super) async fn open(
         browsing_state,
         note: note.clone(),
         content: content.clone(),
-    }.into();
+    }
+    .into();
 
     Ok(Transition::OpenNote { note, content })
 }

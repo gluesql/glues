@@ -10,7 +10,7 @@ use {
 pub fn render_statusbar(siv: &mut Cursive) -> impl View {
     let statusbar_node = Node::statusbar();
 
-    let description = siv.glues().state.describe();
+    let description = siv.glues().state.describe().log_unwrap();
     let description = TextView::new(description).with_name(statusbar_node.description().name());
 
     let shortcuts = siv.glues().state.shortcuts().join(", ");

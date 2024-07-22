@@ -11,8 +11,15 @@ use crate::{
 
 pub struct NoteTreeState {
     pub root: DirectoryItem,
+    pub selected: SelectedItem,
 
     pub inner_state: InnerState,
+}
+
+pub enum SelectedItem {
+    Note(Note),
+    Directory(Directory),
+    None,
 }
 
 pub enum InnerState {
@@ -42,11 +49,11 @@ impl From<EditingState> for InnerState {
 
 #[derive(Clone)]
 pub enum BrowsingState {
-    NoteSelected(Note),
-    NoteMoreActions(Note),
+    NoteSelected,
+    NoteMoreActions,
 
-    DirectorySelected(Directory),
-    DirectoryMoreActions(Directory),
+    DirectorySelected,
+    DirectoryMoreActions,
 }
 
 use {BrowsingState::*, InnerState::*};
@@ -116,10 +123,12 @@ impl NoteTreeState {
             directory: root_directory,
             children: Some(DirectoryItemChildren { notes, directories }),
         };
+        let selected = SelectedItem::Directory(root.directory.clone());
 
         Ok(NoteTreeState {
-            inner_state: Browsing(DirectorySelected(root.directory.clone())),
+            inner_state: Browsing(DirectorySelected),
             root,
+            selected,
         })
     }
 
@@ -133,31 +142,63 @@ impl NoteTreeState {
         )
     }
 
-    pub fn describe(&self) -> String {
-        match &self.inner_state {
-            Browsing(NoteSelected(Note { name, .. })) => format!("Note '{name}' selected"),
-            Browsing(DirectorySelected(Directory { name, .. })) => {
+    pub fn describe(&self) -> Result<String> {
+        Ok(match &self.inner_state {
+            Browsing(NoteMoreActions) => "Note actions dialog".to_owned(),
+            Browsing(DirectoryMoreActions) => "Directory actions dialog".to_owned(),
+            Browsing(NoteSelected) => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' selected")
+            }
+            Browsing(DirectorySelected) => {
+                let name = &self.get_selected_directory()?.name;
+
                 format!("Directory '{name}' selected")
             }
-            Browsing(NoteMoreActions(_)) => "Note actions dialog".to_owned(),
-            Browsing(DirectoryMoreActions(_)) => "Directory actions dialog".to_owned(),
-            Editing(EditingState { mode: EditingMode::View, .. }) => "editing - view".to_owned(),
-            Editing(EditingState { mode: EditingMode::Edit, .. }) => "editing - edit".to_owned(),
-        }
+            Editing(EditingState {
+                mode: EditingMode::View,
+                ..
+            }) => "editing - view".to_owned(),
+            Editing(EditingState {
+                mode: EditingMode::Edit,
+                ..
+            }) => "editing - edit".to_owned(),
+        })
     }
 
     pub fn shortcuts(&self) -> Vec<String> {
         match &self.inner_state {
-            Browsing(NoteSelected(_)) | Browsing(DirectorySelected { .. }) => {
+            Browsing(NoteSelected) | Browsing(DirectorySelected) => {
                 vec!["[M] More actions".to_owned()]
             }
-            Editing(EditingState { mode: EditingMode::View, .. }) => {
+            Editing(EditingState {
+                mode: EditingMode::View,
+                ..
+            }) => {
                 vec!["[E] Edit mode".to_owned()]
             }
-            Editing(EditingState { mode: EditingMode::Edit, .. }) => {
+            Editing(EditingState {
+                mode: EditingMode::Edit,
+                ..
+            }) => {
                 vec!["[Esc] View mode".to_owned()]
             }
             _ => vec![],
+        }
+    }
+
+    pub fn get_selected_note(&self) -> Result<&Note> {
+        match &self.selected {
+            SelectedItem::Note(ref note) => Ok(note),
+            _ => Err(Error::Wip("selected note not found".to_owned())),
+        }
+    }
+
+    pub fn get_selected_directory(&self) -> Result<&Directory> {
+        match &self.selected {
+            SelectedItem::Directory(ref directory) => Ok(directory),
+            _ => Err(Error::Wip("selected directory not found".to_owned())),
         }
     }
 }
@@ -169,66 +210,112 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
     match (event, &state.inner_state) {
         (
             Event::OpenDirectory(directory_id),
-            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)),
+            Browsing(DirectorySelected) | Browsing(NoteSelected),
         ) => directory::open(db, state, directory_id).await,
         (
             Event::CloseDirectory(directory_id),
-            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)),
+            Browsing(DirectorySelected) | Browsing(NoteSelected),
         ) => directory::close(state, directory_id),
-        (Event::Key(KeyEvent::M), Browsing(NoteSelected(ref note))) => {
-            note::show_actions_dialog(state, note.clone())
+        (Event::Key(KeyEvent::M), Browsing(NoteSelected)) => {
+            let note = state.get_selected_note()?.clone();
+
+            note::show_actions_dialog(state, note)
         }
-        (Event::Key(KeyEvent::M), Browsing(DirectorySelected(ref directory))) => {
-            directory::show_actions_dialog(state, directory.clone())
+        (Event::Key(KeyEvent::M), Browsing(DirectorySelected)) => {
+            let directory = state.get_selected_directory()?.clone();
+
+            directory::show_actions_dialog(state, directory)
         }
-        (Event::CloseNoteActionsDialog, Browsing(NoteMoreActions(ref note))) => {
-            note::select(state, note.clone())
-        }
-        (Event::CloseDirectoryActionsDialog, Browsing(DirectoryMoreActions(ref directory))) => {
-            directory::select(state, directory.clone())
-        }
-        (Event::SelectNote(note),
-            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)) | Editing(EditingState { mode: EditingMode::View, .. })
-        ) => {
+        (Event::CloseNoteActionsDialog, Browsing(NoteMoreActions)) => {
+            let note = state.get_selected_note()?.clone();
+
             note::select(state, note)
         }
+        (Event::CloseDirectoryActionsDialog, Browsing(DirectoryMoreActions)) => {
+            let directory = state.get_selected_directory()?.clone();
+
+            directory::select(state, directory)
+        }
+        (
+            Event::SelectNote(note),
+            Browsing(DirectorySelected)
+            | Browsing(NoteSelected)
+            | Editing(EditingState {
+                mode: EditingMode::View,
+                ..
+            }),
+        ) => note::select(state, note),
         (
             Event::SelectDirectory(directory),
-            Browsing(DirectorySelected(_)) | Browsing(NoteSelected(_)) | Editing(EditingState { mode: EditingMode::View, .. }),
+            Browsing(DirectorySelected)
+            | Browsing(NoteSelected)
+            | Editing(EditingState {
+                mode: EditingMode::View,
+                ..
+            }),
         ) => directory::select(state, directory),
-        (Event::RenameNote(new_name), Browsing(NoteMoreActions(ref note))) => {
-            note::rename(db, state, note.clone(), new_name).await
+        (Event::RenameNote(new_name), Browsing(NoteMoreActions)) => {
+            let note = state.get_selected_note()?.clone();
+
+            note::rename(db, state, note, new_name).await
         }
-        (Event::RemoveNote, Browsing(NoteMoreActions(ref note))) => {
-            note::remove(db, state, note.clone()).await
+        (Event::RemoveNote, Browsing(NoteMoreActions)) => {
+            let note = state.get_selected_note()?.clone();
+
+            note::remove(db, state, note).await
         }
-        (Event::RenameDirectory(new_name), Browsing(DirectoryMoreActions(ref directory))) => {
-            directory::rename(db, state, directory.clone(), new_name).await
+        (Event::RenameDirectory(new_name), Browsing(DirectoryMoreActions)) => {
+            let directory = state.get_selected_directory()?.clone();
+
+            directory::rename(db, state, directory, new_name).await
         }
-        (Event::RemoveDirectory, Browsing(DirectoryMoreActions(ref directory))) => {
-            directory::remove(db, state, directory.clone()).await
+        (Event::RemoveDirectory, Browsing(DirectoryMoreActions)) => {
+            let directory = state.get_selected_directory()?.clone();
+
+            directory::remove(db, state, directory).await
         }
-        (Event::AddNote(note_name), Browsing(DirectoryMoreActions(ref directory))) => {
-            note::add(db, state, directory.clone(), note_name).await
+        (Event::AddNote(note_name), Browsing(DirectoryMoreActions)) => {
+            let directory = state.get_selected_directory()?.clone();
+
+            note::add(db, state, directory, note_name).await
         }
-        (Event::AddDirectory(directory_name), Browsing(DirectoryMoreActions(ref directory))) => {
-            directory::add(db, state, directory.clone(), directory_name).await
+        (Event::AddDirectory(directory_name), Browsing(DirectoryMoreActions)) => {
+            let directory = state.get_selected_directory()?.clone();
+
+            directory::add(db, state, directory, directory_name).await
         }
-        (Event::OpenNote, Browsing(s @ NoteSelected(ref note))) => {
-            note::open(db, state, s.clone(), note.clone()).await
+        (Event::OpenNote, Browsing(s @ NoteSelected)) => {
+            let note = state.get_selected_note()?.clone();
+
+            note::open(db, state, s.clone(), note).await
         }
-        (Event::Key(KeyEvent::E), Editing(s @ EditingState { mode: EditingMode::View, .. })) => {
-            note::edit(state, s.clone()).await
+        (
+            Event::Key(KeyEvent::E),
+            Editing(
+                s @ EditingState {
+                    mode: EditingMode::View,
+                    ..
+                },
+            ),
+        ) => note::edit(state, s.clone()).await,
+        (
+            Event::Key(KeyEvent::Esc),
+            Editing(
+                s @ EditingState {
+                    mode: EditingMode::Edit,
+                    ..
+                },
+            ),
+        ) => note::view(state, s.clone()).await,
+        (Event::Cancel, Browsing(NoteMoreActions)) => {
+            let note = state.get_selected_note()?.clone();
+
+            note::select(state, note.clone())
         }
-        (Event::Key(KeyEvent::Esc), Editing(s @ EditingState {
-            mode: EditingMode::Edit,
-            ..
-        })) => {
-            note::view(state, s.clone()).await
-        }
-        (Event::Cancel, Browsing(NoteMoreActions(ref note))) => note::select(state, note.clone()),
-        (Event::Cancel, Browsing(DirectoryMoreActions(ref directory))) => {
-            directory::select(state, directory.clone())
+        (Event::Cancel, Browsing(DirectoryMoreActions)) => {
+            let directory = state.get_selected_directory()?.clone();
+
+            directory::select(state, directory)
         }
         (event @ Event::Key(_), _) => Ok(Transition::Inedible(event)),
         _ => Err(Error::Wip("todo: NoteTree::consume".to_owned())),

@@ -78,7 +78,7 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
 fn update_statusbar(siv: &mut Cursive) {
     let statusbar_node = Node::statusbar();
 
-    let description = siv.glues().state.describe();
+    let description = siv.glues().state.describe().log_unwrap();
     statusbar_node
         .description()
         .find(siv)
