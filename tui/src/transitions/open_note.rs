@@ -16,10 +16,5 @@ pub fn open_note(siv: &mut Cursive, note: Note, content: String) {
     editor.add_fullscreen_layer(content);
     editor.remove_layer(LayerPosition::FromBack(0));
 
-    siv.cb_sink()
-        .send(Box::new(move |siv| {
-            siv.focus_name(&Node::editor().name_button().name())
-                .log_unwrap();
-        }))
-        .log_unwrap();
+    siv.focus_on_next_tick(Node::editor().name_button().name());
 }

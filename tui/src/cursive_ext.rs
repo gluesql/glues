@@ -40,6 +40,8 @@ pub trait CursiveExt {
     fn prompt<F>(&mut self, message: &str, on_submit: F)
     where
         F: Fn(&mut Cursive, &str) + Clone + 'static;
+
+    fn focus_on_next_tick(&mut self, name: String);
 }
 
 impl CursiveExt for Cursive {
@@ -93,5 +95,13 @@ impl CursiveExt for Cursive {
     {
         let dialog = render_prompt(message, on_submit);
         self.add_layer(dialog);
+    }
+
+    fn focus_on_next_tick(&mut self, name: String) {
+        self.cb_sink()
+            .send(Box::new(move |siv| {
+                siv.focus_name(&name).log_unwrap();
+            }))
+            .log_unwrap();
     }
 }

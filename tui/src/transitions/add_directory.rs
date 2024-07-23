@@ -27,15 +27,10 @@ pub fn add_directory(siv: &mut Cursive, directory: Directory) {
         container.add_child(render_directory(siv, directory_item));
     }
 
-    siv.cb_sink()
-        .send(Box::new(move |siv| {
-            siv.focus_name(
-                &Node::note_tree()
-                    .directory(&directory.id)
-                    .name_button()
-                    .name(),
-            )
-            .log_unwrap();
-        }))
-        .log_unwrap();
+    siv.focus_on_next_tick(
+        Node::note_tree()
+            .directory(&directory.id)
+            .name_button()
+            .name(),
+    );
 }

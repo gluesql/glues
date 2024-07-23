@@ -11,10 +11,5 @@ pub fn select_note(siv: &mut Cursive, note: Note) {
         .find(siv)
         .enable();
 
-    siv.cb_sink()
-        .send(Box::new(move |siv| {
-            siv.focus_name(&Node::note_tree().note(&note.id).name_button().name())
-                .log_unwrap();
-        }))
-        .log_unwrap();
+    siv.focus_on_next_tick(Node::note_tree().note(&note.id).name_button().name());
 }
