@@ -136,16 +136,16 @@ impl NoteTreeState {
         })
     }
 
-    pub fn shortcuts(&self) -> Vec<String> {
+    pub fn shortcuts(&self) -> Vec<&str> {
         match &self.inner_state {
             NoteSelected | DirectorySelected => {
-                vec!["[M] More actions".to_owned()]
+                vec!["[Enter] Open note", "[M] More actions"]
             }
             EditingViewMode => {
-                vec!["[E] Edit mode".to_owned()]
+                vec!["[E] Edit mode"]
             }
             EditingEditMode => {
-                vec!["[Esc] View mode".to_owned()]
+                vec!["[Esc] View mode"]
             }
             _ => vec![],
         }

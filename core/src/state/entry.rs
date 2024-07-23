@@ -19,7 +19,7 @@ impl EntryState {
         Ok("Entry".to_owned())
     }
 
-    pub fn shortcuts(&self) -> Vec<String> {
-        vec![":)".to_owned()]
+    pub fn shortcuts(&self) -> Vec<&str> {
+        vec![":)"]
     }
 }
