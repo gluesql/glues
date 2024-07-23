@@ -4,9 +4,9 @@ use {
     glues_core::data::Note,
 };
 
-pub fn view_mode(siv: &mut Cursive, note: Note) {
+pub fn view_mode(siv: &mut Cursive, _note: Note) {
     Node::editor().content().find(siv).disable();
 
-    siv.focus_name(&Node::note_tree().note(&note.id).name_button().name())
+    siv.focus_name(&Node::editor().name_button().name())
         .log_unwrap();
 }

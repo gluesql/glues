@@ -101,3 +101,11 @@ pub(super) async fn view(state: &mut NoteTreeState) -> Result<Transition> {
 
     Ok(Transition::ViewMode(note))
 }
+
+pub(super) async fn browse(state: &mut NoteTreeState) -> Result<Transition> {
+    let note = state.get_selected_note()?.clone();
+
+    state.inner_state = InnerState::NoteSelected;
+
+    Ok(Transition::SelectNote(note))
+}

@@ -9,6 +9,7 @@ mod remove_directory;
 mod remove_note;
 mod rename_directory;
 mod rename_note;
+mod select_note;
 mod show_directory_actions;
 mod show_note_actions;
 mod view_mode;
@@ -24,6 +25,7 @@ use remove_directory::remove_directory;
 use remove_note::remove_note;
 use rename_directory::rename_directory;
 use rename_note::rename_note;
+use select_note::select_note;
 use show_directory_actions::show_directory_actions;
 use show_note_actions::show_note_actions;
 use view_mode::view_mode;
@@ -64,11 +66,14 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
         Transition::ViewMode(note) => {
             view_mode(siv, note);
         }
+        Transition::SelectNote(note) => {
+            select_note(siv, note);
+        }
         Transition::Inedible(Event::Key(KeyEvent::Esc)) => {
             siv.select_menubar();
         }
         _ => {
-            log!("todo");
+            log!("todo - unhandled event");
         }
     };
 

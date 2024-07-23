@@ -32,9 +32,12 @@ pub enum Event {
     AddDirectory(String),
 
     OpenNote,
+    EditNote,
 }
 
+#[derive(Clone, Copy)]
 pub enum KeyEvent {
+    B,
     Q,
     M,
     E,

@@ -142,7 +142,7 @@ impl NoteTreeState {
                 vec!["[Enter] Open note", "[M] More actions"]
             }
             EditingViewMode => {
-                vec!["[E] Edit mode"]
+                vec!["[B] Browse note tree", "[E] Edit mode"]
             }
             EditingEditMode => {
                 vec!["[Esc] View mode"]
@@ -244,7 +244,8 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
 
             note::open(db, state, note).await
         }
-        (Event::Key(KeyEvent::E), EditingViewMode) => note::edit(state).await,
+        (Event::Key(KeyEvent::E) | Event::EditNote, EditingViewMode) => note::edit(state).await,
+        (Event::Key(KeyEvent::B), EditingViewMode) => note::browse(state).await,
         (Event::Key(KeyEvent::Esc), EditingEditMode) => note::view(state).await,
         (Event::Cancel, NoteMoreActions) => {
             let note = state.get_selected_note()?.clone();

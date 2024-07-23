@@ -16,7 +16,7 @@ mod traits {
 
 use {
     cursive::{
-        event::Key,
+        event::{Event, Key},
         view::{Nameable, Resizable},
         views::{DummyView, LinearLayout, PaddedView, StackView},
         Cursive,
@@ -63,15 +63,17 @@ fn main() {
     let mut siv = cursive::default();
     siv.set_user_data(glues);
     siv.add_global_callback('a', Cursive::toggle_debug_console);
-    siv.add_global_callback('m', |siv| {
-        handle_event(siv, KeyEvent::M.into());
-    });
-    siv.add_global_callback('e', |siv| {
-        handle_event(siv, KeyEvent::E.into());
-    });
-    siv.add_global_callback(Key::Esc, |siv| {
-        handle_event(siv, KeyEvent::Esc.into());
-    });
+
+    for (key, event) in [
+        (Event::Char('b'), KeyEvent::B),
+        (Event::Char('e'), KeyEvent::E),
+        (Event::Char('m'), KeyEvent::M),
+        (Key::Esc.into(), KeyEvent::Esc),
+    ] {
+        siv.set_global_callback(key, move |siv| {
+            handle_event(siv, event.into());
+        });
+    }
 
     let stack_view = StackView::new()
         .transparent_layer(DummyView.full_height())
