@@ -21,9 +21,13 @@ pub fn render_content(_siv: &mut Cursive, name: String, content: String) -> impl
         .disabled()
         .with_name(Node::editor().content().name())
         .full_screen();
+    let status = LinearLayout::horizontal()
+        .child(DummyView.full_width())
+        .child(TextView::new("loaded").with_name(Node::editor().status().name()));
 
     LinearLayout::vertical()
         .child(name_row)
         .child(DummyView)
         .child(textarea)
+        .child(status)
 }

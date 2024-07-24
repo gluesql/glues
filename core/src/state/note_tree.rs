@@ -12,14 +12,9 @@ use crate::{
 pub struct NoteTreeState {
     pub root: DirectoryItem,
     pub selected: SelectedItem,
-    pub editing: Option<Editing>,
+    pub editing: Option<Note>,
 
     pub inner_state: InnerState,
-}
-
-pub struct Editing {
-    note: Note,
-    content: String,
 }
 
 pub enum SelectedItem {
@@ -145,7 +140,7 @@ impl NoteTreeState {
                 vec!["[B] Browse note tree", "[E] Edit mode"]
             }
             EditingEditMode => {
-                vec!["[Esc] View mode"]
+                vec!["[Esc] View mode & Save note"]
             }
             _ => vec![],
         }
@@ -165,7 +160,7 @@ impl NoteTreeState {
         }
     }
 
-    pub fn get_editing(&self) -> Result<&Editing> {
+    pub fn get_editing(&self) -> Result<&Note> {
         self.editing
             .as_ref()
             .ok_or_else(|| Error::Wip("editing is none".to_owned()))
@@ -243,6 +238,9 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
             let note = state.get_selected_note()?.clone();
 
             note::open(db, state, note).await
+        }
+        (Event::UpdateNoteContent(content), EditingViewMode) => {
+            note::update_content(db, state, content).await
         }
         (Event::Key(KeyEvent::E) | Event::EditNote, EditingViewMode) => note::edit(state).await,
         (Event::Key(KeyEvent::B), EditingViewMode) => note::browse(state).await,

@@ -1,6 +1,7 @@
 mod content;
 mod name_button;
 mod panel;
+mod status;
 
 use {
     crate::node::{NodePath, ViewFinder},
@@ -8,6 +9,7 @@ use {
     cursive::views::StackView,
     name_button::NameButtonNode,
     panel::PanelNode,
+    status::StatusNode,
 };
 
 #[derive(Clone)]
@@ -16,7 +18,6 @@ pub struct EditorNode;
 const PATH: &str = "editor";
 
 impl EditorNode {
-    // TODO: deprecated, may be...
     pub fn panel(&self) -> PanelNode<'_> {
         PanelNode::new(self)
     }
@@ -27,6 +28,10 @@ impl EditorNode {
 
     pub fn content(&self) -> ContentNode<'_> {
         ContentNode::new(self)
+    }
+
+    pub fn status(&self) -> StatusNode<'_> {
+        StatusNode::new(self)
     }
 }
 

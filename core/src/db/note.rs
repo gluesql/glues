@@ -77,15 +77,16 @@ impl Db {
         Ok(())
     }
 
-    pub async fn update_note_content(&mut self, note_id: NoteId, content: String) {
+    pub async fn update_note_content(&mut self, note_id: NoteId, content: String) -> Result<()> {
         table("Note")
             .update()
             .filter(col("id").eq(uuid(note_id)))
-            .set("content", content)
+            .set("content", text(content))
             .set("updated_at", now())
             .execute(&mut self.glue)
-            .await
-            .unwrap();
+            .await?;
+
+        Ok(())
     }
 
     pub async fn rename_note(&mut self, note_id: NoteId, name: String) -> Result<()> {

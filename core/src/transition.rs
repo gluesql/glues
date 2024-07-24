@@ -36,4 +36,5 @@ pub enum Transition {
     EditMode,
     ViewMode(Note),
     SelectNote(Note),
+    UpdateNoteContent,
 }

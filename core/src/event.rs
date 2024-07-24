@@ -33,6 +33,8 @@ pub enum Event {
 
     OpenNote,
     EditNote,
+
+    UpdateNoteContent(String),
 }
 
 #[derive(Clone, Copy)]

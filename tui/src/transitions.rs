@@ -12,6 +12,7 @@ mod rename_note;
 mod select_note;
 mod show_directory_actions;
 mod show_note_actions;
+mod update_note_content;
 mod view_mode;
 
 use add_directory::add_directory;
@@ -28,6 +29,7 @@ use rename_note::rename_note;
 use select_note::select_note;
 use show_directory_actions::show_directory_actions;
 use show_note_actions::show_note_actions;
+use update_note_content::update_note_content;
 use view_mode::view_mode;
 
 use {
@@ -68,6 +70,9 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
         }
         Transition::SelectNote(note) => {
             select_note(siv, note);
+        }
+        Transition::UpdateNoteContent => {
+            update_note_content(siv);
         }
         Transition::Inedible(Event::Key(KeyEvent::Esc)) => {
             siv.select_menubar();

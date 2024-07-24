@@ -1,5 +1,5 @@
 use {
-    super::{DirectoryItem, Editing, InnerState, NoteTreeState, SelectedItem},
+    super::{DirectoryItem, InnerState, NoteTreeState, SelectedItem},
     crate::{
         data::{Directory, Note},
         db::Db,
@@ -79,10 +79,7 @@ pub(super) async fn add(
 pub(super) async fn open(db: &mut Db, state: &mut NoteTreeState, note: Note) -> Result<Transition> {
     let content = db.fetch_note_content(note.id.clone()).await?;
 
-    state.editing = Some(Editing {
-        note: note.clone(),
-        content: content.clone(),
-    });
+    state.editing = Some(note.clone());
     state.inner_state = InnerState::EditingViewMode;
 
     Ok(Transition::OpenNote { note, content })
@@ -95,7 +92,7 @@ pub(super) async fn edit(state: &mut NoteTreeState) -> Result<Transition> {
 }
 
 pub(super) async fn view(state: &mut NoteTreeState) -> Result<Transition> {
-    let note = state.get_editing()?.note.clone();
+    let note = state.get_editing()?.clone();
 
     state.inner_state = InnerState::EditingViewMode;
 
@@ -108,4 +105,16 @@ pub(super) async fn browse(state: &mut NoteTreeState) -> Result<Transition> {
     state.inner_state = InnerState::NoteSelected;
 
     Ok(Transition::SelectNote(note))
+}
+
+pub(super) async fn update_content(
+    db: &mut Db,
+    state: &mut NoteTreeState,
+    content: String,
+) -> Result<Transition> {
+    let id = state.get_editing()?.id.clone();
+
+    db.update_note_content(id, content).await?;
+
+    Ok(Transition::UpdateNoteContent)
 }
