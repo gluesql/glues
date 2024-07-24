@@ -51,7 +51,7 @@ impl Db {
     }
 
     pub async fn add_note(&mut self, directory_id: DirectoryId, name: String) -> Result<Note> {
-        let id = Uuid::new_v4().to_string();
+        let id = Uuid::now_v7().to_string();
         let note = Note {
             id: id.clone(),
             directory_id: directory_id.clone(),

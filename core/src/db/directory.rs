@@ -52,7 +52,7 @@ impl Db {
         parent_id: DirectoryId,
         name: String,
     ) -> Result<Directory> {
-        let id = Uuid::new_v4().to_string();
+        let id = Uuid::now_v7().to_string();
         let directory = Directory {
             id: id.clone(),
             parent_id: parent_id.clone(),
