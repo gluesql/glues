@@ -10,7 +10,6 @@ use {
     uuid::Uuid,
 };
 
-// fetch
 impl Db {
     pub async fn fetch_note_content(&mut self, note_id: NoteId) -> Result<String> {
         let content = table("Note")
