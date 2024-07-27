@@ -1,12 +1,12 @@
 use {
     crate::{
-        db::Db,
+        db::{Db, Execute},
         schema::setup,
         state::{EntryState, State},
         types::DirectoryId,
         Event, Result, Transition,
     },
-    gluesql::core::ast_builder::{col, table, text, Execute},
+    gluesql::core::ast_builder::{col, table, text},
     std::ops::Deref,
 };
 
@@ -18,15 +18,15 @@ pub struct Glues {
 
 impl Glues {
     pub async fn new() -> Self {
-        let mut db = Db::default();
+        let mut db = Db::memory();
 
-        setup(&mut db.glue).await;
+        setup(&mut db.storage).await;
 
         table("Directory")
             .insert()
             .columns("name")
             .values(vec![vec![text("Notes")]])
-            .execute(&mut db.glue)
+            .execute(&mut db.storage)
             .await
             .unwrap();
 
@@ -34,7 +34,7 @@ impl Glues {
             .select()
             .filter(col("parent_id").is_null())
             .project("id")
-            .execute(&mut db.glue)
+            .execute(&mut db.storage)
             .await
             .unwrap()
             .select()

@@ -8,5 +8,6 @@ license.workspace = true
 [dependencies]
 gluesql.workspace = true
 thiserror = "1.0.61"
+async-trait = "0.1"
 async-recursion = "1.1"
 uuid = { version = "1.8.0", features = ["v7"] }

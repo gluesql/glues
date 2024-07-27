@@ -22,4 +22,4 @@ glues-core = { path = "./core" }
 git = "https://github.com/gluesql/gluesql.git"
 rev = "1341032"
 default_features = false
-features = ["memory-storage", "csv-storage"]
+features = ["memory-storage", "csv-storage", "json-storage"]

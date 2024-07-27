@@ -1,8 +1,8 @@
 use {
-    super::Db,
+    super::{Db, Execute},
     crate::{data::Directory, types::DirectoryId, Result},
     async_recursion::async_recursion,
-    gluesql::core::ast_builder::{col, function::now, table, text, uuid, Execute},
+    gluesql::core::ast_builder::{col, function::now, table, text, uuid},
     std::ops::Deref,
     uuid::Uuid,
 };
@@ -13,7 +13,7 @@ impl Db {
             .select()
             .filter(col("id").eq(uuid(directory_id)))
             .project(vec!["id", "parent_id", "name"])
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?
             .select()
             .unwrap()
@@ -33,7 +33,7 @@ impl Db {
             .select()
             .filter(col("parent_id").eq(uuid(parent_id.clone())))
             .project(vec!["id", "name"])
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?
             .select()
             .unwrap()
@@ -63,7 +63,7 @@ impl Db {
             .insert()
             .columns(vec!["id", "parent_id", "name"])
             .values(vec![vec![uuid(id.clone()), uuid(parent_id), text(name)]])
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?;
 
         Ok(directory)
@@ -74,7 +74,7 @@ impl Db {
         table("Note")
             .delete()
             .filter(col("directory_id").eq(uuid(directory_id.clone())))
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?;
 
         let directories = self.fetch_directories(directory_id.clone()).await?;
@@ -85,7 +85,7 @@ impl Db {
         table("Directory")
             .delete()
             .filter(col("id").eq(uuid(directory_id)))
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?;
 
         Ok(())
@@ -100,7 +100,7 @@ impl Db {
             .update()
             .filter(col("directory_id").eq(uuid(directory_id)))
             .set("parent_id", parent_id)
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?;
 
         Ok(())
@@ -116,7 +116,7 @@ impl Db {
             .filter(col("id").eq(uuid(directory_id)))
             .set("name", text(name))
             .set("updated_at", now())
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?;
 
         Ok(())

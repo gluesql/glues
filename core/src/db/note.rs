@@ -1,11 +1,11 @@
 use {
-    super::Db,
+    super::{Db, Execute},
     crate::{
         data::Note,
         types::{DirectoryId, NoteId},
         Error, Result,
     },
-    gluesql::core::ast_builder::{col, function::now, table, text, uuid, Execute},
+    gluesql::core::ast_builder::{col, function::now, table, text, uuid},
     std::ops::Deref,
     uuid::Uuid,
 };
@@ -16,7 +16,7 @@ impl Db {
             .select()
             .filter(col("id").eq(uuid(note_id)))
             .project(col("content"))
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?
             .select()
             .ok_or(Error::Wip("error case 2".to_owned()))?
@@ -35,7 +35,7 @@ impl Db {
             .select()
             .filter(col("directory_id").eq(uuid(directory_id.clone())))
             .project(vec!["id", "name"])
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?
             .select()
             .unwrap()
@@ -61,7 +61,7 @@ impl Db {
             .insert()
             .columns(vec!["id", "directory_id", "name"])
             .values(vec![vec![uuid(id), uuid(directory_id), text(name)]])
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?;
 
         Ok(note)
@@ -71,7 +71,7 @@ impl Db {
         table("Note")
             .delete()
             .filter(col("id").eq(uuid(note_id)))
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?;
 
         Ok(())
@@ -83,7 +83,7 @@ impl Db {
             .filter(col("id").eq(uuid(note_id)))
             .set("content", text(content))
             .set("updated_at", now())
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?;
 
         Ok(())
@@ -95,7 +95,7 @@ impl Db {
             .filter(col("id").eq(uuid(note_id)))
             .set("name", text(name))
             .set("updated_at", now())
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await?;
 
         Ok(())
@@ -107,7 +107,7 @@ impl Db {
             .filter(col("id").eq(uuid(note_id)))
             .set("directory_id", directory_id)
             .set("updated_at", now())
-            .execute(&mut self.glue)
+            .execute(&mut self.storage)
             .await
             .unwrap();
     }
