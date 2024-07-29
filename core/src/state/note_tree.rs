@@ -178,7 +178,17 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
         (Event::OpenDirectory(directory_id), DirectorySelected | NoteSelected) => {
             directory::open(db, state, directory_id).await
         }
+        (Event::Key(KeyEvent::L) | Event::Key(KeyEvent::Right), DirectorySelected) => {
+            let directory_id = state.get_selected_directory()?.id.clone();
+
+            directory::open(db, state, directory_id).await
+        }
         (Event::CloseDirectory(directory_id), DirectorySelected | NoteSelected) => {
+            directory::close(state, directory_id)
+        }
+        (Event::Key(KeyEvent::H) | Event::Key(KeyEvent::Left), DirectorySelected) => {
+            let directory_id = state.get_selected_directory()?.id.clone();
+
             directory::close(state, directory_id)
         }
         (Event::Key(KeyEvent::M), NoteSelected) => {

@@ -68,6 +68,10 @@ fn main() {
         (Event::Char('b'), KeyEvent::B),
         (Event::Char('e'), KeyEvent::E),
         (Event::Char('m'), KeyEvent::M),
+        (Event::Char('h'), KeyEvent::H),
+        (Event::Char('l'), KeyEvent::L),
+        (Key::Left.into(), KeyEvent::Left),
+        (Key::Right.into(), KeyEvent::Right),
         (Key::Esc.into(), KeyEvent::Esc),
     ] {
         siv.set_global_callback(key, move |siv| {

@@ -43,6 +43,10 @@ pub enum KeyEvent {
     Q,
     M,
     E,
+    H,
+    L,
+    Left,
+    Right,
     Esc,
 }
 
