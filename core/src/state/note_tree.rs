@@ -179,9 +179,16 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
             directory::open(db, state, directory_id).await
         }
         (Event::Key(KeyEvent::L) | Event::Key(KeyEvent::Right), DirectorySelected) => {
-            let directory_id = state.get_selected_directory()?.id.clone();
+            let directory_id = &state.get_selected_directory()?.id;
+            let directory_item = state.root.find(directory_id).ok_or(Error::Wip(
+                "[Key::L] failed to find parent directory".to_owned(),
+            ))?;
 
-            directory::open(db, state, directory_id).await
+            if directory_item.children.is_none() {
+                directory::open(db, state, directory_id.clone()).await
+            } else {
+                directory::close(state, directory_id.clone())
+            }
         }
         (Event::CloseDirectory(directory_id), DirectorySelected | NoteSelected) => {
             directory::close(state, directory_id)
@@ -193,10 +200,9 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
         }
         (Event::Key(KeyEvent::H) | Event::Key(KeyEvent::Left), NoteSelected) => {
             let directory_id = &state.get_selected_note()?.directory_id;
-            let directory_item = state
-                .root
-                .find(directory_id)
-                .ok_or(Error::Wip("failed to find parent directory".to_owned()))?;
+            let directory_item = state.root.find(directory_id).ok_or(Error::Wip(
+                "[Key::H] failed to find parent directory".to_owned(),
+            ))?;
             let directory = directory_item.directory.clone();
 
             directory::close_by_note(state, directory)
