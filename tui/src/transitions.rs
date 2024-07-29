@@ -58,7 +58,10 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
         } => {
             open_directory(siv, id, notes, directories);
         }
-        Transition::CloseDirectory(id) => close_directory(siv, id),
+        Transition::CloseDirectory {
+            directory_id,
+            by_note,
+        } => close_directory(siv, directory_id, by_note),
         Transition::OpenNote { note, content } => {
             open_note(siv, note, content);
         }

@@ -49,7 +49,24 @@ pub(super) fn close(state: &mut NoteTreeState, directory_id: DirectoryId) -> Res
         .ok_or(Error::Wip("todo: asdfasdf".to_owned()))?
         .children = None;
 
-    Ok(Transition::CloseDirectory(directory_id.clone()))
+    Ok(Transition::CloseDirectory {
+        directory_id: directory_id.clone(),
+        by_note: false,
+    })
+}
+
+pub(super) fn close_by_note(state: &mut NoteTreeState, directory: Directory) -> Result<Transition> {
+    close(state, directory.id.clone())?;
+
+    let directory_id = directory.id.clone();
+
+    state.selected = SelectedItem::Directory(directory);
+    state.inner_state = InnerState::DirectorySelected;
+
+    Ok(Transition::CloseDirectory {
+        directory_id,
+        by_note: true,
+    })
 }
 
 pub(super) fn show_actions_dialog(

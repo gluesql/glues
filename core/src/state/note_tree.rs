@@ -191,6 +191,16 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
 
             directory::close(state, directory_id)
         }
+        (Event::Key(KeyEvent::H) | Event::Key(KeyEvent::Left), NoteSelected) => {
+            let directory_id = &state.get_selected_note()?.directory_id;
+            let directory_item = state
+                .root
+                .find(directory_id)
+                .ok_or(Error::Wip("failed to find parent directory".to_owned()))?;
+            let directory = directory_item.directory.clone();
+
+            directory::close_by_note(state, directory)
+        }
         (Event::Key(KeyEvent::M), NoteSelected) => {
             let note = state.get_selected_note()?.clone();
 
