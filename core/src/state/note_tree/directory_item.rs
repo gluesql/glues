@@ -1,6 +1,6 @@
 use crate::{
     data::{Directory, Note},
-    types::DirectoryId,
+    types::{DirectoryId, Id},
 };
 
 #[derive(Clone)]
@@ -11,8 +11,8 @@ pub struct DirectoryItem {
 
 #[derive(Clone)]
 pub struct DirectoryItemChildren {
-    pub notes: Vec<Note>,
     pub directories: Vec<DirectoryItem>,
+    pub notes: Vec<Note>,
 }
 
 impl DirectoryItem {
@@ -41,4 +41,46 @@ impl DirectoryItem {
             .filter_map(|item| item.find_mut(id))
             .next()
     }
+
+    fn tree_items(&self) -> Vec<TreeItem> {
+        let mut items = vec![TreeItem::Directory(&self.directory)];
+
+        if let Some(children) = &self.children {
+            for item in &children.directories {
+                items.extend(item.tree_items());
+            }
+
+            for note in &children.notes {
+                items.push(TreeItem::Note(note));
+            }
+        }
+
+        items
+    }
+
+    pub fn find_prev(&self, id: &Id) -> Option<TreeItem> {
+        let tree_items = self.tree_items();
+        let i = tree_items.iter().position(|item| match item {
+            TreeItem::Directory(directory) => &directory.id == id,
+            TreeItem::Note(note) => &note.id == id,
+        })?;
+
+        tree_items.get(if i > 0 { i - 1 } else { 0 }).cloned()
+    }
+
+    pub fn find_next(&self, id: &Id) -> Option<TreeItem> {
+        let tree_items = self.tree_items();
+        let i = tree_items.iter().position(|item| match item {
+            TreeItem::Directory(directory) => &directory.id == id,
+            TreeItem::Note(note) => &note.id == id,
+        })?;
+
+        tree_items.get(i + 1).cloned()
+    }
+}
+
+#[derive(Clone)]
+pub enum TreeItem<'a> {
+    Note(&'a Note),
+    Directory(&'a Directory),
 }

@@ -70,6 +70,8 @@ fn main() {
         (Event::Char('m'), KeyEvent::M),
         (Event::Char('h'), KeyEvent::H),
         (Event::Char('l'), KeyEvent::L),
+        (Event::Char('j'), KeyEvent::J),
+        (Event::Char('k'), KeyEvent::K),
         (Key::Left.into(), KeyEvent::Left),
         (Key::Right.into(), KeyEvent::Right),
         (Key::Esc.into(), KeyEvent::Esc),

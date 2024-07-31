@@ -39,5 +39,6 @@ pub enum Transition {
     EditMode,
     ViewMode(Note),
     SelectNote(Note),
+    SelectDirectory(Directory),
     UpdateNoteContent,
 }

@@ -9,10 +9,10 @@ use {
         types::DirectoryId,
         Error, Event, Glues, Result, Transition,
     },
-    consume::{directory, note},
+    consume::{directory, note, traverse},
 };
 
-pub use directory_item::{DirectoryItem, DirectoryItemChildren};
+pub use directory_item::{DirectoryItem, DirectoryItemChildren, TreeItem};
 
 pub struct NoteTreeState {
     pub root: DirectoryItem,
@@ -101,12 +101,20 @@ impl NoteTreeState {
             NoteSelected => {
                 vec![
                     "[Enter] Open note",
-                    "[H | Left] Close parent directory",
+                    "[H] Close parent directory",
+                    "[J] Select next",
+                    "[K] Select previous",
                     "[M] More actions",
                 ]
             }
             DirectorySelected => {
-                vec!["[Enter | L] Toggle", "[H] Close", "[M] More actions"]
+                vec![
+                    "[L] Toggle",
+                    "[H] Close",
+                    "[J] Select next",
+                    "[K] Select previous",
+                    "[M] More actions",
+                ]
             }
             EditingViewMode => {
                 vec!["[B] Browse note tree", "[E] Edit mode"]
@@ -176,6 +184,8 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
 
             directory::close_by_note(state, directory)
         }
+        (Event::Key(KeyEvent::J), DirectorySelected | NoteSelected) => traverse::select_next(state),
+        (Event::Key(KeyEvent::K), DirectorySelected | NoteSelected) => traverse::select_prev(state),
         (Event::Key(KeyEvent::M), NoteSelected) => {
             let note = state.get_selected_note()?.clone();
 

@@ -44,6 +44,8 @@ pub enum KeyEvent {
     M,
     E,
     H,
+    J,
+    K,
     L,
     Left,
     Right,
