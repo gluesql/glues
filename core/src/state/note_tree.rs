@@ -1,12 +1,14 @@
-mod directory;
-mod note;
+mod consume;
 
-use crate::{
-    data::{Directory, Note},
-    event::KeyEvent,
-    state::GetInner,
-    types::DirectoryId,
-    Error, Event, Glues, Result, Transition,
+use {
+    crate::{
+        data::{Directory, Note},
+        event::KeyEvent,
+        state::GetInner,
+        types::DirectoryId,
+        Error, Event, Glues, Result, Transition,
+    },
+    consume::{directory, note},
 };
 
 pub struct NoteTreeState {

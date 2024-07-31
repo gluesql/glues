@@ -1,9 +1,14 @@
-use {
-    super::{DirectoryItem, DirectoryItemChildren, InnerState, NoteTreeState, SelectedItem},
-    crate::{data::Directory, db::Db, types::DirectoryId, Error, Result, Transition},
+use crate::{
+    data::Directory,
+    db::Db,
+    state::note_tree::{
+        DirectoryItem, DirectoryItemChildren, InnerState, NoteTreeState, SelectedItem,
+    },
+    types::DirectoryId,
+    Error, Result, Transition,
 };
 
-pub(super) async fn open(
+pub async fn open(
     db: &mut Db,
     state: &mut NoteTreeState,
     directory_id: DirectoryId,
@@ -42,7 +47,7 @@ pub(super) async fn open(
     })
 }
 
-pub(super) fn close(state: &mut NoteTreeState, directory_id: DirectoryId) -> Result<Transition> {
+pub fn close(state: &mut NoteTreeState, directory_id: DirectoryId) -> Result<Transition> {
     state
         .root
         .find_mut(&directory_id)
@@ -55,7 +60,7 @@ pub(super) fn close(state: &mut NoteTreeState, directory_id: DirectoryId) -> Res
     })
 }
 
-pub(super) fn close_by_note(state: &mut NoteTreeState, directory: Directory) -> Result<Transition> {
+pub fn close_by_note(state: &mut NoteTreeState, directory: Directory) -> Result<Transition> {
     close(state, directory.id.clone())?;
 
     let directory_id = directory.id.clone();
@@ -69,24 +74,21 @@ pub(super) fn close_by_note(state: &mut NoteTreeState, directory: Directory) -> 
     })
 }
 
-pub(super) fn show_actions_dialog(
-    state: &mut NoteTreeState,
-    directory: Directory,
-) -> Result<Transition> {
+pub fn show_actions_dialog(state: &mut NoteTreeState, directory: Directory) -> Result<Transition> {
     state.selected = SelectedItem::Directory(directory.clone());
     state.inner_state = InnerState::DirectoryMoreActions;
 
     Ok(Transition::ShowDirectoryActionsDialog(directory))
 }
 
-pub(super) fn select(state: &mut NoteTreeState, directory: Directory) -> Result<Transition> {
+pub fn select(state: &mut NoteTreeState, directory: Directory) -> Result<Transition> {
     state.selected = SelectedItem::Directory(directory);
     state.inner_state = InnerState::DirectorySelected;
 
     Ok(Transition::None)
 }
 
-pub(super) async fn rename(
+pub async fn rename(
     db: &mut Db,
     state: &mut NoteTreeState,
     mut directory: Directory,
@@ -101,7 +103,7 @@ pub(super) async fn rename(
     Ok(Transition::RenameDirectory(directory))
 }
 
-pub(super) async fn remove(
+pub async fn remove(
     db: &mut Db,
     state: &mut NoteTreeState,
     directory: Directory,
@@ -114,7 +116,7 @@ pub(super) async fn remove(
     Ok(Transition::RemoveDirectory(directory))
 }
 
-pub(super) async fn add(
+pub async fn add(
     db: &mut Db,
     state: &mut NoteTreeState,
     directory: Directory,
