@@ -1,4 +1,5 @@
 mod consume;
+mod directory_item;
 
 use {
     crate::{
@@ -10,6 +11,8 @@ use {
     },
     consume::{directory, note},
 };
+
+pub use directory_item::{DirectoryItem, DirectoryItemChildren};
 
 pub struct NoteTreeState {
     pub root: DirectoryItem,
@@ -34,46 +37,6 @@ pub enum InnerState {
     EditingEditMode,
 }
 use InnerState::*;
-
-#[derive(Clone)]
-pub struct DirectoryItem {
-    pub directory: Directory,
-    pub children: Option<DirectoryItemChildren>,
-}
-
-#[derive(Clone)]
-pub struct DirectoryItemChildren {
-    pub notes: Vec<Note>,
-    pub directories: Vec<DirectoryItem>,
-}
-
-impl DirectoryItem {
-    fn find(&self, id: &DirectoryId) -> Option<&DirectoryItem> {
-        if &self.directory.id == id {
-            return Some(self);
-        }
-
-        self.children
-            .as_ref()?
-            .directories
-            .iter()
-            .filter_map(|item| item.find(id))
-            .next()
-    }
-
-    fn find_mut(&mut self, id: &DirectoryId) -> Option<&mut DirectoryItem> {
-        if &self.directory.id == id {
-            return Some(self);
-        }
-
-        self.children
-            .as_mut()?
-            .directories
-            .iter_mut()
-            .filter_map(|item| item.find_mut(id))
-            .next()
-    }
-}
 
 impl NoteTreeState {
     pub async fn new(glues: &mut Glues) -> Result<Self> {
