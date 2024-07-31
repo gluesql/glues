@@ -5,7 +5,7 @@ use {
     cursive::{
         event::EventResult,
         view::Nameable,
-        views::{Button, FocusTracker, LinearLayout, TextView},
+        views::{Button, FocusTracker, LinearLayout, NamedView, TextView},
         View, With,
     },
     glues_core::{data::Note, Event},
@@ -17,17 +17,17 @@ pub fn render_note(note: Note) -> impl View {
     let button = Button::new_raw(note.name.clone(), |siv| {
         siv.dispatch(Event::OpenNote);
     })
-    .with_name(note_node.name_button().name());
+    .with_name(note_node.name_button().name())
+    .wrap_with(FocusTracker::new)
+    .on_focus(on_item_focus(note.clone()));
 
     LinearLayout::horizontal()
         .child(TextView::new("◦ "))
         .child(button)
-        .wrap_with(FocusTracker::new)
-        .on_focus(on_item_focus(note.clone()))
         .with_name(note_node.name())
 }
 
-fn on_item_focus(note: Note) -> impl for<'a> Fn(&'a mut LinearLayout) -> EventResult {
+fn on_item_focus(note: Note) -> impl for<'a> Fn(&'a mut NamedView<Button>) -> EventResult {
     let note = Rc::new(note);
 
     move |_| {
