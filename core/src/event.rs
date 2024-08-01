@@ -41,6 +41,7 @@ pub enum Event {
 pub enum KeyEvent {
     B,
     Q,
+    O,
     M,
     E,
     H,

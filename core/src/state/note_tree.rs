@@ -100,7 +100,7 @@ impl NoteTreeState {
         match &self.inner_state {
             NoteSelected => {
                 vec![
-                    "[Enter] Open note",
+                    "[O] Open note",
                     "[H] Close parent directory",
                     "[J] Select next",
                     "[K] Select previous",
@@ -242,7 +242,7 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
 
             directory::add(db, state, directory, directory_name).await
         }
-        (Event::OpenNote, NoteSelected) => {
+        (Event::Key(KeyEvent::O) | Event::OpenNote, NoteSelected) => {
             let note = state.get_selected_note()?.clone();
 
             note::open(db, state, note).await

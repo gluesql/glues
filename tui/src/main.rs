@@ -72,6 +72,7 @@ fn main() {
         (Event::Char('l'), KeyEvent::L),
         (Event::Char('j'), KeyEvent::J),
         (Event::Char('k'), KeyEvent::K),
+        (Event::Char('o'), KeyEvent::O),
         (Key::Left.into(), KeyEvent::Left),
         (Key::Right.into(), KeyEvent::Right),
         (Key::Esc.into(), KeyEvent::Esc),
