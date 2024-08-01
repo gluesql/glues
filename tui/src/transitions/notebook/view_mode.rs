@@ -1,7 +1,7 @@
 use {
     crate::{traits::*, Node},
     cursive::Cursive,
-    glues_core::{data::Note, Event},
+    glues_core::{data::Note, NotebookEvent},
 };
 
 pub fn view_mode(siv: &mut Cursive, _note: Note) {
@@ -12,5 +12,7 @@ pub fn view_mode(siv: &mut Cursive, _note: Note) {
     siv.focus_name(&Node::notebook().editor().name_button().name())
         .log_unwrap();
 
-    siv.dispatch(Event::UpdateNoteContent(content.get_content().to_owned()))
+    siv.dispatch(NotebookEvent::UpdateNoteContent(
+        content.get_content().to_owned(),
+    ))
 }

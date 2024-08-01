@@ -4,7 +4,7 @@ use {
         menu::{Item, Tree},
         Cursive,
     },
-    glues_core::Event,
+    glues_core::EntryEvent,
 };
 
 pub fn menubar(siv: &mut Cursive) {
@@ -13,7 +13,7 @@ pub fn menubar(siv: &mut Cursive) {
             "Glues",
             Tree::new()
                 .leaf("New Notes", |siv| {
-                    siv.dispatch(Event::Initialize);
+                    siv.dispatch(EntryEvent::Initialize);
                 })
                 .leaf("Quit", |siv| siv.quit()),
         )

@@ -13,7 +13,7 @@ use {
         data::Directory,
         state::notebook::{DirectoryItem, NotebookState},
         types::DirectoryId,
-        Event,
+        NotebookEvent,
     },
     item_list::render_item_list,
 };
@@ -58,9 +58,9 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
 fn on_item_click(directory_id: DirectoryId) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv| {
         if siv.state::<NotebookState>().check_opened(&directory_id) {
-            siv.dispatch(Event::CloseDirectory(directory_id.clone()))
+            siv.dispatch(NotebookEvent::CloseDirectory(directory_id.clone()))
         } else {
-            siv.dispatch(Event::OpenDirectory(directory_id.clone()))
+            siv.dispatch(NotebookEvent::OpenDirectory(directory_id.clone()))
         }
     }
 }
@@ -80,7 +80,7 @@ fn on_item_focus(
         let directory = directory.clone();
 
         EventResult::with_cb(move |siv| {
-            siv.dispatch(Event::SelectDirectory(directory.clone()));
+            siv.dispatch(NotebookEvent::SelectDirectory(directory.clone()));
         })
     }
 }

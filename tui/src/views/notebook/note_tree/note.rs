@@ -8,14 +8,14 @@ use {
         views::{Button, FocusTracker, LinearLayout, NamedView, TextView},
         View, With,
     },
-    glues_core::{data::Note, Event},
+    glues_core::{data::Note, NotebookEvent},
     std::rc::Rc,
 };
 
 pub fn render_note(note: Note) -> impl View {
     let note_node = Node::notebook().note_tree().note(&note.id);
     let button = Button::new_raw(note.name.clone(), |siv| {
-        siv.dispatch(Event::OpenNote);
+        siv.dispatch(NotebookEvent::OpenNote);
     })
     .with_name(note_node.name_button().name())
     .wrap_with(FocusTracker::new)
@@ -36,7 +36,7 @@ fn on_item_focus(note: Note) -> impl for<'a> Fn(&'a mut NamedView<Button>) -> Ev
         EventResult::with_cb(move |siv| {
             let note = note.as_ref().clone();
 
-            siv.dispatch(Event::SelectNote(note));
+            siv.dispatch(NotebookEvent::SelectNote(note));
         })
     }
 }

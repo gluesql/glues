@@ -5,12 +5,12 @@ use {
         views::{Button, DummyView, LinearLayout, TextArea, TextView},
         Cursive, View,
     },
-    glues_core::Event,
+    glues_core::NotebookEvent,
 };
 
 pub fn render_content(_siv: &mut Cursive, name: String, content: String) -> impl View {
     let name_button = Button::new_raw(name, |siv| {
-        siv.dispatch(Event::EditNote);
+        siv.dispatch(NotebookEvent::EditNote);
     })
     .with_name(Node::notebook().editor().name_button().name());
     let name_row = LinearLayout::horizontal()

@@ -1,7 +1,7 @@
 use {
     crate::{traits::*, views::notebook::note_tree::note::render_note, Node},
     cursive::Cursive,
-    glues_core::{data::Note, state::notebook::NotebookState, Event},
+    glues_core::{data::Note, state::notebook::NotebookState, NotebookEvent},
 };
 
 pub fn add_note(siv: &mut Cursive, note: Note) {
@@ -9,7 +9,7 @@ pub fn add_note(siv: &mut Cursive, note: Note) {
         .state::<NotebookState>()
         .check_opened(&note.directory_id)
     {
-        siv.dispatch(Event::OpenDirectory(note.directory_id.clone()));
+        siv.dispatch(NotebookEvent::OpenDirectory(note.directory_id.clone()));
     } else {
         let mut container = Node::notebook()
             .note_tree()

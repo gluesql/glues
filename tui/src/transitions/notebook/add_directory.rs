@@ -4,7 +4,7 @@ use {
     glues_core::{
         data::Directory,
         state::notebook::{DirectoryItem, NotebookState},
-        Event,
+        NotebookEvent,
     },
 };
 
@@ -13,7 +13,7 @@ pub fn add_directory(siv: &mut Cursive, directory: Directory) {
         .state::<NotebookState>()
         .check_opened(&directory.parent_id)
     {
-        siv.dispatch(Event::OpenDirectory(directory.parent_id.clone()));
+        siv.dispatch(NotebookEvent::OpenDirectory(directory.parent_id.clone()));
     } else {
         let mut container = Node::notebook()
             .note_tree()

@@ -4,12 +4,20 @@ use crate::{
 };
 
 pub enum Event {
-    Initialize,
+    Key(KeyEvent),
+    Entry(EntryEvent),
+    Notebook(NotebookEvent),
 
+    Cancel,
+}
+
+pub enum EntryEvent {
+    Initialize,
+}
+
+pub enum NotebookEvent {
     OpenDirectory(DirectoryId),
     CloseDirectory(DirectoryId),
-
-    Key(KeyEvent),
 
     SelectNote(Note),
     SelectDirectory(Directory),
@@ -25,8 +33,6 @@ pub enum Event {
 
     ShowDirectoryActionsDialog,
     CloseDirectoryActionsDialog,
-
-    Cancel,
 
     AddNote(String),
     AddDirectory(String),
@@ -50,6 +56,18 @@ pub enum KeyEvent {
     Left,
     Right,
     Esc,
+}
+
+impl From<EntryEvent> for Event {
+    fn from(event: EntryEvent) -> Self {
+        Self::Entry(event)
+    }
+}
+
+impl From<NotebookEvent> for Event {
+    fn from(event: NotebookEvent) -> Self {
+        Self::Notebook(event)
+    }
 }
 
 impl From<KeyEvent> for Event {

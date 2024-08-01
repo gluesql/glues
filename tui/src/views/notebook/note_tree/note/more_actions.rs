@@ -5,7 +5,7 @@ use {
         views::{Button, CircularFocus, Dialog, DummyView, LinearLayout, TextView},
         Cursive, With,
     },
-    glues_core::{data::Note, Event},
+    glues_core::{data::Note, NotebookEvent},
     std::rc::Rc,
 };
 
@@ -17,11 +17,11 @@ pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
 
         siv.pop_layer();
         siv.prompt(message, move |siv, note_name| {
-            siv.dispatch(Event::RenameNote(note_name.to_owned()));
+            siv.dispatch(NotebookEvent::RenameNote(note_name.to_owned()));
         });
     });
     let cancel_button = Button::new("Cancel", |siv| {
-        siv.dispatch(Event::CloseNoteActionsDialog);
+        siv.dispatch(NotebookEvent::CloseNoteActionsDialog);
         siv.pop_layer();
     });
 
@@ -50,7 +50,7 @@ fn on_remove_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
 
         siv.pop_layer();
         siv.confirm(message, move |siv| {
-            siv.dispatch(Event::RemoveNote);
+            siv.dispatch(NotebookEvent::RemoveNote);
         });
     }
 }
