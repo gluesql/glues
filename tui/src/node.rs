@@ -1,12 +1,12 @@
 mod body;
-mod notes;
+mod notebook;
 mod statusbar;
 
 use {
     crate::traits::CursiveExt,
     body::BodyNode,
     cursive::{view::View, views::ViewRef, Cursive},
-    notes::NotesNode,
+    notebook::NotebookNode,
     statusbar::StatusbarNode,
 };
 
@@ -17,8 +17,8 @@ impl Node {
         BodyNode
     }
 
-    pub fn notes() -> NotesNode {
-        NotesNode
+    pub fn notebook() -> NotebookNode {
+        NotebookNode
     }
 
     pub fn statusbar() -> StatusbarNode {

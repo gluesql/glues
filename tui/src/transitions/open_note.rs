@@ -5,7 +5,7 @@ use {
 };
 
 pub fn open_note(siv: &mut Cursive, note: Note, content: String) {
-    Node::notes()
+    Node::notebook()
         .note_tree()
         .note(&note.id)
         .name_button()
@@ -13,9 +13,9 @@ pub fn open_note(siv: &mut Cursive, note: Note, content: String) {
         .disable();
 
     let content = render_content(siv, note.name, content);
-    let mut editor = Node::notes().editor().find(siv);
+    let mut editor = Node::notebook().editor().find(siv);
     editor.add_fullscreen_layer(content);
     editor.remove_layer(LayerPosition::FromBack(0));
 
-    siv.focus_on_next_tick(Node::notes().editor().name_button().name());
+    siv.focus_on_next_tick(Node::notebook().editor().name_button().name());
 }

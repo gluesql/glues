@@ -11,7 +11,7 @@ pub fn add_note(siv: &mut Cursive, note: Note) {
     {
         siv.dispatch(Event::OpenDirectory(note.directory_id.clone()));
     } else {
-        let mut container = Node::notes()
+        let mut container = Node::notebook()
             .note_tree()
             .directory(&note.directory_id)
             .note_list()
@@ -21,7 +21,7 @@ pub fn add_note(siv: &mut Cursive, note: Note) {
     }
 
     siv.focus_on_next_tick(
-        Node::notes()
+        Node::notebook()
             .note_tree()
             .note(&note.id)
             .name_button()

@@ -4,7 +4,7 @@ use {
 };
 
 pub fn update_note_content(siv: &mut Cursive) {
-    Node::notes()
+    Node::notebook()
         .editor()
         .status()
         .find(siv)

@@ -12,7 +12,7 @@ pub fn rename_directory(siv: &mut Cursive, directory: Directory) {
     );
 
     // ui
-    Node::notes()
+    Node::notebook()
         .note_tree()
         .directory(&directory.id)
         .name_button()

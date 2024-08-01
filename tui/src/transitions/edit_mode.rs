@@ -4,9 +4,9 @@ use {
 };
 
 pub fn edit_mode(siv: &mut Cursive) {
-    Node::notes().editor().panel().find(siv).set_title("*");
-    Node::notes().editor().content().find(siv).enable();
+    Node::notebook().editor().panel().find(siv).set_title("*");
+    Node::notebook().editor().content().find(siv).enable();
 
-    siv.focus_name(&Node::notes().editor().content().name())
+    siv.focus_name(&Node::notebook().editor().content().name())
         .log_unwrap();
 }

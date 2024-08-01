@@ -12,7 +12,7 @@ pub fn rename_note(siv: &mut Cursive, note: Note) {
     );
 
     // ui
-    Node::notes()
+    Node::notebook()
         .note_tree()
         .note(&note.id)
         .name_button()

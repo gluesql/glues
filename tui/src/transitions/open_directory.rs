@@ -10,7 +10,7 @@ pub fn open_directory(
     notes: Vec<Note>,
     directories: Vec<DirectoryItem>,
 ) {
-    let directory_node = Node::notes().note_tree().directory(&id);
+    let directory_node = Node::notebook().note_tree().directory(&id);
 
     directory_node.caret().find(siv).set_content("▾ ");
     directory_node

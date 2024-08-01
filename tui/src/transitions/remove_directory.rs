@@ -12,14 +12,14 @@ pub fn remove_directory(siv: &mut Cursive, directory: Directory) {
     );
 
     // ui - directory
-    let mut container = Node::notes()
+    let mut container = Node::notebook()
         .note_tree()
         .directory(&directory.parent_id)
         .note_list()
         .find(siv);
 
     let i = container
-        .find_child_from_name(&Node::notes().note_tree().directory(&directory.id).name())
+        .find_child_from_name(&Node::notebook().note_tree().directory(&directory.id).name())
         .log_expect("[transitions::remove_directory] directory does not exist");
 
     container.remove_child(i);

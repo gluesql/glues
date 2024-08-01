@@ -5,7 +5,7 @@ use {
 };
 
 pub fn select_note(siv: &mut Cursive, note: Note) {
-    Node::notes()
+    Node::notebook()
         .note_tree()
         .note(&note.id)
         .name_button()
@@ -13,7 +13,7 @@ pub fn select_note(siv: &mut Cursive, note: Note) {
         .enable();
 
     siv.focus_on_next_tick(
-        Node::notes()
+        Node::notebook()
             .note_tree()
             .note(&note.id)
             .name_button()
