@@ -11,7 +11,7 @@ use {
     },
     glues_core::{
         data::Directory,
-        state::notes::{DirectoryItem, NotesState},
+        state::notebook::{DirectoryItem, NotebookState},
         types::DirectoryId,
         Event,
     },
@@ -57,7 +57,7 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
 
 fn on_item_click(directory_id: DirectoryId) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv| {
-        if siv.state::<NotesState>().check_opened(&directory_id) {
+        if siv.state::<NotebookState>().check_opened(&directory_id) {
             siv.dispatch(Event::CloseDirectory(directory_id.clone()))
         } else {
             siv.dispatch(Event::OpenDirectory(directory_id.clone()))

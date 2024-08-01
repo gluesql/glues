@@ -1,6 +1,6 @@
 use crate::{
     data::{Directory, Note},
-    state::notes::DirectoryItem,
+    state::notebook::DirectoryItem,
     types::DirectoryId,
     Event,
 };

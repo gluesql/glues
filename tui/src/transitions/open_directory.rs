@@ -1,7 +1,7 @@
 use {
     crate::{traits::*, views::notes::note_tree::directory::item_list::render_item_list, Node},
     cursive::Cursive,
-    glues_core::{data::Note, state::notes::DirectoryItem, types::DirectoryId},
+    glues_core::{data::Note, state::notebook::DirectoryItem, types::DirectoryId},
 };
 
 pub fn open_directory(

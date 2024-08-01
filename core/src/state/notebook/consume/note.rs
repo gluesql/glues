@@ -1,17 +1,17 @@
 use crate::{
     data::{Directory, Note},
     db::Db,
-    state::notes::{DirectoryItem, InnerState, NotesState, SelectedItem},
+    state::notebook::{DirectoryItem, InnerState, NotebookState, SelectedItem},
     Error, Result, Transition,
 };
 
-pub fn show_actions_dialog(state: &mut NotesState, note: Note) -> Result<Transition> {
+pub fn show_actions_dialog(state: &mut NotebookState, note: Note) -> Result<Transition> {
     state.inner_state = InnerState::NoteMoreActions;
 
     Ok(Transition::ShowNoteActionsDialog(note))
 }
 
-pub fn select(state: &mut NotesState, note: Note) -> Result<Transition> {
+pub fn select(state: &mut NotebookState, note: Note) -> Result<Transition> {
     state.selected = SelectedItem::Note(note);
     state.inner_state = InnerState::NoteSelected;
 
@@ -20,7 +20,7 @@ pub fn select(state: &mut NotesState, note: Note) -> Result<Transition> {
 
 pub async fn rename(
     db: &mut Db,
-    state: &mut NotesState,
+    state: &mut NotebookState,
     mut note: Note,
     new_name: String,
 ) -> Result<Transition> {
@@ -33,7 +33,7 @@ pub async fn rename(
     Ok(Transition::RenameNote(note))
 }
 
-pub async fn remove(db: &mut Db, state: &mut NotesState, note: Note) -> Result<Transition> {
+pub async fn remove(db: &mut Db, state: &mut NotebookState, note: Note) -> Result<Transition> {
     db.remove_note(note.id.clone()).await?;
 
     // TODO
@@ -44,7 +44,7 @@ pub async fn remove(db: &mut Db, state: &mut NotesState, note: Note) -> Result<T
 
 pub async fn add(
     db: &mut Db,
-    state: &mut NotesState,
+    state: &mut NotebookState,
     directory: Directory,
     note_name: String,
 ) -> Result<Transition> {
@@ -70,7 +70,7 @@ pub async fn add(
     Ok(Transition::AddNote(note))
 }
 
-pub async fn open(db: &mut Db, state: &mut NotesState, note: Note) -> Result<Transition> {
+pub async fn open(db: &mut Db, state: &mut NotebookState, note: Note) -> Result<Transition> {
     let content = db.fetch_note_content(note.id.clone()).await?;
 
     state.editing = Some(note.clone());
@@ -79,13 +79,13 @@ pub async fn open(db: &mut Db, state: &mut NotesState, note: Note) -> Result<Tra
     Ok(Transition::OpenNote { note, content })
 }
 
-pub async fn edit(state: &mut NotesState) -> Result<Transition> {
+pub async fn edit(state: &mut NotebookState) -> Result<Transition> {
     state.inner_state = InnerState::EditingEditMode;
 
     Ok(Transition::EditMode)
 }
 
-pub async fn view(state: &mut NotesState) -> Result<Transition> {
+pub async fn view(state: &mut NotebookState) -> Result<Transition> {
     let note = state.get_editing()?.clone();
 
     state.inner_state = InnerState::EditingViewMode;
@@ -93,7 +93,7 @@ pub async fn view(state: &mut NotesState) -> Result<Transition> {
     Ok(Transition::ViewMode(note))
 }
 
-pub async fn browse(state: &mut NotesState) -> Result<Transition> {
+pub async fn browse(state: &mut NotebookState) -> Result<Transition> {
     let note = state.get_selected_note()?.clone();
 
     state.inner_state = InnerState::NoteSelected;
@@ -103,7 +103,7 @@ pub async fn browse(state: &mut NotesState) -> Result<Transition> {
 
 pub async fn update_content(
     db: &mut Db,
-    state: &mut NotesState,
+    state: &mut NotebookState,
     content: String,
 ) -> Result<Transition> {
     let id = state.get_editing()?.id.clone();

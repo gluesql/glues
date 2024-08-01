@@ -6,7 +6,7 @@ use {
         views::{LinearLayout, PaddedView},
         Cursive, View,
     },
-    glues_core::{data::Note, state::notes::DirectoryItem, types::DirectoryId},
+    glues_core::{data::Note, state::notebook::DirectoryItem, types::DirectoryId},
 };
 
 pub fn render_item_list(

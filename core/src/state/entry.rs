@@ -1,4 +1,4 @@
-use crate::{state::notes::NotesState, Error, Event, Glues, Result, Transition};
+use crate::{state::notebook::NotebookState, Error, Event, Glues, Result, Transition};
 
 pub struct EntryState;
 
@@ -6,7 +6,7 @@ impl EntryState {
     pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
         match event {
             Event::Initialize => {
-                glues.state = NotesState::new(glues).await?.into();
+                glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(Transition::Initialize)
             }
