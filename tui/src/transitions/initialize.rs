@@ -1,5 +1,5 @@
 use {
-    crate::{traits::*, views::note_sheet::render_note_sheet, Node},
+    crate::{traits::*, views::notes::note_sheet::render_note_sheet, Node},
     cursive::Cursive,
 };
 
