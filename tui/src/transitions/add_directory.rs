@@ -3,16 +3,13 @@ use {
     cursive::Cursive,
     glues_core::{
         data::Directory,
-        state::note_tree::{DirectoryItem, NoteTreeState},
+        state::notes::{DirectoryItem, NotesState},
         Event,
     },
 };
 
 pub fn add_directory(siv: &mut Cursive, directory: Directory) {
-    if !siv
-        .state::<NoteTreeState>()
-        .check_opened(&directory.parent_id)
-    {
+    if !siv.state::<NotesState>().check_opened(&directory.parent_id) {
         siv.dispatch(Event::OpenDirectory(directory.parent_id.clone()));
     } else {
         let mut container = Node::note_tree()

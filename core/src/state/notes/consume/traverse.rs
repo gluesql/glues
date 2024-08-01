@@ -1,17 +1,17 @@
 use crate::{
-    state::note_tree::{InnerState, NoteTreeState, SelectedItem, TreeItem},
+    state::notes::{InnerState, NotesState, SelectedItem, TreeItem},
     Error, Result, Transition,
 };
 
-pub fn select_next(state: &mut NoteTreeState) -> Result<Transition> {
+pub fn select_next(state: &mut NotesState) -> Result<Transition> {
     select(state, true)
 }
 
-pub fn select_prev(state: &mut NoteTreeState) -> Result<Transition> {
+pub fn select_prev(state: &mut NotesState) -> Result<Transition> {
     select(state, false)
 }
 
-pub fn select(state: &mut NoteTreeState, next: bool) -> Result<Transition> {
+pub fn select(state: &mut NotesState, next: bool) -> Result<Transition> {
     let id = match &state.selected {
         SelectedItem::Note(note) => note.id.clone(),
         SelectedItem::Directory(directory) => directory.id.clone(),

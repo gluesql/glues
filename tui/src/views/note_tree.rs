@@ -9,11 +9,11 @@ use {
         Cursive, View,
     },
     directory::render_directory,
-    glues_core::state::note_tree::NoteTreeState,
+    glues_core::state::notes::NotesState,
 };
 
 pub fn render_note_tree(siv: &mut Cursive) -> impl View {
-    let NoteTreeState { root, .. } = siv.state();
+    let NotesState { root, .. } = siv.state();
     let directory_item = root.clone();
     let layout = render_directory(siv, directory_item)
         .with_name(Node::note_tree().note_list().name())

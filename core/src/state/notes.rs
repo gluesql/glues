@@ -14,7 +14,7 @@ use {
 
 pub use directory_item::{DirectoryItem, DirectoryItemChildren, TreeItem};
 
-pub struct NoteTreeState {
+pub struct NotesState {
     pub root: DirectoryItem,
     pub selected: SelectedItem,
     pub editing: Option<Note>,
@@ -38,7 +38,7 @@ pub enum InnerState {
 }
 use InnerState::*;
 
-impl NoteTreeState {
+impl NotesState {
     pub async fn new(glues: &mut Glues) -> Result<Self> {
         let db = &mut glues.db;
         let root_directory = db.fetch_directory(glues.root_id.clone()).await?;
@@ -59,7 +59,7 @@ impl NoteTreeState {
         };
         let selected = SelectedItem::Directory(root.directory.clone());
 
-        Ok(NoteTreeState {
+        Ok(Self {
             inner_state: DirectorySelected,
             root,
             selected,
@@ -149,7 +149,7 @@ impl NoteTreeState {
 
 pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
     let db = &mut glues.db;
-    let state: &mut NoteTreeState = glues.state.get_inner_mut()?;
+    let state: &mut NotesState = glues.state.get_inner_mut()?;
 
     match (event, &state.inner_state) {
         (Event::OpenDirectory(directory_id), DirectorySelected | NoteSelected) => {
@@ -264,6 +264,6 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
             directory::select(state, directory)
         }
         (event @ Event::Key(_), _) => Ok(Transition::Inedible(event)),
-        _ => Err(Error::Wip("todo: NoteTree::consume".to_owned())),
+        _ => Err(Error::Wip("todo: Notes::consume".to_owned())),
     }
 }

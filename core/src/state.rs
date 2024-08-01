@@ -1,34 +1,34 @@
 mod entry;
-pub mod note_tree;
+pub mod notes;
 
 use crate::{Error, Event, Glues, Result, Transition};
 
-pub use {entry::EntryState, note_tree::NoteTreeState};
+pub use {entry::EntryState, notes::NotesState};
 
 pub enum State {
     EntryState(EntryState),
-    NoteTreeState(NoteTreeState),
+    NotesState(NotesState),
 }
 
 impl State {
     pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
         match &glues.state {
             State::EntryState(_) => EntryState::consume(glues, event).await,
-            State::NoteTreeState(_) => note_tree::consume(glues, event).await,
+            State::NotesState(_) => notes::consume(glues, event).await,
         }
     }
 
     pub fn describe(&self) -> Result<String> {
         match self {
             Self::EntryState(state) => state.describe(),
-            Self::NoteTreeState(state) => state.describe(),
+            Self::NotesState(state) => state.describe(),
         }
     }
 
     pub fn shortcuts(&self) -> Vec<&str> {
         match self {
             Self::EntryState(state) => state.shortcuts(),
-            Self::NoteTreeState(state) => state.shortcuts(),
+            Self::NotesState(state) => state.shortcuts(),
         }
     }
 }
@@ -68,4 +68,4 @@ macro_rules! impl_state_ext {
 }
 
 impl_state_ext!(EntryState);
-impl_state_ext!(NoteTreeState);
+impl_state_ext!(NotesState);
