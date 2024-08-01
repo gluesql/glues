@@ -6,10 +6,16 @@ use crate::{
 };
 
 pub enum Transition {
-    None,
+    Entry(EntryTransition),
+    Notebook(NotebookTransition),
+}
+
+pub enum EntryTransition {
     Initialize,
     Inedible(Event),
+}
 
+pub enum NotebookTransition {
     OpenDirectory {
         id: DirectoryId,
         notes: Vec<Note>,
@@ -41,4 +47,19 @@ pub enum Transition {
     SelectNote(Note),
     SelectDirectory(Directory),
     UpdateNoteContent,
+
+    Inedible(Event),
+    None,
+}
+
+impl From<EntryTransition> for Transition {
+    fn from(t: EntryTransition) -> Self {
+        Self::Entry(t)
+    }
+}
+
+impl From<NotebookTransition> for Transition {
+    fn from(t: NotebookTransition) -> Self {
+        Self::Notebook(t)
+    }
 }

@@ -2,20 +2,20 @@ use crate::{
     data::{Directory, Note},
     db::Db,
     state::notebook::{DirectoryItem, InnerState, NotebookState, SelectedItem},
-    Error, Result, Transition,
+    Error, NotebookTransition, Result,
 };
 
-pub fn show_actions_dialog(state: &mut NotebookState, note: Note) -> Result<Transition> {
+pub fn show_actions_dialog(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
     state.inner_state = InnerState::NoteMoreActions;
 
-    Ok(Transition::ShowNoteActionsDialog(note))
+    Ok(NotebookTransition::ShowNoteActionsDialog(note))
 }
 
-pub fn select(state: &mut NotebookState, note: Note) -> Result<Transition> {
+pub fn select(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
     state.selected = SelectedItem::Note(note);
     state.inner_state = InnerState::NoteSelected;
 
-    Ok(Transition::None)
+    Ok(NotebookTransition::None)
 }
 
 pub async fn rename(
@@ -23,23 +23,27 @@ pub async fn rename(
     state: &mut NotebookState,
     mut note: Note,
     new_name: String,
-) -> Result<Transition> {
+) -> Result<NotebookTransition> {
     db.rename_note(note.id.clone(), new_name.clone()).await?;
 
     note.name = new_name;
     state.selected = SelectedItem::Note(note.clone());
     state.inner_state = InnerState::NoteSelected;
 
-    Ok(Transition::RenameNote(note))
+    Ok(NotebookTransition::RenameNote(note))
 }
 
-pub async fn remove(db: &mut Db, state: &mut NotebookState, note: Note) -> Result<Transition> {
+pub async fn remove(
+    db: &mut Db,
+    state: &mut NotebookState,
+    note: Note,
+) -> Result<NotebookTransition> {
     db.remove_note(note.id.clone()).await?;
 
     // TODO
     state.selected = SelectedItem::None;
 
-    Ok(Transition::RemoveNote(note))
+    Ok(NotebookTransition::RemoveNote(note))
 }
 
 pub async fn add(
@@ -47,7 +51,7 @@ pub async fn add(
     state: &mut NotebookState,
     directory: Directory,
     note_name: String,
-) -> Result<Transition> {
+) -> Result<NotebookTransition> {
     let note = db.add_note(directory.id.clone(), note_name).await?;
 
     let item = state
@@ -67,48 +71,52 @@ pub async fn add(
     state.selected = SelectedItem::Note(note.clone());
     state.inner_state = InnerState::NoteSelected;
 
-    Ok(Transition::AddNote(note))
+    Ok(NotebookTransition::AddNote(note))
 }
 
-pub async fn open(db: &mut Db, state: &mut NotebookState, note: Note) -> Result<Transition> {
+pub async fn open(
+    db: &mut Db,
+    state: &mut NotebookState,
+    note: Note,
+) -> Result<NotebookTransition> {
     let content = db.fetch_note_content(note.id.clone()).await?;
 
     state.editing = Some(note.clone());
     state.inner_state = InnerState::EditingViewMode;
 
-    Ok(Transition::OpenNote { note, content })
+    Ok(NotebookTransition::OpenNote { note, content })
 }
 
-pub async fn edit(state: &mut NotebookState) -> Result<Transition> {
+pub async fn edit(state: &mut NotebookState) -> Result<NotebookTransition> {
     state.inner_state = InnerState::EditingEditMode;
 
-    Ok(Transition::EditMode)
+    Ok(NotebookTransition::EditMode)
 }
 
-pub async fn view(state: &mut NotebookState) -> Result<Transition> {
+pub async fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
     let note = state.get_editing()?.clone();
 
     state.inner_state = InnerState::EditingViewMode;
 
-    Ok(Transition::ViewMode(note))
+    Ok(NotebookTransition::ViewMode(note))
 }
 
-pub async fn browse(state: &mut NotebookState) -> Result<Transition> {
+pub async fn browse(state: &mut NotebookState) -> Result<NotebookTransition> {
     let note = state.get_selected_note()?.clone();
 
     state.inner_state = InnerState::NoteSelected;
 
-    Ok(Transition::SelectNote(note))
+    Ok(NotebookTransition::SelectNote(note))
 }
 
 pub async fn update_content(
     db: &mut Db,
     state: &mut NotebookState,
     content: String,
-) -> Result<Transition> {
+) -> Result<NotebookTransition> {
     let id = state.get_editing()?.id.clone();
 
     db.update_note_content(id, content).await?;
 
-    Ok(Transition::UpdateNoteContent)
+    Ok(NotebookTransition::UpdateNoteContent)
 }

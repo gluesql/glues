@@ -1,16 +1,16 @@
-use crate::{state::notebook::NotebookState, Error, Event, Glues, Result, Transition};
+use crate::{state::notebook::NotebookState, EntryTransition, Error, Event, Glues, Result};
 
 pub struct EntryState;
 
 impl EntryState {
-    pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
+    pub async fn consume(glues: &mut Glues, event: Event) -> Result<EntryTransition> {
         match event {
             Event::Initialize => {
                 glues.state = NotebookState::new(glues).await?.into();
 
-                Ok(Transition::Initialize)
+                Ok(EntryTransition::Initialize)
             }
-            Event::Key(_) => Ok(Transition::Inedible(event)),
+            Event::Key(_) => Ok(EntryTransition::Inedible(event)),
             _ => Err(Error::Wip("todo: EntryState::consume".to_owned())),
         }
     }

@@ -5,14 +5,14 @@ use crate::{
         DirectoryItem, DirectoryItemChildren, InnerState, NotebookState, SelectedItem,
     },
     types::DirectoryId,
-    Error, Result, Transition,
+    Error, NotebookTransition, Result,
 };
 
 pub async fn open(
     db: &mut Db,
     state: &mut NotebookState,
     directory_id: DirectoryId,
-) -> Result<Transition> {
+) -> Result<NotebookTransition> {
     let item = state
         .root
         .find_mut(&directory_id)
@@ -40,27 +40,30 @@ pub async fn open(
         }
     };
 
-    Ok(Transition::OpenDirectory {
+    Ok(NotebookTransition::OpenDirectory {
         id: directory_id,
         notes: notes.clone(),
         directories: directories.clone(),
     })
 }
 
-pub fn close(state: &mut NotebookState, directory_id: DirectoryId) -> Result<Transition> {
+pub fn close(state: &mut NotebookState, directory_id: DirectoryId) -> Result<NotebookTransition> {
     state
         .root
         .find_mut(&directory_id)
         .ok_or(Error::Wip("todo: asdfasdf".to_owned()))?
         .children = None;
 
-    Ok(Transition::CloseDirectory {
+    Ok(NotebookTransition::CloseDirectory {
         directory_id: directory_id.clone(),
         by_note: false,
     })
 }
 
-pub fn close_by_note(state: &mut NotebookState, directory: Directory) -> Result<Transition> {
+pub fn close_by_note(
+    state: &mut NotebookState,
+    directory: Directory,
+) -> Result<NotebookTransition> {
     close(state, directory.id.clone())?;
 
     let directory_id = directory.id.clone();
@@ -68,24 +71,27 @@ pub fn close_by_note(state: &mut NotebookState, directory: Directory) -> Result<
     state.selected = SelectedItem::Directory(directory);
     state.inner_state = InnerState::DirectorySelected;
 
-    Ok(Transition::CloseDirectory {
+    Ok(NotebookTransition::CloseDirectory {
         directory_id,
         by_note: true,
     })
 }
 
-pub fn show_actions_dialog(state: &mut NotebookState, directory: Directory) -> Result<Transition> {
+pub fn show_actions_dialog(
+    state: &mut NotebookState,
+    directory: Directory,
+) -> Result<NotebookTransition> {
     state.selected = SelectedItem::Directory(directory.clone());
     state.inner_state = InnerState::DirectoryMoreActions;
 
-    Ok(Transition::ShowDirectoryActionsDialog(directory))
+    Ok(NotebookTransition::ShowDirectoryActionsDialog(directory))
 }
 
-pub fn select(state: &mut NotebookState, directory: Directory) -> Result<Transition> {
+pub fn select(state: &mut NotebookState, directory: Directory) -> Result<NotebookTransition> {
     state.selected = SelectedItem::Directory(directory);
     state.inner_state = InnerState::DirectorySelected;
 
-    Ok(Transition::None)
+    Ok(NotebookTransition::None)
 }
 
 pub async fn rename(
@@ -93,27 +99,27 @@ pub async fn rename(
     state: &mut NotebookState,
     mut directory: Directory,
     new_name: String,
-) -> Result<Transition> {
+) -> Result<NotebookTransition> {
     db.rename_directory(directory.id.clone(), new_name.clone())
         .await?;
 
     directory.name = new_name;
     state.inner_state = InnerState::DirectorySelected;
 
-    Ok(Transition::RenameDirectory(directory))
+    Ok(NotebookTransition::RenameDirectory(directory))
 }
 
 pub async fn remove(
     db: &mut Db,
     state: &mut NotebookState,
     directory: Directory,
-) -> Result<Transition> {
+) -> Result<NotebookTransition> {
     db.remove_directory(directory.id.clone()).await?;
 
     // TODO
     state.selected = SelectedItem::None;
 
-    Ok(Transition::RemoveDirectory(directory))
+    Ok(NotebookTransition::RemoveDirectory(directory))
 }
 
 pub async fn add(
@@ -121,7 +127,7 @@ pub async fn add(
     state: &mut NotebookState,
     directory: Directory,
     directory_name: String,
-) -> Result<Transition> {
+) -> Result<NotebookTransition> {
     let parent_id = directory.id.clone();
     let directory = db.add_directory(parent_id.clone(), directory_name).await?;
 
@@ -151,5 +157,5 @@ pub async fn add(
     state.selected = SelectedItem::Directory(directory.clone());
     state.inner_state = InnerState::DirectorySelected;
 
-    Ok(Transition::AddDirectory(directory))
+    Ok(NotebookTransition::AddDirectory(directory))
 }

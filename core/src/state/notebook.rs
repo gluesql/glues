@@ -7,7 +7,7 @@ use {
         event::KeyEvent,
         state::GetInner,
         types::DirectoryId,
-        Error, Event, Glues, Result, Transition,
+        Error, Event, Glues, NotebookTransition, Result,
     },
     consume::{directory, note, traverse},
 };
@@ -147,7 +147,7 @@ impl NotebookState {
     }
 }
 
-pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
+pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransition> {
     let db = &mut glues.db;
     let state: &mut NotebookState = glues.state.get_inner_mut()?;
 
@@ -263,7 +263,7 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
 
             directory::select(state, directory)
         }
-        (event @ Event::Key(_), _) => Ok(Transition::Inedible(event)),
+        (event @ Event::Key(_), _) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }

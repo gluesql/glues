@@ -13,8 +13,8 @@ pub enum State {
 impl State {
     pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
         match &glues.state {
-            State::EntryState(_) => EntryState::consume(glues, event).await,
-            State::NotebookState(_) => notebook::consume(glues, event).await,
+            State::EntryState(_) => EntryState::consume(glues, event).await.map(Into::into),
+            State::NotebookState(_) => notebook::consume(glues, event).await.map(Into::into),
         }
     }
 

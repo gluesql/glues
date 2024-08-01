@@ -1,92 +1,88 @@
-mod add_directory;
-mod add_note;
-mod close_directory;
-mod edit_mode;
-mod initialize;
-mod open_directory;
-mod open_note;
-mod remove_directory;
-mod remove_note;
-mod rename_directory;
-mod rename_note;
-mod select_directory;
-mod select_note;
-mod show_directory_actions;
-mod show_note_actions;
-mod update_note_content;
-mod view_mode;
-
-use add_directory::add_directory;
-use add_note::add_note;
-use close_directory::close_directory;
-use edit_mode::edit_mode;
-use initialize::initialize;
-use open_directory::open_directory;
-use open_note::open_note;
-use remove_directory::remove_directory;
-use remove_note::remove_note;
-use rename_directory::rename_directory;
-use rename_note::rename_note;
-use select_directory::select_directory;
-use select_note::select_note;
-use show_directory_actions::show_directory_actions;
-use show_note_actions::show_note_actions;
-use update_note_content::update_note_content;
-use view_mode::view_mode;
+mod entry;
+mod notebook;
 
 use {
     crate::{traits::*, Node},
     cursive::Cursive,
-    glues_core::{Event, KeyEvent, Transition},
+    glues_core::{EntryTransition, Event, KeyEvent, NotebookTransition, Transition},
 };
 
 pub fn handle_event(siv: &mut Cursive, event: Event) {
     let transition = siv.glues().dispatch(event).log_unwrap();
 
     match transition {
-        Transition::Initialize => initialize(siv),
-        Transition::ShowNoteActionsDialog(note) => show_note_actions(siv, note),
-        Transition::ShowDirectoryActionsDialog(directory) => show_directory_actions(siv, directory),
-        Transition::RenameNote(note) => rename_note(siv, note),
-        Transition::RemoveNote(note) => remove_note(siv, note),
-        Transition::AddNote(note) => add_note(siv, note),
-        Transition::RenameDirectory(directory) => rename_directory(siv, directory),
-        Transition::RemoveDirectory(directory) => remove_directory(siv, directory),
-        Transition::AddDirectory(directory) => add_directory(siv, directory),
-        Transition::OpenDirectory {
+        Transition::Entry(transition) => handle_entry_transition(siv, transition),
+        Transition::Notebook(transition) => handle_notebook_transition(siv, transition),
+        /*
+        _ => {
+            log!("todo - unhandled event");
+        }
+        */
+    };
+
+    update_statusbar(siv);
+}
+
+fn handle_entry_transition(siv: &mut Cursive, transition: EntryTransition) {
+    use entry::*;
+
+    match transition {
+        EntryTransition::Initialize => initialize(siv),
+        EntryTransition::Inedible(Event::Key(KeyEvent::Esc)) => {
+            siv.select_menubar();
+        }
+        _ => {
+            log!("[EntryTransition] unhandled event");
+        }
+    }
+}
+
+fn handle_notebook_transition(siv: &mut Cursive, transition: NotebookTransition) {
+    use notebook::*;
+
+    match transition {
+        NotebookTransition::ShowNoteActionsDialog(note) => show_note_actions(siv, note),
+        NotebookTransition::ShowDirectoryActionsDialog(directory) => {
+            show_directory_actions(siv, directory)
+        }
+        NotebookTransition::RenameNote(note) => rename_note(siv, note),
+        NotebookTransition::RemoveNote(note) => remove_note(siv, note),
+        NotebookTransition::AddNote(note) => add_note(siv, note),
+        NotebookTransition::RenameDirectory(directory) => rename_directory(siv, directory),
+        NotebookTransition::RemoveDirectory(directory) => remove_directory(siv, directory),
+        NotebookTransition::AddDirectory(directory) => add_directory(siv, directory),
+        NotebookTransition::OpenDirectory {
             id,
             notes,
             directories,
         } => {
             open_directory(siv, id, notes, directories);
         }
-        Transition::CloseDirectory {
+        NotebookTransition::CloseDirectory {
             directory_id,
             by_note,
         } => close_directory(siv, directory_id, by_note),
-        Transition::OpenNote { note, content } => {
+        NotebookTransition::OpenNote { note, content } => {
             open_note(siv, note, content);
         }
-        Transition::EditMode => {
+        NotebookTransition::EditMode => {
             edit_mode(siv);
         }
-        Transition::ViewMode(note) => {
+        NotebookTransition::ViewMode(note) => {
             view_mode(siv, note);
         }
-        Transition::SelectNote(note) => select_note(siv, note),
-        Transition::SelectDirectory(directory) => select_directory(siv, directory),
-        Transition::UpdateNoteContent => {
+        NotebookTransition::SelectNote(note) => select_note(siv, note),
+        NotebookTransition::SelectDirectory(directory) => select_directory(siv, directory),
+        NotebookTransition::UpdateNoteContent => {
             update_note_content(siv);
         }
-        Transition::Inedible(Event::Key(KeyEvent::Esc)) => {
+        NotebookTransition::Inedible(Event::Key(KeyEvent::Esc)) => {
             siv.select_menubar();
         }
         _ => {
-            log!("todo - unhandled event");
+            log!("[NotebookTransition] unhandled event");
         }
-    };
-
-    update_statusbar(siv);
+    }
 }
 
 fn update_statusbar(siv: &mut Cursive) {

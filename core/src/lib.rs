@@ -12,6 +12,6 @@ pub mod types;
 pub use error::Error;
 pub use event::{Event, KeyEvent};
 pub use glues::Glues;
-pub use transition::Transition;
+pub use transition::{EntryTransition, NotebookTransition, Transition};
 
 type Result<T> = std::result::Result<T, Error>;
