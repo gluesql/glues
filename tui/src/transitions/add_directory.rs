@@ -12,7 +12,8 @@ pub fn add_directory(siv: &mut Cursive, directory: Directory) {
     if !siv.state::<NotesState>().check_opened(&directory.parent_id) {
         siv.dispatch(Event::OpenDirectory(directory.parent_id.clone()));
     } else {
-        let mut container = Node::note_tree()
+        let mut container = Node::notes()
+            .note_tree()
             .directory(&directory.parent_id)
             .note_list()
             .find(siv);
@@ -25,7 +26,8 @@ pub fn add_directory(siv: &mut Cursive, directory: Directory) {
     }
 
     siv.focus_on_next_tick(
-        Node::note_tree()
+        Node::notes()
+            .note_tree()
             .directory(&directory.id)
             .name_button()
             .name(),

@@ -15,10 +15,10 @@ pub fn render_editor(siv: &mut Cursive) -> NamedView<Panel<PaddedView<NamedView<
     let content = render_content(siv, ":D".to_owned(), "hello :)".to_owned());
     let stack = StackView::new()
         .fullscreen_layer(content)
-        .with_name(Node::editor().name());
+        .with_name(Node::notes().editor().name());
 
     let padded_view = PaddedView::lrtb(1, 1, 0, 0, stack);
     Panel::new(padded_view)
         .title_position(HAlign::Left)
-        .with_name(Node::editor().panel().name())
+        .with_name(Node::notes().editor().panel().name())
 }

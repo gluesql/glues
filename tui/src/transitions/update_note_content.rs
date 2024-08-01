@@ -4,5 +4,9 @@ use {
 };
 
 pub fn update_note_content(siv: &mut Cursive) {
-    Node::editor().status().find(siv).set_content("saved");
+    Node::notes()
+        .editor()
+        .status()
+        .find(siv)
+        .set_content("saved");
 }

@@ -16,7 +16,7 @@ pub fn render_note_tree(siv: &mut Cursive) -> impl View {
     let NotesState { root, .. } = siv.state();
     let directory_item = root.clone();
     let layout = render_directory(siv, directory_item)
-        .with_name(Node::note_tree().note_list().name())
+        .with_name(Node::notes().note_tree().note_list().name())
         .min_width(40);
     let padded_view = PaddedView::lrtb(1, 1, 0, 1, layout);
 

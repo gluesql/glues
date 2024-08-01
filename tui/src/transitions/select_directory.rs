@@ -6,7 +6,8 @@ use {
 
 pub fn select_directory(siv: &mut Cursive, directory: Directory) {
     siv.focus_on_next_tick(
-        Node::note_tree()
+        Node::notes()
+            .note_tree()
             .directory(&directory.id)
             .name_button()
             .name(),

@@ -13,7 +13,7 @@ use {
 };
 
 pub fn render_note(note: Note) -> impl View {
-    let note_node = Node::note_tree().note(&note.id);
+    let note_node = Node::notes().note_tree().note(&note.id);
     let button = Button::new_raw(note.name.clone(), |siv| {
         siv.dispatch(Event::OpenNote);
     })

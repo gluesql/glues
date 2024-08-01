@@ -26,7 +26,8 @@ pub fn render_item_list(
     }
 
     let layout = layout.with_name(
-        Node::note_tree()
+        Node::notes()
+            .note_tree()
             .directory(&directory_id)
             .note_list()
             .name(),

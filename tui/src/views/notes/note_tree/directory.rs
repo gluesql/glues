@@ -20,7 +20,7 @@ use {
 
 pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
     let directory = item.directory.clone();
-    let directory_node = Node::note_tree().directory(&directory.id);
+    let directory_node = Node::notes().note_tree().directory(&directory.id);
 
     let directory_id = directory.id.clone();
     let button = Button::new_raw(directory.name.clone(), on_item_click(directory_id))
@@ -28,8 +28,13 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
         .wrap_with(FocusTracker::new)
         .on_focus(on_item_focus(directory.clone()));
 
-    let caret = TextView::new(get_caret(item.children.is_some()))
-        .with_name(Node::note_tree().directory(&directory.id).caret().name());
+    let caret = TextView::new(get_caret(item.children.is_some())).with_name(
+        Node::notes()
+            .note_tree()
+            .directory(&directory.id)
+            .caret()
+            .name(),
+    );
     let content = LinearLayout::horizontal()
         .child(caret)
         .child(button)

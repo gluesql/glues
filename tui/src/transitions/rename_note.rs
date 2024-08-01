@@ -12,7 +12,8 @@ pub fn rename_note(siv: &mut Cursive, note: Note) {
     );
 
     // ui
-    Node::note_tree()
+    Node::notes()
+        .note_tree()
         .note(&note.id)
         .name_button()
         .find(siv)

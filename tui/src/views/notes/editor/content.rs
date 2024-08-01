@@ -12,18 +12,18 @@ pub fn render_content(_siv: &mut Cursive, name: String, content: String) -> impl
     let name_button = Button::new_raw(name, |siv| {
         siv.dispatch(Event::EditNote);
     })
-    .with_name(Node::editor().name_button().name());
+    .with_name(Node::notes().editor().name_button().name());
     let name_row = LinearLayout::horizontal()
         .child(TextView::new("Name: "))
         .child(name_button);
     let textarea = TextArea::new()
         .content(content)
         .disabled()
-        .with_name(Node::editor().content().name())
+        .with_name(Node::notes().editor().content().name())
         .full_screen();
     let status = LinearLayout::horizontal()
         .child(DummyView.full_width())
-        .child(TextView::new("loaded").with_name(Node::editor().status().name()));
+        .child(TextView::new("loaded").with_name(Node::notes().editor().status().name()));
 
     LinearLayout::vertical()
         .child(name_row)
