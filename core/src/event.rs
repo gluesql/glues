@@ -40,14 +40,13 @@ pub enum Event {
 #[derive(Clone, Copy)]
 pub enum KeyEvent {
     B,
-    Q,
-    O,
-    M,
     E,
     H,
     J,
     K,
     L,
+    M,
+    O,
     Left,
     Right,
     Esc,

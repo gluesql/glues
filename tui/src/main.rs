@@ -67,11 +67,11 @@ fn main() {
     for (key, event) in [
         (Event::Char('b'), KeyEvent::B),
         (Event::Char('e'), KeyEvent::E),
-        (Event::Char('m'), KeyEvent::M),
         (Event::Char('h'), KeyEvent::H),
-        (Event::Char('l'), KeyEvent::L),
         (Event::Char('j'), KeyEvent::J),
         (Event::Char('k'), KeyEvent::K),
+        (Event::Char('l'), KeyEvent::L),
+        (Event::Char('m'), KeyEvent::M),
         (Event::Char('o'), KeyEvent::O),
         (Key::Left.into(), KeyEvent::Left),
         (Key::Right.into(), KeyEvent::Right),
