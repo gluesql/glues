@@ -1,5 +1,5 @@
 use {
-    crate::views::notes::{editor::render_editor, note_tree::render_note_tree},
+    crate::views::notebook::{editor::render_editor, note_tree::render_note_tree},
     cursive::{view::View, views::LinearLayout, Cursive},
 };
 

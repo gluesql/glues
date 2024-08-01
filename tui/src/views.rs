@@ -1,3 +1,3 @@
 pub mod menubar;
-pub mod notes;
+pub mod notebook;
 pub mod statusbar;

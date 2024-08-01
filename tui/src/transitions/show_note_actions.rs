@@ -1,5 +1,5 @@
 use {
-    crate::views::notes::note_tree::note::more_actions::render_more_actions, cursive::Cursive,
+    crate::views::notebook::note_tree::note::more_actions::render_more_actions, cursive::Cursive,
     glues_core::data::Note,
 };
 

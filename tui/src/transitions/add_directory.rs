@@ -1,5 +1,5 @@
 use {
-    crate::{traits::*, views::notes::note_tree::directory::render_directory, Node},
+    crate::{traits::*, views::notebook::note_tree::directory::render_directory, Node},
     cursive::Cursive,
     glues_core::{
         data::Directory,

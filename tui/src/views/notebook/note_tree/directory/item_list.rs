@@ -1,6 +1,6 @@
 use {
     super::render_directory,
-    crate::{traits::*, views::notes::note_tree::note::render_note, Node},
+    crate::{traits::*, views::notebook::note_tree::note::render_note, Node},
     cursive::{
         view::Nameable,
         views::{LinearLayout, PaddedView},
