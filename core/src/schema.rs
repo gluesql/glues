@@ -22,7 +22,7 @@ pub async fn setup(storage: &mut Storage) {
         .add_column("directory_id UUID NOT NULL")
         .add_column("created_at TIMESTAMP NOT NULL DEFAULT NOW()")
         .add_column("updated_at TIMESTAMP NOT NULL DEFAULT NOW()")
-        .add_column("content TEXT NOT NULL DEFAULT 'blank'")
+        .add_column("content TEXT NOT NULL DEFAULT ''")
         .execute(storage)
         .await
         .expect("Creating Note failed");
