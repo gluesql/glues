@@ -3,6 +3,7 @@ use crate::{
     types::DirectoryId,
 };
 
+#[derive(Debug)]
 pub enum Event {
     Key(KeyEvent),
     Entry(EntryEvent),
@@ -11,10 +12,12 @@ pub enum Event {
     Cancel,
 }
 
+#[derive(Debug)]
 pub enum EntryEvent {
     Initialize,
 }
 
+#[derive(Debug)]
 pub enum NotebookEvent {
     OpenDirectory(DirectoryId),
     CloseDirectory(DirectoryId),
@@ -43,7 +46,7 @@ pub enum NotebookEvent {
     UpdateNoteContent(String),
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum KeyEvent {
     B,
     E,
