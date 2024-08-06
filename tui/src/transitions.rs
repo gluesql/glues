@@ -22,7 +22,7 @@ fn handle_entry_transition(siv: &mut Cursive, transition: EntryTransition) {
     use entry::*;
 
     match transition {
-        EntryTransition::Initialize => initialize(siv),
+        EntryTransition::OpenNotebook => open_notebook(siv),
         EntryTransition::Inedible(Event::Key(KeyEvent::Esc)) => {
             siv.select_menubar();
         }

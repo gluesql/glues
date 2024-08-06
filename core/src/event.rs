@@ -14,7 +14,9 @@ pub enum Event {
 
 #[derive(Debug)]
 pub enum EntryEvent {
-    Initialize,
+    OpenMemory,
+    OpenCsv(String),
+    OpenJson(String),
 }
 
 #[derive(Debug)]

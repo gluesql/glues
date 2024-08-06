@@ -12,8 +12,18 @@ pub fn menubar(siv: &mut Cursive) {
         .add_subtree(
             "Glues",
             Tree::new()
-                .leaf("New Notes", |siv| {
-                    siv.dispatch(EntryEvent::Initialize);
+                .leaf("New Notes - Memory", |siv| {
+                    siv.dispatch(EntryEvent::OpenMemory);
+                })
+                .leaf("New Notes - CSV", |siv| {
+                    siv.prompt("Path?", |siv, path| {
+                        siv.dispatch(EntryEvent::OpenCsv(path.to_owned()));
+                    })
+                })
+                .leaf("New Notes - JSON", |siv| {
+                    siv.prompt("Path?", |siv, path| {
+                        siv.dispatch(EntryEvent::OpenJson(path.to_owned()));
+                    })
                 })
                 .leaf("Quit", |siv| siv.quit()),
         )

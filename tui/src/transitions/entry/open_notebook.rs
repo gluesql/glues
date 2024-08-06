@@ -3,8 +3,8 @@ use {
     cursive::Cursive,
 };
 
-pub fn initialize(siv: &mut Cursive) {
-    log!("[transitions::initialize] hi");
+pub fn open_notebook(siv: &mut Cursive) {
+    log!("[transitions::open_notebook] hi");
 
     let note_sheet = render_note_sheet(siv);
     Node::body().find(siv).add_layer(note_sheet);

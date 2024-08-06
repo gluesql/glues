@@ -4,7 +4,6 @@ mod directory_item;
 use {
     crate::{
         data::{Directory, Note},
-        db::Db,
         event::KeyEvent,
         state::GetInner,
         types::DirectoryId,
@@ -41,7 +40,10 @@ use InnerState::*;
 
 impl NotebookState {
     pub async fn new(glues: &mut Glues) -> Result<Self> {
-        let mut db = Db::memory().await?;
+        let db = glues
+            .db
+            .as_mut()
+            .ok_or(Error::Wip("[NotebookState::new] empty db".to_owned()))?;
         let root_id = db.root_id.clone();
         let root_directory = db.fetch_directory(root_id).await?;
         let notes = db.fetch_notes(root_directory.id.clone()).await?;
@@ -54,8 +56,6 @@ impl NotebookState {
                 children: None,
             })
             .collect();
-
-        glues.db = Some(db);
 
         let root = DirectoryItem {
             directory: root_directory,

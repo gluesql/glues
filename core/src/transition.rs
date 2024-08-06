@@ -11,7 +11,7 @@ pub enum Transition {
 }
 
 pub enum EntryTransition {
-    Initialize,
+    OpenNotebook,
     Inedible(Event),
 }
 
