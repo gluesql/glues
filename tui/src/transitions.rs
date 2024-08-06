@@ -13,11 +13,6 @@ pub fn handle_event(siv: &mut Cursive, event: Event) {
     match transition {
         Transition::Entry(transition) => handle_entry_transition(siv, transition),
         Transition::Notebook(transition) => handle_notebook_transition(siv, transition),
-        /*
-        _ => {
-            log!("todo - unhandled event");
-        }
-        */
     };
 
     update_statusbar(siv);

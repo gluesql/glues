@@ -1,9 +1,14 @@
 use {
-    crate::db::{Execute, Storage},
-    gluesql::core::ast_builder::table,
+    crate::{
+        db::{Execute, Storage},
+        types::DirectoryId,
+        Error, Result,
+    },
+    gluesql::core::ast_builder::{col, table, text},
+    std::ops::Deref,
 };
 
-pub async fn setup(storage: &mut Storage) {
+pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
     table("Directory")
         .create_table_if_not_exists()
         .add_column("id UUID PRIMARY KEY DEFAULT GENERATE_UUID()")
@@ -12,8 +17,7 @@ pub async fn setup(storage: &mut Storage) {
         .add_column("created_at TIMESTAMP NOT NULL DEFAULT NOW()")
         .add_column("updated_at TIMESTAMP NOT NULL DEFAULT NOW()")
         .execute(storage)
-        .await
-        .expect("Creating Directory failed");
+        .await?;
 
     table("Note")
         .create_table_if_not_exists()
@@ -24,6 +28,40 @@ pub async fn setup(storage: &mut Storage) {
         .add_column("updated_at TIMESTAMP NOT NULL DEFAULT NOW()")
         .add_column("content TEXT NOT NULL DEFAULT ''")
         .execute(storage)
-        .await
-        .expect("Creating Note failed");
+        .await?;
+
+    let root_not_exists = table("Directory")
+        .select()
+        .filter(col("parent_id").is_null())
+        .project("id")
+        .execute(storage)
+        .await?
+        .select()
+        .unwrap()
+        .count()
+        == 0;
+
+    if root_not_exists {
+        table("Directory")
+            .insert()
+            .columns("name")
+            .values(vec![vec![text("Notes")]])
+            .execute(storage)
+            .await?;
+    }
+
+    table("Directory")
+        .select()
+        .filter(col("parent_id").is_null())
+        .project("id")
+        .execute(storage)
+        .await?
+        .select()
+        .unwrap()
+        .next()
+        .unwrap()
+        .get("id")
+        .map(Deref::deref)
+        .map(Into::into)
+        .ok_or(Error::Wip("empty id".to_owned()))
 }

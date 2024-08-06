@@ -35,30 +35,7 @@ fn main() {
 
     log!("logger initialized");
 
-    let mut glues = block_on(Glues::new());
-
-    let directory_id = glues
-        .db
-        .add_directory(glues.root_id.clone(), "Directory 01".to_owned())
-        .log_unwrap()
-        .id;
-
-    let sample_notes = [
-        ("Sample 001", glues.root_id.clone()),
-        ("Note for the note", glues.root_id.clone()),
-        ("Glocery items", directory_id.clone()),
-        ("Sub item note sample", directory_id.clone()),
-        ("Hello Glues!", directory_id.clone()),
-    ];
-
-    for (name, directory_id) in sample_notes {
-        glues
-            .db
-            .add_note(directory_id, name.to_owned())
-            .log_unwrap();
-    }
-
-    log!("added sample notes & directories");
+    let glues = block_on(Glues::new());
 
     let mut siv = cursive::default();
     siv.set_user_data(glues);

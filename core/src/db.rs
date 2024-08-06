@@ -2,7 +2,7 @@ mod directory;
 mod note;
 
 use {
-    crate::Result,
+    crate::{schema::setup, types::DirectoryId, Result},
     async_trait::async_trait,
     gluesql::{
         core::ast_builder::Build,
@@ -12,6 +12,7 @@ use {
 
 pub struct Db {
     pub storage: Storage,
+    pub root_id: DirectoryId,
 }
 
 pub enum Storage {
@@ -21,29 +22,29 @@ pub enum Storage {
 }
 
 impl Db {
-    pub fn memory() -> Self {
-        let storage = MemoryStorage::default();
-        let glue = Glue::new(storage);
+    pub async fn memory() -> Result<Self> {
+        let glue = Glue::new(MemoryStorage::default());
+        let mut storage = Storage::Memory(glue);
 
-        Self {
-            storage: Storage::Memory(glue),
-        }
+        let root_id = setup(&mut storage).await?;
+
+        Ok(Self { storage, root_id })
     }
 
-    pub fn csv(path: &str) -> Result<Self> {
-        CsvStorage::new(path)
-            .map_err(Into::into)
-            .map(Glue::new)
-            .map(Storage::Csv)
-            .map(|storage| Self { storage })
+    pub async fn csv(path: &str) -> Result<Self> {
+        let mut storage = CsvStorage::new(path).map(Glue::new).map(Storage::Csv)?;
+
+        let root_id = setup(&mut storage).await?;
+
+        Ok(Self { storage, root_id })
     }
 
-    pub fn json(path: &str) -> Result<Self> {
-        JsonStorage::new(path)
-            .map_err(Into::into)
-            .map(Glue::new)
-            .map(Storage::Json)
-            .map(|storage| Self { storage })
+    pub async fn json(path: &str) -> Result<Self> {
+        let mut storage = JsonStorage::new(path).map(Glue::new).map(Storage::Json)?;
+
+        let root_id = setup(&mut storage).await?;
+
+        Ok(Self { storage, root_id })
     }
 }
 
