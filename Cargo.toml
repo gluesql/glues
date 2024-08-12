@@ -19,7 +19,10 @@ license = "Apache-2.0"
 glues-core = { path = "./core" }
 
 [workspace.dependencies.gluesql]
-git = "https://github.com/gluesql/gluesql.git"
-rev = "1341032"
+version = "0.16.0"
 default_features = false
-features = ["memory-storage", "csv-storage", "json-storage"]
+features = [
+  "gluesql_memory_storage",
+  "gluesql-csv-storage",
+  "gluesql-json-storage",
+]
