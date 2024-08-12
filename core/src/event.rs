@@ -46,6 +46,8 @@ pub enum NotebookEvent {
     EditNote,
 
     UpdateNoteContent(String),
+
+    CloseEntryDialog,
 }
 
 #[derive(Clone, Copy, Debug)]

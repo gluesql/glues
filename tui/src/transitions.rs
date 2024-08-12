@@ -71,6 +71,9 @@ fn handle_notebook_transition(siv: &mut Cursive, transition: NotebookTransition)
         NotebookTransition::UpdateNoteContent => {
             update_note_content(siv);
         }
+        NotebookTransition::ShowEntryDialog => {
+            show_entry_dialog(siv);
+        }
         NotebookTransition::Inedible(Event::Key(KeyEvent::Esc)) => {
             siv.select_menubar();
         }

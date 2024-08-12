@@ -5,7 +5,7 @@ use {
     crate::{
         data::{Directory, Note},
         event::KeyEvent,
-        state::GetInner,
+        state::{EntryState, GetInner},
         types::DirectoryId,
         Error, Event, Glues, NotebookEvent, NotebookTransition, Result,
     },
@@ -28,6 +28,7 @@ pub enum SelectedItem {
     None,
 }
 
+#[derive(Clone)]
 pub enum InnerState {
     NoteSelected,
     NoteMoreActions,
@@ -35,6 +36,7 @@ pub enum InnerState {
     DirectoryMoreActions,
     EditingViewMode,
     EditingEditMode,
+    EntryDialog(Box<InnerState>),
 }
 use InnerState::*;
 
@@ -97,6 +99,7 @@ impl NotebookState {
             }
             EditingViewMode => "editing - view".to_owned(),
             EditingEditMode => "editing - edit".to_owned(),
+            EntryDialog(_) => "Global menu dialog".to_owned(),
         })
     }
 
@@ -104,6 +107,7 @@ impl NotebookState {
         match &self.inner_state {
             NoteSelected => {
                 vec![
+                    "[Esc] Menu",
                     "[O] Open note",
                     "[H] Close parent directory",
                     "[J] Select next",
@@ -113,6 +117,7 @@ impl NotebookState {
             }
             DirectorySelected => {
                 vec![
+                    "[Esc] Menu",
                     "[L] Toggle",
                     "[H] Close",
                     "[J] Select next",
@@ -121,7 +126,7 @@ impl NotebookState {
                 ]
             }
             EditingViewMode => {
-                vec!["[B] Browse note tree", "[E] Edit mode"]
+                vec!["[Esc] Menu", "[B] Browse note tree", "[E] Edit mode"]
             }
             EditingEditMode => {
                 vec!["[Esc] View mode & Save note"]
@@ -162,6 +167,19 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransiti
     let state: &mut NotebookState = glues.state.get_inner_mut()?;
 
     match (event, &state.inner_state) {
+        (Notebook(CloseEntryDialog), EntryDialog(inner_state)) => {
+            state.inner_state = *inner_state.clone();
+
+            Ok(NotebookTransition::None)
+        }
+        (event, EntryDialog(_)) => EntryState::consume(glues, event)
+            .await
+            .map(NotebookTransition::Entry),
+        (Key(KeyEvent::Esc), DirectorySelected | NoteSelected | EditingViewMode) => {
+            state.inner_state = EntryDialog(Box::new(state.inner_state.clone()));
+
+            Ok(NotebookTransition::ShowEntryDialog)
+        }
         (Notebook(OpenDirectory(directory_id)), DirectorySelected | NoteSelected) => {
             directory::open(db, state, directory_id).await
         }

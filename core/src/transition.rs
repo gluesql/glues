@@ -48,6 +48,9 @@ pub enum NotebookTransition {
     SelectDirectory(Directory),
     UpdateNoteContent,
 
+    ShowEntryDialog,
+    Entry(EntryTransition),
+
     Inedible(Event),
     None,
 }

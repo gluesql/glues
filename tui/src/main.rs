@@ -18,7 +18,7 @@ use {
     cursive::{
         event::{Event, Key},
         view::{Nameable, Resizable},
-        views::{DummyView, LinearLayout, PaddedView, StackView},
+        views::{DummyView, LinearLayout, PaddedView, Panel, StackView},
         Cursive,
     },
     futures::executor::block_on,
@@ -26,7 +26,7 @@ use {
     node::Node,
     traits::*,
     transitions::handle_event,
-    views::{menubar::menubar, statusbar::render_statusbar},
+    views::{entry::render_entry, statusbar::render_statusbar},
 };
 
 fn main() {
@@ -59,19 +59,19 @@ fn main() {
         });
     }
 
+    let entry_view = Panel::new(render_entry()).title("Glues");
     let stack_view = StackView::new()
         .transparent_layer(DummyView.full_height())
+        .layer(entry_view)
         .with_name(Node::body().name());
     let padded_view = PaddedView::lrtb(0, 1, 0, 1, stack_view);
 
     let statusbar = render_statusbar(&mut siv);
     let layout = LinearLayout::vertical()
-        .child(padded_view)
         .child(statusbar)
+        .child(padded_view)
         .full_screen();
 
     siv.screen_mut().add_transparent_layer(layout);
-
-    menubar(&mut siv);
     siv.run();
 }
