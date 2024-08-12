@@ -17,6 +17,7 @@ pub enum EntryEvent {
     OpenMemory,
     OpenCsv(String),
     OpenJson(String),
+    OpenFile(String),
 }
 
 #[derive(Debug)]

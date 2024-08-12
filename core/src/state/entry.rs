@@ -33,6 +33,12 @@ impl EntryState {
 
                 Ok(EntryTransition::OpenNotebook)
             }
+            Entry(OpenFile(path)) => {
+                glues.db = Db::file(&path).await.map(Some)?;
+
+                glues.state = NotebookState::new(glues).await?.into();
+                Ok(EntryTransition::OpenNotebook)
+            }
             Key(_) => Ok(EntryTransition::Inedible(event)),
             _ => Err(Error::Wip("todo: EntryState::consume".to_owned())),
         }

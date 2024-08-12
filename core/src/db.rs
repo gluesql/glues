@@ -6,7 +6,7 @@ use {
     async_trait::async_trait,
     gluesql::{
         core::ast_builder::Build,
-        prelude::{CsvStorage, Glue, JsonStorage, MemoryStorage, Payload},
+        prelude::{CsvStorage, FileStorage, Glue, JsonStorage, MemoryStorage, Payload},
     },
 };
 
@@ -19,6 +19,7 @@ pub enum Storage {
     Memory(Glue<MemoryStorage>),
     Csv(Glue<CsvStorage>),
     Json(Glue<JsonStorage>),
+    File(Glue<FileStorage>),
 }
 
 impl Db {
@@ -46,6 +47,14 @@ impl Db {
 
         Ok(Self { storage, root_id })
     }
+
+    pub async fn file(path: &str) -> Result<Self> {
+        let mut storage = FileStorage::new(path).map(Glue::new).map(Storage::File)?;
+
+        let root_id = setup(&mut storage).await?;
+
+        Ok(Self { storage, root_id })
+    }
 }
 
 #[async_trait(?Send)]
@@ -68,6 +77,7 @@ where
             Storage::Memory(glue) => glue.execute_stmt(&statement).await,
             Storage::Csv(glue) => glue.execute_stmt(&statement).await,
             Storage::Json(glue) => glue.execute_stmt(&statement).await,
+            Storage::File(glue) => glue.execute_stmt(&statement).await,
         }
         .map_err(Into::into)
     }

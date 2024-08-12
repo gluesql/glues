@@ -25,4 +25,5 @@ features = [
   "gluesql_memory_storage",
   "gluesql-csv-storage",
   "gluesql-json-storage",
+  "gluesql-file-storage",
 ]
