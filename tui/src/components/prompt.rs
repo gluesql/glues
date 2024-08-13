@@ -25,7 +25,7 @@ where
                     on_submit(siv, value);
                 })
                 .with_name(EDIT_VIEW_NAME)
-                .fixed_width(20)
+                .min_width(20)
         });
 
     Dialog::around(content)
