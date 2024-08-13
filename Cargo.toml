@@ -16,7 +16,7 @@ edition = "2021"
 license = "Apache-2.0"
 
 [workspace.dependencies]
-glues-core = { path = "./core" }
+glues-core = { path = "./core", version = "0.1.0" }
 
 [workspace.dependencies.gluesql]
 version = "0.16.0"
