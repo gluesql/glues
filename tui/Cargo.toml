@@ -4,6 +4,7 @@ authors.workspace = true
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+description = "TUI-based note-taking application supporting multiple formats (git, CSV, JSON) for data storage"
 
 [dependencies]
 glues-core.workspace = true
