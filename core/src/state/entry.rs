@@ -40,6 +40,7 @@ impl EntryState {
                 Ok(EntryTransition::OpenNotebook)
             }
             Key(_) => Ok(EntryTransition::Inedible(event)),
+            Cancel => Ok(EntryTransition::None),
             _ => Err(Error::Wip("todo: EntryState::consume".to_owned())),
         }
     }

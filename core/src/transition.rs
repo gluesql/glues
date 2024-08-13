@@ -13,6 +13,7 @@ pub enum Transition {
 pub enum EntryTransition {
     OpenNotebook,
     Inedible(Event),
+    None,
 }
 
 pub enum NotebookTransition {
