@@ -24,7 +24,7 @@ fn handle_entry_transition(siv: &mut Cursive, transition: EntryTransition) {
     match transition {
         EntryTransition::OpenNotebook => open_notebook(siv),
         EntryTransition::Inedible(Event::Key(KeyEvent::Esc)) => {
-            siv.select_menubar();
+            log!("[EntryTransition] inedible event - ESC");
         }
         _ => {
             log!("[EntryTransition] unhandled event");
@@ -75,7 +75,7 @@ fn handle_notebook_transition(siv: &mut Cursive, transition: NotebookTransition)
             show_entry_dialog(siv);
         }
         NotebookTransition::Inedible(Event::Key(KeyEvent::Esc)) => {
-            siv.select_menubar();
+            log!("[NotebookTransition] inedible event - ESC");
         }
         _ => {
             log!("[NotebookTransition] unhandled event");
