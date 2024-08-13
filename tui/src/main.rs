@@ -19,7 +19,6 @@ use {
         event::{Event, Key},
         view::{Nameable, Resizable},
         views::{DummyView, LinearLayout, PaddedView, Panel, StackView},
-        Cursive,
     },
     futures::executor::block_on,
     glues_core::{Glues, KeyEvent},
@@ -39,7 +38,6 @@ fn main() {
 
     let mut siv = cursive::default();
     siv.set_user_data(glues);
-    siv.add_global_callback('a', Cursive::toggle_debug_console);
 
     for (key, event) in [
         (Event::Char('b'), KeyEvent::B),
