@@ -55,7 +55,7 @@ fn handle_entry_transition(siv: &mut Cursive, transition: EntryTransition) {
             log!("[EntryTransition] inedible event - ESC");
         }
         _ => {
-            log!("[EntryTransition] unhandled event");
+            log!("[EntryTransition] unhandled - {transition}");
         }
     }
 }
@@ -106,7 +106,7 @@ fn handle_notebook_transition(siv: &mut Cursive, transition: NotebookTransition)
             log!("[NotebookTransition] inedible event - ESC");
         }
         _ => {
-            log!("[NotebookTransition] unhandled event");
+            log!("[NotebookTransition] unhandled - {transition}");
         }
     }
 }
