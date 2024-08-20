@@ -18,32 +18,26 @@ pub async fn open(
         .find_mut(&directory_id)
         .ok_or(Error::Wip("todo: asdfasdf".to_owned()))?;
 
-    if item.children.is_none() {
-        let notes = db.fetch_notes(directory_id.clone()).await?;
-        let directories = db
-            .fetch_directories(directory_id.clone())
-            .await?
-            .into_iter()
-            .map(|directory| DirectoryItem {
-                directory,
-                children: None,
-            })
-            .collect();
+    let notes = db.fetch_notes(directory_id.clone()).await?;
+    let directories = db
+        .fetch_directories(directory_id.clone())
+        .await?
+        .into_iter()
+        .map(|directory| DirectoryItem {
+            directory,
+            children: None,
+        })
+        .collect::<Vec<_>>();
 
-        item.children = Some(DirectoryItemChildren { notes, directories });
-    }
-
-    let (notes, directories) = match &mut item.children {
-        Some(children) => (&children.notes, &children.directories),
-        None => {
-            panic!("...?");
-        }
-    };
+    item.children = Some(DirectoryItemChildren {
+        notes: notes.clone(),
+        directories: directories.clone(),
+    });
 
     Ok(NotebookTransition::OpenDirectory {
         id: directory_id,
-        notes: notes.clone(),
-        directories: directories.clone(),
+        notes,
+        directories,
     })
 }
 
