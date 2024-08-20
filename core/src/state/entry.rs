@@ -12,7 +12,7 @@ impl EntryState {
 
         match event {
             Entry(OpenMemory) => {
-                let mut db = Db::memory().await?;
+                let mut db = Db::memory(glues.task_tx.clone()).await?;
                 let root_id = db.root_id.clone();
                 let note_id = db.add_note(root_id, "Sample Note".to_owned()).await?.id;
                 db.update_note_content(note_id, "Hi :D".to_owned()).await?;
@@ -22,21 +22,27 @@ impl EntryState {
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenCsv(path)) => {
-                glues.db = Db::csv(&path).await.map(Some)?;
+                glues.db = Db::csv(glues.task_tx.clone(), &path).await.map(Some)?;
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenJson(path)) => {
-                glues.db = Db::json(&path).await.map(Some)?;
+                glues.db = Db::json(glues.task_tx.clone(), &path).await.map(Some)?;
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenFile(path)) => {
-                glues.db = Db::file(&path).await.map(Some)?;
-
+                glues.db = Db::file(glues.task_tx.clone(), &path).await.map(Some)?;
                 glues.state = NotebookState::new(glues).await?.into();
+
+                Ok(EntryTransition::OpenNotebook)
+            }
+            Entry(OpenGit(path)) => {
+                glues.db = Db::git(glues.task_tx.clone(), &path).await.map(Some)?;
+                glues.state = NotebookState::new(glues).await?.into();
+
                 Ok(EntryTransition::OpenNotebook)
             }
             Key(_) => Ok(EntryTransition::Inedible(event)),

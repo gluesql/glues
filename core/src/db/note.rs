@@ -64,7 +64,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(note)
+        self.sync().map(|()| note)
     }
 
     pub async fn remove_note(&mut self, note_id: NoteId) -> Result<()> {
@@ -74,7 +74,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(())
+        self.sync()
     }
 
     pub async fn update_note_content(&mut self, note_id: NoteId, content: String) -> Result<()> {
@@ -86,7 +86,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(())
+        self.sync()
     }
 
     pub async fn rename_note(&mut self, note_id: NoteId, name: String) -> Result<()> {
@@ -98,7 +98,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(())
+        self.sync()
     }
 
     pub async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) {

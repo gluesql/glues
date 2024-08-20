@@ -24,21 +24,21 @@ pub fn render_entry() -> impl View {
             siv.dispatch(EntryEvent::OpenFile(path.to_owned()));
         })
     };
+    let git = |siv: &mut Cursive| {
+        siv.prompt("Path of the existing git repository root", |siv, path| {
+            siv.dispatch(EntryEvent::OpenGit(path.to_owned()));
+        })
+    };
 
     let layout = LinearLayout::vertical()
-        .child(TextView::new("New Notes"))
+        .child(TextView::new("Open Notes"))
         .child(Button::new(" Instant ", |siv| {
             siv.dispatch(EntryEvent::OpenMemory);
         }))
         .child(Button::new(" CSV     ", csv))
         .child(Button::new(" JSON    ", json))
         .child(Button::new(" File    ", file))
-        .child(DummyView)
-        .child(DummyView)
-        .child(TextView::new("Open Notes"))
-        .child(Button::new(" CSV     ", csv))
-        .child(Button::new(" JSON    ", json))
-        .child(Button::new(" File    ", file))
+        .child(Button::new(" git     ", git))
         .child(DummyView)
         .child(DummyView)
         .child(Button::new(" Quit    ", |siv| siv.quit()));

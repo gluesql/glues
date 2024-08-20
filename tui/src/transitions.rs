@@ -10,9 +10,37 @@ use {
 pub fn handle_event(siv: &mut Cursive, event: Event) {
     let transition = siv.glues().dispatch(event).log_unwrap();
 
+    handle_transition(siv, transition)
+}
+
+pub fn handle_queue(siv: &mut Cursive) {
+    let mut transitions = Vec::new();
+    {
+        let mut queue = siv.glues().transition_queue.lock().log_unwrap();
+
+        while let Some(transition) = queue.pop_front() {
+            transitions.push(transition);
+        }
+    }
+
+    for transition in transitions {
+        handle_transition(siv, transition);
+    }
+}
+
+fn handle_transition(siv: &mut Cursive, transition: Transition) {
     match transition {
         Transition::Entry(transition) => handle_entry_transition(siv, transition),
         Transition::Notebook(transition) => handle_notebook_transition(siv, transition),
+
+        Transition::Log(message) => {
+            log!("{message}");
+            return;
+        }
+        Transition::Error(message) => {
+            log!("[Err] {message}");
+            return;
+        }
     };
 
     update_statusbar(siv);

@@ -8,6 +8,7 @@ description = "Headless state management module for Glues Notes"
 
 [dependencies]
 gluesql.workspace = true
+gluesql-git-storage.workspace = true
 thiserror = "1.0.61"
 async-trait = "0.1"
 async-recursion = "1.1"

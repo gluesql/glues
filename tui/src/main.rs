@@ -23,8 +23,9 @@ use {
     futures::executor::block_on,
     glues_core::{Glues, KeyEvent},
     node::Node,
+    std::{thread, time::Duration},
     traits::*,
-    transitions::handle_event,
+    transitions::{handle_event, handle_queue},
     views::{entry::render_entry, statusbar::render_statusbar},
 };
 
@@ -69,6 +70,17 @@ fn main() {
         .child(statusbar)
         .child(padded_view)
         .full_screen();
+
+    let cb_sink = siv.cb_sink().clone();
+    thread::spawn(move || loop {
+        cb_sink
+            .send(Box::new(|siv| {
+                handle_queue(siv);
+            }))
+            .log_unwrap();
+
+        thread::sleep(Duration::from_millis(50));
+    });
 
     siv.screen_mut().add_transparent_layer(layout);
     siv.run();

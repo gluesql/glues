@@ -3,6 +3,7 @@ mod error;
 mod event;
 mod glues;
 mod schema;
+mod task;
 
 pub mod data;
 pub mod state;

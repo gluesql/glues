@@ -18,6 +18,7 @@ pub enum EntryEvent {
     OpenCsv(String),
     OpenJson(String),
     OpenFile(String),
+    OpenGit(String), // TODO! - remote, branch
 }
 
 #[derive(Debug)]

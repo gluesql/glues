@@ -8,6 +8,9 @@ use crate::{
 pub enum Transition {
     Entry(EntryTransition),
     Notebook(NotebookTransition),
+
+    Log(String),
+    Error(String),
 }
 
 pub enum EntryTransition {

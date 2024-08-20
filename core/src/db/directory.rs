@@ -66,7 +66,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(directory)
+        self.sync().map(|()| directory)
     }
 
     #[async_recursion(?Send)]
@@ -88,7 +88,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(())
+        self.sync()
     }
 
     pub async fn move_directory(
@@ -103,7 +103,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(())
+        self.sync()
     }
 
     pub async fn rename_directory(
@@ -119,6 +119,6 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(())
+        self.sync()
     }
 }
