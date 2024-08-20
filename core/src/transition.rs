@@ -1,24 +1,36 @@
-use crate::{
-    data::{Directory, Note},
-    state::notebook::DirectoryItem,
-    types::DirectoryId,
-    Event,
+use {
+    crate::{
+        data::{Directory, Note},
+        state::notebook::DirectoryItem,
+        types::DirectoryId,
+        Event,
+    },
+    strum_macros::Display,
 };
 
+#[derive(Display)]
 pub enum Transition {
+    #[strum(to_string = "Entry::{0}")]
     Entry(EntryTransition),
+
+    #[strum(to_string = "Notebook::{0}")]
     Notebook(NotebookTransition),
 
     Log(String),
     Error(String),
 }
 
+#[derive(Display)]
 pub enum EntryTransition {
     OpenNotebook,
+
+    #[strum(to_string = "Inedible::{0}")]
     Inedible(Event),
+
     None,
 }
 
+#[derive(Display)]
 pub enum NotebookTransition {
     OpenDirectory {
         id: DirectoryId,
@@ -55,6 +67,7 @@ pub enum NotebookTransition {
     ShowEntryDialog,
     Entry(EntryTransition),
 
+    #[strum(to_string = "Inedible::{0}")]
     Inedible(Event),
     None,
 }

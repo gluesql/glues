@@ -759,6 +759,7 @@ dependencies = [
  "async-trait",
  "gluesql",
  "gluesql-git-storage",
+ "strum_macros 0.26.4",
  "thiserror",
  "uuid",
 ]
