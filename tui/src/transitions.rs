@@ -123,5 +123,5 @@ fn update_statusbar(siv: &mut Cursive) {
     let shortcuts = siv.glues().state.shortcuts().join(", ");
     statusbar_node.shortcuts().find(siv).set_content(&shortcuts);
 
-    log!("[state] {description} / {shortcuts}");
+    log!("[state] {description}");
 }
