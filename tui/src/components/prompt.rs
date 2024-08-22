@@ -12,7 +12,7 @@ const EDIT_VIEW_NAME: &str = "edit_view_name";
 
 pub fn render_prompt<F>(message: &str, on_submit: F) -> Dialog
 where
-    F: Fn(&mut Cursive, &str) + Clone + 'static,
+    F: Fn(&mut Cursive, &str) + Clone + Send + Sync + 'static,
 {
     let content = LinearLayout::vertical()
         .child(TextView::new(message))

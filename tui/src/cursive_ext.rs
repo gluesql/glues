@@ -31,15 +31,15 @@ pub trait CursiveExt {
 
     fn confirm<F>(&mut self, message: String, on_confirm: F)
     where
-        F: Fn(&mut Cursive) + 'static;
+        F: Fn(&mut Cursive) + Send + Sync + 'static;
 
     fn alert<F>(&mut self, message: String, on_close: F)
     where
-        F: Fn(&mut Cursive) + 'static;
+        F: Fn(&mut Cursive) + Send + Sync + 'static;
 
     fn prompt<F>(&mut self, message: &str, on_submit: F)
     where
-        F: Fn(&mut Cursive, &str) + Clone + 'static;
+        F: Fn(&mut Cursive, &str) + Clone + Send + Sync + 'static;
 
     fn focus_on_next_tick(&mut self, name: String);
 }
@@ -75,7 +75,7 @@ impl CursiveExt for Cursive {
 
     fn confirm<F>(&mut self, message: String, on_confirm: F)
     where
-        F: Fn(&mut Cursive) + 'static,
+        F: Fn(&mut Cursive) + Send + Sync + 'static,
     {
         let dialog = render_confirm(&message, on_confirm);
         self.add_layer(dialog);
@@ -83,7 +83,7 @@ impl CursiveExt for Cursive {
 
     fn alert<F>(&mut self, message: String, on_close: F)
     where
-        F: Fn(&mut Cursive) + 'static,
+        F: Fn(&mut Cursive) + Send + Sync + 'static,
     {
         let dialog = render_alert(&message, on_close);
         self.add_layer(dialog);
@@ -91,7 +91,7 @@ impl CursiveExt for Cursive {
 
     fn prompt<F>(&mut self, message: &str, on_submit: F)
     where
-        F: Fn(&mut Cursive, &str) + Clone + 'static,
+        F: Fn(&mut Cursive, &str) + Clone + Send + Sync + 'static,
     {
         let dialog = render_prompt(message, on_submit);
         self.add_layer(dialog);

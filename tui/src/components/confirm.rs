@@ -9,7 +9,7 @@ use {
 
 pub fn render_confirm<F>(message: &str, on_confirm: F) -> Dialog
 where
-    F: Fn(&mut Cursive) + 'static,
+    F: Fn(&mut Cursive) + Send + Sync + 'static,
 {
     Dialog::around(TextView::new(message))
         .title("Confirm")

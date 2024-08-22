@@ -5,7 +5,7 @@ use cursive::{
 
 pub fn render_alert<F>(message: &str, on_close: F) -> Dialog
 where
-    F: Fn(&mut Cursive) + 'static,
+    F: Fn(&mut Cursive) + Send + Sync + 'static,
 {
     Dialog::around(TextView::new(message))
         .title("Alert")

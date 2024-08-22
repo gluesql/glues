@@ -6,7 +6,7 @@ use {
         Cursive, With,
     },
     glues_core::{data::Note, NotebookEvent},
-    std::rc::Rc,
+    std::sync::Arc,
 };
 
 pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
@@ -42,10 +42,10 @@ pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
 }
 
 fn on_remove_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
-    let note = Rc::new(note);
+    let note = Arc::new(note);
 
     move |siv: &mut Cursive| {
-        let note = Rc::clone(&note);
+        let note = Arc::clone(&note);
         let message = format!("Removes '{}'", &note.name);
 
         siv.pop_layer();

@@ -9,7 +9,6 @@ description = "TUI-based note-taking application supporting multiple formats (gi
 [dependencies]
 glues-core.workspace = true
 gluesql.workspace = true
-cursive = "0.20.0"
-cursive_tree_view = "0.8.0"
+cursive = "0.21.1"
 futures = "0.3.30"
 async-io = "2.3.2"

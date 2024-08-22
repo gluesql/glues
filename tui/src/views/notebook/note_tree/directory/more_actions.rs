@@ -6,11 +6,11 @@ use {
         Cursive, With,
     },
     glues_core::{data::Directory, NotebookEvent},
-    std::rc::Rc,
+    std::sync::Arc,
 };
 
 pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
-    let directory = Rc::new(directory);
+    let directory = Arc::new(directory);
     let label = TextView::new(format!("'{}'", &directory.name)).h_align(HAlign::Center);
     let add_note_button = Button::new("Add Note", on_add_note_click);
     let add_directory_button = Button::new("Add Directory", on_add_directory_click);
@@ -46,9 +46,9 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
         .wrap_tab()
 }
 
-fn on_remove_click(directory: Rc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {
+fn on_remove_click(directory: Arc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {
     move |siv: &mut Cursive| {
-        let directory = Rc::clone(&directory);
+        let directory = Arc::clone(&directory);
         let message = format!("Removes {}", directory.name);
 
         siv.pop_layer();

@@ -9,7 +9,7 @@ use {
         View, With,
     },
     glues_core::{data::Note, NotebookEvent},
-    std::rc::Rc,
+    std::sync::Arc,
 };
 
 pub fn render_note(note: Note) -> impl View {
@@ -28,10 +28,10 @@ pub fn render_note(note: Note) -> impl View {
 }
 
 fn on_item_focus(note: Note) -> impl for<'a> Fn(&'a mut NamedView<Button>) -> EventResult {
-    let note = Rc::new(note);
+    let note = Arc::new(note);
 
     move |_| {
-        let note = Rc::clone(&note);
+        let note = Arc::clone(&note);
 
         EventResult::with_cb(move |siv| {
             let note = note.as_ref().clone();
