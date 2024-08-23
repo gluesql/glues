@@ -3,13 +3,13 @@ use crate::{
     types::{DirectoryId, Id},
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct DirectoryItem {
     pub directory: Directory,
     pub children: Option<DirectoryItemChildren>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct DirectoryItemChildren {
     pub directories: Vec<DirectoryItem>,
     pub notes: Vec<Note>,
