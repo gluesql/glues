@@ -6,9 +6,9 @@ use {
     async_trait::async_trait,
     gluesql::{
         core::ast_builder::Build,
+        gluesql_git_storage::{GitStorage, StorageType},
         prelude::{CsvStorage, FileStorage, Glue, JsonStorage, MemoryStorage, Payload},
     },
-    gluesql_git_storage::{GitStorage, StorageType},
     std::sync::mpsc::Sender,
 };
 

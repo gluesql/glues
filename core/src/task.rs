@@ -1,8 +1,9 @@
 use {
     crate::{Result, Transition},
-    gluesql_git_storage::{GitStorage, StorageType},
+    gluesql::gluesql_git_storage::{GitStorage, StorageType},
     std::{
         collections::VecDeque,
+        path::PathBuf,
         sync::{mpsc::Receiver, Arc, Mutex},
         thread::{spawn, JoinHandle},
     },
@@ -11,7 +12,7 @@ use {
 #[derive(Clone, Debug)]
 pub enum Task {
     GitSync {
-        path: String,
+        path: PathBuf,
         remote: String,
         branch: String,
     },
