@@ -42,14 +42,7 @@ pub fn render_directory(siv: &mut Cursive, item: DirectoryItem) -> impl View {
 
     let mut container = LinearLayout::vertical().child(content);
     if let Some(children) = item.children {
-        let layout = render_item_list(
-            siv,
-            directory.id.clone(),
-            children.directories,
-            children.notes,
-        );
-
-        container.add_child(layout);
+        render_item_list(siv, &mut container, children.directories, children.notes);
     }
 
     container.with_name(directory_node.name())

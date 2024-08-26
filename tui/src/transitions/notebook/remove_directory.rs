@@ -15,7 +15,6 @@ pub fn remove_directory(siv: &mut Cursive, directory: Directory) {
     let mut container = Node::notebook()
         .note_tree()
         .directory(&directory.parent_id)
-        .note_list()
         .find(siv);
 
     let i = container

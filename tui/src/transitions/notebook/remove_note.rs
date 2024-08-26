@@ -14,7 +14,6 @@ pub fn remove_note(siv: &mut Cursive, note: Note) {
     let mut container = Node::notebook()
         .note_tree()
         .directory(&note.directory_id)
-        .note_list()
         .find(siv);
 
     let i = container

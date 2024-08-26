@@ -1,25 +1,11 @@
 use {
-    crate::{traits::*, views::notebook::note_tree::note::render_note, Node},
+    crate::{traits::*, Node},
     cursive::Cursive,
-    glues_core::{data::Note, state::notebook::NotebookState, NotebookEvent},
+    glues_core::{data::Note, NotebookEvent},
 };
 
 pub fn add_note(siv: &mut Cursive, note: Note) {
-    if !siv
-        .state::<NotebookState>()
-        .check_opened(&note.directory_id)
-    {
-        siv.dispatch(NotebookEvent::OpenDirectory(note.directory_id.clone()));
-    } else {
-        let mut container = Node::notebook()
-            .note_tree()
-            .directory(&note.directory_id)
-            .note_list()
-            .find(siv);
-        let note_view = render_note(note.clone());
-        container.add_child(note_view);
-    }
-
+    siv.dispatch(NotebookEvent::OpenDirectory(note.directory_id.clone()));
     siv.focus_on_next_tick(
         Node::notebook()
             .note_tree()
