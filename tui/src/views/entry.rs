@@ -1,9 +1,9 @@
 use {
-    crate::{traits::*, wrapper::JkWrapper},
+    crate::traits::*,
     cursive::{
         view::View,
         views::{Button, DummyView, LinearLayout, PaddedView, TextView},
-        Cursive, With,
+        Cursive,
     },
     glues_core::EntryEvent,
 };
@@ -41,8 +41,7 @@ pub fn render_entry() -> impl View {
         .child(Button::new(" git     ", git))
         .child(DummyView)
         .child(DummyView)
-        .child(Button::new(" Quit    ", |siv| siv.quit()))
-        .wrap_with(JkWrapper::new);
+        .child(Button::new(" Quit    ", |siv| siv.quit()));
 
     PaddedView::lrtb(10, 10, 3, 3, layout)
 }

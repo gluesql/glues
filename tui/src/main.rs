@@ -20,6 +20,7 @@ use {
         event::{Event, Key},
         view::{Nameable, Resizable},
         views::{DummyView, LinearLayout, PaddedView, Panel, StackView},
+        With,
     },
     futures::executor::block_on,
     glues_core::{Glues, KeyEvent},
@@ -28,6 +29,7 @@ use {
     traits::*,
     transitions::{handle_event, handle_queue},
     views::{entry::render_entry, statusbar::render_statusbar},
+    wrapper::JkWrapper,
 };
 
 fn main() {
@@ -59,7 +61,9 @@ fn main() {
         });
     }
 
-    let entry_view = Panel::new(render_entry()).title("Glues");
+    let entry_view = Panel::new(render_entry())
+        .title("Glues")
+        .wrap_with(JkWrapper::new);
     let stack_view = StackView::new()
         .transparent_layer(DummyView.full_height())
         .layer(entry_view)
