@@ -5,6 +5,7 @@ mod logger;
 mod node;
 mod transitions;
 mod views;
+mod wrapper;
 
 mod traits {
     pub(crate) use crate::{

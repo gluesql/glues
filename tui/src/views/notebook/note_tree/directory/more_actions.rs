@@ -1,15 +1,16 @@
 use {
-    crate::traits::*,
+    crate::{traits::*, wrapper::HjklWrapper},
     cursive::{
         align::HAlign,
-        views::{Button, CircularFocus, Dialog, DummyView, LinearLayout, TextView},
+        view::View,
+        views::{Button, Dialog, DummyView, LinearLayout, TextView},
         Cursive, With,
     },
     glues_core::{data::Directory, NotebookEvent},
     std::sync::Arc,
 };
 
-pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
+pub fn render_more_actions(directory: Directory) -> impl View {
     let directory = Arc::new(directory);
     let label = TextView::new(format!("'{}'", &directory.name)).h_align(HAlign::Center);
     let add_note_button = Button::new("Add Note", on_add_note_click);
@@ -42,8 +43,7 @@ pub fn render_more_actions(directory: Directory) -> CircularFocus<Dialog> {
         .title("More Actions")
         .content(actions)
         .padding_lrtb(3, 3, 1, 1)
-        .wrap_with(CircularFocus::new)
-        .wrap_tab()
+        .wrap_with(HjklWrapper::new)
 }
 
 fn on_remove_click(directory: Arc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {

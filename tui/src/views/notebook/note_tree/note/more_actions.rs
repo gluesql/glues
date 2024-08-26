@@ -1,15 +1,16 @@
 use {
-    crate::traits::*,
+    crate::{traits::*, wrapper::HjklWrapper},
     cursive::{
         align::HAlign,
-        views::{Button, CircularFocus, Dialog, DummyView, LinearLayout, TextView},
+        view::View,
+        views::{Button, Dialog, DummyView, LinearLayout, TextView},
         Cursive, With,
     },
     glues_core::{data::Note, NotebookEvent},
     std::sync::Arc,
 };
 
-pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
+pub fn render_more_actions(note: Note) -> impl View {
     let label = TextView::new(format!("'{}'", &note.name)).h_align(HAlign::Center);
     let remove_button = Button::new("Remove", on_remove_click(note.clone()));
     let rename_button = Button::new("Rename", |siv| {
@@ -37,8 +38,7 @@ pub fn render_more_actions(note: Note) -> CircularFocus<Dialog> {
         .title("More Actions")
         .content(actions)
         .padding_lrtb(3, 3, 1, 1)
-        .wrap_with(CircularFocus::new)
-        .wrap_tab()
+        .wrap_with(HjklWrapper::new)
 }
 
 fn on_remove_click(note: Note) -> impl for<'a> Fn(&'a mut Cursive) {
