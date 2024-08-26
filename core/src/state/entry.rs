@@ -56,6 +56,6 @@ impl EntryState {
     }
 
     pub fn shortcuts(&self) -> Vec<&str> {
-        vec![":)"]
+        vec!["[J] Focus next", "[K] Focus previous", "[Enter] Select"]
     }
 }
