@@ -69,10 +69,16 @@ fn handle_notebook_transition(siv: &mut Cursive, transition: NotebookTransition)
             show_directory_actions(siv, directory)
         }
         NotebookTransition::RenameNote(note) => rename_note(siv, note),
-        NotebookTransition::RemoveNote(note) => remove_note(siv, note),
+        NotebookTransition::RemoveNote {
+            note,
+            selected_directory,
+        } => remove_note(siv, note, selected_directory),
         NotebookTransition::AddNote(note) => add_note(siv, note),
         NotebookTransition::RenameDirectory(directory) => rename_directory(siv, directory),
-        NotebookTransition::RemoveDirectory(directory) => remove_directory(siv, directory),
+        NotebookTransition::RemoveDirectory {
+            directory,
+            selected_directory,
+        } => remove_directory(siv, directory, selected_directory),
         NotebookTransition::AddDirectory(directory) => add_directory(siv, directory),
         NotebookTransition::OpenDirectory {
             id,

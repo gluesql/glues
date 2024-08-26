@@ -45,8 +45,14 @@ pub enum NotebookTransition {
     RenameNote(Note),
     RenameDirectory(Directory),
 
-    RemoveNote(Note),
-    RemoveDirectory(Directory),
+    RemoveNote {
+        note: Note,
+        selected_directory: Directory,
+    },
+    RemoveDirectory {
+        directory: Directory,
+        selected_directory: Directory,
+    },
 
     AddNote(Note),
     AddDirectory(Directory),

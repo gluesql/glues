@@ -40,10 +40,17 @@ pub async fn remove(
 ) -> Result<NotebookTransition> {
     db.remove_note(note.id.clone()).await?;
 
-    // TODO
-    state.selected = SelectedItem::None;
+    let directory = state.root.remove_note(&note).ok_or(Error::Wip(
+        "[note::remove] failed to find parent directory".to_owned(),
+    ))?;
 
-    Ok(NotebookTransition::RemoveNote(note))
+    state.selected = SelectedItem::Directory(directory.clone());
+    state.inner_state = InnerState::DirectorySelected;
+
+    Ok(NotebookTransition::RemoveNote {
+        note,
+        selected_directory: directory.clone(),
+    })
 }
 
 pub async fn add(

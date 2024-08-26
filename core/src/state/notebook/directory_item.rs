@@ -42,6 +42,28 @@ impl DirectoryItem {
             .next()
     }
 
+    pub fn remove_note(&mut self, target: &Note) -> Option<&Directory> {
+        let directory_item = self.find_mut(&target.directory_id)?;
+        directory_item
+            .children
+            .as_mut()?
+            .notes
+            .retain_mut(|note| note.id != target.id);
+
+        Some(&directory_item.directory)
+    }
+
+    pub fn remove_directory(&mut self, target: &Directory) -> Option<&Directory> {
+        let directory_item = self.find_mut(&target.parent_id)?;
+        directory_item
+            .children
+            .as_mut()?
+            .directories
+            .retain_mut(|item| item.directory.id != target.id);
+
+        Some(&directory_item.directory)
+    }
+
     fn tree_items(&self) -> Vec<TreeItem> {
         let mut items = vec![TreeItem::Directory(&self.directory)];
 
