@@ -50,7 +50,7 @@ fn handle_task(task: Task) -> Result<Transition> {
         } => {
             let message = format!("[Task::GitSync] remote: {remote}, branch: {branch}");
 
-            let mut storage = GitStorage::open(&path, StorageType::File)?;
+            let mut storage = GitStorage::open(path, StorageType::File)?;
             storage.set_remote(remote);
             storage.set_branch(branch);
             storage.pull()?;
