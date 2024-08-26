@@ -97,8 +97,16 @@ impl NotebookState {
 
                 format!("Directory '{name}' selected")
             }
-            EditingViewMode => "editing - view".to_owned(),
-            EditingEditMode => "editing - edit".to_owned(),
+            EditingViewMode => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' view mode")
+            }
+            EditingEditMode => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' edit mode")
+            }
             EntryDialog(_) => "Global menu dialog".to_owned(),
         })
     }
@@ -129,7 +137,7 @@ impl NotebookState {
                 vec!["[Esc] Menu", "[B] Browse note tree", "[E] Edit mode"]
             }
             EditingEditMode => {
-                vec!["[Esc] View mode & Save note"]
+                vec!["[Esc] Save note & View mode"]
             }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
                 vec!["[J] Focus next", "[K] Focus previous", "[Enter] Select"]
