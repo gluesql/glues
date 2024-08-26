@@ -39,6 +39,8 @@ fn handle_transition(siv: &mut Cursive, transition: Transition) {
         }
         Transition::Error(message) => {
             log!("[Err] {message}");
+
+            siv.alert(format!("[ERROR] {message}"), |_| {});
             return;
         }
     };
