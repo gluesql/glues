@@ -76,11 +76,17 @@ impl Db {
         })
     }
 
-    pub async fn git(task_tx: Sender<Task>, path: &str) -> Result<Self> {
-        let mut storage = GitStorage::open(path, StorageType::File)
-            .map(Glue::new)
-            .map(Storage::Git)?;
+    pub async fn git(
+        task_tx: Sender<Task>,
+        path: &str,
+        remote: String,
+        branch: String,
+    ) -> Result<Self> {
+        let mut storage = GitStorage::open(path, StorageType::File)?;
+        storage.set_remote(remote);
+        storage.set_branch(branch);
 
+        let mut storage = Storage::Git(Glue::new(storage));
         let root_id = setup(&mut storage).await?;
 
         Ok(Self {

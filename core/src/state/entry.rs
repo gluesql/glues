@@ -39,8 +39,14 @@ impl EntryState {
 
                 Ok(EntryTransition::OpenNotebook)
             }
-            Entry(OpenGit(path)) => {
-                glues.db = Db::git(glues.task_tx.clone(), &path).await.map(Some)?;
+            Entry(OpenGit {
+                path,
+                remote,
+                branch,
+            }) => {
+                glues.db = Db::git(glues.task_tx.clone(), &path, remote, branch)
+                    .await
+                    .map(Some)?;
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)

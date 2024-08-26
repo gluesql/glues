@@ -26,7 +26,23 @@ pub fn render_entry() -> impl View {
     };
     let git = |siv: &mut Cursive| {
         siv.prompt("Path of the existing git repository root", |siv, path| {
-            siv.dispatch(EntryEvent::OpenGit(path.to_owned()));
+            let path = path.to_owned();
+
+            siv.prompt("Remote? (default: origin)", move |siv, remote| {
+                let path = path.clone();
+                let remote = if remote.is_empty() { "origin" } else { remote }.to_owned();
+
+                siv.prompt("Branch? (default: main)", move |siv, branch| {
+                    let branch = if branch.is_empty() { "main" } else { branch }.to_owned();
+                    let event = EntryEvent::OpenGit {
+                        path: path.clone(),
+                        remote: remote.clone(),
+                        branch,
+                    };
+
+                    siv.dispatch(event);
+                })
+            });
         })
     };
 
