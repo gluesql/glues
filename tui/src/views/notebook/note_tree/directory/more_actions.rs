@@ -1,5 +1,5 @@
 use {
-    crate::{traits::*, wrapper::HjklWrapper},
+    crate::{traits::*, wrapper::JkWrapper},
     cursive::{
         align::HAlign,
         view::View,
@@ -43,7 +43,7 @@ pub fn render_more_actions(directory: Directory) -> impl View {
         .title("More Actions")
         .content(actions)
         .padding_lrtb(3, 3, 1, 1)
-        .wrap_with(HjklWrapper::new)
+        .wrap_with(JkWrapper::new)
 }
 
 fn on_remove_click(directory: Arc<Directory>) -> impl for<'a> Fn(&'a mut Cursive) {

@@ -1,5 +1,5 @@
 use {
-    crate::{traits::*, wrapper::HjklWrapper},
+    crate::{traits::*, wrapper::JkWrapper},
     cursive::{
         view::View,
         views::{Button, DummyView, LinearLayout, PaddedView, TextView},
@@ -42,7 +42,7 @@ pub fn render_entry() -> impl View {
         .child(DummyView)
         .child(DummyView)
         .child(Button::new(" Quit    ", |siv| siv.quit()))
-        .wrap_with(HjklWrapper::new);
+        .wrap_with(JkWrapper::new);
 
     PaddedView::lrtb(10, 10, 3, 3, layout)
 }

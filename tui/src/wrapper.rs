@@ -4,11 +4,11 @@ use cursive::{
     View,
 };
 
-pub struct HjklWrapper<T> {
+pub struct JkWrapper<T> {
     view: T,
 }
 
-impl<T> HjklWrapper<T> {
+impl<T> JkWrapper<T> {
     pub fn new(view: T) -> Self {
         Self { view }
     }
@@ -16,7 +16,7 @@ impl<T> HjklWrapper<T> {
     cursive::inner_getters!(self.view: T);
 }
 
-impl<T> ViewWrapper for HjklWrapper<T>
+impl<T> ViewWrapper for JkWrapper<T>
 where
     T: View,
 {
@@ -24,10 +24,8 @@ where
 
     fn wrap_on_event(&mut self, event: Event) -> EventResult {
         let event = match event {
-            Event::Char('h') => Key::Left.into(),
             Event::Char('j') => Key::Down.into(),
             Event::Char('k') => Key::Up.into(),
-            Event::Char('l') => Key::Right.into(),
             _ => event,
         };
 
