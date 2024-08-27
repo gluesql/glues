@@ -27,6 +27,21 @@ cargo install glues
 
 We're working on making Glues available through more package managers soon. For now, installing via Cargo is the way to go.
 
+## Usage
+
+Glues offers five storage options to suit your needs:
+
+* **Instant**: Data is stored in memory and only persists while the app is running. This is useful for testing purposes.
+* **CSV**: Notes are saved in CSV format. When you provide a path, Glues will load existing data if available or create a new file if none exists.
+* **JSON**: Notes are stored in JSON format, specifically using JSONL (JSON Lines). This functions similarly to CSV storage, allowing you to provide a path to load or create data.
+* **File**: Glues uses a custom storage format where each note and directory is stored as separate files. This is ideal for users who prefer a more granular file-based approach.
+* **Git**:
+  - Git storage requires three inputs: `path`, `remote`, and `branch`.
+  - The `path` should point to an existing local Git repository, similar to the file storage path. For example, you can clone a GitHub repository and use that path.
+  - The `remote` and `branch` specify the target remote repository and branch for synchronization.
+  - When you modify notes or directories, Glues will automatically sync changes with the specified remote repository.
+
+  To see how notes and directories are stored using Git, you can refer to the [Glues sample repository](https://github.com/gluesql/glues-sample-note).
 
 ## License
 
