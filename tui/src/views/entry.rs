@@ -54,7 +54,7 @@ pub fn render_entry() -> impl View {
         .child(Button::new(" CSV     ", csv))
         .child(Button::new(" JSON    ", json))
         .child(Button::new(" File    ", file))
-        .child(Button::new(" git     ", git))
+        .child(Button::new(" Git     ", git))
         .child(DummyView)
         .child(DummyView)
         .child(Button::new(" Quit    ", |siv| siv.quit()));
