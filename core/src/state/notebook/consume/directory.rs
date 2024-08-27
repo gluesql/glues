@@ -41,34 +41,22 @@ pub async fn open(
     })
 }
 
-pub fn close(state: &mut NotebookState, directory_id: DirectoryId) -> Result<NotebookTransition> {
+pub fn close(state: &mut NotebookState, directory: Directory) -> Result<NotebookTransition> {
     state
         .root
-        .find_mut(&directory_id)
-        .ok_or(Error::Wip("todo: asdfasdf".to_owned()))?
+        .find_mut(&directory.id)
+        .ok_or(Error::Wip(format!(
+            "[directory::close] failed to find directory '{}'",
+            directory.name
+        )))?
         .children = None;
-
-    Ok(NotebookTransition::CloseDirectory {
-        directory_id: directory_id.clone(),
-        by_note: false,
-    })
-}
-
-pub fn close_by_note(
-    state: &mut NotebookState,
-    directory: Directory,
-) -> Result<NotebookTransition> {
-    close(state, directory.id.clone())?;
 
     let directory_id = directory.id.clone();
 
     state.selected = SelectedItem::Directory(directory);
     state.inner_state = InnerState::DirectorySelected;
 
-    Ok(NotebookTransition::CloseDirectory {
-        directory_id,
-        by_note: true,
-    })
+    Ok(NotebookTransition::CloseDirectory(directory_id))
 }
 
 pub fn show_actions_dialog(

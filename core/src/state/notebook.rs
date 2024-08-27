@@ -127,7 +127,7 @@ impl NotebookState {
                 vec![
                     "[Esc] Menu",
                     "[L] Toggle",
-                    "[H] Close",
+                    "[H] Close parent directory",
                     "[J] Select next",
                     "[K] Select previous",
                     "[M] More actions",
@@ -197,24 +197,41 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransiti
             directory::open(db, state, directory_id).await
         }
         (Key(KeyEvent::L) | Key(KeyEvent::Right), DirectorySelected) => {
-            let directory_id = &state.get_selected_directory()?.id;
-            let directory_item = state.root.find(directory_id).ok_or(Error::Wip(
-                "[Key::L] failed to find parent directory".to_owned(),
+            let directory = state.get_selected_directory()?.clone();
+            let directory_item = state.root.find(&directory.id).ok_or(Error::Wip(
+                "[Key::L] failed to find the target directory".to_owned(),
             ))?;
 
             if directory_item.children.is_none() {
-                directory::open(db, state, directory_id.clone()).await
+                directory::open(db, state, directory.id.clone()).await
             } else {
-                directory::close(state, directory_id.clone())
+                directory::close(state, directory)
             }
         }
         (Notebook(CloseDirectory(directory_id)), DirectorySelected | NoteSelected) => {
-            directory::close(state, directory_id)
+            let directory = state
+                .root
+                .find(&directory_id)
+                .ok_or(Error::Wip(
+                    "[CloseDirectory] failed to find target directory".to_owned(),
+                ))?
+                .directory
+                .clone();
+
+            directory::close(state, directory)
         }
         (Key(KeyEvent::H) | Key(KeyEvent::Left), DirectorySelected) => {
-            let directory_id = state.get_selected_directory()?.id.clone();
+            let directory = state.get_selected_directory()?;
+            if state.root.directory.id == directory.id {
+                return Ok(NotebookTransition::None);
+            }
 
-            directory::close(state, directory_id)
+            let parent_item = state.root.find(&directory.parent_id).ok_or(Error::Wip(
+                "[Key::H] failed to find parent directory".to_owned(),
+            ))?;
+            let parent = parent_item.directory.clone();
+
+            directory::close(state, parent)
         }
         (Key(KeyEvent::H) | Key(KeyEvent::Left), NoteSelected) => {
             let directory_id = &state.get_selected_note()?.directory_id;
@@ -223,7 +240,7 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransiti
             ))?;
             let directory = directory_item.directory.clone();
 
-            directory::close_by_note(state, directory)
+            directory::close(state, directory)
         }
         (Key(KeyEvent::J), DirectorySelected | NoteSelected) => traverse::select_next(state),
         (Key(KeyEvent::K), DirectorySelected | NoteSelected) => traverse::select_prev(state),

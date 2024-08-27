@@ -37,10 +37,7 @@ pub enum NotebookTransition {
         notes: Vec<Note>,
         directories: Vec<DirectoryItem>,
     },
-    CloseDirectory {
-        directory_id: DirectoryId,
-        by_note: bool,
-    },
+    CloseDirectory(DirectoryId),
 
     RenameNote(Note),
     RenameDirectory(Directory),

@@ -89,10 +89,7 @@ fn handle_notebook_transition(siv: &mut Cursive, transition: NotebookTransition)
         } => {
             open_directory(siv, id, notes, directories);
         }
-        NotebookTransition::CloseDirectory {
-            directory_id,
-            by_note,
-        } => close_directory(siv, directory_id, by_note),
+        NotebookTransition::CloseDirectory(directory_id) => close_directory(siv, directory_id),
         NotebookTransition::OpenNote { note, content } => {
             open_note(siv, note, content);
         }

@@ -4,7 +4,7 @@ use {
     glues_core::types::DirectoryId,
 };
 
-pub fn close_directory(siv: &mut Cursive, directory_id: DirectoryId, by_note: bool) {
+pub fn close_directory(siv: &mut Cursive, directory_id: DirectoryId) {
     let directory_node = Node::notebook().note_tree().directory(&directory_id);
 
     directory_node.caret().find(siv).set_content("▸ ");
@@ -14,13 +14,11 @@ pub fn close_directory(siv: &mut Cursive, directory_id: DirectoryId, by_note: bo
         container.remove_child(1);
     }
 
-    if by_note {
-        siv.focus_on_next_tick(
-            Node::notebook()
-                .note_tree()
-                .directory(&directory_id)
-                .name_button()
-                .name(),
-        );
-    }
+    siv.focus_on_next_tick(
+        Node::notebook()
+            .note_tree()
+            .directory(&directory_id)
+            .name_button()
+            .name(),
+    );
 }
