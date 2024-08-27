@@ -137,7 +137,10 @@ impl NotebookState {
                 vec!["[Esc] Menu", "[B] Browse note tree", "[E] Edit mode"]
             }
             EditingEditMode => {
-                vec!["[Esc] Save note & View mode"]
+                vec![
+                    "[Esc] Save note & View mode",
+                    "[Up, Down, Left, Right, PgUp, PgDown, Home, End] Move cursor",
+                ]
             }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
                 vec!["[J] Focus next", "[K] Focus previous", "[Enter] Select"]
