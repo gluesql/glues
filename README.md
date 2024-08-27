@@ -22,3 +22,8 @@ cargo install glues
 ```
 
 We're working on making Glues available through more package managers soon. For now, installing via Cargo is the way to go.
+
+
+## License
+
+This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](https://github.com/gluesql/glues/blob/main/LICENSE) file for details.
