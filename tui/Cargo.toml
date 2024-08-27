@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 description = "Lightweight TUI note-taking app with Git, CSV, and JSON support - privacy-focused and sync-enabled"
 readme = "../README.md"
-keywords = ["tui", "note-taking", "terminal-based", "notes-app", "cursive", "privacy"]
+keywords = ["tui", "note-taking", "notes-app", "cursive", "data-privacy"]
 
 [dependencies]
 glues-core.workspace = true
