@@ -12,3 +12,13 @@ Glues is a lightweight, terminal-based (TUI) note-taking application that offers
 Glues is designed with a core architecture that operates independently of the TUI, providing robust state management and action handling. The TUI interface clearly displays the current state and available actions, making it intuitive and easy to use.
 
 With no reliance on third-party services, Glues ensures that your data remains private and fully under your control. Currently, it supports Git for storage, but we plan to integrate additional storage options through [GlueSQL](https://github.com/gluesql/gluesql), giving you even more flexibility in managing your data. The core concept behind Glues is to empower users to choose how their data is handled—whether through local files, Git, or future storage options—without any dependence on a central authority. This makes Glues a sync-enabled application that prioritizes user autonomy and privacy.
+
+## Installation
+
+First, ensure [Rust](https://www.rust-lang.org/tools/install) is installed. Then, install Glues by running:
+
+```bash
+cargo install glues
+```
+
+We're working on making Glues available through more package managers soon. For now, installing via Cargo is the way to go.
