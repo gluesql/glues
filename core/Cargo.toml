@@ -4,6 +4,7 @@ authors.workspace = true
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
 description = "Headless state management module for Glues Notes"
 
 [dependencies]
