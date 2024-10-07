@@ -1,0 +1,20 @@
+[package]
+name = "glues2"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Lightweight TUI note-taking app with Git, CSV, and JSON support - privacy-focused and sync-enabled"
+readme = "../README.md"
+keywords = ["tui", "note-taking", "notes-app", "ratatui", "data-privacy"]
+default-run = "glues2"
+
+[dependencies]
+glues-core.workspace = true
+gluesql.workspace = true
+futures = "0.3.30"
+async-io = "2.3.2"
+ratatui = "0.28.1"
+color-eyre = "0.6.3"
+edtui = "0.7.2"
