@@ -78,7 +78,6 @@ impl App {
                     Action::Tui(TuiAction::Quit) => return Ok(()),
                     Action::Dispatch(event) => {
                         let transition = self.glues.dispatch(event).log_unwrap();
-
                         self.handle_transition(transition);
                     }
                     Action::PassThrough => {
@@ -86,7 +85,9 @@ impl App {
                             Some(event) => event.into(),
                             None => continue,
                         };
-                        let _transition = self.glues.dispatch(event).log_unwrap();
+
+                        let transition = self.glues.dispatch(event).log_unwrap();
+                        self.handle_transition(transition);
                     }
                     Action::None => {}
                 };

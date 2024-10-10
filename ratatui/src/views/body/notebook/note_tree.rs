@@ -14,7 +14,7 @@ const CLOSED_SYMBOL: &str = "▶ ";
 const OPEN_SYMBOL: &str = "▼ ";
 
 pub fn draw(frame: &mut Frame, area: Rect, _state: &NotebookState, context: &mut NotebookContext) {
-    let block = Block::bordered();
+    let block = Block::bordered().title("[Browser]");
     let inner_area = block.inner(area);
 
     let tree_items = context.tree_items.iter().map(|item| match item {

@@ -1,29 +1,35 @@
 use {
     crate::context::NotebookContext,
+    edtui::{EditorTheme, EditorView},
     glues_core::state::NotebookState,
     ratatui::{
         layout::Rect,
-        style::Stylize,
-        text::Line,
-        widgets::{Block, Paragraph},
+        style::{Color, Style},
+        widgets::{Block, Padding},
         Frame,
     },
 };
 
-pub fn draw(frame: &mut Frame, area: Rect, _state: &NotebookState, _context: &mut NotebookContext) {
-    let block = Block::bordered().title("Editor");
-    let inner_area = block.inner(area);
+pub fn draw(frame: &mut Frame, area: Rect, _state: &NotebookState, context: &mut NotebookContext) {
+    let (title, cursor_style) = match context.opened_note {
+        Some(ref note) => (
+            format!("[Editor: {}]", note.name),
+            Style::default().bg(Color::DarkGray).fg(Color::White),
+        ),
+        None => ("[Editor]".to_string(), Style::default()),
+    };
+    let block = Block::bordered()
+        .title(title)
+        .padding(Padding::horizontal(1));
 
-    frame.render_widget(block, area);
-    frame.render_widget(
-        Paragraph::new(vec![
-            Line::from(" "),
-            Line::from("Notebook"),
-            Line::from("Horizontal Layout Example. Press q to quit".dark_gray()).centered(),
-            Line::from("Each line has 2 constraints, plus Min(0) to fill the remaining space."),
-            Line::from("E.g. the second line of the Len/Min box is [Length(2), Min(2), Min(0)]"),
-            Line::from("Note: constraint labels that don't fit are truncated"),
-        ]),
-        inner_area,
-    );
+    let theme = EditorTheme::default()
+        .block(block)
+        .base(Style::default())
+        .cursor_style(cursor_style)
+        .selection_style(Style::default())
+        .hide_status_line();
+
+    let editor = EditorView::new(&mut context.editor_state).theme(theme);
+
+    frame.render_widget(editor, area);
 }

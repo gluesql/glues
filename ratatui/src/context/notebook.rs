@@ -1,16 +1,24 @@
 use {
     crate::{action::Action, logger::*},
+    edtui::{EditorEventHandler, EditorMode, EditorState, Lines},
     glues_core::{
         data::{Directory, Note},
         state::notebook::DirectoryItem,
         NotebookEvent,
     },
-    ratatui::{crossterm::event::KeyCode, widgets::ListState},
+    ratatui::{
+        crossterm::event::{Event, KeyCode},
+        widgets::ListState,
+    },
 };
 
 pub struct NotebookContext {
     pub tree_state: ListState,
     pub tree_items: Vec<TreeItem>,
+
+    pub editor_state: EditorState,
+    pub editor_handler: EditorEventHandler,
+    pub opened_note: Option<Note>,
 }
 
 impl NotebookContext {
@@ -18,6 +26,9 @@ impl NotebookContext {
         Self {
             tree_state: ListState::default().with_selected(Some(0)),
             tree_items: vec![],
+            editor_state: EditorState::new(Lines::from("\n   >\")++++<")),
+            editor_handler: EditorEventHandler::default(),
+            opened_note: None,
         }
     }
 
@@ -25,7 +36,20 @@ impl NotebookContext {
         self.tree_items = flatten(directory_item, 0);
     }
 
+    pub fn open_note(&mut self, note: Note, content: String) {
+        self.opened_note = Some(note);
+        self.editor_state = EditorState::new(Lines::from(content.as_str()));
+    }
+
     pub fn consume(&mut self, code: KeyCode) -> Action {
+        if self.opened_note.is_some() {
+            self.consume_on_editor(code)
+        } else {
+            self.consume_on_note_tree(code)
+        }
+    }
+
+    fn consume_on_note_tree(&mut self, code: KeyCode) -> Action {
         macro_rules! item {
             () => {
                 self.tree_state
@@ -82,8 +106,44 @@ impl NotebookContext {
                 }
                 TreeItem::Note { .. } => Action::None,
             },
-            KeyCode::Char('o') => Action::PassThrough,
+            KeyCode::Char('o') | KeyCode::Char('b') | KeyCode::Char('e') | KeyCode::Esc => {
+                Action::PassThrough
+            }
             _ => Action::None,
+        }
+    }
+
+    fn consume_on_editor(&mut self, code: KeyCode) -> Action {
+        let mode = self.editor_state.mode;
+
+        match code {
+            KeyCode::Char('/') | KeyCode::Char('v') if mode == EditorMode::Normal => Action::None,
+            KeyCode::Char('b') if mode == EditorMode::Normal => {
+                self.opened_note = None;
+
+                Action::Dispatch(NotebookEvent::BrowseNoteTree.into())
+            }
+            KeyCode::Esc if mode == EditorMode::Insert => {
+                self.editor_handler
+                    .on_event(Event::Key(code.into()), &mut self.editor_state);
+
+                Action::Dispatch(NotebookEvent::ViewNote.into())
+            }
+            _ => {
+                self.editor_handler
+                    .on_event(Event::Key(code.into()), &mut self.editor_state);
+
+                let new_mode = self.editor_state.mode;
+                if mode != new_mode {
+                    match new_mode {
+                        EditorMode::Normal => Action::Dispatch(NotebookEvent::ViewNote.into()),
+                        EditorMode::Insert => Action::Dispatch(NotebookEvent::EditNote.into()),
+                        _ => Action::None,
+                    }
+                } else {
+                    Action::None
+                }
+            }
         }
     }
 }

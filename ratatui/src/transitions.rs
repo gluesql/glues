@@ -52,6 +52,11 @@ impl App {
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
                 self.context.notebook.update_items(root);
             }
+            NotebookTransition::OpenNote { note, content } => {
+                self.context.notebook.open_note(note, content);
+            }
+            NotebookTransition::ViewMode(_note) => {}
+            NotebookTransition::EditMode => {}
             _ => {}
         }
     }

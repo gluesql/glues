@@ -58,6 +58,8 @@ pub enum NotebookEvent {
 
     OpenNote,
     EditNote,
+    ViewNote,
+    BrowseNoteTree,
 
     UpdateNoteContent(String),
 
