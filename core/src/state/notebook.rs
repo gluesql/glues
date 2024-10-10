@@ -100,12 +100,12 @@ impl NotebookState {
             EditingViewMode => {
                 let name = &self.get_selected_note()?.name;
 
-                format!("Note '{name}' view mode")
+                format!("Note '{name}' normal mode")
             }
             EditingEditMode => {
                 let name = &self.get_selected_note()?.name;
 
-                format!("Note '{name}' edit mode")
+                format!("Note '{name}' insert mode")
             }
             EntryDialog(_) => "Global menu dialog".to_owned(),
         })
@@ -134,13 +134,10 @@ impl NotebookState {
                 ]
             }
             EditingViewMode => {
-                vec!["[Esc] Menu", "[B] Browse note tree", "[E] Edit mode"]
+                vec!["[Esc] Menu", "[B] Browse note tree", "[-] todo: EdTUI"]
             }
             EditingEditMode => {
-                vec![
-                    "[Esc] Save note & View mode",
-                    "[Up, Down, Left, Right, PgUp, PgDown, Home, End] Move cursor",
-                ]
+                vec!["[Esc] Save note & Normal mode", "[-] todo: EdTUI"]
             }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
                 vec!["[J] Focus next", "[K] Focus previous", "[Enter] Select"]
@@ -310,8 +307,8 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransiti
             note::update_content(db, state, content).await
         }
         (Key(KeyEvent::E) | Notebook(EditNote), EditingViewMode) => note::edit(state).await,
-        (Key(KeyEvent::B), EditingViewMode) => note::browse(state).await,
-        (Key(KeyEvent::Esc), EditingEditMode) => note::view(state).await,
+        (Key(KeyEvent::B) | Notebook(BrowseNoteTree), EditingViewMode) => note::browse(state).await,
+        (Key(KeyEvent::Esc) | Notebook(ViewNote), EditingEditMode) => note::view(state).await,
         (Cancel, NoteMoreActions) => {
             let note = state.get_selected_note()?.clone();
 
