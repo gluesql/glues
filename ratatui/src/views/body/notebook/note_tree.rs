@@ -34,7 +34,15 @@ pub fn draw(frame: &mut Frame, area: Rect, _state: &NotebookState, context: &mut
     });
 
     let list = List::new(tree_items)
-        .highlight_style(Style::new().fg(Color::White).bg(Color::DarkGray))
+        .highlight_style(
+            Style::new()
+                .fg(Color::White)
+                .bg(if context.opened_note.is_some() {
+                    Color::Gray
+                } else {
+                    Color::DarkGray
+                }),
+        )
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);
