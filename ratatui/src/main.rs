@@ -22,6 +22,7 @@ use {
         },
         DefaultTerminal, Frame,
     },
+    std::time::Duration,
 };
 
 fn main() -> Result<()> {
@@ -50,10 +51,33 @@ impl App {
     }
 
     fn run(mut self, mut terminal: DefaultTerminal) -> Result<()> {
+        let mut updated = true;
+
         loop {
-            terminal.draw(|frame| self.draw(frame))?;
+            if updated {
+                terminal.draw(|frame| self.draw(frame))?;
+            }
+
+            if !event::poll(Duration::from_millis(1500))? {
+                let mut transitions = Vec::new();
+                {
+                    let mut queue = self.glues.transition_queue.lock().log_unwrap();
+
+                    while let Some(transition) = queue.pop_front() {
+                        transitions.push(transition);
+                    }
+                }
+
+                updated = !transitions.is_empty();
+
+                for transition in transitions {
+                    self.handle_transition(transition);
+                }
+            }
 
             if let Event::Key(key) = event::read()? {
+                updated = true;
+
                 if key.kind != KeyEventKind::Press {
                     continue;
                 }
