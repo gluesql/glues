@@ -14,7 +14,7 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, area: Rect, state: &NotebookState, context: &mut NotebookContext) {
-    let horizontal = Layout::horizontal([Length(40), Percentage(100)]);
+    let horizontal = Layout::horizontal([Length(45), Percentage(100)]);
     let [note_tree_area, editor_area] = horizontal.areas(area);
 
     note_tree::draw(frame, note_tree_area, state, context);
