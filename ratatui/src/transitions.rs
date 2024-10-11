@@ -3,6 +3,7 @@ use {
     glues_core::{
         state::{GetInner, NotebookState},
         transition::{EntryTransition, NotebookTransition, Transition},
+        NotebookEvent,
     },
 };
 
@@ -55,7 +56,12 @@ impl App {
             NotebookTransition::OpenNote { note, content } => {
                 self.context.notebook.open_note(note, content);
             }
-            NotebookTransition::ViewMode(_note) => {}
+            NotebookTransition::ViewMode(_note) => {
+                let content: String = self.context.notebook.editor_state.lines.clone().into();
+                let event = NotebookEvent::UpdateNoteContent(content).into();
+
+                self.glues.dispatch(event).log_unwrap();
+            }
             NotebookTransition::EditMode => {}
             _ => {}
         }
