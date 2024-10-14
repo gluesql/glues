@@ -21,7 +21,7 @@ pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
         .title_alignment(Alignment::Center);
     let list = List::new(NOTE_ACTIONS)
         .block(block)
-        .highlight_style(Style::new().fg(Color::White).bg(Color::DarkGray))
+        .highlight_style(Style::new().fg(Color::White).bg(Color::Blue))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);

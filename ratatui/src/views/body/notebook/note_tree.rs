@@ -37,8 +37,8 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
 
     let list = List::new(tree_items)
         .highlight_style(Style::new().fg(Color::White).bg(match context.state {
-            ContextState::NoteTreeBrowsing => Color::DarkGray,
-            _ => Color::Gray,
+            ContextState::NoteTreeBrowsing => Color::Blue,
+            _ => Color::DarkGray,
         }))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)

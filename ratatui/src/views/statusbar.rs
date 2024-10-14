@@ -18,12 +18,9 @@ pub fn draw(frame: &mut Frame, area: Rect, state: &State) {
             .flex(Flex::SpaceBetween)
             .areas(area);
 
-    frame.render_widget(Text::raw(shortcuts).white().on_dark_gray(), shortcuts_area);
+    frame.render_widget(Text::raw(shortcuts).black().on_gray(), shortcuts_area);
     frame.render_widget(
-        Text::raw(description)
-            .right_aligned()
-            .white()
-            .on_dark_gray(),
+        Text::raw(description).right_aligned().black().on_gray(),
         description_area,
     );
 }

@@ -28,7 +28,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
     let items = ["Instant", "CSV", "JSON", "File", "Git"];
     let list = List::new(items)
         .block(block)
-        .highlight_style(Style::new().fg(Color::White).bg(Color::DarkGray))
+        .highlight_style(Style::new().fg(Color::White).bg(Color::Blue))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);
