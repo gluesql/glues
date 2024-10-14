@@ -25,7 +25,7 @@ impl App {
             }
             Transition::Error(message) => {
                 log!("[Err] {message}");
-                // todo! - show dialog with error message
+                self.context.alert = Some(message);
             }
         }
     }

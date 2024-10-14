@@ -19,6 +19,7 @@ pub struct Context {
     pub state: ContextState,
 
     pub confirm: Option<(String, Action)>,
+    pub alert: Option<String>,
 }
 
 impl Default for Context {
@@ -29,16 +30,21 @@ impl Default for Context {
 
             state: ContextState::Entry,
             confirm: None,
+            alert: None,
         }
     }
 }
 
 impl Context {
     pub fn consume(&mut self, code: KeyCode) -> Action {
-        if self.confirm.is_some() {
+        if self.alert.is_some() {
+            // any key pressed will close the alert
+            self.alert = None;
+            return Action::None;
+        } else if self.confirm.is_some() {
             match code {
                 KeyCode::Char('y') => {
-                    let (_, action) = self.confirm.take().unwrap();
+                    let (_, action) = self.confirm.take().log_expect("confirm must be some");
                     log("Context::consume - remove note!!!");
                     return action;
                 }
