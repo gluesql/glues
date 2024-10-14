@@ -1,7 +1,6 @@
 use {
     crate::context::NotebookContext,
     edtui::{EditorTheme, EditorView},
-    glues_core::state::NotebookState,
     ratatui::{
         layout::Rect,
         style::{Color, Style},
@@ -10,7 +9,7 @@ use {
     },
 };
 
-pub fn draw(frame: &mut Frame, area: Rect, _state: &NotebookState, context: &mut NotebookContext) {
+pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let (title, cursor_style) = match context.opened_note {
         Some(ref note) => (
             format!("[Editor: {}]", note.name),

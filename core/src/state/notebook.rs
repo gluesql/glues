@@ -140,7 +140,7 @@ impl NotebookState {
                 vec!["[Esc] Save note & Normal mode", "[-] todo: EdTUI"]
             }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
-                vec!["[J] Focus next", "[K] Focus previous", "[Enter] Select"]
+                vec!["[J] Next", "[K] Previous", "[Enter] Select", "[Esc] Close"]
             }
         }
     }

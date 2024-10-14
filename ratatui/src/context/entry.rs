@@ -8,13 +8,15 @@ pub struct EntryContext {
     pub list_state: ListState,
 }
 
-impl EntryContext {
-    pub fn new() -> Self {
+impl Default for EntryContext {
+    fn default() -> Self {
         Self {
             list_state: ListState::default().with_selected(Some(0)),
         }
     }
+}
 
+impl EntryContext {
     pub fn consume(&mut self, code: KeyCode) -> Action {
         match code {
             KeyCode::Char('q') => return TuiAction::Quit.into(),

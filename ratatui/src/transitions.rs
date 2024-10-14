@@ -1,5 +1,9 @@
 use {
-    super::{logger::*, App},
+    super::{
+        context::{self, ContextState},
+        logger::*,
+        App,
+    },
     glues_core::{
         state::{GetInner, NotebookState},
         transition::{EntryTransition, NotebookTransition, Transition},
@@ -32,6 +36,7 @@ impl App {
                 log!("Opening notebook");
 
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
+                self.context.state = ContextState::Notebook;
                 self.context.notebook.update_items(root);
             }
             EntryTransition::Inedible(event) => {
@@ -63,6 +68,18 @@ impl App {
                 self.glues.dispatch(event).log_unwrap();
             }
             NotebookTransition::EditMode => {}
+            NotebookTransition::RemoveNote {
+                selected_directory, ..
+            }
+            | NotebookTransition::RemoveDirectory {
+                selected_directory, ..
+            } => {
+                let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
+
+                self.context.notebook.select_item(&selected_directory.id);
+                self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
+                self.context.notebook.update_items(root);
+            }
             _ => {}
         }
     }

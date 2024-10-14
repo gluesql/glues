@@ -1,9 +1,13 @@
 use {
-    crate::{action::Action, logger::*},
+    crate::{
+        action::{Action, TuiAction},
+        logger::*,
+    },
     edtui::{EditorEventHandler, EditorMode, EditorState, Lines},
     glues_core::{
         data::{Directory, Note},
         state::notebook::DirectoryItem,
+        types::Id,
         NotebookEvent,
     },
     ratatui::{
@@ -12,40 +16,90 @@ use {
     },
 };
 
+pub const REMOVE_NOTE: &str = "Remove note";
+pub const REMOVE_DIRECTORY: &str = "Remove directory";
+pub const CLOSE: &str = "Close";
+
+pub const NOTE_ACTIONS: [&str; 2] = [REMOVE_NOTE, CLOSE];
+pub const DIRECTORY_ACTIONS: [&str; 2] = [REMOVE_DIRECTORY, CLOSE];
+
+pub enum ContextState {
+    NoteTreeBrowsing,
+    NoteActionsDialog,
+    DirectoryActionsDialog,
+    EditorViewMode,
+    EditorEditMode,
+}
+
 pub struct NotebookContext {
+    pub state: ContextState,
+
+    // note tree
     pub tree_state: ListState,
     pub tree_items: Vec<TreeItem>,
 
+    // note actions
+    pub note_actions_state: ListState,
+
+    // directory actions
+    pub directory_actions_state: ListState,
+
+    // editor
     pub editor_state: EditorState,
     pub editor_handler: EditorEventHandler,
     pub opened_note: Option<Note>,
 }
 
-impl NotebookContext {
-    pub fn new() -> Self {
+impl Default for NotebookContext {
+    fn default() -> Self {
         Self {
+            state: ContextState::NoteTreeBrowsing,
             tree_state: ListState::default().with_selected(Some(0)),
             tree_items: vec![],
+
+            note_actions_state: ListState::default(),
+            directory_actions_state: ListState::default(),
+
             editor_state: EditorState::new(Lines::from("\n   >\")++++<")),
             editor_handler: EditorEventHandler::default(),
             opened_note: None,
         }
     }
+}
 
+impl NotebookContext {
     pub fn update_items(&mut self, directory_item: &DirectoryItem) {
         self.tree_items = flatten(directory_item, 0);
     }
 
+    pub fn select_item(&mut self, id: &Id) {
+        for (i, item) in self.tree_items.iter().enumerate() {
+            let item_id = match item {
+                TreeItem::Directory { value, .. } => &value.id,
+                TreeItem::Note { value, .. } => &value.id,
+            };
+
+            if item_id == id {
+                self.tree_state.select(Some(i));
+                break;
+            }
+        }
+    }
+
     pub fn open_note(&mut self, note: Note, content: String) {
+        self.state = ContextState::EditorViewMode;
         self.opened_note = Some(note);
         self.editor_state = EditorState::new(Lines::from(content.as_str()));
     }
 
     pub fn consume(&mut self, code: KeyCode) -> Action {
-        if self.opened_note.is_some() {
-            self.consume_on_editor(code)
-        } else {
-            self.consume_on_note_tree(code)
+        match self.state {
+            ContextState::NoteTreeBrowsing => self.consume_on_note_tree(code),
+            ContextState::EditorViewMode | ContextState::EditorEditMode => {
+                self.consume_on_editor(code)
+            }
+            ContextState::NoteActionsDialog => self.consume_on_note_actions(code),
+            ContextState::DirectoryActionsDialog => self.consume_on_directory_actions(code),
         }
     }
 
@@ -106,6 +160,20 @@ impl NotebookContext {
                 }
                 TreeItem::Note { .. } => Action::None,
             },
+            KeyCode::Char('m') => match item!() {
+                TreeItem::Directory { .. } => {
+                    self.state = ContextState::DirectoryActionsDialog;
+                    self.directory_actions_state.select_first();
+
+                    Action::PassThrough
+                }
+                TreeItem::Note { .. } => {
+                    self.state = ContextState::NoteActionsDialog;
+                    self.note_actions_state.select_first();
+
+                    Action::PassThrough
+                }
+            },
             KeyCode::Char('o') | KeyCode::Char('b') | KeyCode::Char('e') | KeyCode::Esc => {
                 Action::PassThrough
             }
@@ -119,11 +187,13 @@ impl NotebookContext {
         match code {
             KeyCode::Char('/') | KeyCode::Char('v') if mode == EditorMode::Normal => Action::None,
             KeyCode::Char('b') if mode == EditorMode::Normal => {
+                self.state = ContextState::NoteTreeBrowsing;
                 self.opened_note = None;
 
                 Action::Dispatch(NotebookEvent::BrowseNoteTree.into())
             }
             KeyCode::Esc if mode == EditorMode::Insert => {
+                self.state = ContextState::EditorViewMode;
                 self.editor_handler
                     .on_event(Event::Key(code.into()), &mut self.editor_state);
 
@@ -136,14 +206,96 @@ impl NotebookContext {
                 let new_mode = self.editor_state.mode;
                 if mode != new_mode {
                     match new_mode {
-                        EditorMode::Normal => Action::Dispatch(NotebookEvent::ViewNote.into()),
-                        EditorMode::Insert => Action::Dispatch(NotebookEvent::EditNote.into()),
+                        EditorMode::Normal => {
+                            self.state = ContextState::EditorViewMode;
+                            Action::Dispatch(NotebookEvent::ViewNote.into())
+                        }
+                        EditorMode::Insert => {
+                            self.state = ContextState::EditorEditMode;
+                            Action::Dispatch(NotebookEvent::EditNote.into())
+                        }
                         _ => Action::None,
                     }
                 } else {
                     Action::None
                 }
             }
+        }
+    }
+
+    fn consume_on_note_actions(&mut self, code: KeyCode) -> Action {
+        match code {
+            KeyCode::Char('j') => {
+                self.note_actions_state.select_next();
+                Action::None
+            }
+            KeyCode::Char('k') => {
+                self.note_actions_state.select_previous();
+                Action::None
+            }
+            KeyCode::Esc => {
+                self.state = ContextState::NoteTreeBrowsing;
+
+                Action::Dispatch(NotebookEvent::CloseNoteActionsDialog.into())
+            }
+            KeyCode::Enter => {
+                match NOTE_ACTIONS[self
+                    .note_actions_state
+                    .selected()
+                    .log_expect("note action must not be empty")]
+                {
+                    REMOVE_NOTE => TuiAction::Confirm {
+                        message: "Confirm to remove note?".to_owned(),
+                        action: Box::new(TuiAction::RemoveNote.into()),
+                    }
+                    .into(),
+                    CLOSE => {
+                        self.state = ContextState::NoteTreeBrowsing;
+
+                        Action::Dispatch(NotebookEvent::CloseNoteActionsDialog.into())
+                    }
+                    _ => Action::None,
+                }
+            }
+            _ => Action::None,
+        }
+    }
+
+    fn consume_on_directory_actions(&mut self, code: KeyCode) -> Action {
+        match code {
+            KeyCode::Char('j') => {
+                self.directory_actions_state.select_next();
+                Action::None
+            }
+            KeyCode::Char('k') => {
+                self.directory_actions_state.select_previous();
+                Action::None
+            }
+            KeyCode::Enter => {
+                match DIRECTORY_ACTIONS[self
+                    .directory_actions_state
+                    .selected()
+                    .log_expect("directory action must not be empty")]
+                {
+                    REMOVE_DIRECTORY => TuiAction::Confirm {
+                        message: "Confirm to remove directory?".to_owned(),
+                        action: Box::new(TuiAction::RemoveDirectory.into()),
+                    }
+                    .into(),
+                    CLOSE => {
+                        self.state = ContextState::NoteTreeBrowsing;
+
+                        Action::Dispatch(NotebookEvent::CloseDirectoryActionsDialog.into())
+                    }
+                    _ => Action::None,
+                }
+            }
+            KeyCode::Esc => {
+                self.state = ContextState::NoteTreeBrowsing;
+
+                Action::Dispatch(NotebookEvent::CloseDirectoryActionsDialog.into())
+            }
+            _ => Action::None,
         }
     }
 }

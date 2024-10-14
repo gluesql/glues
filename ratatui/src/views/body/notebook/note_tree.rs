@@ -1,6 +1,8 @@
 use {
-    crate::context::{notebook::TreeItem, NotebookContext},
-    glues_core::state::NotebookState,
+    crate::context::{
+        notebook::{ContextState, TreeItem},
+        NotebookContext,
+    },
     ratatui::{
         layout::Rect,
         style::{Color, Style},
@@ -13,7 +15,7 @@ use {
 const CLOSED_SYMBOL: &str = "▶ ";
 const OPEN_SYMBOL: &str = "▼ ";
 
-pub fn draw(frame: &mut Frame, area: Rect, _state: &NotebookState, context: &mut NotebookContext) {
+pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let block = Block::bordered().title("[Browser]");
     let inner_area = block.inner(area);
 
@@ -34,15 +36,10 @@ pub fn draw(frame: &mut Frame, area: Rect, _state: &NotebookState, context: &mut
     });
 
     let list = List::new(tree_items)
-        .highlight_style(
-            Style::new()
-                .fg(Color::White)
-                .bg(if context.opened_note.is_some() {
-                    Color::Gray
-                } else {
-                    Color::DarkGray
-                }),
-        )
+        .highlight_style(Style::new().fg(Color::White).bg(match context.state {
+            ContextState::NoteTreeBrowsing => Color::DarkGray,
+            _ => Color::Gray,
+        }))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);

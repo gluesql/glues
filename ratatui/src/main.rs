@@ -1,5 +1,5 @@
 mod action;
-mod context;
+pub mod context;
 #[macro_use]
 mod logger;
 mod transitions;
@@ -10,7 +10,7 @@ use {
     color_eyre::Result,
     context::Context,
     futures::executor::block_on,
-    glues_core::{state::State, Glues, KeyEvent},
+    glues_core::Glues,
     logger::*,
     ratatui::{
         crossterm::event::{
@@ -45,7 +45,7 @@ struct App {
 impl App {
     fn new() -> Self {
         let glues = block_on(Glues::new());
-        let context = Context::new();
+        let context = Context::default();
 
         Self { glues, context }
     }
@@ -93,48 +93,13 @@ impl App {
                     return Ok(());
                 }
 
-                let action = match &self.glues.state {
-                    State::EntryState(_) => self.context.entry.consume(key.code),
-                    State::NotebookState(_) => self.context.notebook.consume(key.code),
-                };
-
-                match action {
+                match self.context.consume(key.code) {
                     Action::Tui(TuiAction::Quit) => return Ok(()),
-                    Action::Dispatch(event) => {
-                        let transition = self.glues.dispatch(event).log_unwrap();
-                        self.handle_transition(transition);
+                    action => {
+                        self.handle_action(action, key);
                     }
-                    Action::PassThrough => {
-                        let event = match to_event(key.code) {
-                            Some(event) => event.into(),
-                            None => continue,
-                        };
-
-                        let transition = self.glues.dispatch(event).log_unwrap();
-                        self.handle_transition(transition);
-                    }
-                    Action::None => {}
                 };
             }
-        }
-
-        fn to_event(code: KeyCode) -> Option<KeyEvent> {
-            let event = match code {
-                KeyCode::Char('b') => KeyEvent::B,
-                KeyCode::Char('e') => KeyEvent::E,
-                KeyCode::Char('h') => KeyEvent::H,
-                KeyCode::Char('j') => KeyEvent::J,
-                KeyCode::Char('k') => KeyEvent::K,
-                KeyCode::Char('l') => KeyEvent::L,
-                KeyCode::Char('m') => KeyEvent::M,
-                KeyCode::Char('o') => KeyEvent::O,
-                KeyCode::Left => KeyEvent::Left,
-                KeyCode::Right => KeyEvent::Right,
-                KeyCode::Esc => KeyEvent::Esc,
-                _ => return None,
-            };
-
-            Some(event)
         }
     }
 
@@ -145,6 +110,7 @@ impl App {
         let [statusbar, body] = vertical.areas(frame.area());
 
         views::statusbar::draw(frame, statusbar, state);
-        views::body::draw(frame, body, state, context);
+        views::body::draw(frame, body, context);
+        views::dialog::draw(frame, context);
     }
 }

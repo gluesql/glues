@@ -1,6 +1,5 @@
 use {
     crate::context::EntryContext,
-    glues_core::state::EntryState,
     ratatui::{
         layout::{Alignment, Constraint::Length, Flex, Layout, Rect},
         style::{Color, Style, Stylize},
@@ -10,7 +9,7 @@ use {
     tui_big_text::BigText,
 };
 
-pub fn draw(frame: &mut Frame, area: Rect, _state: &EntryState, context: &mut EntryContext) {
+pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
     let [area] = Layout::horizontal([Length(38)])
         .flex(Flex::Center)
         .areas(area);
