@@ -67,6 +67,15 @@ impl Default for Context {
 }
 
 impl Context {
+    pub fn take_prompt_input(&mut self) -> Option<String> {
+        self.prompt
+            .take()?
+            .widget
+            .lines()
+            .first()
+            .map(ToOwned::to_owned)
+    }
+
     pub fn consume(&mut self, input: &Input) -> Action {
         if self.alert.is_some() {
             // any key pressed will close the alert

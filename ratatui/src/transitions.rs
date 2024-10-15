@@ -80,7 +80,10 @@ impl App {
                 self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
                 self.context.notebook.update_items(root);
             }
-            NotebookTransition::RenameNote(_) | NotebookTransition::RenameDirectory(_) => {
+            NotebookTransition::RenameNote(_)
+            | NotebookTransition::RenameDirectory(_)
+            | NotebookTransition::AddNote(_)
+            | NotebookTransition::AddDirectory(_) => {
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
 
                 self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;

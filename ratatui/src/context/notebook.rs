@@ -20,13 +20,21 @@ use {
 pub const REMOVE_NOTE: &str = "Remove note";
 pub const RENAME_NOTE: &str = "Rename note";
 
+pub const ADD_NOTE: &str = "Add note";
+pub const ADD_DIRECTORY: &str = "Add directory";
 pub const RENAME_DIRECTORY: &str = "Rename directory";
 pub const REMOVE_DIRECTORY: &str = "Remove directory";
 
 pub const CLOSE: &str = "Close";
 
 pub const NOTE_ACTIONS: [&str; 3] = [RENAME_NOTE, REMOVE_NOTE, CLOSE];
-pub const DIRECTORY_ACTIONS: [&str; 3] = [RENAME_DIRECTORY, REMOVE_DIRECTORY, CLOSE];
+pub const DIRECTORY_ACTIONS: [&str; 5] = [
+    ADD_NOTE,
+    ADD_DIRECTORY,
+    RENAME_DIRECTORY,
+    REMOVE_DIRECTORY,
+    CLOSE,
+];
 
 pub enum ContextState {
     NoteTreeBrowsing,
@@ -287,6 +295,16 @@ impl NotebookContext {
                     .selected()
                     .log_expect("directory action must not be empty")]
                 {
+                    ADD_NOTE => TuiAction::Prompt {
+                        message: vec![Line::raw("Enter note name:")],
+                        action: Box::new(TuiAction::AddNote.into()),
+                    }
+                    .into(),
+                    ADD_DIRECTORY => TuiAction::Prompt {
+                        message: vec![Line::raw("Enter directory name:")],
+                        action: Box::new(TuiAction::AddDirectory.into()),
+                    }
+                    .into(),
                     RENAME_DIRECTORY => TuiAction::Prompt {
                         message: vec![Line::raw("Enter new directory name:")],
                         action: Box::new(TuiAction::RenameDirectory.into()),

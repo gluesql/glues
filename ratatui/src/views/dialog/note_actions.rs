@@ -9,11 +9,10 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
-    let [area] = Layout::horizontal([Length(34)])
+    let [area] = Layout::horizontal([Length(28)])
         .flex(Flex::Center)
         .areas(frame.area());
-
-    let [area] = Layout::vertical([Length(6)]).flex(Flex::Center).areas(area);
+    let [area] = Layout::vertical([Length(7)]).flex(Flex::Center).areas(area);
 
     let block = Block::bordered()
         .padding(Padding::new(2, 2, 1, 1))

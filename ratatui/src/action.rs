@@ -29,6 +29,8 @@ pub enum TuiAction {
 
     RenameNote,
     RemoveNote,
+    AddNote,
+    AddDirectory,
     RenameDirectory,
     RemoveDirectory,
 }
@@ -58,15 +60,8 @@ impl App {
             Action::Tui(TuiAction::RenameNote) => {
                 let new_name = self
                     .context
-                    .prompt
-                    .take()
-                    .log_expect("prompt must not be none")
-                    .widget
-                    .lines()
-                    .first()
-                    .log_expect("prompt must have at least one line")
-                    .to_string();
-
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
                 if new_name.is_empty() {
                     self.context.alert = Some("Note name cannot be empty".to_string());
                     return;
@@ -85,18 +80,43 @@ impl App {
                     .log_unwrap();
                 self.handle_transition(transition);
             }
+            Action::Tui(TuiAction::AddNote) => {
+                let note_name = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
+                if note_name.is_empty() {
+                    self.context.alert = Some("Note name cannot be empty".to_string());
+                    return;
+                }
+
+                let transition = self
+                    .glues
+                    .dispatch(NotebookEvent::AddNote(note_name).into())
+                    .log_unwrap();
+                self.handle_transition(transition);
+            }
+            Action::Tui(TuiAction::AddDirectory) => {
+                let directory_name = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
+                if directory_name.is_empty() {
+                    self.context.alert = Some("Directory name cannot be empty".to_string());
+                    return;
+                }
+
+                let transition = self
+                    .glues
+                    .dispatch(NotebookEvent::AddDirectory(directory_name).into())
+                    .log_unwrap();
+                self.handle_transition(transition);
+            }
             Action::Tui(TuiAction::RenameDirectory) => {
                 let new_name = self
                     .context
-                    .prompt
-                    .take()
-                    .log_expect("prompt must not be none")
-                    .widget
-                    .lines()
-                    .first()
-                    .log_expect("prompt must have at least one line")
-                    .to_string();
-
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
                 if new_name.is_empty() {
                     self.context.alert = Some("Directory name cannot be empty".to_string());
                     return;
