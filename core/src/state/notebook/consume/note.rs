@@ -27,6 +27,10 @@ pub async fn rename(
     db.rename_note(note.id.clone(), new_name.clone()).await?;
 
     note.name = new_name;
+    state.root.rename_note(&note).ok_or(Error::Wip(
+        "[note::rename] failed to find parent directory".to_owned(),
+    ))?;
+
     state.selected = SelectedItem::Note(note.clone());
     state.inner_state = InnerState::NoteSelected;
 
