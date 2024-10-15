@@ -262,6 +262,7 @@ impl NotebookContext {
                     RENAME_NOTE => TuiAction::Prompt {
                         message: vec![Line::raw("Enter new note name:")],
                         action: Box::new(TuiAction::RenameNote.into()),
+                        default: None,
                     }
                     .into(),
                     REMOVE_NOTE => TuiAction::Confirm {
@@ -300,16 +301,19 @@ impl NotebookContext {
                     ADD_NOTE => TuiAction::Prompt {
                         message: vec![Line::raw("Enter note name:")],
                         action: Box::new(TuiAction::AddNote.into()),
+                        default: None,
                     }
                     .into(),
                     ADD_DIRECTORY => TuiAction::Prompt {
                         message: vec![Line::raw("Enter directory name:")],
                         action: Box::new(TuiAction::AddDirectory.into()),
+                        default: None,
                     }
                     .into(),
                     RENAME_DIRECTORY => TuiAction::Prompt {
                         message: vec![Line::raw("Enter new directory name:")],
                         action: Box::new(TuiAction::RenameDirectory.into()),
+                        default: None,
                     }
                     .into(),
                     REMOVE_DIRECTORY => TuiAction::Confirm {

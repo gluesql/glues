@@ -1,5 +1,5 @@
 use {
-    crate::context::EntryContext,
+    crate::context::{entry::MENU_ITEMS, EntryContext},
     ratatui::{
         layout::{Alignment, Constraint::Length, Flex, Layout, Rect},
         style::{Color, Style, Stylize},
@@ -13,7 +13,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
     let [area] = Layout::horizontal([Length(38)])
         .flex(Flex::Center)
         .areas(area);
-    let [title_area, area] = Layout::vertical([Length(9), Length(9)])
+    let [title_area, area] = Layout::vertical([Length(9), Length(10)])
         .flex(Flex::Center)
         .areas(area);
 
@@ -25,8 +25,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
         .title("Open Notes")
         .title_alignment(Alignment::Center);
 
-    let items = ["Instant", "CSV", "JSON", "File", "Git"];
-    let list = List::new(items)
+    let list = List::new(MENU_ITEMS)
         .block(block)
         .highlight_style(Style::new().fg(Color::White).bg(Color::Blue))
         .highlight_symbol(" ")

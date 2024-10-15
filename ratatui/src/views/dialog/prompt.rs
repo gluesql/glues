@@ -20,7 +20,7 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .log_expect("prompt message not found");
     let num_lines = message.len() as u16;
 
-    let [area] = Layout::horizontal([Length(45)])
+    let [area] = Layout::horizontal([Length(51)])
         .flex(Flex::Center)
         .areas(frame.area());
     let [area] = Layout::vertical([Length(num_lines + 10)])

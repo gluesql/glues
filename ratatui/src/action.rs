@@ -1,5 +1,10 @@
 use {
-    super::{context::ContextPrompt, logger::*, App},
+    super::{
+        config::{self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_JSON_PATH},
+        context::ContextPrompt,
+        logger::*,
+        App,
+    },
     glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent},
     ratatui::{
         crossterm::event::{Event as Input, KeyCode},
@@ -17,6 +22,7 @@ pub enum Action {
 
 #[derive(Clone)]
 pub enum TuiAction {
+    Alert(String),
     Confirm {
         message: String,
         action: Box<Action>,
@@ -24,8 +30,13 @@ pub enum TuiAction {
     Prompt {
         message: Vec<Line<'static>>,
         action: Box<Action>,
+        default: Option<String>,
     },
     Quit,
+
+    OpenCsv,
+    OpenJson,
+    OpenFile,
 
     RenameNote,
     RemoveNote,
@@ -51,11 +62,72 @@ impl App {
     pub(super) fn handle_action(&mut self, action: Action, input: Input) {
         match action {
             Action::Tui(TuiAction::Quit) => {}
+            Action::Tui(TuiAction::Alert(message)) => {
+                self.context.alert = Some(message);
+            }
             Action::Tui(TuiAction::Confirm { message, action }) => {
                 self.context.confirm = Some((message, *action));
             }
-            Action::Tui(TuiAction::Prompt { message, action }) => {
-                self.context.prompt = Some(ContextPrompt::new(message, *action));
+            Action::Tui(TuiAction::Prompt {
+                message,
+                action,
+                default,
+            }) => {
+                self.context.prompt = Some(ContextPrompt::new(message, *action, default));
+            }
+            Action::Tui(TuiAction::OpenCsv) => {
+                let path = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
+                if path.is_empty() {
+                    self.context.alert = Some("Path cannot be empty".to_string());
+                    return;
+                }
+
+                config::update(LAST_CSV_PATH, &path);
+
+                let transition = self
+                    .glues
+                    .dispatch(EntryEvent::OpenCsv(path).into())
+                    .log_unwrap();
+                self.handle_transition(transition);
+            }
+            Action::Tui(TuiAction::OpenJson) => {
+                let path = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
+                if path.is_empty() {
+                    self.context.alert = Some("Path cannot be empty".to_string());
+                    return;
+                }
+
+                config::update(LAST_JSON_PATH, &path);
+
+                let transition = self
+                    .glues
+                    .dispatch(EntryEvent::OpenJson(path).into())
+                    .log_unwrap();
+                self.handle_transition(transition);
+            }
+            Action::Tui(TuiAction::OpenFile) => {
+                let path = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
+                if path.is_empty() {
+                    self.context.alert = Some("Path cannot be empty".to_string());
+                    return;
+                }
+
+                config::update(LAST_FILE_PATH, &path);
+
+                let transition = self
+                    .glues
+                    .dispatch(EntryEvent::OpenFile(path).into())
+                    .log_unwrap();
+                self.handle_transition(transition);
             }
             Action::Tui(TuiAction::RenameNote) => {
                 let new_name = self

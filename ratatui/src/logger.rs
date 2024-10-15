@@ -1,22 +1,12 @@
 use {
+    super::config::get_glue,
     async_io::block_on,
-    gluesql::{
-        core::ast_builder::{table, text, Execute},
-        prelude::{CsvStorage, Glue},
-    },
+    gluesql::core::ast_builder::{table, text, Execute},
     std::{
         fmt::{Debug, Display},
         future::Future,
     },
 };
-
-const PATH: &str = ".glues/";
-
-fn get_glue() -> Glue<CsvStorage> {
-    let storage = CsvStorage::new(PATH).unwrap();
-
-    Glue::new(storage)
-}
 
 pub fn init() {
     block_on(async {

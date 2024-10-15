@@ -1,4 +1,4 @@
-mod entry;
+pub mod entry;
 pub mod notebook;
 
 use {
@@ -25,8 +25,8 @@ pub struct ContextPrompt {
 }
 
 impl ContextPrompt {
-    pub fn new(message: Vec<Line<'static>>, action: Action) -> Self {
-        let mut widget = TextArea::default();
+    pub fn new(message: Vec<Line<'static>>, action: Action, default: Option<String>) -> Self {
+        let mut widget = TextArea::new(vec![default.unwrap_or_default()]);
         widget.set_cursor_style(Style::default().white().on_blue());
         widget.set_block(
             Block::default()

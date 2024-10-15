@@ -2,6 +2,7 @@ mod action;
 pub mod context;
 #[macro_use]
 mod logger;
+mod config;
 mod transitions;
 mod views;
 
@@ -27,6 +28,7 @@ use {
 };
 
 fn main() -> Result<()> {
+    config::init();
     logger::init();
     color_eyre::install()?;
 
