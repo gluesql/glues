@@ -86,6 +86,9 @@ pub async fn rename(
         .await?;
 
     directory.name = new_name;
+    state.root.rename_directory(&directory).ok_or(Error::Wip(
+        "[directory::rename] failed to find directory".to_owned(),
+    ))?;
     state.inner_state = InnerState::DirectorySelected;
 
     Ok(NotebookTransition::RenameDirectory(directory))

@@ -29,6 +29,7 @@ pub enum TuiAction {
 
     RenameNote,
     RemoveNote,
+    RenameDirectory,
     RemoveDirectory,
 }
 
@@ -81,6 +82,29 @@ impl App {
                 let transition = self
                     .glues
                     .dispatch(NotebookEvent::RemoveNote.into())
+                    .log_unwrap();
+                self.handle_transition(transition);
+            }
+            Action::Tui(TuiAction::RenameDirectory) => {
+                let new_name = self
+                    .context
+                    .prompt
+                    .take()
+                    .log_expect("prompt must not be none")
+                    .widget
+                    .lines()
+                    .first()
+                    .log_expect("prompt must have at least one line")
+                    .to_string();
+
+                if new_name.is_empty() {
+                    self.context.alert = Some("Directory name cannot be empty".to_string());
+                    return;
+                }
+
+                let transition = self
+                    .glues
+                    .dispatch(NotebookEvent::RenameDirectory(new_name).into())
                     .log_unwrap();
                 self.handle_transition(transition);
             }
