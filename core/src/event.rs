@@ -6,7 +6,7 @@ use {
     strum_macros::Display,
 };
 
-#[derive(Debug, Display)]
+#[derive(Clone, Debug, Display)]
 pub enum Event {
     #[strum(to_string = "Key::{0}")]
     Key(KeyEvent),
@@ -20,7 +20,7 @@ pub enum Event {
     Cancel,
 }
 
-#[derive(Debug, Display)]
+#[derive(Clone, Debug, Display)]
 pub enum EntryEvent {
     OpenMemory,
     OpenCsv(String),
@@ -33,7 +33,7 @@ pub enum EntryEvent {
     },
 }
 
-#[derive(Debug, Display)]
+#[derive(Clone, Debug, Display)]
 pub enum NotebookEvent {
     OpenDirectory(DirectoryId),
     CloseDirectory(DirectoryId),
