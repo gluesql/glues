@@ -1094,6 +1094,7 @@ dependencies = [
  "gluesql",
  "ratatui",
  "tui-big-text",
+ "tui-textarea",
 ]
 
 [[package]]
@@ -2510,6 +2511,17 @@ dependencies = [
  "font8x8",
  "itertools 0.13.0",
  "ratatui",
+]
+
+[[package]]
+name = "tui-textarea"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29c07084342a575cea919eea996b9658a358c800b03d435df581c1d7c60e065a"
+dependencies = [
+ "crossterm",
+ "ratatui",
+ "unicode-width",
 ]
 
 [[package]]

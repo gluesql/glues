@@ -2,6 +2,7 @@ mod alert;
 mod confirm;
 mod directory_actions;
 mod note_actions;
+mod prompt;
 
 use {
     crate::{
@@ -17,6 +18,9 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         return;
     } else if context.confirm.is_some() {
         confirm::draw(frame, context);
+        return;
+    } else if context.prompt.is_some() {
+        prompt::draw(frame, context);
         return;
     }
 

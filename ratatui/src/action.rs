@@ -1,9 +1,13 @@
 use {
-    super::{logger::*, App},
+    super::{context::ContextPrompt, logger::*, App},
     glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent},
-    ratatui::crossterm::event::{KeyCode, KeyEvent as CKeyEvent},
+    ratatui::{
+        crossterm::event::{Event as Input, KeyCode},
+        text::Line,
+    },
 };
 
+#[derive(Clone)]
 pub enum Action {
     Tui(TuiAction),
     Dispatch(Event),
@@ -11,13 +15,19 @@ pub enum Action {
     None,
 }
 
+#[derive(Clone)]
 pub enum TuiAction {
     Confirm {
         message: String,
         action: Box<Action>,
     },
+    Prompt {
+        message: Vec<Line<'static>>,
+        action: Box<Action>,
+    },
     Quit,
 
+    RenameNote,
     RemoveNote,
     RemoveDirectory,
 }
@@ -35,11 +45,37 @@ impl From<EntryEvent> for Action {
 }
 
 impl App {
-    pub(super) fn handle_action(&mut self, action: Action, key: CKeyEvent) {
+    pub(super) fn handle_action(&mut self, action: Action, input: Input) {
         match action {
             Action::Tui(TuiAction::Quit) => {}
             Action::Tui(TuiAction::Confirm { message, action }) => {
                 self.context.confirm = Some((message, *action));
+            }
+            Action::Tui(TuiAction::Prompt { message, action }) => {
+                self.context.prompt = Some(ContextPrompt::new(message, *action));
+            }
+            Action::Tui(TuiAction::RenameNote) => {
+                let new_name = self
+                    .context
+                    .prompt
+                    .take()
+                    .log_expect("prompt must not be none")
+                    .widget
+                    .lines()
+                    .first()
+                    .log_expect("prompt must have at least one line")
+                    .to_string();
+
+                if new_name.is_empty() {
+                    self.context.alert = Some("Note name cannot be empty".to_string());
+                    return;
+                }
+
+                let transition = self
+                    .glues
+                    .dispatch(NotebookEvent::RenameNote(new_name).into())
+                    .log_unwrap();
+                self.handle_transition(transition);
             }
             Action::Tui(TuiAction::RemoveNote) => {
                 let transition = self
@@ -60,7 +96,7 @@ impl App {
                 self.handle_transition(transition);
             }
             Action::PassThrough => {
-                let event = match to_event(key.code) {
+                let event = match to_event(input) {
                     Some(event) => event.into(),
                     None => {
                         return;
@@ -75,7 +111,12 @@ impl App {
     }
 }
 
-fn to_event(code: KeyCode) -> Option<KeyEvent> {
+fn to_event(input: Input) -> Option<KeyEvent> {
+    let code = match input {
+        Input::Key(key) => key.code,
+        _ => return None,
+    };
+
     let event = match code {
         KeyCode::Char('b') => KeyEvent::B,
         KeyCode::Char('e') => KeyEvent::E,

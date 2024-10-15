@@ -3,13 +3,42 @@ pub mod notebook;
 
 use {
     crate::{logger::*, Action},
-    ratatui::crossterm::event::KeyCode,
+    ratatui::{
+        crossterm::event::{Event as Input, KeyCode, KeyEvent},
+        style::{Style, Stylize},
+        text::Line,
+        widgets::{Block, Borders},
+    },
+    tui_textarea::TextArea,
 };
 pub use {entry::EntryContext, notebook::NotebookContext};
 
 pub enum ContextState {
     Entry,
     Notebook,
+}
+
+pub struct ContextPrompt {
+    pub widget: TextArea<'static>,
+    pub message: Vec<Line<'static>>,
+    pub action: Action,
+}
+
+impl ContextPrompt {
+    pub fn new(message: Vec<Line<'static>>, action: Action) -> Self {
+        let mut widget = TextArea::default();
+        widget.set_cursor_style(Style::default().white().on_blue());
+        widget.set_block(
+            Block::default()
+                .border_style(Style::default())
+                .borders(Borders::ALL),
+        );
+        Self {
+            widget,
+            message,
+            action,
+        }
+    }
 }
 
 pub struct Context {
@@ -20,6 +49,7 @@ pub struct Context {
 
     pub confirm: Option<(String, Action)>,
     pub alert: Option<String>,
+    pub prompt: Option<ContextPrompt>,
 }
 
 impl Default for Context {
@@ -31,17 +61,23 @@ impl Default for Context {
             state: ContextState::Entry,
             confirm: None,
             alert: None,
+            prompt: None,
         }
     }
 }
 
 impl Context {
-    pub fn consume(&mut self, code: KeyCode) -> Action {
+    pub fn consume(&mut self, input: &Input) -> Action {
         if self.alert.is_some() {
             // any key pressed will close the alert
             self.alert = None;
             return Action::None;
         } else if self.confirm.is_some() {
+            let code = match input {
+                Input::Key(key) => key.code,
+                _ => return Action::None,
+            };
+
             match code {
                 KeyCode::Char('y') => {
                     let (_, action) = self.confirm.take().log_expect("confirm must be some");
@@ -54,7 +90,36 @@ impl Context {
                 }
                 _ => return Action::None,
             }
+        } else if let Some(prompt) = self.prompt.as_ref() {
+            match input {
+                Input::Key(KeyEvent {
+                    code: KeyCode::Enter,
+                    ..
+                }) => {
+                    return prompt.action.clone();
+                }
+                Input::Key(KeyEvent {
+                    code: KeyCode::Esc, ..
+                }) => {
+                    self.prompt = None;
+                    return Action::None;
+                }
+                _ => {
+                    self.prompt
+                        .as_mut()
+                        .log_expect("prompt must be some")
+                        .widget
+                        .input(input.clone());
+
+                    return Action::None;
+                }
+            }
         }
+
+        let code = match input {
+            Input::Key(key) => key.code,
+            _ => return Action::None,
+        };
 
         match self.state {
             ContextState::Entry => self.entry.consume(code),

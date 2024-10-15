@@ -13,8 +13,9 @@ use {
     glues_core::Glues,
     logger::*,
     ratatui::{
-        crossterm::event::{
-            self, Event, KeyCode, KeyEvent as CKeyEvent, KeyEventKind, KeyModifiers,
+        crossterm::{
+            self,
+            event::{Event as Input, KeyCode, KeyEvent as CKeyEvent, KeyEventKind, KeyModifiers},
         },
         layout::{
             Constraint::{Length, Percentage},
@@ -51,14 +52,10 @@ impl App {
     }
 
     fn run(mut self, mut terminal: DefaultTerminal) -> Result<()> {
-        let mut updated = true;
-
         loop {
-            if updated {
-                terminal.draw(|frame| self.draw(frame))?;
-            }
+            terminal.draw(|frame| self.draw(frame))?;
 
-            if !event::poll(Duration::from_millis(1500))? {
+            if !crossterm::event::poll(Duration::from_millis(1500))? {
                 let mut transitions = Vec::new();
                 {
                     let mut queue = self.glues.transition_queue.lock().log_unwrap();
@@ -68,37 +65,38 @@ impl App {
                     }
                 }
 
-                updated = !transitions.is_empty();
-
                 for transition in transitions {
                     self.handle_transition(transition);
                 }
             }
 
-            if let Event::Key(key) = event::read()? {
-                updated = true;
+            let input = crossterm::event::read()?;
+            if !matches!(
+                input,
+                Input::Key(CKeyEvent {
+                    kind: KeyEventKind::Press,
+                    ..
+                })
+            ) {
+                continue;
+            }
 
-                if key.kind != KeyEventKind::Press {
-                    continue;
-                }
-
-                if matches!(
-                    key,
-                    CKeyEvent {
-                        code: KeyCode::Char('c'),
-                        modifiers: KeyModifiers::CONTROL,
-                        ..
-                    }
-                ) {
+            match input {
+                Input::Key(CKeyEvent {
+                    code: KeyCode::Char('c'),
+                    modifiers: KeyModifiers::CONTROL,
+                    ..
+                }) => {
                     return Ok(());
                 }
-
-                match self.context.consume(key.code) {
-                    Action::Tui(TuiAction::Quit) => return Ok(()),
-                    action => {
-                        self.handle_action(action, key);
-                    }
-                };
+                _ => {
+                    match self.context.consume(&input) {
+                        Action::Tui(TuiAction::Quit) => return Ok(()),
+                        action => {
+                            self.handle_action(action, input);
+                        }
+                    };
+                }
             }
         }
     }

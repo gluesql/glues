@@ -12,15 +12,17 @@ use {
     },
     ratatui::{
         crossterm::event::{Event, KeyCode},
+        text::Line,
         widgets::ListState,
     },
 };
 
 pub const REMOVE_NOTE: &str = "Remove note";
+pub const RENAME_NOTE: &str = "Rename note";
 pub const REMOVE_DIRECTORY: &str = "Remove directory";
 pub const CLOSE: &str = "Close";
 
-pub const NOTE_ACTIONS: [&str; 2] = [REMOVE_NOTE, CLOSE];
+pub const NOTE_ACTIONS: [&str; 3] = [RENAME_NOTE, REMOVE_NOTE, CLOSE];
 pub const DIRECTORY_ACTIONS: [&str; 2] = [REMOVE_DIRECTORY, CLOSE];
 
 pub enum ContextState {
@@ -244,6 +246,11 @@ impl NotebookContext {
                     .selected()
                     .log_expect("note action must not be empty")]
                 {
+                    RENAME_NOTE => TuiAction::Prompt {
+                        message: vec![Line::raw("Enter new note name:")],
+                        action: Box::new(TuiAction::RenameNote.into()),
+                    }
+                    .into(),
                     REMOVE_NOTE => TuiAction::Confirm {
                         message: "Confirm to remove note?".to_owned(),
                         action: Box::new(TuiAction::RemoveNote.into()),
