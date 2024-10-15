@@ -58,6 +58,7 @@ impl App {
                 log!("Closing directory {id}");
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
                 self.context.notebook.update_items(root);
+                self.context.notebook.select_item(&id);
             }
             NotebookTransition::OpenNote { note, content } => {
                 self.context.notebook.open_note(note, content);

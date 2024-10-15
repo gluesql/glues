@@ -160,7 +160,6 @@ impl NotebookContext {
                     }
                 }
             }
-            KeyCode::Char('h') => Action::None,
             KeyCode::Char('l') => match item!() {
                 TreeItem::Directory { value, opened, .. } => {
                     let directory_id = value.id.clone();
@@ -188,9 +187,11 @@ impl NotebookContext {
                     Action::PassThrough
                 }
             },
-            KeyCode::Char('o') | KeyCode::Char('b') | KeyCode::Char('e') | KeyCode::Esc => {
-                Action::PassThrough
-            }
+            KeyCode::Char('o')
+            | KeyCode::Char('b')
+            | KeyCode::Char('e')
+            | KeyCode::Char('h')
+            | KeyCode::Esc => Action::PassThrough,
             _ => Action::None,
         }
     }
