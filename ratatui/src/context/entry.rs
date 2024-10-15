@@ -13,9 +13,10 @@ pub const CSV: &str = "[2] CSV";
 pub const JSON: &str = "[3] JSON";
 pub const FILE: &str = "[4] File";
 pub const GIT: &str = "[5] Git";
+pub const HELP: &str = "[h] Help";
 pub const QUIT: &str = "[q] Quit";
 
-pub const MENU_ITEMS: [&str; 6] = [INSTANT, CSV, JSON, FILE, GIT, QUIT];
+pub const MENU_ITEMS: [&str; 7] = [INSTANT, CSV, JSON, FILE, GIT, HELP, QUIT];
 
 pub struct EntryContext {
     pub list_state: ListState,
@@ -57,6 +58,10 @@ impl EntryContext {
             KeyCode::Char('2') => open(LAST_CSV_PATH, TuiAction::OpenCsv),
             KeyCode::Char('3') => open(LAST_JSON_PATH, TuiAction::OpenJson),
             KeyCode::Char('4') => open(LAST_FILE_PATH, TuiAction::OpenFile),
+            KeyCode::Char('5') | KeyCode::Char('h') => {
+                TuiAction::Alert("Not implemented yet.".to_string()).into()
+            }
+
             KeyCode::Enter => {
                 let i = self
                     .list_state
@@ -67,7 +72,7 @@ impl EntryContext {
                     CSV => open(LAST_CSV_PATH, TuiAction::OpenCsv),
                     JSON => open(LAST_JSON_PATH, TuiAction::OpenJson),
                     FILE => open(LAST_FILE_PATH, TuiAction::OpenFile),
-                    GIT => TuiAction::Alert("Not implemented yet.".to_string()).into(),
+                    GIT | HELP => TuiAction::Alert("Not implemented yet.".to_string()).into(),
                     QUIT => TuiAction::Quit.into(),
                     _ => Action::None,
                 }
