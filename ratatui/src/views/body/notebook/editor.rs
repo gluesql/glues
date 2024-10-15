@@ -3,7 +3,7 @@ use {
     edtui::{EditorTheme, EditorView},
     ratatui::{
         layout::Rect,
-        style::{Color, Style},
+        style::{Style, Stylize},
         widgets::{Block, Padding},
         Frame,
     },
@@ -13,7 +13,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let (title, cursor_style) = match context.opened_note {
         Some(ref note) => (
             format!("[Editor: {}]", note.name),
-            Style::default().bg(Color::DarkGray).fg(Color::White),
+            Style::default().white().on_blue(),
         ),
         None => ("[Editor]".to_string(), Style::default()),
     };
