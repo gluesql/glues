@@ -5,6 +5,7 @@ use {
         App,
     },
     glues_core::{
+        data::{Directory, Note},
         state::{GetInner, NotebookState},
         transition::{EntryTransition, NotebookTransition, Transition},
         NotebookEvent,
@@ -80,14 +81,26 @@ impl App {
                 self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
                 self.context.notebook.update_items(root);
             }
-            NotebookTransition::RenameNote(_)
-            | NotebookTransition::RenameDirectory(_)
-            | NotebookTransition::AddNote(_)
-            | NotebookTransition::AddDirectory(_) => {
+            NotebookTransition::RenameNote(_) | NotebookTransition::RenameDirectory(_) => {
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
 
                 self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
                 self.context.notebook.update_items(root);
+            }
+            NotebookTransition::AddNote(Note {
+                id,
+                directory_id: parent_id,
+                ..
+            })
+            | NotebookTransition::AddDirectory(Directory { id, parent_id, .. }) => {
+                self.glues
+                    .dispatch(NotebookEvent::OpenDirectory(parent_id.clone()).into())
+                    .log_unwrap();
+                let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
+
+                self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
+                self.context.notebook.update_items(root);
+                self.context.notebook.select_item(&id);
             }
             _ => {}
         }
