@@ -1,5 +1,5 @@
 use {
-    crate::context::NotebookContext,
+    crate::context::{notebook::ContextState, NotebookContext},
     edtui::{EditorTheme, EditorView},
     ratatui::{
         layout::Rect,
@@ -16,6 +16,14 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
             Style::default().white().on_blue(),
         ),
         None => ("[Editor]".to_string(), Style::default()),
+    };
+    let title = if matches!(
+        context.state,
+        ContextState::EditorViewMode | ContextState::EditorEditMode
+    ) {
+        title.blue()
+    } else {
+        title.dark_gray()
     };
     let block = Block::bordered()
         .title(title)

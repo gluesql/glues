@@ -36,6 +36,7 @@ pub const DIRECTORY_ACTIONS: [&str; 5] = [
     CLOSE,
 ];
 
+#[derive(Clone, Copy, PartialEq)]
 pub enum ContextState {
     NoteTreeBrowsing,
     NoteActionsDialog,

@@ -5,7 +5,7 @@ use {
     },
     ratatui::{
         layout::Rect,
-        style::{Color, Style},
+        style::{Color, Style, Stylize},
         text::Line,
         widgets::{Block, HighlightSpacing, List, ListDirection},
         Frame,
@@ -16,7 +16,13 @@ const CLOSED_SYMBOL: &str = "▶ ";
 const OPEN_SYMBOL: &str = "▼ ";
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
-    let block = Block::bordered().title("[Browser]");
+    let title = "[Browser]";
+    let title = if context.state == ContextState::NoteTreeBrowsing {
+        title.blue()
+    } else {
+        title.dark_gray()
+    };
+    let block = Block::bordered().title(title);
     let inner_area = block.inner(area);
 
     let tree_items = context.tree_items.iter().map(|item| match item {
