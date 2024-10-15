@@ -21,7 +21,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
         context.state,
         ContextState::EditorViewMode | ContextState::EditorEditMode
     ) {
-        title.blue()
+        title.light_blue()
     } else {
         title.dark_gray()
     };

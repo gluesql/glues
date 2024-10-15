@@ -18,7 +18,7 @@ const OPEN_SYMBOL: &str = "▼ ";
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let title = "[Browser]";
     let title = if context.state == ContextState::NoteTreeBrowsing {
-        title.blue()
+        title.light_blue()
     } else {
         title.dark_gray()
     };
