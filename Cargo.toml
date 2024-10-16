@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
-members = ["tui", "core"]
-default-members = ["tui", "core"]
+members = ["tui", "ratatui", "core"]
+default-members = ["tui", "ratatui", "core"]
 
 [workspace.package]
 authors = ["Taehoon Moon <taehoon.moon@outlook.com>"]
@@ -14,7 +14,7 @@ repository = "https://github.com/gluesql/glues"
 glues-core = { path = "./core", version = "0.2.2" }
 
 [workspace.dependencies.gluesql]
-version = "0.16.1"
+version = "0.16.2"
 default-features = false
 features = [
     "gluesql_memory_storage",

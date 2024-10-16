@@ -115,35 +115,37 @@ impl NotebookState {
         match &self.inner_state {
             NoteSelected => {
                 vec![
-                    "[Esc] Menu",
-                    "[O] Open note",
-                    "[H] Close parent directory",
-                    "[J] Select next",
-                    "[K] Select previous",
-                    "[M] More actions",
+                    "[o] Open note",
+                    "[h] Close parent",
+                    "[j] Down",
+                    "[k] Up",
+                    "[m] More actions",
+                    "[Esc] Quit",
                 ]
             }
             DirectorySelected => {
                 vec![
-                    "[Esc] Menu",
-                    "[L] Toggle",
-                    "[H] Close parent directory",
-                    "[J] Select next",
-                    "[K] Select previous",
-                    "[M] More actions",
+                    "[l] Toggle",
+                    "[h] Close parent",
+                    "[j] Down",
+                    "[k] Up",
+                    "[m] More actions",
+                    "[Esc] Quit",
                 ]
             }
             EditingViewMode => {
-                vec!["[Esc] Menu", "[B] Browse note tree", "[E] Edit mode"]
-            }
-            EditingEditMode => {
                 vec![
-                    "[Esc] Save note & View mode",
-                    "[Up, Down, Left, Right, PgUp, PgDown, Home, End] Move cursor",
+                    "[i] Edit mode",
+                    "[b] Browse note tree",
+                    "[h] Show editor keymap",
+                    "[Esc] Quit",
                 ]
             }
+            EditingEditMode => {
+                vec!["[Esc] Save note & View mode", "[Ctrl+h] Show editor keymap"]
+            }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
-                vec!["[J] Focus next", "[K] Focus previous", "[Enter] Select"]
+                vec!["[j] Next", "[k] Previous", "[Enter] Select", "[Esc] Close"]
             }
         }
     }
@@ -310,8 +312,8 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransiti
             note::update_content(db, state, content).await
         }
         (Key(KeyEvent::E) | Notebook(EditNote), EditingViewMode) => note::edit(state).await,
-        (Key(KeyEvent::B), EditingViewMode) => note::browse(state).await,
-        (Key(KeyEvent::Esc), EditingEditMode) => note::view(state).await,
+        (Key(KeyEvent::B) | Notebook(BrowseNoteTree), EditingViewMode) => note::browse(state).await,
+        (Key(KeyEvent::Esc) | Notebook(ViewNote), EditingEditMode) => note::view(state).await,
         (Cancel, NoteMoreActions) => {
             let note = state.get_selected_note()?.clone();
 

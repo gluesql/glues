@@ -48,15 +48,15 @@ fn handle_task(task: Task) -> Result<Transition> {
             remote,
             branch,
         } => {
-            let message = format!("[Task::GitSync] remote: {remote}, branch: {branch}");
-
             let mut storage = GitStorage::open(path, StorageType::File)?;
             storage.set_remote(remote);
             storage.set_branch(branch);
             storage.pull()?;
             storage.push()?;
 
-            Ok(Transition::Log(message))
+            Ok(Transition::Log(
+                "Sync complete. Your notes are up to date.".to_owned(),
+            ))
         }
     }
 }

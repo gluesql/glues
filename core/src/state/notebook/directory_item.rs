@@ -42,6 +42,25 @@ impl DirectoryItem {
             .next()
     }
 
+    pub fn rename_directory(&mut self, target: &Directory) -> Option<()> {
+        let directory_item = self.find_mut(&target.id)?;
+        directory_item.directory.name = target.name.clone();
+
+        Some(())
+    }
+
+    pub fn rename_note(&mut self, target: &Note) -> Option<()> {
+        let directory_item = self.find_mut(&target.directory_id)?;
+        for note in directory_item.children.as_mut()?.notes.iter_mut() {
+            if note.id == target.id {
+                note.name = target.name.clone();
+                break;
+            }
+        }
+
+        Some(())
+    }
+
     pub fn remove_note(&mut self, target: &Note) -> Option<&Directory> {
         let directory_item = self.find_mut(&target.directory_id)?;
         directory_item

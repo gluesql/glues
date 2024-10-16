@@ -13,10 +13,9 @@ pub async fn open(
     state: &mut NotebookState,
     directory_id: DirectoryId,
 ) -> Result<NotebookTransition> {
-    let item = state
-        .root
-        .find_mut(&directory_id)
-        .ok_or(Error::Wip("todo: asdfasdf".to_owned()))?;
+    let item = state.root.find_mut(&directory_id).ok_or(Error::Wip(
+        "[state::notebook::open] directory not found".to_owned(),
+    ))?;
 
     let notes = db.fetch_notes(directory_id.clone()).await?;
     let directories = db
@@ -86,6 +85,9 @@ pub async fn rename(
         .await?;
 
     directory.name = new_name;
+    state.root.rename_directory(&directory).ok_or(Error::Wip(
+        "[directory::rename] failed to find directory".to_owned(),
+    ))?;
     state.inner_state = InnerState::DirectorySelected;
 
     Ok(NotebookTransition::RenameDirectory(directory))
