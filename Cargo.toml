@@ -14,7 +14,7 @@ repository = "https://github.com/gluesql/glues"
 glues-core = { path = "./core", version = "0.2.2" }
 
 [workspace.dependencies.gluesql]
-version = "0.16.1"
+version = "0.16.2"
 default-features = false
 features = [
     "gluesql_memory_storage",
