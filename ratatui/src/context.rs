@@ -51,8 +51,10 @@ pub struct Context {
     pub confirm: Option<(String, Action)>,
     pub alert: Option<String>,
     pub prompt: Option<ContextPrompt>,
-    pub help: bool,
     pub last_log: Option<(String, SystemTime)>,
+
+    pub help: bool,
+    pub editor_keymap: bool,
 }
 
 impl Default for Context {
@@ -65,8 +67,10 @@ impl Default for Context {
             confirm: None,
             alert: None,
             prompt: None,
-            help: false,
             last_log: None,
+
+            help: false,
+            editor_keymap: false,
         }
     }
 }
@@ -82,8 +86,10 @@ impl Context {
     }
 
     pub fn consume(&mut self, input: &Input) -> Action {
-        if self.help {
-            // any key pressed will close the help dialog
+        if self.editor_keymap {
+            self.editor_keymap = false;
+            return Action::None;
+        } else if self.help {
             self.help = false;
             return Action::None;
         } else if self.alert.is_some() {

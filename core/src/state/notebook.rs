@@ -134,10 +134,15 @@ impl NotebookState {
                 ]
             }
             EditingViewMode => {
-                vec!["[Esc] Quit", "[b] Browse note tree", "[i] Edit mode"]
+                vec![
+                    "[Esc] Quit",
+                    "[b] Browse note tree",
+                    "[i] Edit mode",
+                    "[h] Show editor keymap",
+                ]
             }
             EditingEditMode => {
-                vec!["[Esc] Save note & View mode", "[-] todo: tui-textarea"]
+                vec!["[Esc] Save note & View mode"]
             }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
                 vec!["[j] Next", "[k] Previous", "[Enter] Select", "[Esc] Close"]

@@ -229,6 +229,7 @@ impl NotebookContext {
                 self.state = ContextState::EditorEditMode;
                 Action::Dispatch(NotebookEvent::EditNote.into())
             }
+            KeyCode::Char('h') => TuiAction::ShowEditorKeymap.into(),
             KeyCode::Esc => TuiAction::Confirm {
                 message: "Do you want to quit?".to_owned(),
                 action: Box::new(TuiAction::Quit.into()),

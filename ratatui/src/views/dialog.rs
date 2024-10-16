@@ -1,6 +1,7 @@
 mod alert;
 mod confirm;
 mod directory_actions;
+mod editor_keymap;
 mod help;
 mod note_actions;
 mod prompt;
@@ -14,7 +15,10 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, context: &mut Context) {
-    if context.help {
+    if context.editor_keymap {
+        editor_keymap::draw(frame);
+        return;
+    } else if context.help {
         help::draw(frame);
         return;
     } else if context.alert.is_some() {

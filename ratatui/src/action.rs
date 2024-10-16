@@ -37,6 +37,7 @@ pub enum TuiAction {
         default: Option<String>,
     },
     Help,
+    ShowEditorKeymap,
     Quit,
 
     OpenCsv,
@@ -77,6 +78,9 @@ impl App {
             Action::Tui(TuiAction::Quit) => {}
             Action::Tui(TuiAction::Help) => {
                 self.context.help = true;
+            }
+            Action::Tui(TuiAction::ShowEditorKeymap) => {
+                self.context.editor_keymap = true;
             }
             Action::Tui(TuiAction::Alert(message)) => {
                 self.context.alert = Some(message);
