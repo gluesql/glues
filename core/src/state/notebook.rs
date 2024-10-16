@@ -100,12 +100,12 @@ impl NotebookState {
             EditingViewMode => {
                 let name = &self.get_selected_note()?.name;
 
-                format!("Note '{name}' normal mode")
+                format!("Note '{name}' view mode")
             }
             EditingEditMode => {
                 let name = &self.get_selected_note()?.name;
 
-                format!("Note '{name}' insert mode")
+                format!("Note '{name}' edit mode")
             }
             EntryDialog(_) => "Global menu dialog".to_owned(),
         })
@@ -134,10 +134,10 @@ impl NotebookState {
                 ]
             }
             EditingViewMode => {
-                vec!["[Esc] Quit", "[b] Browse note tree", "[-] todo: EdTUI"]
+                vec!["[Esc] Quit", "[b] Browse note tree", "[i] Edit mode"]
             }
             EditingEditMode => {
-                vec!["[Esc] Save note & Normal mode", "[-] todo: EdTUI"]
+                vec!["[Esc] Save note & View mode", "[-] todo: tui-textarea"]
             }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
                 vec!["[j] Next", "[k] Previous", "[Enter] Select", "[Esc] Close"]

@@ -66,7 +66,7 @@ impl App {
                 self.context.notebook.open_note(note, content);
             }
             NotebookTransition::ViewMode(_note) => {
-                let content: String = self.context.notebook.editor_state.lines.clone().into();
+                let content = self.context.notebook.editor.lines().join("\n");
                 let event = NotebookEvent::UpdateNoteContent(content).into();
 
                 self.glues.dispatch(event).log_unwrap();

@@ -134,14 +134,12 @@ impl Context {
             }
         }
 
-        let code = match input {
-            Input::Key(key) => key.code,
-            _ => return Action::None,
-        };
-
         match self.state {
-            ContextState::Entry => self.entry.consume(code),
-            ContextState::Notebook => self.notebook.consume(code),
+            ContextState::Entry => match input {
+                Input::Key(key) => self.entry.consume(key.code),
+                _ => Action::None,
+            },
+            ContextState::Notebook => self.notebook.consume(input),
         }
     }
 }

@@ -3,7 +3,6 @@ use {
         action::{Action, TuiAction},
         logger::*,
     },
-    edtui::{EditorEventHandler, EditorMode, EditorState, Lines},
     glues_core::{
         data::{Directory, Note},
         state::notebook::DirectoryItem,
@@ -11,10 +10,11 @@ use {
         NotebookEvent,
     },
     ratatui::{
-        crossterm::event::{Event, KeyCode},
+        crossterm::event::{Event as Input, KeyCode},
         text::Line,
         widgets::ListState,
     },
+    tui_textarea::TextArea,
 };
 
 pub const REMOVE_NOTE: &str = "Remove note";
@@ -59,8 +59,7 @@ pub struct NotebookContext {
     pub directory_actions_state: ListState,
 
     // editor
-    pub editor_state: EditorState,
-    pub editor_handler: EditorEventHandler,
+    pub editor: TextArea<'static>,
     pub opened_note: Option<Note>,
 }
 
@@ -74,12 +73,7 @@ impl Default for NotebookContext {
             note_actions_state: ListState::default(),
             directory_actions_state: ListState::default(),
 
-            editor_state: EditorState::new(Lines::from(
-                "
-    Welcome to Glues!
-            ",
-            )),
-            editor_handler: EditorEventHandler::default(),
+            editor: TextArea::new(vec!["Welcome to Glues :D".to_owned()]),
             opened_note: None,
         }
     }
@@ -107,14 +101,19 @@ impl NotebookContext {
     pub fn open_note(&mut self, note: Note, content: String) {
         self.state = ContextState::EditorViewMode;
         self.opened_note = Some(note);
-        self.editor_state = EditorState::new(Lines::from(content.as_str()));
+        self.editor = TextArea::from(content.lines());
     }
 
-    pub fn consume(&mut self, code: KeyCode) -> Action {
+    pub fn consume(&mut self, input: &Input) -> Action {
+        let code = match input {
+            Input::Key(key) => key.code,
+            _ => return Action::None,
+        };
+
         match self.state {
             ContextState::NoteTreeBrowsing => self.consume_on_note_tree(code),
             ContextState::EditorViewMode | ContextState::EditorEditMode => {
-                self.consume_on_editor(code)
+                self.consume_on_editor(input)
             }
             ContextState::NoteActionsDialog => self.consume_on_note_actions(code),
             ContextState::DirectoryActionsDialog => self.consume_on_directory_actions(code),
@@ -203,50 +202,39 @@ impl NotebookContext {
         }
     }
 
-    fn consume_on_editor(&mut self, code: KeyCode) -> Action {
-        let mode = self.editor_state.mode;
+    fn consume_on_editor(&mut self, input: &Input) -> Action {
+        let code = match input {
+            Input::Key(key) => key.code,
+            _ => return Action::None,
+        };
+
+        if self.state == ContextState::EditorEditMode {
+            if code == KeyCode::Esc {
+                self.state = ContextState::EditorViewMode;
+                return Action::Dispatch(NotebookEvent::ViewNote.into());
+            } else {
+                self.editor.input(input.clone());
+                return Action::None;
+            }
+        }
 
         match code {
-            KeyCode::Char('/') | KeyCode::Char('v') if mode == EditorMode::Normal => Action::None,
-            KeyCode::Char('b') if mode == EditorMode::Normal => {
+            KeyCode::Char('b') => {
                 self.state = ContextState::NoteTreeBrowsing;
                 self.opened_note = None;
 
                 Action::Dispatch(NotebookEvent::BrowseNoteTree.into())
             }
-            KeyCode::Esc if mode == EditorMode::Insert => {
-                self.state = ContextState::EditorViewMode;
-                self.editor_handler
-                    .on_event(Event::Key(code.into()), &mut self.editor_state);
-
-                Action::Dispatch(NotebookEvent::ViewNote.into())
+            KeyCode::Char('i') => {
+                self.state = ContextState::EditorEditMode;
+                Action::Dispatch(NotebookEvent::EditNote.into())
             }
             KeyCode::Esc => TuiAction::Confirm {
                 message: "Do you want to quit?".to_owned(),
                 action: Box::new(TuiAction::Quit.into()),
             }
             .into(),
-            _ => {
-                self.editor_handler
-                    .on_event(Event::Key(code.into()), &mut self.editor_state);
-
-                let new_mode = self.editor_state.mode;
-                if mode != new_mode {
-                    match new_mode {
-                        EditorMode::Normal => {
-                            self.state = ContextState::EditorViewMode;
-                            Action::Dispatch(NotebookEvent::ViewNote.into())
-                        }
-                        EditorMode::Insert => {
-                            self.state = ContextState::EditorEditMode;
-                            Action::Dispatch(NotebookEvent::EditNote.into())
-                        }
-                        _ => Action::None,
-                    }
-                } else {
-                    Action::None
-                }
-            }
+            _ => Action::None,
         }
     }
 
