@@ -115,30 +115,30 @@ impl NotebookState {
         match &self.inner_state {
             NoteSelected => {
                 vec![
-                    "[Esc] Quit",
                     "[o] Open note",
-                    "[h] Close parent directory",
-                    "[j] Select next",
-                    "[k] Select previous",
+                    "[h] Close parent",
+                    "[j] Down",
+                    "[k] Up",
                     "[m] More actions",
+                    "[Esc] Quit",
                 ]
             }
             DirectorySelected => {
                 vec![
-                    "[Esc] Quit",
                     "[l] Toggle",
-                    "[h] Close parent directory",
-                    "[j] Select next",
-                    "[k] Select previous",
+                    "[h] Close parent",
+                    "[j] Down",
+                    "[k] Up",
                     "[m] More actions",
+                    "[Esc] Quit",
                 ]
             }
             EditingViewMode => {
                 vec![
-                    "[Esc] Quit",
-                    "[b] Browse note tree",
                     "[i] Edit mode",
+                    "[b] Browse note tree",
                     "[h] Show editor keymap",
+                    "[Esc] Quit",
                 ]
             }
             EditingEditMode => {
