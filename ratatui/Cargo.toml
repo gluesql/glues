@@ -1,5 +1,5 @@
 [package]
-name = "glues2"
+name = "glues"
 authors.workspace = true
 version.workspace = true
 edition.workspace = true
@@ -8,7 +8,7 @@ repository.workspace = true
 description = "Lightweight TUI note-taking app with Git, CSV, and JSON support - privacy-focused and sync-enabled"
 readme = "../README.md"
 keywords = ["tui", "note-taking", "notes-app", "ratatui", "data-privacy"]
-default-run = "glues2"
+default-run = "glues"
 
 [dependencies]
 glues-core.workspace = true
