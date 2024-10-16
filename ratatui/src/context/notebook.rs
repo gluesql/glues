@@ -10,7 +10,7 @@ use {
         NotebookEvent,
     },
     ratatui::{
-        crossterm::event::{Event as Input, KeyCode},
+        crossterm::event::{Event as Input, KeyCode, KeyEvent, KeyModifiers},
         text::Line,
         widgets::ListState,
     },
@@ -212,6 +212,15 @@ impl NotebookContext {
             if code == KeyCode::Esc {
                 self.state = ContextState::EditorViewMode;
                 return Action::Dispatch(NotebookEvent::ViewNote.into());
+            } else if matches!(
+                input,
+                Input::Key(KeyEvent {
+                    code: KeyCode::Char('h'),
+                    modifiers: KeyModifiers::CONTROL,
+                    ..
+                })
+            ) {
+                return TuiAction::ShowEditorKeymap.into();
             } else {
                 self.editor.input(input.clone());
                 return Action::None;

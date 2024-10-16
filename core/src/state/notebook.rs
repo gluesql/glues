@@ -142,7 +142,7 @@ impl NotebookState {
                 ]
             }
             EditingEditMode => {
-                vec!["[Esc] Save note & View mode"]
+                vec!["[Esc] Save note & View mode", "[Ctrl+h] Show editor keymap"]
             }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
                 vec!["[j] Next", "[k] Previous", "[Enter] Select", "[Esc] Close"]
