@@ -81,6 +81,12 @@ pub async fn rename(
     mut directory: Directory,
     new_name: String,
 ) -> Result<NotebookTransition> {
+    if directory.id == db.root_id {
+        return Ok(NotebookTransition::Error(
+            "Cannot rename root directory".to_owned(),
+        ));
+    }
+
     db.rename_directory(directory.id.clone(), new_name.clone())
         .await?;
 
@@ -98,6 +104,12 @@ pub async fn remove(
     state: &mut NotebookState,
     directory: Directory,
 ) -> Result<NotebookTransition> {
+    if directory.id == db.root_id {
+        return Ok(NotebookTransition::Error(
+            "Cannot remove root directory".to_owned(),
+        ));
+    }
+
     db.remove_directory(directory.id.clone()).await?;
 
     let selected_directory = state

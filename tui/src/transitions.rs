@@ -105,6 +105,10 @@ impl App {
                 self.context.notebook.update_items(root);
                 self.context.notebook.select_item(&id);
             }
+            NotebookTransition::Error(message) => {
+                log!("[Err] {message}");
+                self.context.alert = Some(message);
+            }
             _ => {}
         }
     }

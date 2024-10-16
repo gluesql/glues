@@ -73,6 +73,8 @@ pub enum NotebookTransition {
     #[strum(to_string = "Inedible::{0}")]
     Inedible(Event),
     None,
+
+    Error(String),
 }
 
 impl From<EntryTransition> for Transition {
