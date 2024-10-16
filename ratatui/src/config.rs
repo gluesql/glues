@@ -13,7 +13,7 @@ pub const LAST_CSV_PATH: &str = "last_csv_path";
 pub const LAST_JSON_PATH: &str = "last_json_path";
 pub const LAST_FILE_PATH: &str = "last_file_path";
 pub const LAST_GIT_PATH: &str = "last_git_path";
-pub const LAST_GIT_ORIGIN: &str = "last_git_origin";
+pub const LAST_GIT_REMOTE: &str = "last_git_remote";
 pub const LAST_GIT_BRANCH: &str = "last_git_branch";
 
 const PATH: &str = ".glues/";
@@ -44,8 +44,8 @@ pub fn init() {
             (LAST_JSON_PATH, ""),
             (LAST_FILE_PATH, ""),
             (LAST_GIT_PATH, ""),
-            (LAST_GIT_ORIGIN, ""),
-            (LAST_GIT_BRANCH, ""),
+            (LAST_GIT_REMOTE, "origin"),
+            (LAST_GIT_BRANCH, "main"),
         ] {
             let _ = table("config")
                 .insert()

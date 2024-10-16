@@ -1,6 +1,9 @@
 use {
     super::{
-        config::{self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_JSON_PATH},
+        config::{
+            self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
+            LAST_JSON_PATH,
+        },
         context::ContextPrompt,
         logger::*,
         App,
@@ -8,6 +11,7 @@ use {
     glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent},
     ratatui::{
         crossterm::event::{Event as Input, KeyCode},
+        style::Stylize,
         text::Line,
     },
 };
@@ -37,6 +41,7 @@ pub enum TuiAction {
     OpenCsv,
     OpenJson,
     OpenFile,
+    OpenGit(OpenGitStep),
 
     RenameNote,
     RemoveNote,
@@ -44,6 +49,13 @@ pub enum TuiAction {
     AddDirectory,
     RenameDirectory,
     RemoveDirectory,
+}
+
+#[derive(Clone)]
+pub enum OpenGitStep {
+    Path,
+    Remote { path: String },
+    Branch { path: String, remote: String },
 }
 
 impl From<TuiAction> for Action {
@@ -74,6 +86,57 @@ impl App {
                 default,
             }) => {
                 self.context.prompt = Some(ContextPrompt::new(message, *action, default));
+            }
+            Action::Tui(TuiAction::OpenGit(OpenGitStep::Path)) => {
+                let path = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
+                let message = vec![
+                    Line::from(format!("path: {path}").dark_gray()),
+                    Line::raw(""),
+                    Line::raw("Enter the git remote:"),
+                ];
+
+                config::update(LAST_GIT_PATH, &path);
+                let default = config::get(LAST_GIT_REMOTE);
+                let action = TuiAction::OpenGit(OpenGitStep::Remote { path }).into();
+                self.context.prompt = Some(ContextPrompt::new(message, action, default));
+            }
+            Action::Tui(TuiAction::OpenGit(OpenGitStep::Remote { path })) => {
+                let remote = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
+                let message = vec![
+                    Line::from(format!("path: {path}").dark_gray()),
+                    Line::from(format!("remote: {remote}").dark_gray()),
+                    Line::raw(""),
+                    Line::raw("Enter the git branch:"),
+                ];
+
+                config::update(LAST_GIT_REMOTE, &remote);
+                let default = config::get(LAST_GIT_BRANCH);
+                let action = TuiAction::OpenGit(OpenGitStep::Branch { path, remote }).into();
+                self.context.prompt = Some(ContextPrompt::new(message, action, default));
+            }
+            Action::Tui(TuiAction::OpenGit(OpenGitStep::Branch { path, remote })) => {
+                let branch = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("branch must not be none");
+                let transition = self
+                    .glues
+                    .dispatch(
+                        EntryEvent::OpenGit {
+                            path,
+                            remote,
+                            branch,
+                        }
+                        .into(),
+                    )
+                    .log_unwrap();
+                self.handle_transition(transition);
             }
             Action::Tui(TuiAction::OpenCsv) => {
                 let path = self

@@ -1,7 +1,7 @@
 use {
     crate::{
-        action::{Action, TuiAction},
-        config::{self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_JSON_PATH},
+        action::{Action, OpenGitStep, TuiAction},
+        config::{self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_PATH, LAST_JSON_PATH},
         logger::*,
     },
     glues_core::EntryEvent,
@@ -44,6 +44,19 @@ impl EntryContext {
             .into()
         };
 
+        let open_git = || {
+            TuiAction::Prompt {
+                message: vec![
+                    Line::raw("Enter the git repository path:"),
+                    Line::from("The path must contain an existing .git repository;".dark_gray()),
+                    Line::from("otherwise, an error will occur.".dark_gray()),
+                ],
+                action: Box::new(TuiAction::OpenGit(OpenGitStep::Path).into()),
+                default: config::get(LAST_GIT_PATH),
+            }
+            .into()
+        };
+
         match code {
             KeyCode::Char('q') => TuiAction::Quit.into(),
             KeyCode::Char('j') | KeyCode::Down => {
@@ -58,9 +71,8 @@ impl EntryContext {
             KeyCode::Char('2') => open(LAST_CSV_PATH, TuiAction::OpenCsv),
             KeyCode::Char('3') => open(LAST_JSON_PATH, TuiAction::OpenJson),
             KeyCode::Char('4') => open(LAST_FILE_PATH, TuiAction::OpenFile),
-            KeyCode::Char('5') | KeyCode::Char('h') => {
-                TuiAction::Alert("Not implemented yet.".to_string()).into()
-            }
+            KeyCode::Char('5') => open_git(),
+            KeyCode::Char('h') => TuiAction::Alert("Not implemented yet.".to_string()).into(),
 
             KeyCode::Enter => {
                 let i = self
@@ -72,7 +84,8 @@ impl EntryContext {
                     CSV => open(LAST_CSV_PATH, TuiAction::OpenCsv),
                     JSON => open(LAST_JSON_PATH, TuiAction::OpenJson),
                     FILE => open(LAST_FILE_PATH, TuiAction::OpenFile),
-                    GIT | HELP => TuiAction::Alert("Not implemented yet.".to_string()).into(),
+                    GIT => open_git(),
+                    HELP => TuiAction::Alert("Not implemented yet.".to_string()).into(),
                     QUIT => TuiAction::Quit.into(),
                     _ => Action::None,
                 }
