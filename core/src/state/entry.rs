@@ -17,17 +17,6 @@ impl EntryState {
                 let note_id = db.add_note(root_id, "Sample Note".to_owned()).await?.id;
                 db.update_note_content(note_id, "Hi :D".to_owned()).await?;
 
-                // test
-                let dir_id = db
-                    .add_directory(db.root_id.clone(), "Sample Directory".to_owned())
-                    .await?
-                    .id;
-                db.add_note(dir_id.clone(), "Sub Note".to_owned()).await?;
-                let dir_id = db.add_directory(dir_id, "sub sub dir".to_owned()).await?.id;
-                db.add_note(dir_id, "Sub Sub Note".to_owned()).await?;
-                db.add_directory(db.root_id.clone(), "Second empty dir".to_owned())
-                    .await?;
-
                 glues.db = Some(db);
                 glues.state = NotebookState::new(glues).await?.into();
                 Ok(EntryTransition::OpenNotebook)
