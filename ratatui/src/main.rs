@@ -55,6 +55,12 @@ impl App {
 
     fn run(mut self, mut terminal: DefaultTerminal) -> Result<()> {
         loop {
+            if let Some((_, created_at)) = self.context.last_log {
+                if created_at.elapsed().log_unwrap().as_secs() > 5 {
+                    self.context.last_log = None;
+                }
+            }
+
             terminal.draw(|frame| self.draw(frame))?;
 
             if !crossterm::event::poll(Duration::from_millis(1500))? {

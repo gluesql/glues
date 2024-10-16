@@ -9,6 +9,7 @@ use {
         text::Line,
         widgets::{Block, Borders},
     },
+    std::time::SystemTime,
     tui_textarea::TextArea,
 };
 pub use {entry::EntryContext, notebook::NotebookContext};
@@ -51,6 +52,7 @@ pub struct Context {
     pub alert: Option<String>,
     pub prompt: Option<ContextPrompt>,
     pub help: bool,
+    pub last_log: Option<(String, SystemTime)>,
 }
 
 impl Default for Context {
@@ -64,6 +66,7 @@ impl Default for Context {
             alert: None,
             prompt: None,
             help: false,
+            last_log: None,
         }
     }
 }

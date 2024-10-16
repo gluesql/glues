@@ -10,6 +10,7 @@ use {
         transition::{EntryTransition, NotebookTransition, Transition},
         NotebookEvent,
     },
+    std::time::SystemTime,
 };
 
 impl App {
@@ -23,6 +24,7 @@ impl App {
             }
             Transition::Log(message) => {
                 log!("{message}");
+                self.context.last_log = Some((message, SystemTime::now()));
             }
             Transition::Error(message) => {
                 log!("[Err] {message}");
