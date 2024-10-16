@@ -70,6 +70,8 @@ impl App {
                 for transition in transitions {
                     self.handle_transition(transition);
                 }
+
+                continue;
             }
 
             let input = crossterm::event::read()?;
