@@ -93,7 +93,6 @@ allow = [
     "Apache-2.0",
     "Unicode-DFS-2016",
     "MPL-2.0",
-    "BSL-1.0", # Boost Software License 1.0
 ]
 # The confidence threshold for detecting a license from license text.
 # The higher the value, the more closely the license text must be to the
