@@ -72,7 +72,7 @@ impl EntryContext {
             KeyCode::Char('3') => open(LAST_JSON_PATH, TuiAction::OpenJson),
             KeyCode::Char('4') => open(LAST_FILE_PATH, TuiAction::OpenFile),
             KeyCode::Char('5') => open_git(),
-            KeyCode::Char('h') => TuiAction::Alert("Not implemented yet.".to_string()).into(),
+            KeyCode::Char('h') => TuiAction::Help.into(),
 
             KeyCode::Enter => {
                 let i = self
@@ -85,7 +85,7 @@ impl EntryContext {
                     JSON => open(LAST_JSON_PATH, TuiAction::OpenJson),
                     FILE => open(LAST_FILE_PATH, TuiAction::OpenFile),
                     GIT => open_git(),
-                    HELP => TuiAction::Alert("Not implemented yet.".to_string()).into(),
+                    HELP => TuiAction::Help.into(),
                     QUIT => TuiAction::Quit.into(),
                     _ => Action::None,
                 }

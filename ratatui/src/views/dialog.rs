@@ -1,6 +1,7 @@
 mod alert;
 mod confirm;
 mod directory_actions;
+mod help;
 mod note_actions;
 mod prompt;
 
@@ -13,7 +14,10 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, context: &mut Context) {
-    if context.alert.is_some() {
+    if context.help {
+        help::draw(frame);
+        return;
+    } else if context.alert.is_some() {
         alert::draw(frame, context);
         return;
     } else if context.confirm.is_some() {

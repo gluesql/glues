@@ -74,7 +74,11 @@ impl Default for NotebookContext {
             note_actions_state: ListState::default(),
             directory_actions_state: ListState::default(),
 
-            editor_state: EditorState::new(Lines::from("\n   >\")++++<")),
+            editor_state: EditorState::new(Lines::from(
+                "
+    Welcome to Glues!
+            ",
+            )),
             editor_handler: EditorEventHandler::default(),
             opened_note: None,
         }

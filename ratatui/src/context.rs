@@ -50,6 +50,7 @@ pub struct Context {
     pub confirm: Option<(String, Action)>,
     pub alert: Option<String>,
     pub prompt: Option<ContextPrompt>,
+    pub help: bool,
 }
 
 impl Default for Context {
@@ -62,6 +63,7 @@ impl Default for Context {
             confirm: None,
             alert: None,
             prompt: None,
+            help: false,
         }
     }
 }
@@ -77,7 +79,11 @@ impl Context {
     }
 
     pub fn consume(&mut self, input: &Input) -> Action {
-        if self.alert.is_some() {
+        if self.help {
+            // any key pressed will close the help dialog
+            self.help = false;
+            return Action::None;
+        } else if self.alert.is_some() {
             // any key pressed will close the alert
             self.alert = None;
             return Action::None;

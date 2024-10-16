@@ -36,6 +36,7 @@ pub enum TuiAction {
         action: Box<Action>,
         default: Option<String>,
     },
+    Help,
     Quit,
 
     OpenCsv,
@@ -74,6 +75,9 @@ impl App {
     pub(super) fn handle_action(&mut self, action: Action, input: Input) {
         match action {
             Action::Tui(TuiAction::Quit) => {}
+            Action::Tui(TuiAction::Help) => {
+                self.context.help = true;
+            }
             Action::Tui(TuiAction::Alert(message)) => {
                 self.context.alert = Some(message);
             }
