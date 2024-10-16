@@ -116,31 +116,31 @@ impl NotebookState {
             NoteSelected => {
                 vec![
                     "[Esc] Quit",
-                    "[O] Open note",
-                    "[H] Close parent directory",
-                    "[J] Select next",
-                    "[K] Select previous",
-                    "[M] More actions",
+                    "[o] Open note",
+                    "[h] Close parent directory",
+                    "[j] Select next",
+                    "[k] Select previous",
+                    "[m] More actions",
                 ]
             }
             DirectorySelected => {
                 vec![
                     "[Esc] Quit",
-                    "[L] Toggle",
-                    "[H] Close parent directory",
-                    "[J] Select next",
-                    "[K] Select previous",
-                    "[M] More actions",
+                    "[l] Toggle",
+                    "[h] Close parent directory",
+                    "[j] Select next",
+                    "[k] Select previous",
+                    "[m] More actions",
                 ]
             }
             EditingViewMode => {
-                vec!["[Esc] Quit", "[B] Browse note tree", "[-] todo: EdTUI"]
+                vec!["[Esc] Quit", "[b] Browse note tree", "[-] todo: EdTUI"]
             }
             EditingEditMode => {
                 vec!["[Esc] Save note & Normal mode", "[-] todo: EdTUI"]
             }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
-                vec!["[J] Next", "[K] Previous", "[Enter] Select", "[Esc] Close"]
+                vec!["[j] Next", "[k] Previous", "[Enter] Select", "[Esc] Close"]
             }
         }
     }
