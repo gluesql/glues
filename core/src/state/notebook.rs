@@ -115,7 +115,7 @@ impl NotebookState {
         match &self.inner_state {
             NoteSelected => {
                 vec![
-                    "[Esc] Menu",
+                    "[Esc] Quit",
                     "[O] Open note",
                     "[H] Close parent directory",
                     "[J] Select next",
@@ -125,7 +125,7 @@ impl NotebookState {
             }
             DirectorySelected => {
                 vec![
-                    "[Esc] Menu",
+                    "[Esc] Quit",
                     "[L] Toggle",
                     "[H] Close parent directory",
                     "[J] Select next",
@@ -134,7 +134,7 @@ impl NotebookState {
                 ]
             }
             EditingViewMode => {
-                vec!["[Esc] Menu", "[B] Browse note tree", "[-] todo: EdTUI"]
+                vec!["[Esc] Quit", "[B] Browse note tree", "[-] todo: EdTUI"]
             }
             EditingEditMode => {
                 vec!["[Esc] Save note & Normal mode", "[-] todo: EdTUI"]

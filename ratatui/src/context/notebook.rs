@@ -187,11 +187,14 @@ impl NotebookContext {
                     Action::PassThrough
                 }
             },
-            KeyCode::Char('o')
-            | KeyCode::Char('b')
-            | KeyCode::Char('e')
-            | KeyCode::Char('h')
-            | KeyCode::Esc => Action::PassThrough,
+            KeyCode::Char('o') | KeyCode::Char('b') | KeyCode::Char('e') | KeyCode::Char('h') => {
+                Action::PassThrough
+            }
+            KeyCode::Esc => TuiAction::Confirm {
+                message: "Do you want to quit?".to_owned(),
+                action: Box::new(TuiAction::Quit.into()),
+            }
+            .into(),
             _ => Action::None,
         }
     }
@@ -214,6 +217,11 @@ impl NotebookContext {
 
                 Action::Dispatch(NotebookEvent::ViewNote.into())
             }
+            KeyCode::Esc => TuiAction::Confirm {
+                message: "Do you want to quit?".to_owned(),
+                action: Box::new(TuiAction::Quit.into()),
+            }
+            .into(),
             _ => {
                 self.editor_handler
                     .on_event(Event::Key(code.into()), &mut self.editor_state);
