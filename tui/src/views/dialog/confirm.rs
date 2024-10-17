@@ -33,8 +33,8 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .alignment(Alignment::Left);
 
     let lines = vec![
-        "[Y] Confirm".dark_gray().into(),
-        "[N] Cancel".dark_gray().into(),
+        "[y] Confirm".dark_gray().into(),
+        "[n] Cancel".dark_gray().into(),
     ];
     let control = Paragraph::new(lines)
         .wrap(Wrap { trim: true })
