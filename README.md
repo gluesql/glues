@@ -43,6 +43,19 @@ Glues offers five storage options to suit your needs:
 
   To see how notes and directories are stored using Git, you can refer to the [Glues sample repository](https://github.com/gluesql/glues-sample-note).
 
+## Roadmap
+
+Here is our plan for Glues and the features we aim to implement. Below is a list of upcoming improvements to make Glues more useful and versatile. If you have suggestions for new features, please feel free to open a GitHub issue.
+
+* **Enhanced Note Content Support:** Add support for richer note content, including tables and images, in addition to plain text. This will help users create more detailed and organized notes.
+* **Search and Tagging Improvements:** Improve search with tag support and advanced filtering to make it easier to find specific notes.
+* **Customizable Themes:** Allow users to personalize the TUI interface with customizable themes.
+* **Additional Package Manager Support:** Expand distribution beyond Cargo, making Glues available through more package managers like Homebrew, Snap, and APT for easier installation.
+* **Note and Directory Movement:** Add features to move notes and directories for better organization.
+* **Storage Migration:** Add a feature to migrate data between different storage options, such as from CSV to Git.
+* **Vim Keybindings:** Integrate Vim keybindings for users who prefer Vim-like shortcuts.
+* **Additional Storage Backends:** Support more storage options like MongoDB and object storage for greater flexibility.
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](https://github.com/gluesql/glues/blob/main/LICENSE) file for details.
