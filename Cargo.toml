@@ -23,3 +23,6 @@ features = [
     "gluesql-file-storage",
     "gluesql-git-storage",
 ]
+
+[profile.release]
+lto = true
