@@ -137,6 +137,7 @@ impl NotebookState {
                 vec![
                     "[i] Edit mode",
                     "[b] Browse note tree",
+                    "[n] Toggle line number",
                     "[h] Show editor keymap",
                     "[Esc] Quit",
                 ]

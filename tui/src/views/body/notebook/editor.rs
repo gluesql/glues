@@ -34,7 +34,11 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         ),
         None => block,
     }
-    .padding(Padding::horizontal(1));
+    .padding(if context.notebook.show_line_number {
+        Padding::ZERO
+    } else {
+        Padding::left(1)
+    });
 
     context.notebook.editor.set_block(block);
 
@@ -46,11 +50,14 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         _ => (Style::default(), Style::default()),
     };
 
-    context.notebook.editor.set_cursor_style(cursor_style);
-    context
-        .notebook
-        .editor
-        .set_cursor_line_style(cursor_line_style);
+    let editor = &mut context.notebook.editor;
+    editor.set_cursor_style(cursor_style);
+    editor.set_cursor_line_style(cursor_line_style);
+    if context.notebook.show_line_number {
+        editor.set_line_number_style(Style::default().dark_gray().dim());
+    } else {
+        editor.remove_line_number();
+    }
 
     frame.render_widget(&context.notebook.editor, area);
 }
