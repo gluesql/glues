@@ -61,6 +61,7 @@ pub struct NotebookContext {
     // editor
     pub editor: TextArea<'static>,
     pub opened_note: Option<Note>,
+    pub show_line_number: bool,
 }
 
 impl Default for NotebookContext {
@@ -75,6 +76,7 @@ impl Default for NotebookContext {
 
             editor: TextArea::new(vec!["Welcome to Glues :D".to_owned()]),
             opened_note: None,
+            show_line_number: true,
         }
     }
 }
@@ -237,6 +239,11 @@ impl NotebookContext {
             KeyCode::Char('i') => {
                 self.state = ContextState::EditorEditMode;
                 Action::Dispatch(NotebookEvent::EditNote.into())
+            }
+            KeyCode::Char('n') => {
+                self.show_line_number = !self.show_line_number;
+
+                Action::None
             }
             KeyCode::Char('h') => TuiAction::ShowEditorKeymap.into(),
             KeyCode::Esc => TuiAction::Confirm {
