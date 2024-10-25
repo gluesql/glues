@@ -9,6 +9,7 @@ use {
         gluesql_git_storage::{GitStorage, StorageType},
         prelude::{CsvStorage, FileStorage, Glue, JsonStorage, MemoryStorage, Payload},
     },
+    gluesql_mongo_storage::MongoStorage,
     std::sync::mpsc::Sender,
 };
 
@@ -24,6 +25,7 @@ pub enum Storage {
     Json(Glue<JsonStorage>),
     File(Glue<FileStorage>),
     Git(Glue<GitStorage>),
+    Mongo(Glue<MongoStorage>),
 }
 
 impl Db {
@@ -96,6 +98,21 @@ impl Db {
         })
     }
 
+    pub async fn mongo(task_tx: Sender<Task>, conn_str: &str, db_name: &str) -> Result<Self> {
+        let mut storage = MongoStorage::new(conn_str, db_name)
+            .await
+            .map(Glue::new)
+            .map(Storage::Mongo)?;
+
+        let root_id = setup(&mut storage).await?;
+
+        Ok(Self {
+            storage,
+            root_id,
+            task_tx,
+        })
+    }
+
     pub async fn pull(&mut self) -> Result<()> {
         if let Storage::Git(glue) = &mut self.storage {
             glue.storage.pull()?;
@@ -145,6 +162,7 @@ where
             Storage::Json(glue) => glue.execute_stmt(&statement).await,
             Storage::File(glue) => glue.execute_stmt(&statement).await,
             Storage::Git(glue) => glue.execute_stmt(&statement).await,
+            Storage::Mongo(glue) => glue.execute_stmt(&statement).await,
         }
         .map_err(Into::into)
     }

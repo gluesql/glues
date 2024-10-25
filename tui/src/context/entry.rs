@@ -1,7 +1,9 @@
 use {
     crate::{
-        action::{Action, OpenGitStep, TuiAction},
-        config::{self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_PATH, LAST_JSON_PATH},
+        action::{Action, OpenGitStep, OpenMongoStep, TuiAction},
+        config::{
+            self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_PATH, LAST_JSON_PATH, LAST_MONGO_CONN_STR,
+        },
         logger::*,
     },
     glues_core::EntryEvent,
@@ -13,10 +15,11 @@ pub const CSV: &str = "[2] CSV";
 pub const JSON: &str = "[3] JSON";
 pub const FILE: &str = "[4] File";
 pub const GIT: &str = "[5] Git";
+pub const MONGO: &str = "[6] MongoDB";
 pub const HELP: &str = "[h] Help";
 pub const QUIT: &str = "[q] Quit";
 
-pub const MENU_ITEMS: [&str; 7] = [INSTANT, CSV, JSON, FILE, GIT, HELP, QUIT];
+pub const MENU_ITEMS: [&str; 8] = [INSTANT, CSV, JSON, FILE, GIT, MONGO, HELP, QUIT];
 
 pub struct EntryContext {
     pub list_state: ListState,
@@ -57,6 +60,18 @@ impl EntryContext {
             .into()
         };
 
+        let open_mongo = || async move {
+            TuiAction::Prompt {
+                message: vec![
+                    Line::raw("Enter the MongoDB connection string:"),
+                    Line::from("e.g. mongodb://localhost:27017".dark_gray()),
+                ],
+                action: Box::new(TuiAction::OpenMongo(OpenMongoStep::ConnStr).into()),
+                default: config::get(LAST_MONGO_CONN_STR).await,
+            }
+            .into()
+        };
+
         match code {
             KeyCode::Char('q') => TuiAction::Quit.into(),
             KeyCode::Char('j') | KeyCode::Down => {
@@ -72,6 +87,7 @@ impl EntryContext {
             KeyCode::Char('3') => open(LAST_JSON_PATH, TuiAction::OpenJson).await,
             KeyCode::Char('4') => open(LAST_FILE_PATH, TuiAction::OpenFile).await,
             KeyCode::Char('5') => open_git().await,
+            KeyCode::Char('6') => open_mongo().await,
             KeyCode::Char('h') => TuiAction::Help.into(),
 
             KeyCode::Enter => {
@@ -85,6 +101,7 @@ impl EntryContext {
                     JSON => open(LAST_JSON_PATH, TuiAction::OpenJson).await,
                     FILE => open(LAST_FILE_PATH, TuiAction::OpenFile).await,
                     GIT => open_git().await,
+                    MONGO => open_mongo().await,
                     HELP => TuiAction::Help.into(),
                     QUIT => TuiAction::Quit.into(),
                     _ => Action::None,

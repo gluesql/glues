@@ -7,11 +7,11 @@
 
 ## Flexible, privacy-first TUI note-taking app with multiple storage options
 
-Glues is a lightweight, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can choose to store your notes locally in CSV or JSON formats, or utilize Git as a storage option for version control. This flexibility allows you to manage your notes in the way that best suits your workflow, whether you prefer the simplicity of local files or the robustness of Git integration.
+Glues is a lightweight, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can choose to store your notes locally in CSV or JSON formats, use Git for version control, or opt for MongoDB for a centralized database solution. This flexibility allows you to manage your notes in the way that best suits your workflow, whether you prefer the simplicity of local files, the robustness of Git integration, or the scalability of MongoDB.
 
 Glues is designed with a core architecture that operates independently of the TUI, providing robust state management and action handling. Although the current frontend is TUI-based, the architecture allows for easy integration with other frontends such as GUI, iOS, Android, or even running headlessly without a UI. The TUI interface clearly displays the current state and available actions, making it intuitive and easy to use.
 
-With no reliance on third-party services, Glues ensures that your data remains private and fully under your control. Currently, it supports Git for storage, but we plan to integrate additional storage options through [GlueSQL](https://github.com/gluesql/gluesql), giving you even more flexibility in managing your data. The core concept behind Glues is to empower users to choose how their data is handled—whether through local files, Git, or future storage options—without any dependence on a central authority. This makes Glues a sync-enabled application that prioritizes user autonomy and privacy.
+With no reliance on third-party services, Glues ensures that your data remains private and fully under your control. Currently, it supports Git and MongoDB for storage, and we plan to integrate additional storage options through [GlueSQL](https://github.com/gluesql/gluesql), giving you even more flexibility in managing your data. The core concept behind Glues is to empower users to choose how their data is handled—whether through local files, Git, MongoDB, or future storage options—without any dependence on a central authority. This makes Glues a sync-enabled application that prioritizes user autonomy and privacy.
 
 [![Glues Demo](http://img.youtube.com/vi/bnDoAhHJ-zI/0.jpg)](https://youtu.be/bnDoAhHJ-zI "Watch the Glues Demo Video")
 
@@ -29,7 +29,7 @@ We're working on making Glues available through more package managers soon. For 
 
 ## Usage
 
-Glues offers five storage options to suit your needs:
+Glues offers six storage options to suit your needs:
 
 * **Instant**: Data is stored in memory and only persists while the app is running. This is useful for testing purposes.
 * **CSV**: Notes are saved in CSV format. When you provide a path, Glues will load existing data if available or create a new file if none exists.
@@ -42,6 +42,10 @@ Glues offers five storage options to suit your needs:
   - When you modify notes or directories, Glues will automatically sync changes with the specified remote repository.
 
   To see how notes and directories are stored using Git, you can refer to the [Glues sample repository](https://github.com/gluesql/glues-sample-note).
+* **MongoDB**:
+  - MongoDB storage allows you to store your notes in a MongoDB database, providing a scalable and centralized solution for managing your notes.
+  - You need to provide the MongoDB connection string and the database name. Glues will handle storing and retrieving notes from the specified database.
+  - This option is ideal for users who prefer a centralized storage solution or need robust, reliable data storage.
 
 ## Roadmap
 
@@ -54,7 +58,7 @@ Here is our plan for Glues and the features we aim to implement. Below is a list
 * **Note and Directory Movement:** Add features to move notes and directories for better organization.
 * **Storage Migration:** Add a feature to migrate data between different storage options, such as from CSV to Git.
 * **Vim Keybindings:** Integrate Vim keybindings for users who prefer Vim-like shortcuts.
-* **Additional Storage Backends:** Support more storage options like MongoDB and object storage for greater flexibility.
+* **Additional Storage Backends:** Support more storage options like Redis and object storage for greater flexibility.
 
 ## License
 

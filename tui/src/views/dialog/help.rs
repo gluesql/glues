@@ -7,10 +7,10 @@ use ratatui::{
 };
 
 pub fn draw(frame: &mut Frame) {
-    let [area] = Layout::horizontal([Length(100)])
+    let [area] = Layout::horizontal([Length(120)])
         .flex(Flex::Center)
         .areas(frame.area());
-    let [area] = Layout::vertical([Length(32)])
+    let [area] = Layout::vertical([Length(37)])
         .flex(Flex::Center)
         .areas(area);
 
@@ -20,12 +20,12 @@ pub fn draw(frame: &mut Frame) {
         .title_alignment(Alignment::Center);
 
     let inner_area = block.inner(area);
-    let [message_area, control_area] = Layout::vertical([Length(25), Length(1)])
+    let [message_area, control_area] = Layout::vertical([Length(30), Length(1)])
         .flex(Flex::SpaceBetween)
         .areas(inner_area);
 
     let message = vec![
-        Line::from("Glues offers five storage options to suit your needs:"),
+        Line::from("Glues offers six storage options to suit your needs:"),
         Line::raw(""),
         Line::from("Instant".white().on_dark_gray()),
         Line::raw("Data is stored in memory and only persists while the app is running. This is useful for testing purposes."),
@@ -44,6 +44,11 @@ pub fn draw(frame: &mut Frame) {
         Line::raw("The `path` should point to an existing local Git repository, similar to the file storage path. For example, you can clone a GitHub repository and use that path."),
         Line::raw("The `remote` and `branch` specify the target remote repository and branch for synchronization."),
         Line::raw("When you modify notes or directories, Glues will automatically sync changes with the specified remote repository."),
+        Line::raw(""),
+        Line::from("MongoDB".white().on_dark_gray()),
+        Line::raw("MongoDB storage allows you to store your notes in a MongoDB database, providing a scalable and centralized solution for managing your notes."),
+        Line::raw("You need to provide the MongoDB connection string and the database name. Glues will handle storing and retrieving notes from the specified database."),
+        Line::raw("This option is ideal for users who prefer a centralized storage solution or need robust, reliable data storage."),
     ];
     let paragraph = Paragraph::new(message)
         .wrap(Wrap { trim: true })
