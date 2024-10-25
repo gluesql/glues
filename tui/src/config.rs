@@ -14,6 +14,8 @@ pub const LAST_FILE_PATH: &str = "last_file_path";
 pub const LAST_GIT_PATH: &str = "last_git_path";
 pub const LAST_GIT_REMOTE: &str = "last_git_remote";
 pub const LAST_GIT_BRANCH: &str = "last_git_branch";
+pub const LAST_MONGO_CONN_STR: &str = "last_mongo_conn_str";
+pub const LAST_MONGO_DB_NAME: &str = "last_mongo_db_name";
 
 const PATH: &str = ".glues/";
 
@@ -44,6 +46,8 @@ pub async fn init() {
         (LAST_GIT_PATH, ""),
         (LAST_GIT_REMOTE, "origin"),
         (LAST_GIT_BRANCH, "main"),
+        (LAST_MONGO_CONN_STR, ""),
+        (LAST_MONGO_DB_NAME, ""),
     ] {
         let _ = table("config")
             .insert()

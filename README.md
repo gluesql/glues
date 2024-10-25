@@ -42,6 +42,10 @@ Glues offers five storage options to suit your needs:
   - When you modify notes or directories, Glues will automatically sync changes with the specified remote repository.
 
   To see how notes and directories are stored using Git, you can refer to the [Glues sample repository](https://github.com/gluesql/glues-sample-note).
+* **MongoDB**:
+  - MongoDB storage allows you to store your notes in a MongoDB database, providing a scalable and centralized solution for managing your notes.
+  - You need to provide the MongoDB connection string and the database name. Glues will handle storing and retrieving notes from the specified database.
+  - This option is ideal for users who prefer a centralized storage solution or need robust, reliable data storage.
 
 ## Roadmap
 
@@ -54,7 +58,7 @@ Here is our plan for Glues and the features we aim to implement. Below is a list
 * **Note and Directory Movement:** Add features to move notes and directories for better organization.
 * **Storage Migration:** Add a feature to migrate data between different storage options, such as from CSV to Git.
 * **Vim Keybindings:** Integrate Vim keybindings for users who prefer Vim-like shortcuts.
-* **Additional Storage Backends:** Support more storage options like MongoDB and object storage for greater flexibility.
+* **Additional Storage Backends:** Support more storage options like Redis and object storage for greater flexibility.
 
 ## License
 

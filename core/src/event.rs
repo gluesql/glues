@@ -31,6 +31,10 @@ pub enum EntryEvent {
         remote: String,
         branch: String,
     },
+    OpenMongo {
+        conn_str: String,
+        db_name: String,
+    },
 }
 
 #[derive(Clone, Debug, Display)]

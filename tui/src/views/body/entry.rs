@@ -13,7 +13,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
     let [area] = Layout::horizontal([Length(38)])
         .flex(Flex::Center)
         .areas(area);
-    let [title_area, area] = Layout::vertical([Length(9), Length(11)])
+    let [title_area, area] = Layout::vertical([Length(9), Length(12)])
         .flex(Flex::Center)
         .areas(area);
 

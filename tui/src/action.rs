@@ -2,7 +2,7 @@ use {
     super::{
         config::{
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
-            LAST_JSON_PATH,
+            LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME,
         },
         context::ContextPrompt,
         logger::*,
@@ -44,6 +44,7 @@ pub enum TuiAction {
     OpenJson,
     OpenFile,
     OpenGit(OpenGitStep),
+    OpenMongo(OpenMongoStep),
 
     RenameNote,
     RemoveNote,
@@ -51,6 +52,12 @@ pub enum TuiAction {
     AddDirectory,
     RenameDirectory,
     RemoveDirectory,
+}
+
+#[derive(Clone)]
+pub enum OpenMongoStep {
+    ConnStr,
+    Database { conn_str: String },
 }
 
 #[derive(Clone)]
@@ -143,6 +150,38 @@ impl App {
                         }
                         .into(),
                     )
+                    .await
+                    .log_unwrap();
+                self.handle_transition(transition).await;
+            }
+            Action::Tui(TuiAction::OpenMongo(OpenMongoStep::ConnStr)) => {
+                let conn_str = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("conn str must not be none");
+                let message = vec![
+                    Line::from(format!("conn_str: {conn_str}").dark_gray()),
+                    Line::raw(""),
+                    Line::raw("Enter the database name:"),
+                ];
+
+                config::update(LAST_MONGO_CONN_STR, &conn_str).await;
+                let default = config::get(LAST_MONGO_DB_NAME).await;
+
+                let action = TuiAction::OpenMongo(OpenMongoStep::Database { conn_str }).into();
+                self.context.prompt = Some(ContextPrompt::new(message, action, default));
+            }
+            Action::Tui(TuiAction::OpenMongo(OpenMongoStep::Database { conn_str })) => {
+                let db_name = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("database name must not be none");
+
+                config::update(LAST_MONGO_DB_NAME, &db_name).await;
+
+                let transition = self
+                    .glues
+                    .dispatch(EntryEvent::OpenMongo { conn_str, db_name }.into())
                     .await
                     .log_unwrap();
                 self.handle_transition(transition).await;

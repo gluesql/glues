@@ -51,6 +51,14 @@ impl EntryState {
 
                 Ok(EntryTransition::OpenNotebook)
             }
+            Entry(OpenMongo { conn_str, db_name }) => {
+                glues.db = Db::mongo(glues.task_tx.clone(), &conn_str, &db_name)
+                    .await
+                    .map(Some)?;
+                glues.state = NotebookState::new(glues).await?.into();
+
+                Ok(EntryTransition::OpenNotebook)
+            }
             Key(_) => Ok(EntryTransition::Inedible(event)),
             Cancel => Ok(EntryTransition::None),
             _ => Err(Error::Wip("todo: EntryState::consume".to_owned())),
