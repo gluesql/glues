@@ -73,7 +73,7 @@ impl From<EntryEvent> for Action {
 }
 
 impl App {
-    pub(super) fn handle_action(&mut self, action: Action, input: Input) {
+    pub(super) async fn handle_action(&mut self, action: Action, input: Input) {
         match action {
             Action::Tui(TuiAction::Quit) => {}
             Action::Tui(TuiAction::Help) => {
@@ -106,8 +106,8 @@ impl App {
                     Line::raw("Enter the git remote:"),
                 ];
 
-                config::update(LAST_GIT_PATH, &path);
-                let default = config::get(LAST_GIT_REMOTE);
+                config::update(LAST_GIT_PATH, &path).await;
+                let default = config::get(LAST_GIT_REMOTE).await;
                 let action = TuiAction::OpenGit(OpenGitStep::Remote { path }).into();
                 self.context.prompt = Some(ContextPrompt::new(message, action, default));
             }
@@ -123,8 +123,8 @@ impl App {
                     Line::raw("Enter the git branch:"),
                 ];
 
-                config::update(LAST_GIT_REMOTE, &remote);
-                let default = config::get(LAST_GIT_BRANCH);
+                config::update(LAST_GIT_REMOTE, &remote).await;
+                let default = config::get(LAST_GIT_BRANCH).await;
                 let action = TuiAction::OpenGit(OpenGitStep::Branch { path, remote }).into();
                 self.context.prompt = Some(ContextPrompt::new(message, action, default));
             }
@@ -143,8 +143,9 @@ impl App {
                         }
                         .into(),
                     )
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Tui(TuiAction::OpenCsv) => {
                 let path = self
@@ -156,13 +157,14 @@ impl App {
                     return;
                 }
 
-                config::update(LAST_CSV_PATH, &path);
+                config::update(LAST_CSV_PATH, &path).await;
 
                 let transition = self
                     .glues
                     .dispatch(EntryEvent::OpenCsv(path).into())
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Tui(TuiAction::OpenJson) => {
                 let path = self
@@ -174,13 +176,14 @@ impl App {
                     return;
                 }
 
-                config::update(LAST_JSON_PATH, &path);
+                config::update(LAST_JSON_PATH, &path).await;
 
                 let transition = self
                     .glues
                     .dispatch(EntryEvent::OpenJson(path).into())
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Tui(TuiAction::OpenFile) => {
                 let path = self
@@ -192,13 +195,14 @@ impl App {
                     return;
                 }
 
-                config::update(LAST_FILE_PATH, &path);
+                config::update(LAST_FILE_PATH, &path).await;
 
                 let transition = self
                     .glues
                     .dispatch(EntryEvent::OpenFile(path).into())
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Tui(TuiAction::RenameNote) => {
                 let new_name = self
@@ -213,15 +217,17 @@ impl App {
                 let transition = self
                     .glues
                     .dispatch(NotebookEvent::RenameNote(new_name).into())
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Tui(TuiAction::RemoveNote) => {
                 let transition = self
                     .glues
                     .dispatch(NotebookEvent::RemoveNote.into())
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Tui(TuiAction::AddNote) => {
                 let note_name = self
@@ -236,8 +242,9 @@ impl App {
                 let transition = self
                     .glues
                     .dispatch(NotebookEvent::AddNote(note_name).into())
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Tui(TuiAction::AddDirectory) => {
                 let directory_name = self
@@ -252,8 +259,9 @@ impl App {
                 let transition = self
                     .glues
                     .dispatch(NotebookEvent::AddDirectory(directory_name).into())
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Tui(TuiAction::RenameDirectory) => {
                 let new_name = self
@@ -268,19 +276,21 @@ impl App {
                 let transition = self
                     .glues
                     .dispatch(NotebookEvent::RenameDirectory(new_name).into())
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Tui(TuiAction::RemoveDirectory) => {
                 let transition = self
                     .glues
                     .dispatch(NotebookEvent::RemoveDirectory.into())
+                    .await
                     .log_unwrap();
-                self.handle_transition(transition);
+                self.handle_transition(transition).await;
             }
             Action::Dispatch(event) => {
-                let transition = self.glues.dispatch(event).log_unwrap();
-                self.handle_transition(transition);
+                let transition = self.glues.dispatch(event).await.log_unwrap();
+                self.handle_transition(transition).await;
             }
             Action::PassThrough => {
                 let event = match to_event(input) {
@@ -290,8 +300,8 @@ impl App {
                     }
                 };
 
-                let transition = self.glues.dispatch(event).log_unwrap();
-                self.handle_transition(transition);
+                let transition = self.glues.dispatch(event).await.log_unwrap();
+                self.handle_transition(transition).await;
             }
             Action::None => {}
         };

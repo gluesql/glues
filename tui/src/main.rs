@@ -10,7 +10,6 @@ use {
     action::{Action, TuiAction},
     color_eyre::Result,
     context::Context,
-    futures::executor::block_on,
     glues_core::Glues,
     logger::*,
     ratatui::{
@@ -27,15 +26,16 @@ use {
     std::time::Duration,
 };
 
-fn main() -> Result<()> {
-    config::init();
-    logger::init();
+#[tokio::main]
+async fn main() -> Result<()> {
+    config::init().await;
+    logger::init().await;
     color_eyre::install()?;
 
     log!("Hello");
 
     let terminal = ratatui::init();
-    let app_result = App::new().run(terminal);
+    let app_result = App::new().await.run(terminal).await;
     ratatui::restore();
     app_result
 }
@@ -46,14 +46,14 @@ struct App {
 }
 
 impl App {
-    fn new() -> Self {
-        let glues = block_on(Glues::new());
+    async fn new() -> Self {
+        let glues = Glues::new().await;
         let context = Context::default();
 
         Self { glues, context }
     }
 
-    fn run(mut self, mut terminal: DefaultTerminal) -> Result<()> {
+    async fn run(mut self, mut terminal: DefaultTerminal) -> Result<()> {
         loop {
             if let Some((_, created_at)) = self.context.last_log {
                 if created_at.elapsed().log_unwrap().as_secs() > 5 {
@@ -74,7 +74,7 @@ impl App {
                 }
 
                 for transition in transitions {
-                    self.handle_transition(transition);
+                    self.handle_transition(transition).await;
                 }
 
                 continue;
@@ -100,10 +100,10 @@ impl App {
                     return Ok(());
                 }
                 _ => {
-                    match self.context.consume(&input) {
+                    match self.context.consume(&input).await {
                         Action::Tui(TuiAction::Quit) => return Ok(()),
                         action => {
-                            self.handle_action(action, input);
+                            self.handle_action(action, input).await;
                         }
                     };
                 }

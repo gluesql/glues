@@ -14,13 +14,13 @@ use {
 };
 
 impl App {
-    pub(super) fn handle_transition(&mut self, transition: Transition) {
+    pub(super) async fn handle_transition(&mut self, transition: Transition) {
         match transition {
             Transition::Entry(transition) => {
-                self.handle_entry_transition(transition);
+                self.handle_entry_transition(transition).await;
             }
             Transition::Notebook(transition) => {
-                self.handle_notebook_transition(transition);
+                self.handle_notebook_transition(transition).await;
             }
             Transition::Log(message) => {
                 log!("{message}");
@@ -33,7 +33,7 @@ impl App {
         }
     }
 
-    pub(super) fn handle_entry_transition(&mut self, transition: EntryTransition) {
+    pub(super) async fn handle_entry_transition(&mut self, transition: EntryTransition) {
         match transition {
             EntryTransition::OpenNotebook => {
                 log!("Opening notebook");
@@ -49,7 +49,7 @@ impl App {
         }
     }
 
-    pub(super) fn handle_notebook_transition(&mut self, transition: NotebookTransition) {
+    pub(super) async fn handle_notebook_transition(&mut self, transition: NotebookTransition) {
         match transition {
             NotebookTransition::OpenDirectory { id, .. } => {
                 log!("Opening directory {id}");
@@ -69,7 +69,7 @@ impl App {
                 let content = self.context.notebook.editor.lines().join("\n");
                 let event = NotebookEvent::UpdateNoteContent(content).into();
 
-                self.glues.dispatch(event).log_unwrap();
+                self.glues.dispatch(event).await.log_unwrap();
             }
             NotebookTransition::EditMode => {}
             NotebookTransition::RemoveNote {
@@ -98,6 +98,7 @@ impl App {
             | NotebookTransition::AddDirectory(Directory { id, parent_id, .. }) => {
                 self.glues
                     .dispatch(NotebookEvent::OpenDirectory(parent_id.clone()).into())
+                    .await
                     .log_unwrap();
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
 

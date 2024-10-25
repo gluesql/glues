@@ -2,7 +2,7 @@ pub mod entry;
 pub mod notebook;
 
 use {
-    crate::{logger::*, Action},
+    crate::{log, logger::*, Action},
     ratatui::{
         crossterm::event::{Event as Input, KeyCode, KeyEvent},
         style::{Style, Stylize},
@@ -85,7 +85,7 @@ impl Context {
             .map(ToOwned::to_owned)
     }
 
-    pub fn consume(&mut self, input: &Input) -> Action {
+    pub async fn consume(&mut self, input: &Input) -> Action {
         if self.editor_keymap {
             self.editor_keymap = false;
             return Action::None;
@@ -105,7 +105,7 @@ impl Context {
             match code {
                 KeyCode::Char('y') => {
                     let (_, action) = self.confirm.take().log_expect("confirm must be some");
-                    log("Context::consume - remove note!!!");
+                    log!("Context::consume - remove note!!!");
                     return action;
                 }
                 KeyCode::Char('n') => {
@@ -142,7 +142,7 @@ impl Context {
 
         match self.state {
             ContextState::Entry => match input {
-                Input::Key(key) => self.entry.consume(key.code),
+                Input::Key(key) => self.entry.consume(key.code).await,
                 _ => Action::None,
             },
             ContextState::Notebook => self.notebook.consume(input),
