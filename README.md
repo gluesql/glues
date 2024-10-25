@@ -7,11 +7,11 @@
 
 ## Flexible, privacy-first TUI note-taking app with multiple storage options
 
-Glues is a lightweight, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can choose to store your notes locally in CSV or JSON formats, or utilize Git as a storage option for version control. This flexibility allows you to manage your notes in the way that best suits your workflow, whether you prefer the simplicity of local files or the robustness of Git integration.
+Glues is a lightweight, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can choose to store your notes locally in CSV or JSON formats, use Git for version control, or opt for MongoDB for a centralized database solution. This flexibility allows you to manage your notes in the way that best suits your workflow, whether you prefer the simplicity of local files, the robustness of Git integration, or the scalability of MongoDB.
 
 Glues is designed with a core architecture that operates independently of the TUI, providing robust state management and action handling. Although the current frontend is TUI-based, the architecture allows for easy integration with other frontends such as GUI, iOS, Android, or even running headlessly without a UI. The TUI interface clearly displays the current state and available actions, making it intuitive and easy to use.
 
-With no reliance on third-party services, Glues ensures that your data remains private and fully under your control. Currently, it supports Git for storage, but we plan to integrate additional storage options through [GlueSQL](https://github.com/gluesql/gluesql), giving you even more flexibility in managing your data. The core concept behind Glues is to empower users to choose how their data is handled—whether through local files, Git, or future storage options—without any dependence on a central authority. This makes Glues a sync-enabled application that prioritizes user autonomy and privacy.
+With no reliance on third-party services, Glues ensures that your data remains private and fully under your control. Currently, it supports Git and MongoDB for storage, and we plan to integrate additional storage options through [GlueSQL](https://github.com/gluesql/gluesql), giving you even more flexibility in managing your data. The core concept behind Glues is to empower users to choose how their data is handled—whether through local files, Git, MongoDB, or future storage options—without any dependence on a central authority. This makes Glues a sync-enabled application that prioritizes user autonomy and privacy.
 
 [![Glues Demo](http://img.youtube.com/vi/bnDoAhHJ-zI/0.jpg)](https://youtu.be/bnDoAhHJ-zI "Watch the Glues Demo Video")
 
