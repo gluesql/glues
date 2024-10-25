@@ -1,12 +1,10 @@
 use {
     crate::context::{notebook::ContextState, Context},
     ratatui::{
-        layout::{Alignment, Rect},
+        layout::Rect,
         style::{Style, Stylize},
-        widgets::{
-            block::{Position, Title},
-            Block, Padding,
-        },
+        text::Line,
+        widgets::{Block, Padding},
         Frame,
     },
 };
@@ -27,11 +25,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
 
     let block = Block::bordered().title(title);
     let block = match context.last_log.as_ref() {
-        Some((log, _)) => block.title(
-            Title::from(log.clone().green())
-                .position(Position::Bottom)
-                .alignment(Alignment::Right),
-        ),
+        Some((log, _)) => block.title_bottom(Line::from(log.clone().green()).right_aligned()),
         None => block,
     }
     .padding(if context.notebook.show_line_number {
