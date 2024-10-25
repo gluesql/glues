@@ -27,7 +27,7 @@ pub fn draw(frame: &mut Frame) {
     let message = "
 | Mappings                                      | Description                                |
 |-----------------------------------------------|--------------------------------------------|
-| `Ctrl+H`, `Backspace`                         | Delete one character before cursor         |
+| `Backspace`                                   | Delete one character before cursor         |
 | `Ctrl+D`, `Delete`                            | Delete one character next to cursor        |
 | `Ctrl+M`, `Enter`                             | Insert newline                             |
 | `Ctrl+K`                                      | Delete from cursor until the end of line   |
