@@ -29,7 +29,7 @@ We're working on making Glues available through more package managers soon. For 
 
 ## Usage
 
-Glues offers five storage options to suit your needs:
+Glues offers six storage options to suit your needs:
 
 * **Instant**: Data is stored in memory and only persists while the app is running. This is useful for testing purposes.
 * **CSV**: Notes are saved in CSV format. When you provide a path, Glues will load existing data if available or create a new file if none exists.
