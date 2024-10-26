@@ -34,6 +34,7 @@ pub enum InnerState {
     NoteMoreActions,
     DirectorySelected,
     DirectoryMoreActions,
+    NoteTreeNumber(usize),
     EditingViewMode,
     EditingEditMode,
     EntryDialog(Box<InnerState>),
@@ -97,6 +98,9 @@ impl NotebookState {
 
                 format!("Directory '{name}' selected")
             }
+            NoteTreeNumber(n) => {
+                format!("Steps: '{n}' selected")
+            }
             EditingViewMode => {
                 let name = &self.get_selected_note()?.name;
 
@@ -111,42 +115,60 @@ impl NotebookState {
         })
     }
 
-    pub fn shortcuts(&self) -> Vec<&str> {
+    pub fn shortcuts(&self) -> Vec<String> {
         match &self.inner_state {
             NoteSelected => {
                 vec![
-                    "[o] Open note",
-                    "[h] Close parent",
-                    "[j] Down",
-                    "[k] Up",
-                    "[m] More actions",
-                    "[Esc] Quit",
+                    "[o] Open note".to_owned(),
+                    "[h] Close parent".to_owned(),
+                    "[j] Down".to_owned(),
+                    "[k] Up".to_owned(),
+                    "[1-9] Set steps".to_owned(),
+                    "[m] More actions".to_owned(),
+                    "[Esc] Quit".to_owned(),
                 ]
             }
             DirectorySelected => {
                 vec![
-                    "[l] Toggle",
-                    "[h] Close parent",
-                    "[j] Down",
-                    "[k] Up",
-                    "[m] More actions",
-                    "[Esc] Quit",
+                    "[l] Toggle".to_owned(),
+                    "[h] Close parent".to_owned(),
+                    "[j] Down".to_owned(),
+                    "[k] Up".to_owned(),
+                    "[1-9] Set steps".to_owned(),
+                    "[m] More actions".to_owned(),
+                    "[Esc] Quit".to_owned(),
+                ]
+            }
+            NoteTreeNumber(n) => {
+                vec![
+                    format!("[j] Move {n} down"),
+                    format!("[k] Move {n} up"),
+                    "[0-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingViewMode => {
                 vec![
-                    "[i] Edit mode",
-                    "[b] Browse note tree",
-                    "[n] Toggle line number",
-                    "[h] Show editor keymap",
-                    "[Esc] Quit",
+                    "[i] Edit mode".to_owned(),
+                    "[b] Browse note tree".to_owned(),
+                    "[n] Toggle line number".to_owned(),
+                    "[h] Show editor keymap".to_owned(),
+                    "[Esc] Quit".to_owned(),
                 ]
             }
             EditingEditMode => {
-                vec!["[Esc] Save note & View mode", "[Ctrl+h] Show editor keymap"]
+                vec![
+                    "[Esc] Save note & View mode".to_owned(),
+                    "[Ctrl+h] Show editor keymap".to_owned(),
+                ]
             }
             DirectoryMoreActions | NoteMoreActions | EntryDialog(_) => {
-                vec!["[j] Next", "[k] Previous", "[Enter] Select", "[Esc] Close"]
+                vec![
+                    "[j] Next".to_owned(),
+                    "[k] Previous".to_owned(),
+                    "[Enter] Select".to_owned(),
+                    "[Esc] Close".to_owned(),
+                ]
             }
         }
     }
@@ -267,12 +289,13 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransiti
 
             directory::select(state, directory)
         }
-        (Notebook(SelectNote(note)), DirectorySelected | NoteSelected | EditingViewMode) => {
-            note::select(state, note)
-        }
+        (
+            Notebook(SelectNote(note)),
+            DirectorySelected | NoteSelected | NoteTreeNumber(_) | EditingViewMode,
+        ) => note::select(state, note),
         (
             Notebook(SelectDirectory(directory)),
-            DirectorySelected | NoteSelected | EditingViewMode,
+            DirectorySelected | NoteSelected | NoteTreeNumber(_) | EditingViewMode,
         ) => directory::select(state, directory),
         (Notebook(RenameNote(new_name)), NoteMoreActions) => {
             let note = state.get_selected_note()?.clone();
@@ -325,6 +348,31 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransiti
 
             directory::select(state, directory)
         }
+        (Key(KeyEvent::Num(n)), NoteSelected | DirectorySelected) => {
+            state.inner_state = NoteTreeNumber(n.into());
+
+            Ok(NotebookTransition::None)
+        }
+        (Key(KeyEvent::Num(n2)), NoteTreeNumber(n)) => {
+            state.inner_state = NoteTreeNumber(n2 + n * 10);
+
+            Ok(NotebookTransition::None)
+        }
+        (Key(KeyEvent::Esc), NoteTreeNumber(_)) => {
+            match state.selected {
+                SelectedItem::Note { .. } => {
+                    state.inner_state = NoteSelected;
+                }
+                SelectedItem::Directory { .. } => {
+                    state.inner_state = DirectorySelected;
+                }
+                SelectedItem::None => {}
+            };
+
+            Ok(NotebookTransition::None)
+        }
+        (Key(KeyEvent::J), NoteTreeNumber(n)) => Ok(NotebookTransition::SelectNext(*n)),
+        (Key(KeyEvent::K), NoteTreeNumber(n)) => Ok(NotebookTransition::SelectPrev(*n)),
         (event @ Key(_), _) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }

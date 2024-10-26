@@ -69,7 +69,12 @@ impl EntryState {
         Ok("Entry".to_owned())
     }
 
-    pub fn shortcuts(&self) -> Vec<&str> {
-        vec!["[j] Next", "[k] Previous", "[Enter] Select", "[q] Quit"]
+    pub fn shortcuts(&self) -> Vec<String> {
+        vec![
+            "[j] Next".to_owned(),
+            "[k] Previous".to_owned(),
+            "[Enter] Select".to_owned(),
+            "[q] Quit".to_owned(),
+        ]
     }
 }

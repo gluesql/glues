@@ -73,6 +73,10 @@ pub enum NotebookTransition {
     #[strum(to_string = "Inedible::{0}")]
     Inedible(Event),
     None,
+
+    // Additional frontend action required
+    SelectNext(usize),
+    SelectPrev(usize),
 }
 
 impl From<EntryTransition> for Transition {

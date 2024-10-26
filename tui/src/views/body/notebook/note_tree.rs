@@ -16,8 +16,12 @@ const CLOSED_SYMBOL: &str = "▶ ";
 const OPEN_SYMBOL: &str = "▼ ";
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
+    let note_tree_focused = matches!(
+        context.state,
+        ContextState::NoteTreeBrowsing | ContextState::NoteTreeNumbering
+    );
     let title = "[Browser]";
-    let title = if context.state == ContextState::NoteTreeBrowsing {
+    let title = if note_tree_focused {
         title.light_blue()
     } else {
         title.dark_gray()
@@ -42,9 +46,10 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     });
 
     let list = List::new(tree_items)
-        .highlight_style(Style::new().fg(Color::White).bg(match context.state {
-            ContextState::NoteTreeBrowsing => Color::Blue,
-            _ => Color::DarkGray,
+        .highlight_style(Style::new().fg(Color::White).bg(if note_tree_focused {
+            Color::Blue
+        } else {
+            Color::DarkGray
         }))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)

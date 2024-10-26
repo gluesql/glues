@@ -80,9 +80,24 @@ pub enum KeyEvent {
     L,
     M,
     O,
+    Num(NumKey),
     Left,
     Right,
     Esc,
+}
+
+#[derive(Clone, Copy, Debug, Display)]
+pub enum NumKey {
+    One,
+    Two,
+    Three,
+    Four,
+    Five,
+    Six,
+    Seven,
+    Eight,
+    Nine,
+    Zero,
 }
 
 impl From<EntryEvent> for Event {
@@ -100,5 +115,36 @@ impl From<NotebookEvent> for Event {
 impl From<KeyEvent> for Event {
     fn from(event: KeyEvent) -> Self {
         Self::Key(event)
+    }
+}
+
+impl From<NumKey> for KeyEvent {
+    fn from(num_key: NumKey) -> Self {
+        KeyEvent::Num(num_key)
+    }
+}
+
+impl From<NumKey> for usize {
+    fn from(num_key: NumKey) -> Self {
+        match num_key {
+            NumKey::One => 1,
+            NumKey::Two => 2,
+            NumKey::Three => 3,
+            NumKey::Four => 4,
+            NumKey::Five => 5,
+            NumKey::Six => 6,
+            NumKey::Seven => 7,
+            NumKey::Eight => 8,
+            NumKey::Nine => 9,
+            NumKey::Zero => 0,
+        }
+    }
+}
+
+impl std::ops::Add<usize> for NumKey {
+    type Output = usize;
+
+    fn add(self, rhs: usize) -> Self::Output {
+        usize::from(self) + rhs
     }
 }

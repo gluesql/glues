@@ -11,7 +11,7 @@ pub mod transition;
 pub mod types;
 
 pub use error::Error;
-pub use event::{EntryEvent, Event, KeyEvent, NotebookEvent};
+pub use event::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey};
 pub use glues::Glues;
 pub use transition::{EntryTransition, NotebookTransition, Transition};
 
