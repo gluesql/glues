@@ -25,7 +25,7 @@ impl State {
         }
     }
 
-    pub fn shortcuts(&self) -> Vec<&str> {
+    pub fn shortcuts(&self) -> Vec<String> {
         match self {
             Self::EntryState(state) => state.shortcuts(),
             Self::NotebookState(state) => state.shortcuts(),

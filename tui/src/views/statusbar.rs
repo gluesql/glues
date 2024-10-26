@@ -13,12 +13,14 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, area: Rect, state: &State) {
+    let state_shortcuts = state.shortcuts();
+    let num_shortcuts = state_shortcuts.len();
     let mut shortcuts = vec![" ".into()];
 
-    for (i, shortcut) in state.shortcuts().iter().enumerate() {
-        shortcuts.push(shortcut.black());
+    for (i, shortcut) in state_shortcuts.iter().enumerate() {
+        shortcuts.push(shortcut.clone().black());
 
-        if i < state.shortcuts().len() - 1 {
+        if i < num_shortcuts - 1 {
             shortcuts.push(" | ".light_blue().on_gray());
         }
     }

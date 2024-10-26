@@ -1,6 +1,6 @@
 use {
     super::{
-        context::{self, ContextState},
+        context::{self, notebook::TreeItem, ContextState},
         logger::*,
         App,
     },
@@ -105,6 +105,30 @@ impl App {
                 self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
                 self.context.notebook.update_items(root);
                 self.context.notebook.select_item(&id);
+            }
+            NotebookTransition::SelectNext(n) => {
+                self.context.notebook.select_next(n);
+
+                let event = match self.context.notebook.selected() {
+                    TreeItem::Directory { value, .. } => {
+                        NotebookEvent::SelectDirectory(value.clone()).into()
+                    }
+                    TreeItem::Note { value, .. } => NotebookEvent::SelectNote(value.clone()).into(),
+                };
+
+                self.glues.dispatch(event).await.log_unwrap();
+            }
+            NotebookTransition::SelectPrev(n) => {
+                self.context.notebook.select_prev(n);
+
+                let event = match self.context.notebook.selected() {
+                    TreeItem::Directory { value, .. } => {
+                        NotebookEvent::SelectDirectory(value.clone()).into()
+                    }
+                    TreeItem::Note { value, .. } => NotebookEvent::SelectNote(value.clone()).into(),
+                };
+
+                self.glues.dispatch(event).await.log_unwrap();
             }
             _ => {}
         }

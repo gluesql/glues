@@ -39,6 +39,7 @@ pub const DIRECTORY_ACTIONS: [&str; 5] = [
 #[derive(Clone, Copy, PartialEq)]
 pub enum ContextState {
     NoteTreeBrowsing,
+    NoteTreeNumbering,
     NoteActionsDialog,
     DirectoryActionsDialog,
     EditorViewMode,
@@ -100,6 +101,32 @@ impl NotebookContext {
         }
     }
 
+    pub fn select_next(&mut self, step: usize) {
+        let i = match self.tree_state.selected().unwrap_or_default() + step {
+            i if i >= self.tree_items.len() => self.tree_items.len() - 1,
+            i => i,
+        };
+
+        self.tree_state.select(Some(i));
+    }
+
+    pub fn select_prev(&mut self, step: usize) {
+        let i = self
+            .tree_state
+            .selected()
+            .unwrap_or_default()
+            .saturating_sub(step);
+
+        self.tree_state.select(Some(i));
+    }
+
+    pub fn selected(&self) -> &TreeItem {
+        self.tree_state
+            .selected()
+            .and_then(|i| self.tree_items.get(i))
+            .log_expect("[NotebookContext::selected] selected must not be empty")
+    }
+
     pub fn open_note(&mut self, note: Note, content: String) {
         self.state = ContextState::EditorViewMode;
         self.opened_note = Some(note);
@@ -113,7 +140,8 @@ impl NotebookContext {
         };
 
         match self.state {
-            ContextState::NoteTreeBrowsing => self.consume_on_note_tree(code),
+            ContextState::NoteTreeBrowsing => self.consume_on_note_tree_browsing(code),
+            ContextState::NoteTreeNumbering => self.consume_on_note_tree_numbering(code),
             ContextState::EditorViewMode | ContextState::EditorEditMode => {
                 self.consume_on_editor(input)
             }
@@ -122,7 +150,7 @@ impl NotebookContext {
         }
     }
 
-    fn consume_on_note_tree(&mut self, code: KeyCode) -> Action {
+    fn consume_on_note_tree_browsing(&mut self, code: KeyCode) -> Action {
         macro_rules! item {
             () => {
                 self.tree_state
@@ -195,11 +223,43 @@ impl NotebookContext {
             KeyCode::Char('o') | KeyCode::Char('b') | KeyCode::Char('e') | KeyCode::Char('h') => {
                 Action::PassThrough
             }
+            KeyCode::Char('1')
+            | KeyCode::Char('2')
+            | KeyCode::Char('3')
+            | KeyCode::Char('4')
+            | KeyCode::Char('5')
+            | KeyCode::Char('6')
+            | KeyCode::Char('7')
+            | KeyCode::Char('8')
+            | KeyCode::Char('9') => {
+                self.state = ContextState::NoteTreeNumbering;
+                Action::PassThrough
+            }
             KeyCode::Esc => TuiAction::Confirm {
                 message: "Do you want to quit?".to_owned(),
                 action: Box::new(TuiAction::Quit.into()),
             }
             .into(),
+            _ => Action::None,
+        }
+    }
+
+    fn consume_on_note_tree_numbering(&mut self, code: KeyCode) -> Action {
+        match code {
+            KeyCode::Char('1')
+            | KeyCode::Char('2')
+            | KeyCode::Char('3')
+            | KeyCode::Char('4')
+            | KeyCode::Char('5')
+            | KeyCode::Char('6')
+            | KeyCode::Char('7')
+            | KeyCode::Char('8')
+            | KeyCode::Char('9')
+            | KeyCode::Char('0') => Action::PassThrough,
+            KeyCode::Char('j') | KeyCode::Char('k') | KeyCode::Esc => {
+                self.state = ContextState::NoteTreeBrowsing;
+                Action::PassThrough
+            }
             _ => Action::None,
         }
     }
