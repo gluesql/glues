@@ -67,6 +67,8 @@ pub enum NotebookTransition {
     SelectDirectory(Directory),
     UpdateNoteContent,
 
+    Alert(String),
+
     #[strum(to_string = "Inedible::{0}")]
     Inedible(Event),
     None,

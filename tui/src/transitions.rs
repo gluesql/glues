@@ -130,6 +130,10 @@ impl App {
 
                 self.glues.dispatch(event).await.log_unwrap();
             }
+            NotebookTransition::Alert(message) => {
+                log!("[Alert] {message}");
+                self.context.alert = Some(message);
+            }
             _ => {}
         }
     }
