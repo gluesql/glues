@@ -224,6 +224,17 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertNewLineBelow) => {
+                self.context.notebook.editor.move_cursor(CursorMove::End);
+                self.context.notebook.editor.insert_newline();
+                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertNewLineAbove) => {
+                self.context.notebook.editor.move_cursor(CursorMove::Head);
+                self.context.notebook.editor.insert_newline();
+                self.context.notebook.editor.move_cursor(CursorMove::Up);
+                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
+            }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");
                 self.context.alert = Some(message);

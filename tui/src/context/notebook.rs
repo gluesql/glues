@@ -274,8 +274,8 @@ impl NotebookContext {
             }
             .into(),
             KeyCode::Char(
-                'h' | 'j' | 'k' | 'l' | 'w' | 'e' | 'b' | '0' | '1' | '2' | '3' | '4' | '5' | '6'
-                | '7' | '8' | '9',
+                'h' | 'j' | 'k' | 'l' | 'w' | 'e' | 'b' | 'o' | 'O' | '0' | '1' | '2' | '3' | '4'
+                | '5' | '6' | '7' | '8' | '9',
             )
             | KeyCode::Esc => Action::PassThrough,
             _ => Action::None,
