@@ -66,7 +66,10 @@ impl EntryState {
     }
 
     pub fn describe(&self) -> Result<String> {
-        Ok("Entry".to_owned())
+        Ok(
+            "Glues - TUI note-taking app offering complete data control and flexible storage options"
+                .to_owned(),
+        )
     }
 
     pub fn shortcuts(&self) -> Vec<String> {
