@@ -1,7 +1,7 @@
 mod directory_more_actions;
 mod directory_selected;
-mod editing_edit_mode;
-mod editing_view_mode;
+mod editing_insert_mode;
+mod editing_normal_mode;
 mod note_more_actions;
 mod note_selected;
 mod note_tree_number;
@@ -15,8 +15,8 @@ pub enum InnerState {
     DirectorySelected,
     DirectoryMoreActions,
     NoteTreeNumber(usize),
-    EditingViewMode,
-    EditingEditMode,
+    EditingNormalMode,
+    EditingInsertMode,
 }
 
 pub async fn consume(
@@ -32,7 +32,7 @@ pub async fn consume(
         NoteMoreActions => note_more_actions::consume(db, state, event).await,
         DirectoryMoreActions => directory_more_actions::consume(db, state, event).await,
         NoteTreeNumber(n) => note_tree_number::consume(db, state, *n, event).await,
-        EditingViewMode => editing_view_mode::consume(db, state, event).await,
-        EditingEditMode => editing_edit_mode::consume(db, state, event).await,
+        EditingNormalMode => editing_normal_mode::consume(db, state, event).await,
+        EditingInsertMode => editing_insert_mode::consume(db, state, event).await,
     }
 }

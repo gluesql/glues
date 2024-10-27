@@ -42,8 +42,8 @@ pub enum ContextState {
     NoteTreeNumbering,
     NoteActionsDialog,
     DirectoryActionsDialog,
-    EditorViewMode,
-    EditorEditMode,
+    EditorNormalMode,
+    EditorInsertMode,
 }
 
 pub struct NotebookContext {
@@ -128,7 +128,7 @@ impl NotebookContext {
     }
 
     pub fn open_note(&mut self, note: Note, content: String) {
-        self.state = ContextState::EditorViewMode;
+        self.state = ContextState::EditorNormalMode;
         self.opened_note = Some(note);
         self.editor = TextArea::from(content.lines());
     }
@@ -142,7 +142,7 @@ impl NotebookContext {
         match self.state {
             ContextState::NoteTreeBrowsing => self.consume_on_note_tree_browsing(code),
             ContextState::NoteTreeNumbering => self.consume_on_note_tree_numbering(code),
-            ContextState::EditorViewMode | ContextState::EditorEditMode => {
+            ContextState::EditorNormalMode | ContextState::EditorInsertMode => {
                 self.consume_on_editor(input)
             }
             ContextState::NoteActionsDialog => self.consume_on_note_actions(code),
@@ -270,9 +270,9 @@ impl NotebookContext {
             _ => return Action::None,
         };
 
-        if self.state == ContextState::EditorEditMode {
+        if self.state == ContextState::EditorInsertMode {
             if code == KeyCode::Esc {
-                self.state = ContextState::EditorViewMode;
+                self.state = ContextState::EditorNormalMode;
                 return Action::Dispatch(NotebookEvent::ViewNote.into());
             } else if matches!(
                 input,
@@ -297,7 +297,7 @@ impl NotebookContext {
                 Action::Dispatch(NotebookEvent::BrowseNoteTree.into())
             }
             KeyCode::Char('i') => {
-                self.state = ContextState::EditorEditMode;
+                self.state = ContextState::EditorInsertMode;
                 Action::Dispatch(NotebookEvent::EditNote.into())
             }
             KeyCode::Char('n') => {

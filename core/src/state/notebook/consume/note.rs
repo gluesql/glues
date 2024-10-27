@@ -93,13 +93,13 @@ pub async fn open(
     let content = db.fetch_note_content(note.id.clone()).await?;
 
     state.editing = Some(note.clone());
-    state.inner_state = InnerState::EditingViewMode;
+    state.inner_state = InnerState::EditingNormalMode;
 
     Ok(NotebookTransition::OpenNote { note, content })
 }
 
 pub async fn edit(state: &mut NotebookState) -> Result<NotebookTransition> {
-    state.inner_state = InnerState::EditingEditMode;
+    state.inner_state = InnerState::EditingInsertMode;
 
     Ok(NotebookTransition::EditMode)
 }
@@ -107,7 +107,7 @@ pub async fn edit(state: &mut NotebookState) -> Result<NotebookTransition> {
 pub async fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
     let note = state.get_editing()?.clone();
 
-    state.inner_state = InnerState::EditingViewMode;
+    state.inner_state = InnerState::EditingNormalMode;
 
     Ok(NotebookTransition::ViewMode(note))
 }
