@@ -7,10 +7,11 @@ use {
     glues_core::{
         data::{Directory, Note},
         state::{GetInner, NotebookState},
-        transition::{EntryTransition, NotebookTransition, Transition},
+        transition::{EntryTransition, NormalModeTransition, NotebookTransition, Transition},
         NotebookEvent,
     },
     std::time::SystemTime,
+    tui_textarea::CursorMove,
 };
 
 impl App {
@@ -129,6 +130,64 @@ impl App {
                 };
 
                 self.glues.dispatch(event).await.log_unwrap();
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::IdleMode) => {
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::NumberingMode) => {
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: false };
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorDown(n)) => {
+                let num_lines = self.context.notebook.editor.lines().len();
+                let (row, col) = self.context.notebook.editor.cursor();
+                let cursor_move = if row + n >= num_lines {
+                    CursorMove::Bottom
+                } else {
+                    CursorMove::Jump((row + n) as u16, col as u16)
+                };
+
+                self.context.notebook.editor.move_cursor(cursor_move);
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorUp(n)) => {
+                let (row, col) = self.context.notebook.editor.cursor();
+                let cursor_move = if row < n {
+                    CursorMove::Top
+                } else {
+                    CursorMove::Jump((row - n) as u16, col as u16)
+                };
+
+                self.context.notebook.editor.move_cursor(cursor_move);
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorBack(n)) => {
+                let (row, col) = self.context.notebook.editor.cursor();
+                let cursor_move = if col < n {
+                    CursorMove::Head
+                } else {
+                    CursorMove::Jump(row as u16, (col - n) as u16)
+                };
+
+                self.context.notebook.editor.move_cursor(cursor_move);
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorForward(n)) => {
+                let editor = &mut self.context.notebook.editor;
+                let (row, col) = editor.cursor();
+                let cursor_move = if col + n >= editor.lines()[row].len() {
+                    CursorMove::End
+                } else {
+                    CursorMove::Jump(row as u16, (col + n) as u16)
+                };
+
+                editor.move_cursor(cursor_move);
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");

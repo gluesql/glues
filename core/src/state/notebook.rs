@@ -10,7 +10,10 @@ use {
         Error, Event, Glues, NotebookTransition, Result,
     },
     consume::{directory, note, traverse},
-    inner_state::InnerState::{self, *},
+    inner_state::{
+        InnerState::{self, *},
+        VimState,
+    },
 };
 
 pub use directory_item::{DirectoryItem, DirectoryItemChildren, TreeItem};
@@ -89,10 +92,15 @@ impl NotebookState {
             NoteTreeNumber(n) => {
                 format!("Steps: '{n}' selected")
             }
-            EditingNormalMode => {
+            EditingNormalMode(VimState::Idle) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode")
+            }
+            EditingNormalMode(VimState::Numbering(n)) => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' normal mode, steps: '{n}'")
             }
             EditingInsertMode => {
                 let name = &self.get_selected_note()?.name;
@@ -134,13 +142,21 @@ impl NotebookState {
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            EditingNormalMode => {
+            EditingNormalMode(VimState::Idle) => {
                 vec![
                     "[i] Insert mode".to_owned(),
+                    "[h|j|k|l] Move cursor".to_owned(),
+                    "[1-9] Set steps".to_owned(),
                     "[b] Browse note tree".to_owned(),
                     "[n] Toggle line number".to_owned(),
-                    "[h] Show editor keymap".to_owned(),
                     "[Esc] Quit".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimState::Numbering(n)) => {
+                vec![
+                    format!("[h|j|k|l] Move cursor {n} steps"),
+                    "[0-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingInsertMode => {

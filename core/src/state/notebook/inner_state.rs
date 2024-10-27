@@ -7,6 +7,7 @@ mod note_selected;
 mod note_tree_number;
 
 use crate::{db::Db, state::notebook::NotebookState, Event, NotebookTransition, Result};
+pub use editing_normal_mode::VimState;
 
 #[derive(Clone)]
 pub enum InnerState {
@@ -15,7 +16,7 @@ pub enum InnerState {
     DirectorySelected,
     DirectoryMoreActions,
     NoteTreeNumber(usize),
-    EditingNormalMode,
+    EditingNormalMode(VimState),
     EditingInsertMode,
 }
 
@@ -32,7 +33,9 @@ pub async fn consume(
         NoteMoreActions => note_more_actions::consume(db, state, event).await,
         DirectoryMoreActions => directory_more_actions::consume(db, state, event).await,
         NoteTreeNumber(n) => note_tree_number::consume(db, state, *n, event).await,
-        EditingNormalMode => editing_normal_mode::consume(db, state, event).await,
+        EditingNormalMode(vim_state) => {
+            editing_normal_mode::consume(db, state, *vim_state, event).await
+        }
         EditingInsertMode => editing_insert_mode::consume(db, state, event).await,
     }
 }

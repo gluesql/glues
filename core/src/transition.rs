@@ -76,6 +76,17 @@ pub enum NotebookTransition {
     // Additional frontend action required
     SelectNext(usize),
     SelectPrev(usize),
+    EditingNormalMode(NormalModeTransition),
+}
+
+#[derive(Display)]
+pub enum NormalModeTransition {
+    IdleMode,
+    NumberingMode,
+    MoveCursorDown(usize),
+    MoveCursorUp(usize),
+    MoveCursorBack(usize),
+    MoveCursorForward(usize),
 }
 
 impl From<EntryTransition> for Transition {
