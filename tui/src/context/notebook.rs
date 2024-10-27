@@ -42,7 +42,7 @@ pub enum ContextState {
     NoteTreeNumbering,
     NoteActionsDialog,
     DirectoryActionsDialog,
-    EditorNormalMode,
+    EditorNormalMode { idle: bool },
     EditorInsertMode,
 }
 
@@ -128,7 +128,7 @@ impl NotebookContext {
     }
 
     pub fn open_note(&mut self, note: Note, content: String) {
-        self.state = ContextState::EditorNormalMode;
+        self.state = ContextState::EditorNormalMode { idle: true };
         self.opened_note = Some(note);
         self.editor = TextArea::from(content.lines());
     }
@@ -142,9 +142,8 @@ impl NotebookContext {
         match self.state {
             ContextState::NoteTreeBrowsing => self.consume_on_note_tree_browsing(code),
             ContextState::NoteTreeNumbering => self.consume_on_note_tree_numbering(code),
-            ContextState::EditorNormalMode | ContextState::EditorInsertMode => {
-                self.consume_on_editor(input)
-            }
+            ContextState::EditorNormalMode { idle } => self.consume_on_editor_normal(input, idle),
+            ContextState::EditorInsertMode => self.consume_on_editor_insert(input),
             ContextState::NoteActionsDialog => self.consume_on_note_actions(code),
             ContextState::DirectoryActionsDialog => self.consume_on_directory_actions(code),
         }
@@ -264,30 +263,11 @@ impl NotebookContext {
         }
     }
 
-    fn consume_on_editor(&mut self, input: &Input) -> Action {
+    fn consume_on_editor_normal(&mut self, input: &Input, idle: bool) -> Action {
         let code = match input {
             Input::Key(key) => key.code,
             _ => return Action::None,
         };
-
-        if self.state == ContextState::EditorInsertMode {
-            if code == KeyCode::Esc {
-                self.state = ContextState::EditorNormalMode;
-                return Action::Dispatch(NotebookEvent::ViewNote.into());
-            } else if matches!(
-                input,
-                Input::Key(KeyEvent {
-                    code: KeyCode::Char('h'),
-                    modifiers: KeyModifiers::CONTROL,
-                    ..
-                })
-            ) {
-                return TuiAction::ShowEditorKeymap.into();
-            } else {
-                self.editor.input(input.clone());
-                return Action::None;
-            }
-        }
 
         match code {
             KeyCode::Char('b') => {
@@ -305,13 +285,51 @@ impl NotebookContext {
 
                 Action::None
             }
-            KeyCode::Char('h') => TuiAction::ShowEditorKeymap.into(),
-            KeyCode::Esc => TuiAction::Confirm {
+            KeyCode::Esc if idle => TuiAction::Confirm {
                 message: "Do you want to quit?".to_owned(),
                 action: Box::new(TuiAction::Quit.into()),
             }
             .into(),
+            KeyCode::Esc
+            | KeyCode::Char('h')
+            | KeyCode::Char('j')
+            | KeyCode::Char('k')
+            | KeyCode::Char('l')
+            | KeyCode::Char('0')
+            | KeyCode::Char('1')
+            | KeyCode::Char('2')
+            | KeyCode::Char('3')
+            | KeyCode::Char('4')
+            | KeyCode::Char('5')
+            | KeyCode::Char('6')
+            | KeyCode::Char('7')
+            | KeyCode::Char('8')
+            | KeyCode::Char('9') => Action::PassThrough,
             _ => Action::None,
+        }
+    }
+
+    fn consume_on_editor_insert(&mut self, input: &Input) -> Action {
+        let code = match input {
+            Input::Key(key) => key.code,
+            _ => return Action::None,
+        };
+
+        if code == KeyCode::Esc {
+            self.state = ContextState::EditorNormalMode { idle: true };
+            Action::Dispatch(NotebookEvent::ViewNote.into())
+        } else if matches!(
+            input,
+            Input::Key(KeyEvent {
+                code: KeyCode::Char('h'),
+                modifiers: KeyModifiers::CONTROL,
+                ..
+            })
+        ) {
+            TuiAction::ShowEditorKeymap.into()
+        } else {
+            self.editor.input(input.clone());
+            Action::None
         }
     }
 
