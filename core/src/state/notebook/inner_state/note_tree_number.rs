@@ -17,7 +17,8 @@ pub async fn consume(
         Notebook(SelectNote(note)) => note::select(state, note),
         Notebook(SelectDirectory(directory)) => directory::select(state, directory),
         Key(KeyEvent::Num(n2)) => {
-            state.inner_state = InnerState::NoteTreeNumber(n2 + n * 10);
+            let step = n2 + n.saturating_mul(10);
+            state.inner_state = InnerState::NoteTreeNumber(step);
 
             Ok(NotebookTransition::None)
         }
