@@ -145,16 +145,18 @@ impl NotebookState {
             EditingNormalMode(VimState::Idle) => {
                 vec![
                     "[i] Insert mode".to_owned(),
+                    "[n] Browse".to_owned(),
                     "[h|j|k|l] Move cursor".to_owned(),
+                    "[w|e|b] Word forward|end|back".to_owned(),
                     "[1-9] Set steps".to_owned(),
-                    "[b] Browse note tree".to_owned(),
-                    "[n] Toggle line number".to_owned(),
+                    "[t] Toggle line number".to_owned(),
                     "[Esc] Quit".to_owned(),
                 ]
             }
             EditingNormalMode(VimState::Numbering(n)) => {
                 vec![
                     format!("[h|j|k|l] Move cursor {n} steps"),
+                    format!("[w|e|b] Word forward|end|back {n} steps"),
                     "[0-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
