@@ -2,7 +2,7 @@ use crate::{
     db::Db,
     state::notebook::{directory, note, InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition},
-    Error, Event, KeyEvent, NotebookEvent, Result,
+    Error, Event, KeyEvent, NotebookEvent, NumKey, Result,
 };
 
 #[derive(Clone, Copy)]
@@ -37,13 +37,6 @@ async fn consume_idle(
         Notebook(UpdateNoteContent(content)) => note::update_content(db, state, content).await,
         Notebook(EditNote) => note::edit(state).await,
         Notebook(BrowseNoteTree) => note::browse(state).await,
-        Key(KeyEvent::Num(n)) => {
-            state.inner_state = InnerState::EditingNormalMode(VimState::Numbering(n.into()));
-
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::NumberingMode,
-            ))
-        }
         Key(KeyEvent::J) => Ok(NotebookTransition::EditingNormalMode(
             NormalModeTransition::MoveCursorDown(1),
         )),
@@ -65,6 +58,12 @@ async fn consume_idle(
         Key(KeyEvent::B) => Ok(NotebookTransition::EditingNormalMode(
             NormalModeTransition::MoveCursorWordBack(1),
         )),
+        Key(KeyEvent::Num(NumKey::Zero)) => Ok(NotebookTransition::EditingNormalMode(
+            NormalModeTransition::MoveCursorLineStart,
+        )),
+        Key(KeyEvent::DollarSign) => Ok(NotebookTransition::EditingNormalMode(
+            NormalModeTransition::MoveCursorLineEnd,
+        )),
         Key(KeyEvent::O) => {
             state.inner_state = InnerState::EditingInsertMode;
 
@@ -77,6 +76,13 @@ async fn consume_idle(
 
             Ok(NotebookTransition::EditingNormalMode(
                 NormalModeTransition::InsertNewLineAbove,
+            ))
+        }
+        Key(KeyEvent::Num(n)) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Numbering(n.into()));
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::NumberingMode,
             ))
         }
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),

@@ -82,6 +82,7 @@ pub enum KeyEvent {
     O,
     W,
     CapO,
+    DollarSign,
     Num(NumKey),
     Left,
     Right,
