@@ -81,6 +81,7 @@ pub enum KeyEvent {
     M,
     O,
     W,
+    CapO,
     Num(NumKey),
     Left,
     Right,

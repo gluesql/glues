@@ -361,6 +361,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('k') => KeyEvent::K,
         KeyCode::Char('l') => KeyEvent::L,
         KeyCode::Char('m') => KeyEvent::M,
+        KeyCode::Char('O') => KeyEvent::CapO,
         KeyCode::Char('o') => KeyEvent::O,
         KeyCode::Char('w') => KeyEvent::W,
         KeyCode::Char('1') => NumKey::One.into(),

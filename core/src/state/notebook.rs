@@ -143,6 +143,11 @@ impl NotebookState {
                 ]
             }
             EditingNormalMode(VimState::Idle) => {
+                /* TODO:
+                    [o] insert new line below
+                    [O] insert new line above
+                */
+
                 vec![
                     "[i] Insert mode".to_owned(),
                     "[n] Browse".to_owned(),

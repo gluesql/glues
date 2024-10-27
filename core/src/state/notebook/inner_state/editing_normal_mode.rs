@@ -65,6 +65,20 @@ async fn consume_idle(
         Key(KeyEvent::B) => Ok(NotebookTransition::EditingNormalMode(
             NormalModeTransition::MoveCursorWordBack(1),
         )),
+        Key(KeyEvent::O) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::InsertNewLineBelow,
+            ))
+        }
+        Key(KeyEvent::CapO) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::InsertNewLineAbove,
+            ))
+        }
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }

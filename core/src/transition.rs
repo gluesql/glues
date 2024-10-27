@@ -90,6 +90,8 @@ pub enum NormalModeTransition {
     MoveCursorWordForward(usize),
     MoveCursorWordEnd(usize),
     MoveCursorWordBack(usize),
+    InsertNewLineBelow,
+    InsertNewLineAbove,
 }
 
 impl From<EntryTransition> for Transition {
