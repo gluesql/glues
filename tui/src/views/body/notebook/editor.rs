@@ -16,7 +16,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     };
     let title = if matches!(
         context.notebook.state,
-        ContextState::EditorViewMode | ContextState::EditorEditMode
+        ContextState::EditorNormalMode | ContextState::EditorInsertMode
     ) {
         title.light_blue()
     } else {
@@ -37,7 +37,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     context.notebook.editor.set_block(block);
 
     let (cursor_style, cursor_line_style) = match context.notebook.state {
-        ContextState::EditorEditMode => (
+        ContextState::EditorInsertMode => (
             Style::default().white().on_blue(),
             Style::default().underlined(),
         ),

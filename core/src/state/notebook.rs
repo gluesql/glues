@@ -89,15 +89,15 @@ impl NotebookState {
             NoteTreeNumber(n) => {
                 format!("Steps: '{n}' selected")
             }
-            EditingViewMode => {
+            EditingNormalMode => {
                 let name = &self.get_selected_note()?.name;
 
-                format!("Note '{name}' view mode")
+                format!("Note '{name}' normal mode")
             }
-            EditingEditMode => {
+            EditingInsertMode => {
                 let name = &self.get_selected_note()?.name;
 
-                format!("Note '{name}' edit mode")
+                format!("Note '{name}' insert mode")
             }
         })
     }
@@ -134,18 +134,18 @@ impl NotebookState {
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            EditingViewMode => {
+            EditingNormalMode => {
                 vec![
-                    "[i] Edit mode".to_owned(),
+                    "[i] Insert mode".to_owned(),
                     "[b] Browse note tree".to_owned(),
                     "[n] Toggle line number".to_owned(),
                     "[h] Show editor keymap".to_owned(),
                     "[Esc] Quit".to_owned(),
                 ]
             }
-            EditingEditMode => {
+            EditingInsertMode => {
                 vec![
-                    "[Esc] Save note & View mode".to_owned(),
+                    "[Esc] Save note & Normal mode".to_owned(),
                     "[Ctrl+h] Show editor keymap".to_owned(),
                 ]
             }
