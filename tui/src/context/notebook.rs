@@ -219,18 +219,8 @@ impl NotebookContext {
                     Action::PassThrough
                 }
             },
-            KeyCode::Char('o') | KeyCode::Char('b') | KeyCode::Char('e') | KeyCode::Char('h') => {
-                Action::PassThrough
-            }
-            KeyCode::Char('1')
-            | KeyCode::Char('2')
-            | KeyCode::Char('3')
-            | KeyCode::Char('4')
-            | KeyCode::Char('5')
-            | KeyCode::Char('6')
-            | KeyCode::Char('7')
-            | KeyCode::Char('8')
-            | KeyCode::Char('9') => {
+            KeyCode::Char('o' | 'b' | 'e' | 'h') => Action::PassThrough,
+            KeyCode::Char('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') => {
                 self.state = ContextState::NoteTreeNumbering;
                 Action::PassThrough
             }
@@ -245,16 +235,9 @@ impl NotebookContext {
 
     fn consume_on_note_tree_numbering(&mut self, code: KeyCode) -> Action {
         match code {
-            KeyCode::Char('1')
-            | KeyCode::Char('2')
-            | KeyCode::Char('3')
-            | KeyCode::Char('4')
-            | KeyCode::Char('5')
-            | KeyCode::Char('6')
-            | KeyCode::Char('7')
-            | KeyCode::Char('8')
-            | KeyCode::Char('9')
-            | KeyCode::Char('0') => Action::PassThrough,
+            KeyCode::Char('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') => {
+                Action::PassThrough
+            }
             KeyCode::Char('j') | KeyCode::Char('k') | KeyCode::Esc => {
                 self.state = ContextState::NoteTreeBrowsing;
                 Action::PassThrough
@@ -290,21 +273,10 @@ impl NotebookContext {
                 action: Box::new(TuiAction::Quit.into()),
             }
             .into(),
-            KeyCode::Esc
-            | KeyCode::Char('h')
-            | KeyCode::Char('j')
-            | KeyCode::Char('k')
-            | KeyCode::Char('l')
-            | KeyCode::Char('0')
-            | KeyCode::Char('1')
-            | KeyCode::Char('2')
-            | KeyCode::Char('3')
-            | KeyCode::Char('4')
-            | KeyCode::Char('5')
-            | KeyCode::Char('6')
-            | KeyCode::Char('7')
-            | KeyCode::Char('8')
-            | KeyCode::Char('9') => Action::PassThrough,
+            KeyCode::Char(
+                'h' | 'j' | 'k' | 'l' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9',
+            )
+            | KeyCode::Esc => Action::PassThrough,
             _ => Action::None,
         }
     }
