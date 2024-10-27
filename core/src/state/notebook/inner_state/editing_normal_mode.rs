@@ -70,7 +70,8 @@ async fn consume_numbering(
 
     match event {
         Key(KeyEvent::Num(n2)) => {
-            state.inner_state = InnerState::EditingNormalMode(VimState::Numbering(n2 + n * 10));
+            let step = n2 + n.saturating_mul(10);
+            state.inner_state = InnerState::EditingNormalMode(VimState::Numbering(step));
 
             Ok(NotebookTransition::None)
         }

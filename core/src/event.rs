@@ -145,6 +145,12 @@ impl std::ops::Add<usize> for NumKey {
     type Output = usize;
 
     fn add(self, rhs: usize) -> Self::Output {
-        usize::from(self) + rhs
+        let n = usize::from(self).saturating_add(rhs);
+
+        if n > u16::MAX as usize {
+            u16::MAX as usize
+        } else {
+            n
+        }
     }
 }
