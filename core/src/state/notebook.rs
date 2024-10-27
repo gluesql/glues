@@ -146,6 +146,8 @@ impl NotebookState {
                 /* TODO:
                     [o] insert new line below
                     [O] insert new line above
+                    [0] move to line start
+                    [$] move to line end
                 */
 
                 vec![

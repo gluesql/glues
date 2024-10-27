@@ -224,6 +224,12 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorLineStart) => {
+                self.context.notebook.editor.move_cursor(CursorMove::Head);
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorLineEnd) => {
+                self.context.notebook.editor.move_cursor(CursorMove::End);
+            }
             NotebookTransition::EditingNormalMode(NormalModeTransition::InsertNewLineBelow) => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
                 self.context.notebook.editor.insert_newline();
