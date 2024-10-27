@@ -114,9 +114,10 @@ impl App {
     fn draw(&mut self, frame: &mut Frame) {
         let state = &self.glues.state;
         let context = &mut self.context;
-        let vertical = Layout::vertical([Length(1), Percentage(100)]);
-        let [statusbar, body] = vertical.areas(frame.area());
+        let vertical = Layout::vertical([Length(1), Percentage(100), Length(1)]);
+        let [keymap, body, statusbar] = vertical.areas(frame.area());
 
+        views::keymap::draw(frame, keymap, state);
         views::statusbar::draw(frame, statusbar, state);
         views::body::draw(frame, body, context);
         views::dialog::draw(frame, context);
