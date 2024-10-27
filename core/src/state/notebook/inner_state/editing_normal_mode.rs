@@ -35,8 +35,8 @@ async fn consume_idle(
         Notebook(SelectNote(note)) => note::select(state, note),
         Notebook(SelectDirectory(directory)) => directory::select(state, directory),
         Notebook(UpdateNoteContent(content)) => note::update_content(db, state, content).await,
-        Key(KeyEvent::E) | Notebook(EditNote) => note::edit(state).await,
-        Key(KeyEvent::B) | Notebook(BrowseNoteTree) => note::browse(state).await,
+        Notebook(EditNote) => note::edit(state).await,
+        Notebook(BrowseNoteTree) => note::browse(state).await,
         Key(KeyEvent::Num(n)) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Numbering(n.into()));
 
@@ -55,6 +55,15 @@ async fn consume_idle(
         )),
         Key(KeyEvent::L) => Ok(NotebookTransition::EditingNormalMode(
             NormalModeTransition::MoveCursorForward(1),
+        )),
+        Key(KeyEvent::W) => Ok(NotebookTransition::EditingNormalMode(
+            NormalModeTransition::MoveCursorWordForward(1),
+        )),
+        Key(KeyEvent::E) => Ok(NotebookTransition::EditingNormalMode(
+            NormalModeTransition::MoveCursorWordEnd(1),
+        )),
+        Key(KeyEvent::B) => Ok(NotebookTransition::EditingNormalMode(
+            NormalModeTransition::MoveCursorWordBack(1),
         )),
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
@@ -101,6 +110,27 @@ async fn consume_numbering(
 
             Ok(NotebookTransition::EditingNormalMode(
                 NormalModeTransition::MoveCursorForward(n),
+            ))
+        }
+        Key(KeyEvent::W) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::MoveCursorWordForward(n),
+            ))
+        }
+        Key(KeyEvent::E) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::MoveCursorWordEnd(n),
+            ))
+        }
+        Key(KeyEvent::B) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::MoveCursorWordBack(n),
             ))
         }
         Key(KeyEvent::Esc) => {

@@ -80,6 +80,7 @@ pub enum KeyEvent {
     L,
     M,
     O,
+    W,
     Num(NumKey),
     Left,
     Right,

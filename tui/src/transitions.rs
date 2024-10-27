@@ -189,6 +189,41 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorWordForward(
+                n,
+            )) => {
+                for _ in 0..n {
+                    self.context
+                        .notebook
+                        .editor
+                        .move_cursor(CursorMove::WordForward);
+                }
+
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorWordEnd(n)) => {
+                for _ in 0..n {
+                    self.context
+                        .notebook
+                        .editor
+                        .move_cursor(CursorMove::WordEnd);
+                }
+
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorWordBack(n)) => {
+                for _ in 0..n {
+                    self.context
+                        .notebook
+                        .editor
+                        .move_cursor(CursorMove::WordBack);
+                }
+
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");
                 self.context.alert = Some(message);
