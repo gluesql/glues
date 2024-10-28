@@ -102,6 +102,9 @@ pub enum NormalModeTransition {
     InsertAtLineEnd,
     InsertNewLineBelow,
     InsertNewLineAbove,
+    DeleteChars(usize),
+    DeleteCharsAndInsertMode(usize),
+    DeleteLineAndInsertMode(usize),
 }
 
 impl From<EntryTransition> for Transition {
