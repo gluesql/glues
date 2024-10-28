@@ -222,6 +222,22 @@ impl App {
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorLineEnd) => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
             }
+            NotebookTransition::EditingNormalMode(
+                NormalModeTransition::MoveCursorLineNonEmptyStart,
+            ) => {
+                let editor = &mut self.context.notebook.editor;
+                editor.move_cursor(CursorMove::Head);
+
+                let (row, _) = editor.cursor();
+                let is_whitespace_at_first = editor.lines()[row]
+                    .chars()
+                    .next()
+                    .map(|c| c.is_whitespace())
+                    .unwrap_or(false);
+                if is_whitespace_at_first {
+                    editor.move_cursor(CursorMove::WordForward);
+                }
+            }
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorTop) => {
                 self.context.notebook.editor.move_cursor(CursorMove::Top);
             }

@@ -52,6 +52,7 @@ async fn consume_idle(
         Key(KeyEvent::B) => MoveCursorWordBack(1).into(),
         Key(KeyEvent::Num(NumKey::Zero)) => MoveCursorLineStart.into(),
         Key(KeyEvent::DollarSign) => MoveCursorLineEnd.into(),
+        Key(KeyEvent::Caret) => MoveCursorLineNonEmptyStart.into(),
         Key(KeyEvent::CapG) => MoveCursorBottom.into(),
         Key(KeyEvent::I) => {
             state.inner_state = InnerState::EditingInsertMode;
