@@ -9,6 +9,7 @@ use crate::{
 pub enum VimState {
     Idle,
     Numbering(usize),
+    Gateway,
 }
 
 pub async fn consume(
@@ -19,7 +20,8 @@ pub async fn consume(
 ) -> Result<NotebookTransition> {
     match vim_state {
         VimState::Idle => consume_idle(db, state, event).await,
-        VimState::Numbering(n) => consume_numbering(state, n, event).await,
+        VimState::Numbering(n) => consume_numbering(db, state, n, event).await,
+        VimState::Gateway => consume_gateway(db, state, event).await,
     }
 }
 
@@ -35,7 +37,11 @@ async fn consume_idle(
         Notebook(SelectNote(note)) => note::select(state, note),
         Notebook(SelectDirectory(directory)) => directory::select(state, directory),
         Notebook(UpdateNoteContent(content)) => note::update_content(db, state, content).await,
-        Notebook(BrowseNoteTree) => note::browse(state).await,
+        Key(KeyEvent::N) => {
+            state.inner_state = InnerState::NoteSelected;
+
+            Ok(NotebookTransition::BrowseNoteTree)
+        }
         Key(KeyEvent::J) => Ok(NotebookTransition::EditingNormalMode(
             NormalModeTransition::MoveCursorDown(1),
         )),
@@ -108,6 +114,13 @@ async fn consume_idle(
                 NormalModeTransition::InsertNewLineAbove,
             ))
         }
+        Key(KeyEvent::G) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Gateway);
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::NumberingMode,
+            ))
+        }
         Key(KeyEvent::Num(n)) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Numbering(n.into()));
 
@@ -121,6 +134,7 @@ async fn consume_idle(
 }
 
 async fn consume_numbering(
+    db: &mut Db,
     state: &mut NotebookState,
     n: usize,
     event: Event,
@@ -197,7 +211,42 @@ async fn consume_numbering(
                 NormalModeTransition::IdleMode,
             ))
         }
-        event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            consume_idle(db, state, event).await
+        }
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+async fn consume_gateway(
+    db: &mut Db,
+    state: &mut NotebookState,
+    event: Event,
+) -> Result<NotebookTransition> {
+    use Event::*;
+
+    match event {
+        Key(KeyEvent::G) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::MoveCursorTop,
+            ))
+        }
+        Key(KeyEvent::Esc) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::IdleMode,
+            ))
+        }
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            consume_idle(db, state, event).await
+        }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
