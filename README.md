@@ -29,23 +29,24 @@ We're working on making Glues available through more package managers soon. For 
 
 ## Usage
 
-Glues offers six storage options to suit your needs:
+Glues offers various storage options to suit your needs:
 
-* **Instant**: Data is stored in memory and only persists while the app is running. This is useful for testing purposes.
-* **CSV**: Notes are saved in CSV format. When you provide a path, Glues will load existing data if available or create a new file if none exists.
-* **JSON**: Notes are stored in JSON format, specifically using JSONL (JSON Lines). This functions similarly to CSV storage, allowing you to provide a path to load or create data.
-* **File**: Glues uses a custom storage format where each note and directory is stored as separate files. This is ideal for users who prefer a more granular file-based approach.
+* **Instant**: Data is stored in memory and only persists while the app is running. This option is useful for testing or temporary notes as it is entirely volatile.
+* **Local**: Notes are stored locally as separate files. This is the default option for users who prefer a simple, file-based approach without any remote synchronization.
 * **Git**:
   - Git storage requires three inputs: `path`, `remote`, and `branch`.
-  - The `path` should point to an existing local Git repository, similar to the file storage path. For example, you can clone a GitHub repository and use that path.
+  - The `path` should point to an existing local Git repository. For example, you can clone a GitHub repository and use that path.
   - The `remote` and `branch` specify the target remote repository and branch for synchronization.
-  - When you modify notes or directories, Glues will automatically sync changes with the specified remote repository.
+  - When you modify notes or directories, Glues will automatically sync changes with the specified remote repository, allowing for distributed note management.
 
   To see how notes and directories are stored using Git, you can refer to the [Glues sample repository](https://github.com/gluesql/glues-sample-note).
 * **MongoDB**:
   - MongoDB storage allows you to store your notes in a MongoDB database, providing a scalable and centralized solution for managing your notes.
   - You need to provide the MongoDB connection string and the database name. Glues will handle storing and retrieving notes from the specified database.
-  - This option is ideal for users who prefer a centralized storage solution or need robust, reliable data storage.
+  - This option is ideal for users who need centralized data management or work in team environments where notes are shared.
+* **CSV or JSON**:
+  - These formats store notes as simple log files, ideal for quick data exports or reading logs.
+  - CSV saves data in comma-separated format, while JSON uses JSONL (JSON Lines) format.
 
 ## Roadmap
 
