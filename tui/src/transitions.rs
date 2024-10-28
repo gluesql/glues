@@ -137,7 +137,12 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::NumberingMode) => {
+            NotebookTransition::EditingNormalMode(
+                NormalModeTransition::NumberingMode
+                | NormalModeTransition::GatewayMode
+                | NormalModeTransition::YankMode
+                | NormalModeTransition::Yank2Mode,
+            ) => {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: false };
             }
@@ -320,6 +325,21 @@ impl App {
                 editor.cut();
 
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::Paste) => {
+                self.context.notebook.editor.paste();
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::Yank(n)) => {
+                let editor = &mut self.context.notebook.editor;
+                let cursor = editor.cursor();
+                editor.move_cursor(CursorMove::Head);
+                editor.start_selection();
+                let cursor_move = cursor_move_down(editor, n - 1);
+                editor.move_cursor(cursor_move);
+                editor.move_cursor(CursorMove::End);
+                editor.copy();
+                editor.cancel_selection();
+                editor.move_cursor(CursorMove::Jump(cursor.0 as u16, cursor.1 as u16));
             }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");

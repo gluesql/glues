@@ -107,6 +107,31 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - gateway")
             }
+            EditingNormalMode(VimState::Yank(n)) => {
+                let name = &self.get_selected_note()?.name;
+
+                let n = if *n >= 2 {
+                    format!("{n}")
+                } else {
+                    "".to_owned()
+                };
+                format!("Note '{name}' normal mode - yank '{n}y'")
+            }
+            EditingNormalMode(VimState::Yank2(n1, n2)) => {
+                let name = &self.get_selected_note()?.name;
+                let n1 = if *n1 >= 2 {
+                    format!("{n1}")
+                } else {
+                    "".to_owned()
+                };
+                let n2 = if *n2 >= 2 {
+                    format!("{n2}")
+                } else {
+                    "".to_owned()
+                };
+
+                format!("Note '{name}' normal mode - yank '{n1}y{n2}'")
+            }
             EditingInsertMode => {
                 let name = &self.get_selected_note()?.name;
 
@@ -167,7 +192,7 @@ impl NotebookState {
                 ]
             }
             EditingNormalMode(VimState::Numbering(n)) => {
-                // TODO: s, S, x
+                // TODO: s, S, x, y
 
                 vec![
                     format!("[h|j|k|l] Move cursor {n} steps"),
@@ -180,6 +205,24 @@ impl NotebookState {
             EditingNormalMode(VimState::Gateway) => {
                 vec![
                     "[g] Move cursor to top".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimState::Yank(n)) => {
+                vec![
+                    format!("[y] Yank {n} lines"),
+                    "[1-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimState::Yank2(n1, n2)) => {
+                vec![
+                    if *n1 == 1 {
+                        format!("[y] Yank {n2} lines")
+                    } else {
+                        format!("[y] Yank {n1}*{n2} lines")
+                    },
+                    "[0-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }

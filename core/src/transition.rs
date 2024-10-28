@@ -84,6 +84,9 @@ pub enum NotebookTransition {
 pub enum NormalModeTransition {
     IdleMode,
     NumberingMode,
+    GatewayMode,
+    YankMode,
+    Yank2Mode,
     MoveCursorDown(usize),
     MoveCursorUp(usize),
     MoveCursorBack(usize),
@@ -106,6 +109,8 @@ pub enum NormalModeTransition {
     DeleteChars(usize),
     DeleteCharsAndInsertMode(usize),
     DeleteLineAndInsertMode(usize),
+    Paste,
+    Yank(usize),
 }
 
 impl From<EntryTransition> for Transition {
