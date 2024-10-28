@@ -72,6 +72,9 @@ impl App {
 
                 self.glues.dispatch(event).await.log_unwrap();
             }
+            NotebookTransition::BrowseNoteTree => {
+                self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
+            }
             NotebookTransition::RemoveNote {
                 selected_directory, ..
             }
@@ -228,6 +231,9 @@ impl App {
             }
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorLineEnd) => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorTop) => {
+                self.context.notebook.editor.move_cursor(CursorMove::Top);
             }
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorBottom) => {
                 self.context.notebook.editor.move_cursor(CursorMove::Bottom);

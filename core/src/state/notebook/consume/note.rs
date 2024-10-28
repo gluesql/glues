@@ -106,14 +106,6 @@ pub async fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
     Ok(NotebookTransition::ViewMode(note))
 }
 
-pub async fn browse(state: &mut NotebookState) -> Result<NotebookTransition> {
-    let note = state.get_selected_note()?.clone();
-
-    state.inner_state = InnerState::NoteSelected;
-
-    Ok(NotebookTransition::SelectNote(note))
-}
-
 pub async fn update_content(
     db: &mut Db,
     state: &mut NotebookState,

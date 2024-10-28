@@ -253,12 +253,6 @@ impl NotebookContext {
         };
 
         match code {
-            KeyCode::Char('n') => {
-                self.state = ContextState::NoteTreeBrowsing;
-                self.opened_note = None;
-
-                Action::Dispatch(NotebookEvent::BrowseNoteTree.into())
-            }
             KeyCode::Char('t') => {
                 self.show_line_number = !self.show_line_number;
 
@@ -269,12 +263,7 @@ impl NotebookContext {
                 action: Box::new(TuiAction::Quit.into()),
             }
             .into(),
-            KeyCode::Char(
-                'a' | 'h' | 'i' | 'j' | 'k' | 'l' | 'w' | 'e' | 'b' | 'o' | 'A' | 'G' | 'I' | 'O'
-                | '$' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9',
-            )
-            | KeyCode::Esc => Action::PassThrough,
-            _ => Action::None,
+            _ => Action::PassThrough,
         }
     }
 

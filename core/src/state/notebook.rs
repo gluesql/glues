@@ -102,6 +102,11 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode, steps: '{n}'")
             }
+            EditingNormalMode(VimState::Gateway) => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' normal mode - gateway")
+            }
             EditingInsertMode => {
                 let name = &self.get_selected_note()?.name;
 
@@ -148,7 +153,7 @@ impl NotebookState {
                     [O] insert new line above
                     [0] move to line start
                     [$] move to line end
-                    a, A, I, G
+                    a, A, I, G, g
                 */
 
                 vec![
@@ -167,6 +172,12 @@ impl NotebookState {
                     format!("[w|e|b] Word forward|end|back {n} steps"),
                     format!("[G] Go to line {n}"),
                     "[0-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimState::Gateway) => {
+                vec![
+                    "[g] Move cursor to top".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }

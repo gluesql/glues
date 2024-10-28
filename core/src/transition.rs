@@ -62,6 +62,8 @@ pub enum NotebookTransition {
         content: String,
     },
     ViewMode(Note),
+    BrowseNoteTree,
+
     SelectNote(Note),
     SelectDirectory(Directory),
     UpdateNoteContent,
@@ -91,6 +93,7 @@ pub enum NormalModeTransition {
     MoveCursorWordBack(usize),
     MoveCursorLineStart,
     MoveCursorLineEnd,
+    MoveCursorTop,
     MoveCursorBottom,
     MoveCursorToLine(usize),
     InsertAtCursor,

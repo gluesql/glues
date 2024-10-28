@@ -63,7 +63,6 @@ pub enum NotebookEvent {
     OpenNote,
     EditNote,
     ViewNote,
-    BrowseNoteTree,
 
     UpdateNoteContent(String),
 
@@ -75,12 +74,14 @@ pub enum KeyEvent {
     A,
     B,
     E,
+    G,
     H,
     I,
     J,
     K,
     L,
     M,
+    N,
     O,
     W,
     CapA,
