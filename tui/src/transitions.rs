@@ -229,6 +229,21 @@ impl App {
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorLineEnd) => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
             }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorBottom) => {
+                self.context.notebook.editor.move_cursor(CursorMove::Bottom);
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorToLine(n)) => {
+                self.context
+                    .notebook
+                    .editor
+                    .move_cursor(CursorMove::Jump((n - 1) as u16, 0));
+                self.context
+                    .notebook
+                    .editor
+                    .move_cursor(CursorMove::WordForward);
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
             NotebookTransition::EditingNormalMode(NormalModeTransition::InsertNewLineBelow) => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
                 self.context.notebook.editor.insert_newline();

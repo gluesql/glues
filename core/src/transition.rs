@@ -91,6 +91,8 @@ pub enum NormalModeTransition {
     MoveCursorWordBack(usize),
     MoveCursorLineStart,
     MoveCursorLineEnd,
+    MoveCursorBottom,
+    MoveCursorToLine(usize),
     InsertAtCursor,
     InsertAtLineStart,
     InsertAfterCursor,

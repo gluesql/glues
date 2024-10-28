@@ -63,6 +63,9 @@ async fn consume_idle(
         Key(KeyEvent::DollarSign) => Ok(NotebookTransition::EditingNormalMode(
             NormalModeTransition::MoveCursorLineEnd,
         )),
+        Key(KeyEvent::CapG) => Ok(NotebookTransition::EditingNormalMode(
+            NormalModeTransition::MoveCursorBottom,
+        )),
         Key(KeyEvent::I) => {
             state.inner_state = InnerState::EditingInsertMode;
 
@@ -178,6 +181,13 @@ async fn consume_numbering(
 
             Ok(NotebookTransition::EditingNormalMode(
                 NormalModeTransition::MoveCursorWordBack(n),
+            ))
+        }
+        Key(KeyEvent::CapG) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::MoveCursorToLine(n),
             ))
         }
         Key(KeyEvent::Esc) => {
