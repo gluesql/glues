@@ -88,6 +88,17 @@ async fn consume_idle(
 
             NumberingMode.into()
         }
+        Key(KeyEvent::X) => DeleteChars(1).into(),
+        Key(KeyEvent::S) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            DeleteCharsAndInsertMode(1).into()
+        }
+        Key(KeyEvent::CapS) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            DeleteLineAndInsertMode(1).into()
+        }
         Key(KeyEvent::Num(n)) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Numbering(n.into()));
 
@@ -153,6 +164,21 @@ async fn consume_numbering(
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
             MoveCursorToLine(n).into()
+        }
+        Key(KeyEvent::X) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            DeleteChars(n).into()
+        }
+        Key(KeyEvent::S) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            DeleteCharsAndInsertMode(n).into()
+        }
+        Key(KeyEvent::CapS) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            DeleteLineAndInsertMode(n).into()
         }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);

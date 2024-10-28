@@ -11,7 +11,7 @@ use {
         NotebookEvent,
     },
     std::time::SystemTime,
-    tui_textarea::CursorMove,
+    tui_textarea::{CursorMove, TextArea},
 };
 
 impl App {
@@ -142,15 +142,10 @@ impl App {
                     context::notebook::ContextState::EditorNormalMode { idle: false };
             }
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorDown(n)) => {
-                let num_lines = self.context.notebook.editor.lines().len();
-                let (row, col) = self.context.notebook.editor.cursor();
-                let cursor_move = if row + n >= num_lines {
-                    CursorMove::Bottom
-                } else {
-                    CursorMove::Jump((row + n) as u16, col as u16)
-                };
+                let editor = &mut self.context.notebook.editor;
+                let cursor_move = cursor_move_down(editor, n);
 
-                self.context.notebook.editor.move_cursor(cursor_move);
+                editor.move_cursor(cursor_move);
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
@@ -180,12 +175,7 @@ impl App {
             }
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorForward(n)) => {
                 let editor = &mut self.context.notebook.editor;
-                let (row, col) = editor.cursor();
-                let cursor_move = if col + n >= editor.lines()[row].len() {
-                    CursorMove::End
-                } else {
-                    CursorMove::Jump(row as u16, (col + n) as u16)
-                };
+                let cursor_move = cursor_move_forward(editor, n);
 
                 editor.move_cursor(cursor_move);
                 self.context.notebook.state =
@@ -279,11 +269,66 @@ impl App {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::DeleteChars(n)) => {
+                let editor = &mut self.context.notebook.editor;
+                editor.start_selection();
+                let cursor_move = cursor_move_forward(editor, n);
+
+                editor.move_cursor(cursor_move);
+                editor.cut();
+
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            NotebookTransition::EditingNormalMode(
+                NormalModeTransition::DeleteCharsAndInsertMode(n),
+            ) => {
+                let editor = &mut self.context.notebook.editor;
+                editor.start_selection();
+                let cursor_move = cursor_move_forward(editor, n);
+
+                editor.move_cursor(cursor_move);
+                editor.cut();
+
+                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
+            }
+            NotebookTransition::EditingNormalMode(
+                NormalModeTransition::DeleteLineAndInsertMode(n),
+            ) => {
+                let editor = &mut self.context.notebook.editor;
+                editor.move_cursor(CursorMove::Head);
+                editor.start_selection();
+                let cursor_move = cursor_move_down(editor, n - 1);
+                editor.move_cursor(cursor_move);
+                editor.move_cursor(CursorMove::End);
+                editor.cut();
+
+                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
+            }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");
                 self.context.alert = Some(message);
             }
             _ => {}
+        }
+
+        fn cursor_move_forward(editor: &TextArea, n: usize) -> CursorMove {
+            let (row, col) = editor.cursor();
+            if col + n >= editor.lines()[row].len() {
+                CursorMove::End
+            } else {
+                CursorMove::Jump(row as u16, (col + n) as u16)
+            }
+        }
+
+        fn cursor_move_down(editor: &TextArea, n: usize) -> CursorMove {
+            let num_lines = editor.lines().len();
+            let (row, col) = editor.cursor();
+            if row + n >= num_lines {
+                CursorMove::Bottom
+            } else {
+                CursorMove::Jump((row + n) as u16, col as u16)
+            }
         }
     }
 }

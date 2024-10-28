@@ -153,7 +153,7 @@ impl NotebookState {
                     [O] insert new line above
                     [0] move to line start
                     [$] move to line end
-                    a, A, I, G, g
+                    a, A, I, G, g, s, S, x
                 */
 
                 vec![
@@ -167,6 +167,8 @@ impl NotebookState {
                 ]
             }
             EditingNormalMode(VimState::Numbering(n)) => {
+                // TODO: s, S, x
+
                 vec![
                     format!("[h|j|k|l] Move cursor {n} steps"),
                     format!("[w|e|b] Word forward|end|back {n} steps"),
