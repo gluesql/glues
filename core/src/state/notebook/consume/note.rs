@@ -98,12 +98,6 @@ pub async fn open(
     Ok(NotebookTransition::OpenNote { note, content })
 }
 
-pub async fn edit(state: &mut NotebookState) -> Result<NotebookTransition> {
-    state.inner_state = InnerState::EditingInsertMode;
-
-    Ok(NotebookTransition::EditMode)
-}
-
 pub async fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
     let note = state.get_editing()?.clone();
 

@@ -354,16 +354,20 @@ fn to_event(input: Input) -> Option<KeyEvent> {
     };
 
     let event = match code {
+        KeyCode::Char('a') => KeyEvent::A,
         KeyCode::Char('b') => KeyEvent::B,
         KeyCode::Char('e') => KeyEvent::E,
         KeyCode::Char('h') => KeyEvent::H,
+        KeyCode::Char('i') => KeyEvent::I,
         KeyCode::Char('j') => KeyEvent::J,
         KeyCode::Char('k') => KeyEvent::K,
         KeyCode::Char('l') => KeyEvent::L,
         KeyCode::Char('m') => KeyEvent::M,
-        KeyCode::Char('O') => KeyEvent::CapO,
         KeyCode::Char('o') => KeyEvent::O,
         KeyCode::Char('w') => KeyEvent::W,
+        KeyCode::Char('A') => KeyEvent::CapA,
+        KeyCode::Char('I') => KeyEvent::CapI,
+        KeyCode::Char('O') => KeyEvent::CapO,
         KeyCode::Char('1') => NumKey::One.into(),
         KeyCode::Char('2') => NumKey::Two.into(),
         KeyCode::Char('3') => NumKey::Three.into(),
