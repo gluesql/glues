@@ -148,6 +148,7 @@ impl NotebookState {
                     [O] insert new line above
                     [0] move to line start
                     [$] move to line end
+                    a, A, I, G
                 */
 
                 vec![
@@ -164,6 +165,7 @@ impl NotebookState {
                 vec![
                     format!("[h|j|k|l] Move cursor {n} steps"),
                     format!("[w|e|b] Word forward|end|back {n} steps"),
+                    format!("[G] Go to line {n}"),
                     "[0-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]

@@ -84,6 +84,7 @@ pub enum KeyEvent {
     O,
     W,
     CapA,
+    CapG,
     CapI,
     CapO,
     DollarSign,
