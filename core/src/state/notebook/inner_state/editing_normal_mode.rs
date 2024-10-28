@@ -35,7 +35,6 @@ async fn consume_idle(
         Notebook(SelectNote(note)) => note::select(state, note),
         Notebook(SelectDirectory(directory)) => directory::select(state, directory),
         Notebook(UpdateNoteContent(content)) => note::update_content(db, state, content).await,
-        Notebook(EditNote) => note::edit(state).await,
         Notebook(BrowseNoteTree) => note::browse(state).await,
         Key(KeyEvent::J) => Ok(NotebookTransition::EditingNormalMode(
             NormalModeTransition::MoveCursorDown(1),
@@ -64,6 +63,34 @@ async fn consume_idle(
         Key(KeyEvent::DollarSign) => Ok(NotebookTransition::EditingNormalMode(
             NormalModeTransition::MoveCursorLineEnd,
         )),
+        Key(KeyEvent::I) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::InsertAtCursor,
+            ))
+        }
+        Key(KeyEvent::CapI) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::InsertAtLineStart,
+            ))
+        }
+        Key(KeyEvent::A) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::InsertAfterCursor,
+            ))
+        }
+        Key(KeyEvent::CapA) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            Ok(NotebookTransition::EditingNormalMode(
+                NormalModeTransition::InsertAtLineEnd,
+            ))
+        }
         Key(KeyEvent::O) => {
             state.inner_state = InnerState::EditingInsertMode;
 

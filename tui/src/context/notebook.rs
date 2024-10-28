@@ -259,10 +259,6 @@ impl NotebookContext {
 
                 Action::Dispatch(NotebookEvent::BrowseNoteTree.into())
             }
-            KeyCode::Char('i') => {
-                self.state = ContextState::EditorInsertMode;
-                Action::Dispatch(NotebookEvent::EditNote.into())
-            }
             KeyCode::Char('t') => {
                 self.show_line_number = !self.show_line_number;
 
@@ -274,8 +270,8 @@ impl NotebookContext {
             }
             .into(),
             KeyCode::Char(
-                'h' | 'j' | 'k' | 'l' | 'w' | 'e' | 'b' | 'o' | 'O' | '$' | '0' | '1' | '2' | '3'
-                | '4' | '5' | '6' | '7' | '8' | '9',
+                'a' | 'h' | 'i' | 'j' | 'k' | 'l' | 'w' | 'e' | 'b' | 'o' | 'A' | 'I' | 'O' | '$'
+                | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9',
             )
             | KeyCode::Esc => Action::PassThrough,
             _ => Action::None,

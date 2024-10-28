@@ -72,15 +72,19 @@ pub enum NotebookEvent {
 
 #[derive(Clone, Copy, Debug, Display)]
 pub enum KeyEvent {
+    A,
     B,
     E,
     H,
+    I,
     J,
     K,
     L,
     M,
     O,
     W,
+    CapA,
+    CapI,
     CapO,
     DollarSign,
     Num(NumKey),

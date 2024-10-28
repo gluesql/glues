@@ -72,7 +72,6 @@ impl App {
 
                 self.glues.dispatch(event).await.log_unwrap();
             }
-            NotebookTransition::EditMode => {}
             NotebookTransition::RemoveNote {
                 selected_directory, ..
             }
@@ -239,6 +238,24 @@ impl App {
                 self.context.notebook.editor.move_cursor(CursorMove::Head);
                 self.context.notebook.editor.insert_newline();
                 self.context.notebook.editor.move_cursor(CursorMove::Up);
+                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertAtCursor) => {
+                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertAtLineStart) => {
+                self.context.notebook.editor.move_cursor(CursorMove::Head);
+                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertAfterCursor) => {
+                self.context
+                    .notebook
+                    .editor
+                    .move_cursor(CursorMove::Forward);
+                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertAtLineEnd) => {
+                self.context.notebook.editor.move_cursor(CursorMove::End);
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
             NotebookTransition::Alert(message) => {
