@@ -7,7 +7,7 @@
 
 ## Flexible, privacy-first TUI note-taking app with multiple storage options
 
-Glues is a lightweight, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can choose to store your notes locally in CSV or JSON formats, use Git for version control, or opt for MongoDB for a centralized database solution. This flexibility allows you to manage your notes in the way that best suits your workflow, whether you prefer the simplicity of local files, the robustness of Git integration, or the scalability of MongoDB.
+Glues is a lightweight, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can store your notes locally, choose Git for distributed version control, or opt for MongoDB for centralized data management. This flexibility allows you to manage your notes in the way that best suits your workflow, whether you prefer the simplicity of local files, the collaboration capabilities of Git, or the scalability of MongoDB. For additional support, log file formats such as CSV and JSON are also available.
 
 Glues is designed with a core architecture that operates independently of the TUI, providing robust state management and action handling. Although the current frontend is TUI-based, the architecture allows for easy integration with other frontends such as GUI, iOS, Android, or even running headlessly without a UI. The TUI interface clearly displays the current state and available actions, making it intuitive and easy to use.
 
