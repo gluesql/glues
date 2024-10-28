@@ -31,102 +31,67 @@ async fn consume_idle(
     event: Event,
 ) -> Result<NotebookTransition> {
     use Event::*;
-    use NotebookEvent::*;
+    use NormalModeTransition::*;
+    use NotebookEvent as NE;
 
     match event {
-        Notebook(SelectNote(note)) => note::select(state, note),
-        Notebook(SelectDirectory(directory)) => directory::select(state, directory),
-        Notebook(UpdateNoteContent(content)) => note::update_content(db, state, content).await,
+        Notebook(NE::SelectNote(note)) => note::select(state, note),
+        Notebook(NE::SelectDirectory(directory)) => directory::select(state, directory),
+        Notebook(NE::UpdateNoteContent(content)) => note::update_content(db, state, content).await,
         Key(KeyEvent::N) => {
             state.inner_state = InnerState::NoteSelected;
 
             Ok(NotebookTransition::BrowseNoteTree)
         }
-        Key(KeyEvent::J) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorDown(1),
-        )),
-        Key(KeyEvent::K) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorUp(1),
-        )),
-        Key(KeyEvent::H) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorBack(1),
-        )),
-        Key(KeyEvent::L) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorForward(1),
-        )),
-        Key(KeyEvent::W) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorWordForward(1),
-        )),
-        Key(KeyEvent::E) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorWordEnd(1),
-        )),
-        Key(KeyEvent::B) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorWordBack(1),
-        )),
-        Key(KeyEvent::Num(NumKey::Zero)) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorLineStart,
-        )),
-        Key(KeyEvent::DollarSign) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorLineEnd,
-        )),
-        Key(KeyEvent::CapG) => Ok(NotebookTransition::EditingNormalMode(
-            NormalModeTransition::MoveCursorBottom,
-        )),
+        Key(KeyEvent::J) => MoveCursorDown(1).into(),
+        Key(KeyEvent::K) => MoveCursorUp(1).into(),
+        Key(KeyEvent::H) => MoveCursorBack(1).into(),
+        Key(KeyEvent::L) => MoveCursorForward(1).into(),
+        Key(KeyEvent::W) => MoveCursorWordForward(1).into(),
+        Key(KeyEvent::E) => MoveCursorWordEnd(1).into(),
+        Key(KeyEvent::B) => MoveCursorWordBack(1).into(),
+        Key(KeyEvent::Num(NumKey::Zero)) => MoveCursorLineStart.into(),
+        Key(KeyEvent::DollarSign) => MoveCursorLineEnd.into(),
+        Key(KeyEvent::CapG) => MoveCursorBottom.into(),
         Key(KeyEvent::I) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::InsertAtCursor,
-            ))
+            InsertAtCursor.into()
         }
         Key(KeyEvent::CapI) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::InsertAtLineStart,
-            ))
+            InsertAtLineStart.into()
         }
         Key(KeyEvent::A) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::InsertAfterCursor,
-            ))
+            InsertAfterCursor.into()
         }
         Key(KeyEvent::CapA) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::InsertAtLineEnd,
-            ))
+            InsertAtLineEnd.into()
         }
         Key(KeyEvent::O) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::InsertNewLineBelow,
-            ))
+            InsertNewLineBelow.into()
         }
         Key(KeyEvent::CapO) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::InsertNewLineAbove,
-            ))
+            InsertNewLineAbove.into()
         }
         Key(KeyEvent::G) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Gateway);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::NumberingMode,
-            ))
+            NumberingMode.into()
         }
         Key(KeyEvent::Num(n)) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Numbering(n.into()));
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::NumberingMode,
-            ))
+            NumberingMode.into()
         }
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
@@ -140,6 +105,7 @@ async fn consume_numbering(
     event: Event,
 ) -> Result<NotebookTransition> {
     use Event::*;
+    use NormalModeTransition::*;
 
     match event {
         Key(KeyEvent::Num(n2)) => {
@@ -151,65 +117,47 @@ async fn consume_numbering(
         Key(KeyEvent::J) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorDown(n),
-            ))
+            MoveCursorDown(n).into()
         }
         Key(KeyEvent::K) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorUp(n),
-            ))
+            MoveCursorUp(n).into()
         }
         Key(KeyEvent::H) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorBack(n),
-            ))
+            NormalModeTransition::MoveCursorBack(n).into()
         }
         Key(KeyEvent::L) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorForward(n),
-            ))
+            MoveCursorForward(n).into()
         }
         Key(KeyEvent::W) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorWordForward(n),
-            ))
+            MoveCursorWordForward(n).into()
         }
         Key(KeyEvent::E) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorWordEnd(n),
-            ))
+            MoveCursorWordEnd(n).into()
         }
         Key(KeyEvent::B) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorWordBack(n),
-            ))
+            MoveCursorWordBack(n).into()
         }
         Key(KeyEvent::CapG) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorToLine(n),
-            ))
+            MoveCursorToLine(n).into()
         }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::IdleMode,
-            ))
+            IdleMode.into()
         }
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
@@ -226,21 +174,18 @@ async fn consume_gateway(
     event: Event,
 ) -> Result<NotebookTransition> {
     use Event::*;
+    use NormalModeTransition::*;
 
     match event {
         Key(KeyEvent::G) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorTop,
-            ))
+            NormalModeTransition::MoveCursorTop.into()
         }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Ok(NotebookTransition::EditingNormalMode(
-                NormalModeTransition::IdleMode,
-            ))
+            IdleMode.into()
         }
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
@@ -248,5 +193,11 @@ async fn consume_gateway(
             consume_idle(db, state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+impl From<NormalModeTransition> for Result<NotebookTransition> {
+    fn from(transition: NormalModeTransition) -> Self {
+        Ok(NotebookTransition::EditingNormalMode(transition))
     }
 }
