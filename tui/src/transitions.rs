@@ -7,7 +7,10 @@ use {
     glues_core::{
         data::{Directory, Note},
         state::{GetInner, NotebookState},
-        transition::{EntryTransition, NormalModeTransition, NotebookTransition, Transition},
+        transition::{
+            EntryTransition, NormalModeTransition, NotebookTransition, Transition,
+            VisualModeTransition,
+        },
         NotebookEvent,
     },
     std::time::SystemTime,
@@ -67,10 +70,7 @@ impl App {
                 self.context.notebook.open_note(note, content);
             }
             NotebookTransition::ViewMode(_note) => {
-                let content = self.context.notebook.editor.lines().join("\n");
-                let event = NotebookEvent::UpdateNoteContent(content).into();
-
-                self.glues.dispatch(event).await.log_unwrap();
+                self.save().await;
             }
             NotebookTransition::BrowseNoteTree => {
                 self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
@@ -134,6 +134,7 @@ impl App {
                 self.glues.dispatch(event).await.log_unwrap();
             }
             NotebookTransition::EditingNormalMode(NormalModeTransition::IdleMode) => {
+                self.context.notebook.editor.cancel_selection();
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
@@ -368,53 +369,199 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
+            NotebookTransition::EditingVisualMode(transition) => {
+                self.handle_visual_mode_transition(transition);
+            }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");
                 self.context.alert = Some(message);
             }
             _ => {}
         }
+    }
 
-        fn cursor_move_forward(editor: &TextArea, n: usize) -> CursorMove {
-            let (row, col) = editor.cursor();
-            if col + n >= editor.lines()[row].len() {
-                CursorMove::End
-            } else {
-                CursorMove::Jump(row as u16, (col + n) as u16)
+    fn handle_visual_mode_transition(&mut self, transition: VisualModeTransition) {
+        use VisualModeTransition::*;
+
+        match transition {
+            IdleMode => {
+                self.context.notebook.editor.start_selection();
+                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
-        }
+            NumberingMode | GatewayMode => {}
+            MoveCursorDown(n) => {
+                let editor = &mut self.context.notebook.editor;
+                let cursor_move = cursor_move_down(editor, n);
 
-        fn cursor_move_down(editor: &TextArea, n: usize) -> CursorMove {
-            let num_lines = editor.lines().len();
-            let (row, col) = editor.cursor();
-            if row + n >= num_lines {
-                CursorMove::Bottom
-            } else {
-                CursorMove::Jump((row + n) as u16, col as u16)
+                editor.move_cursor(cursor_move);
+                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
-        }
+            MoveCursorUp(n) => {
+                let editor = &mut self.context.notebook.editor;
+                let cursor_move = cursor_move_up(editor, n);
 
-        fn cursor_move_up(editor: &TextArea, n: usize) -> CursorMove {
-            let (row, col) = editor.cursor();
-            if row < n {
-                CursorMove::Top
-            } else {
-                CursorMove::Jump((row - n) as u16, col as u16)
+                editor.move_cursor(cursor_move);
+                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
-        }
+            MoveCursorBack(n) => {
+                let (row, col) = self.context.notebook.editor.cursor();
+                let cursor_move = if col < n {
+                    CursorMove::Head
+                } else {
+                    CursorMove::Jump(row as u16, (col - n) as u16)
+                };
 
-        fn move_cursor_to_line_non_empty_start(editor: &mut TextArea) {
-            editor.move_cursor(CursorMove::Head);
+                self.context.notebook.editor.move_cursor(cursor_move);
+                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
+            }
+            MoveCursorForward(n) => {
+                let editor = &mut self.context.notebook.editor;
+                let cursor_move = cursor_move_forward(editor, n);
 
-            let (row, _) = editor.cursor();
-            let is_whitespace_at_first = editor.lines()[row]
-                .chars()
-                .next()
-                .map(|c| c.is_whitespace())
-                .unwrap_or(false);
-            if is_whitespace_at_first {
-                editor.move_cursor(CursorMove::WordForward);
+                editor.move_cursor(cursor_move);
+                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
+            }
+            MoveCursorWordForward(n) => {
+                for _ in 0..n {
+                    self.context
+                        .notebook
+                        .editor
+                        .move_cursor(CursorMove::WordForward);
+                }
+
+                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
+            }
+            MoveCursorWordEnd(n) => {
+                for _ in 0..n {
+                    self.context
+                        .notebook
+                        .editor
+                        .move_cursor(CursorMove::WordEnd);
+                }
+
+                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
+            }
+            MoveCursorWordBack(n) => {
+                for _ in 0..n {
+                    self.context
+                        .notebook
+                        .editor
+                        .move_cursor(CursorMove::WordBack);
+                }
+
+                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
+            }
+            MoveCursorLineStart => {
+                self.context.notebook.editor.move_cursor(CursorMove::Head);
+            }
+            MoveCursorLineEnd => {
+                self.context.notebook.editor.move_cursor(CursorMove::End);
+            }
+            MoveCursorLineNonEmptyStart => {
+                move_cursor_to_line_non_empty_start(&mut self.context.notebook.editor);
+            }
+            MoveCursorBottom => {
+                self.context.notebook.editor.move_cursor(CursorMove::Bottom);
+            }
+            MoveCursorTop => {
+                self.context.notebook.editor.move_cursor(CursorMove::Top);
+            }
+            MoveCursorToLine(n) => {
+                self.context
+                    .notebook
+                    .editor
+                    .move_cursor(CursorMove::Jump((n - 1) as u16, 0));
+                self.context
+                    .notebook
+                    .editor
+                    .move_cursor(CursorMove::WordForward);
+                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
+            }
+            YankSelection => {
+                let editor = &mut self.context.notebook.editor;
+                reselect_for_yank(editor);
+                editor.copy();
+                self.context.notebook.line_yanked = false;
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            DeleteSelection => {
+                let editor = &mut self.context.notebook.editor;
+                reselect_for_yank(editor);
+                editor.cut();
+                self.context.notebook.line_yanked = false;
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            DeleteSelectionAndInsertMode => {
+                let editor = &mut self.context.notebook.editor;
+                reselect_for_yank(editor);
+                self.context.notebook.editor.cut();
+                self.context.notebook.line_yanked = false;
+                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
         }
     }
+
+    pub(crate) async fn save(&mut self) {
+        let content = self.context.notebook.editor.lines().join("\n");
+        let event = NotebookEvent::UpdateNoteContent(content).into();
+
+        self.glues.dispatch(event).await.log_unwrap();
+    }
+}
+
+fn cursor_move_forward(editor: &TextArea, n: usize) -> CursorMove {
+    let (row, col) = editor.cursor();
+    if col + n >= editor.lines()[row].len() {
+        CursorMove::End
+    } else {
+        CursorMove::Jump(row as u16, (col + n) as u16)
+    }
+}
+
+fn cursor_move_down(editor: &TextArea, n: usize) -> CursorMove {
+    let num_lines = editor.lines().len();
+    let (row, col) = editor.cursor();
+    if row + n >= num_lines {
+        CursorMove::Bottom
+    } else {
+        CursorMove::Jump((row + n) as u16, col as u16)
+    }
+}
+
+fn cursor_move_up(editor: &TextArea, n: usize) -> CursorMove {
+    let (row, col) = editor.cursor();
+    if row < n {
+        CursorMove::Top
+    } else {
+        CursorMove::Jump((row - n) as u16, col as u16)
+    }
+}
+
+fn move_cursor_to_line_non_empty_start(editor: &mut TextArea) {
+    editor.move_cursor(CursorMove::Head);
+
+    let (row, _) = editor.cursor();
+    let is_whitespace_at_first = editor.lines()[row]
+        .chars()
+        .next()
+        .map(|c| c.is_whitespace())
+        .unwrap_or(false);
+    if is_whitespace_at_first {
+        editor.move_cursor(CursorMove::WordForward);
+    }
+}
+
+fn reselect_for_yank(editor: &mut TextArea) {
+    let (begin, end) = match editor.selection_range() {
+        None => return,
+        Some(range) => range,
+    };
+
+    editor.cancel_selection();
+    editor.move_cursor(CursorMove::Jump(begin.0 as u16, begin.1 as u16));
+    editor.start_selection();
+    editor.move_cursor(CursorMove::Jump(end.0 as u16, end.1 as u16));
+    editor.move_cursor(CursorMove::Forward);
 }

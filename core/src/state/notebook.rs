@@ -12,7 +12,7 @@ use {
     consume::{directory, note, traverse},
     inner_state::{
         InnerState::{self, *},
-        VimState,
+        VimNormalState, VimVisualState,
     },
 };
 
@@ -92,22 +92,22 @@ impl NotebookState {
             NoteTreeNumber(n) => {
                 format!("Steps: '{n}' selected")
             }
-            EditingNormalMode(VimState::Idle) => {
+            EditingNormalMode(VimNormalState::Idle) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode")
             }
-            EditingNormalMode(VimState::Numbering(n)) => {
+            EditingNormalMode(VimNormalState::Numbering(n)) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode, steps: '{n}'")
             }
-            EditingNormalMode(VimState::Gateway) => {
+            EditingNormalMode(VimNormalState::Gateway) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode - gateway")
             }
-            EditingNormalMode(VimState::Yank(n)) => {
+            EditingNormalMode(VimNormalState::Yank(n)) => {
                 let name = &self.get_selected_note()?.name;
 
                 let n = if *n >= 2 {
@@ -117,7 +117,7 @@ impl NotebookState {
                 };
                 format!("Note '{name}' normal mode - yank '{n}y'")
             }
-            EditingNormalMode(VimState::Yank2(n1, n2)) => {
+            EditingNormalMode(VimNormalState::Yank2(n1, n2)) => {
                 let name = &self.get_selected_note()?.name;
                 let n1 = if *n1 >= 2 {
                     format!("{n1}")
@@ -132,7 +132,7 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - yank '{n1}y{n2}'")
             }
-            EditingNormalMode(VimState::Delete(n)) => {
+            EditingNormalMode(VimNormalState::Delete(n)) => {
                 let name = &self.get_selected_note()?.name;
 
                 let n = if *n >= 2 {
@@ -142,7 +142,7 @@ impl NotebookState {
                 };
                 format!("Note '{name}' normal mode - delete '{n}d'")
             }
-            EditingNormalMode(VimState::Delete2(n1, n2)) => {
+            EditingNormalMode(VimNormalState::Delete2(n1, n2)) => {
                 let name = &self.get_selected_note()?.name;
                 let n1 = if *n1 >= 2 {
                     format!("{n1}")
@@ -156,6 +156,21 @@ impl NotebookState {
                 };
 
                 format!("Note '{name}' normal mode - delete '{n1}d{n2}'")
+            }
+            EditingVisualMode(VimVisualState::Idle) => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' visual mode")
+            }
+            EditingVisualMode(VimVisualState::Numbering(n)) => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' visual mode, input: '{n}'")
+            }
+            EditingVisualMode(VimVisualState::Gateway) => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' visual mode - gateway")
             }
             EditingInsertMode => {
                 let name = &self.get_selected_note()?.name;
@@ -197,7 +212,7 @@ impl NotebookState {
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            EditingNormalMode(VimState::Idle) => {
+            EditingNormalMode(VimNormalState::Idle) => {
                 /* TODO:
                     [o] insert new line below
                     [O] insert new line above
@@ -216,7 +231,7 @@ impl NotebookState {
                     "[Esc] Quit".to_owned(),
                 ]
             }
-            EditingNormalMode(VimState::Numbering(n)) => {
+            EditingNormalMode(VimNormalState::Numbering(n)) => {
                 // TODO: s, S, x, y, d
 
                 vec![
@@ -227,20 +242,20 @@ impl NotebookState {
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            EditingNormalMode(VimState::Gateway) => {
+            EditingNormalMode(VimNormalState::Gateway) => {
                 vec![
                     "[g] Move cursor to top".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            EditingNormalMode(VimState::Yank(n)) => {
+            EditingNormalMode(VimNormalState::Yank(n)) => {
                 vec![
                     format!("[y] Yank {n} lines"),
                     "[1-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            EditingNormalMode(VimState::Yank2(n1, n2)) => {
+            EditingNormalMode(VimNormalState::Yank2(n1, n2)) => {
                 vec![
                     if *n1 == 1 {
                         format!("[y] Yank {n2} lines")
@@ -251,14 +266,14 @@ impl NotebookState {
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            EditingNormalMode(VimState::Delete(n)) => {
+            EditingNormalMode(VimNormalState::Delete(n)) => {
                 vec![
                     format!("[d] Delete {n} lines"),
                     "[1-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            EditingNormalMode(VimState::Delete2(n1, n2)) => {
+            EditingNormalMode(VimNormalState::Delete2(n1, n2)) => {
                 vec![
                     if *n1 == 1 {
                         format!("[d] Delete {n2} lines")
@@ -266,6 +281,28 @@ impl NotebookState {
                         format!("[d] Delete {n1}*{n2} lines")
                     },
                     "[0-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingVisualMode(VimVisualState::Idle) => {
+                //todo
+                vec![
+                    "[hjkl] Move".to_owned(),
+                    "[1-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingVisualMode(VimVisualState::Numbering(n)) => {
+                //todo
+                vec![
+                    format!("[h|j|k|l] Move cursor {n} steps"),
+                    "[1-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingVisualMode(VimVisualState::Gateway) => {
+                vec![
+                    "[g] Move cursor to top".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }

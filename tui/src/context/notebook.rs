@@ -43,6 +43,7 @@ pub enum ContextState {
     NoteActionsDialog,
     DirectoryActionsDialog,
     EditorNormalMode { idle: bool },
+    EditorVisualMode,
     EditorInsertMode,
 }
 
@@ -145,6 +146,7 @@ impl NotebookContext {
             ContextState::NoteTreeBrowsing => self.consume_on_note_tree_browsing(code),
             ContextState::NoteTreeNumbering => self.consume_on_note_tree_numbering(code),
             ContextState::EditorNormalMode { idle } => self.consume_on_editor_normal(input, idle),
+            ContextState::EditorVisualMode => Action::PassThrough,
             ContextState::EditorInsertMode => self.consume_on_editor_insert(input),
             ContextState::NoteActionsDialog => self.consume_on_note_actions(code),
             ContextState::DirectoryActionsDialog => self.consume_on_directory_actions(code),
@@ -260,11 +262,12 @@ impl NotebookContext {
 
                 Action::None
             }
-            KeyCode::Esc if idle => TuiAction::Confirm {
+            KeyCode::Esc if idle => TuiAction::SaveAndConfirm {
                 message: "Do you want to quit?".to_owned(),
                 action: Box::new(TuiAction::Quit.into()),
             }
             .into(),
+            KeyCode::Char('n') => TuiAction::SaveAndPassThrough.into(),
             _ => Action::PassThrough,
         }
     }

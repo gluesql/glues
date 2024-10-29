@@ -7,7 +7,7 @@ mod transitions;
 mod views;
 
 use {
-    action::{Action, TuiAction},
+    action::Action,
     color_eyre::Result,
     context::Context,
     glues_core::Glues,
@@ -100,12 +100,11 @@ impl App {
                     return Ok(());
                 }
                 _ => {
-                    match self.context.consume(&input).await {
-                        Action::Tui(TuiAction::Quit) => return Ok(()),
-                        action => {
-                            self.handle_action(action, input).await;
-                        }
-                    };
+                    let action = self.context.consume(&input).await;
+                    let quit = self.handle_action(action, input).await;
+                    if quit {
+                        return Ok(());
+                    }
                 }
             }
         }

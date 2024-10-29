@@ -87,6 +87,7 @@ pub enum KeyEvent {
     P,
     S,
     U,
+    V,
     W,
     X,
     Y,

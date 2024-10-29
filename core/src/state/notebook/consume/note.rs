@@ -1,7 +1,7 @@
 use crate::{
     data::{Directory, Note},
     db::Db,
-    state::notebook::{DirectoryItem, InnerState, NotebookState, SelectedItem, VimState},
+    state::notebook::{DirectoryItem, InnerState, NotebookState, SelectedItem, VimNormalState},
     Error, NotebookTransition, Result,
 };
 
@@ -93,7 +93,7 @@ pub async fn open(
     let content = db.fetch_note_content(note.id.clone()).await?;
 
     state.editing = Some(note.clone());
-    state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
     Ok(NotebookTransition::OpenNote { note, content })
 }
@@ -101,7 +101,7 @@ pub async fn open(
 pub async fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
     let note = state.get_editing()?.clone();
 
-    state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
     Ok(NotebookTransition::ViewMode(note))
 }
