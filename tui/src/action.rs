@@ -31,6 +31,11 @@ pub enum TuiAction {
         message: String,
         action: Box<Action>,
     },
+    SaveAndConfirm {
+        // todo: there might be a better way to do this
+        message: String,
+        action: Box<Action>,
+    },
     Prompt {
         message: Vec<Line<'static>>,
         action: Box<Action>,
@@ -38,6 +43,7 @@ pub enum TuiAction {
     },
     Help,
     ShowEditorKeymap,
+    SaveAndPassThrough,
     Quit,
 
     OpenCsv,
@@ -80,9 +86,11 @@ impl From<EntryEvent> for Action {
 }
 
 impl App {
-    pub(super) async fn handle_action(&mut self, action: Action, input: Input) {
+    pub(super) async fn handle_action(&mut self, action: Action, input: Input) -> bool {
         match action {
-            Action::Tui(TuiAction::Quit) => {}
+            Action::Tui(TuiAction::Quit) => {
+                return true;
+            }
             Action::Tui(TuiAction::Help) => {
                 self.context.help = true;
             }
@@ -93,6 +101,10 @@ impl App {
                 self.context.alert = Some(message);
             }
             Action::Tui(TuiAction::Confirm { message, action }) => {
+                self.context.confirm = Some((message, *action));
+            }
+            Action::Tui(TuiAction::SaveAndConfirm { message, action }) => {
+                self.save().await;
                 self.context.confirm = Some((message, *action));
             }
             Action::Tui(TuiAction::Prompt {
@@ -193,7 +205,7 @@ impl App {
                     .log_expect("prompt must not be none");
                 if path.is_empty() {
                     self.context.alert = Some("Path cannot be empty".to_string());
-                    return;
+                    return false;
                 }
 
                 config::update(LAST_CSV_PATH, &path).await;
@@ -212,7 +224,7 @@ impl App {
                     .log_expect("prompt must not be none");
                 if path.is_empty() {
                     self.context.alert = Some("Path cannot be empty".to_string());
-                    return;
+                    return false;
                 }
 
                 config::update(LAST_JSON_PATH, &path).await;
@@ -231,7 +243,7 @@ impl App {
                     .log_expect("prompt must not be none");
                 if path.is_empty() {
                     self.context.alert = Some("Path cannot be empty".to_string());
-                    return;
+                    return false;
                 }
 
                 config::update(LAST_FILE_PATH, &path).await;
@@ -250,7 +262,7 @@ impl App {
                     .log_expect("prompt must not be none");
                 if new_name.is_empty() {
                     self.context.alert = Some("Note name cannot be empty".to_string());
-                    return;
+                    return false;
                 }
 
                 let transition = self
@@ -275,7 +287,7 @@ impl App {
                     .log_expect("prompt must not be none");
                 if note_name.is_empty() {
                     self.context.alert = Some("Note name cannot be empty".to_string());
-                    return;
+                    return false;
                 }
 
                 let transition = self
@@ -292,7 +304,7 @@ impl App {
                     .log_expect("prompt must not be none");
                 if directory_name.is_empty() {
                     self.context.alert = Some("Directory name cannot be empty".to_string());
-                    return;
+                    return false;
                 }
 
                 let transition = self
@@ -309,7 +321,7 @@ impl App {
                     .log_expect("prompt must not be none");
                 if new_name.is_empty() {
                     self.context.alert = Some("Directory name cannot be empty".to_string());
-                    return;
+                    return false;
                 }
 
                 let transition = self
@@ -331,11 +343,25 @@ impl App {
                 let transition = self.glues.dispatch(event).await.log_unwrap();
                 self.handle_transition(transition).await;
             }
+
+            Action::Tui(TuiAction::SaveAndPassThrough) => {
+                self.save().await;
+
+                let event = match to_event(input) {
+                    Some(event) => event.into(),
+                    None => {
+                        return false;
+                    }
+                };
+
+                let transition = self.glues.dispatch(event).await.log_unwrap();
+                self.handle_transition(transition).await;
+            }
             Action::PassThrough => {
                 let event = match to_event(input) {
                     Some(event) => event.into(),
                     None => {
-                        return;
+                        return false;
                     }
                 };
 
@@ -344,6 +370,8 @@ impl App {
             }
             Action::None => {}
         };
+
+        false
     }
 }
 
@@ -372,6 +400,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('p') => KeyEvent::P,
         KeyCode::Char('s') => KeyEvent::S,
         KeyCode::Char('u') => KeyEvent::U,
+        KeyCode::Char('v') => KeyEvent::V,
         KeyCode::Char('w') => KeyEvent::W,
         KeyCode::Char('x') => KeyEvent::X,
         KeyCode::Char('y') => KeyEvent::Y,

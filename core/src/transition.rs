@@ -78,6 +78,7 @@ pub enum NotebookTransition {
     SelectNext(usize),
     SelectPrev(usize),
     EditingNormalMode(NormalModeTransition),
+    EditingVisualMode(VisualModeTransition),
 }
 
 #[derive(Display)]
@@ -114,6 +115,29 @@ pub enum NormalModeTransition {
     Redo,
     YankLines(usize),
     DeleteLines(usize),
+}
+
+#[derive(Display)]
+pub enum VisualModeTransition {
+    IdleMode,
+    NumberingMode,
+    GatewayMode,
+    MoveCursorDown(usize),
+    MoveCursorUp(usize),
+    MoveCursorBack(usize),
+    MoveCursorForward(usize),
+    MoveCursorWordForward(usize),
+    MoveCursorWordEnd(usize),
+    MoveCursorWordBack(usize),
+    MoveCursorLineStart,
+    MoveCursorLineEnd,
+    MoveCursorLineNonEmptyStart,
+    MoveCursorTop,
+    MoveCursorBottom,
+    MoveCursorToLine(usize),
+    YankSelection,
+    DeleteSelection,
+    DeleteSelectionAndInsertMode,
 }
 
 impl From<EntryTransition> for Transition {
