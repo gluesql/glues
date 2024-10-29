@@ -1,7 +1,7 @@
 use crate::{
     db::Db,
     state::notebook::{InnerState, NotebookState, VimNormalState},
-    transition::{NormalModeTransition, NotebookTransition, VisualModeTransition},
+    transition::{NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition},
     Error, Event, KeyEvent, NumKey, Result,
 };
 
@@ -78,6 +78,7 @@ async fn consume_idle(
 
             NumberingMode.into()
         }
+        Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(VimKeymapKind::VisualIdle)),
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
@@ -167,17 +168,6 @@ async fn consume_numbering(
 
             MoveCursorToLine(n).into()
         }
-        Key(KeyEvent::X | KeyEvent::D) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
-
-            DeleteSelection.into()
-        }
-
-        Key(KeyEvent::Y) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
-
-            YankSelection.into()
-        }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
@@ -185,6 +175,9 @@ async fn consume_numbering(
                 NormalModeTransition::IdleMode,
             ))
         }
+        Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(
+            VimKeymapKind::VisualNumbering,
+        )),
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 

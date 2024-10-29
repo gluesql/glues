@@ -186,8 +186,7 @@ impl NotebookState {
                 vec![
                     "[o] Open note".to_owned(),
                     "[h] Close parent".to_owned(),
-                    "[j] Down".to_owned(),
-                    "[k] Up".to_owned(),
+                    "[j|k] Down | Up".to_owned(),
                     "[1-9] Set steps".to_owned(),
                     "[m] More actions".to_owned(),
                     "[Esc] Quit".to_owned(),
@@ -197,8 +196,7 @@ impl NotebookState {
                 vec![
                     "[l] Toggle".to_owned(),
                     "[h] Close parent".to_owned(),
-                    "[j] Down".to_owned(),
-                    "[k] Up".to_owned(),
+                    "[j|k] Down | Up".to_owned(),
                     "[1-9] Set steps".to_owned(),
                     "[m] More actions".to_owned(),
                     "[Esc] Quit".to_owned(),
@@ -213,32 +211,25 @@ impl NotebookState {
                 ]
             }
             EditingNormalMode(VimNormalState::Idle) => {
-                /* TODO:
-                    [o] insert new line below
-                    [O] insert new line above
-                    [0] move to line start
-                    [$] move to line end
+                /*
+                    h j k l w e b [1-9] o O 0 $
                     a, A, I, G, g, s, S, x, ^, y, d, u, Ctrl+r
                 */
-
                 vec![
                     "[i] Insert mode".to_owned(),
+                    "[v] Visual mode".to_owned(),
                     "[n] Browse".to_owned(),
-                    "[h|j|k|l] Move cursor".to_owned(),
-                    "[w|e|b] Word forward|end|back".to_owned(),
-                    "[1-9] Set steps".to_owned(),
                     "[t] Toggle line number".to_owned(),
+                    "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Quit".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Numbering(n)) => {
-                // TODO: s, S, x, y, d
-
+                // h j k l [0-9] s S x y d w e b G
                 vec![
                     format!("[h|j|k|l] Move cursor {n} steps"),
-                    format!("[w|e|b] Word forward|end|back {n} steps"),
-                    format!("[G] Go to line {n}"),
                     "[0-9] Append steps".to_owned(),
+                    "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
@@ -285,18 +276,20 @@ impl NotebookState {
                 ]
             }
             EditingVisualMode(VimVisualState::Idle) => {
-                //todo
+                // more in the keymap
                 vec![
-                    "[hjkl] Move".to_owned(),
+                    "[h|j|k|l] Move cursor".to_owned(),
                     "[1-9] Append steps".to_owned(),
+                    "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingVisualMode(VimVisualState::Numbering(n)) => {
-                //todo
+                // more in the keymap
                 vec![
-                    format!("[h|j|k|l] Move cursor {n} steps"),
-                    "[1-9] Append steps".to_owned(),
+                    format!("[h|j|k|l] move cursor {n} steps"),
+                    "[0-9] append steps".to_owned(),
+                    "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }

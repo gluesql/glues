@@ -11,7 +11,7 @@ use crate::{db::Db, state::notebook::NotebookState, Event, NotebookTransition, R
 pub use editing_normal_mode::VimNormalState;
 pub use editing_visual_mode::VimVisualState;
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum InnerState {
     NoteSelected,
     NoteMoreActions,

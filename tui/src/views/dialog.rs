@@ -5,6 +5,7 @@ mod editor_keymap;
 mod help;
 mod note_actions;
 mod prompt;
+mod vim_keymap;
 
 use {
     crate::{
@@ -15,7 +16,10 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, context: &mut Context) {
-    if context.editor_keymap {
+    if let Some(kind) = context.vim_keymap {
+        vim_keymap::draw(frame, kind);
+        return;
+    } else if context.editor_keymap {
         editor_keymap::draw(frame);
         return;
     } else if context.help {

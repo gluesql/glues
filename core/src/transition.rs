@@ -79,6 +79,15 @@ pub enum NotebookTransition {
     SelectPrev(usize),
     EditingNormalMode(NormalModeTransition),
     EditingVisualMode(VisualModeTransition),
+    ShowVimKeymap(VimKeymapKind),
+}
+
+#[derive(Clone, Copy, Display)]
+pub enum VimKeymapKind {
+    NormalIdle,
+    NormalNumbering,
+    VisualIdle,
+    VisualNumbering,
 }
 
 #[derive(Display)]

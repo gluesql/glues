@@ -3,6 +3,7 @@ pub mod notebook;
 
 use {
     crate::{log, logger::*, Action},
+    glues_core::transition::VimKeymapKind,
     ratatui::{
         crossterm::event::{Event as Input, KeyCode, KeyEvent},
         style::{Style, Stylize},
@@ -55,6 +56,7 @@ pub struct Context {
 
     pub help: bool,
     pub editor_keymap: bool,
+    pub vim_keymap: Option<VimKeymapKind>,
 }
 
 impl Default for Context {
@@ -71,6 +73,7 @@ impl Default for Context {
 
             help: false,
             editor_keymap: false,
+            vim_keymap: None,
         }
     }
 }
@@ -86,7 +89,10 @@ impl Context {
     }
 
     pub async fn consume(&mut self, input: &Input) -> Action {
-        if self.editor_keymap {
+        if self.vim_keymap.is_some() {
+            self.vim_keymap = None;
+            return Action::None;
+        } else if self.editor_keymap {
             self.editor_keymap = false;
             return Action::None;
         } else if self.help {
