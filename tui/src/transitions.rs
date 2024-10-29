@@ -133,21 +133,34 @@ impl App {
 
                 self.glues.dispatch(event).await.log_unwrap();
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::IdleMode) => {
+            NotebookTransition::EditingNormalMode(transition) => {
+                self.handle_normal_mode_transition(transition);
+            }
+            NotebookTransition::EditingVisualMode(transition) => {
+                self.handle_visual_mode_transition(transition);
+            }
+            NotebookTransition::Alert(message) => {
+                log!("[Alert] {message}");
+                self.context.alert = Some(message);
+            }
+            _ => {}
+        }
+    }
+
+    fn handle_normal_mode_transition(&mut self, transition: NormalModeTransition) {
+        use NormalModeTransition::*;
+
+        match transition {
+            IdleMode => {
                 self.context.notebook.editor.cancel_selection();
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(
-                NormalModeTransition::NumberingMode
-                | NormalModeTransition::GatewayMode
-                | NormalModeTransition::YankMode
-                | NormalModeTransition::DeleteMode,
-            ) => {
+            NumberingMode | GatewayMode | YankMode | DeleteMode => {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: false };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorDown(n)) => {
+            MoveCursorDown(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_down(editor, n);
 
@@ -155,7 +168,7 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorUp(n)) => {
+            MoveCursorUp(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_up(editor, n);
 
@@ -163,7 +176,7 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorBack(n)) => {
+            MoveCursorBack(n) => {
                 let (row, col) = self.context.notebook.editor.cursor();
                 let cursor_move = if col < n {
                     CursorMove::Head
@@ -175,7 +188,7 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorForward(n)) => {
+            MoveCursorForward(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_forward(editor, n);
 
@@ -183,9 +196,7 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorWordForward(
-                n,
-            )) => {
+            MoveCursorWordForward(n) => {
                 for _ in 0..n {
                     self.context
                         .notebook
@@ -196,7 +207,7 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorWordEnd(n)) => {
+            MoveCursorWordEnd(n) => {
                 for _ in 0..n {
                     self.context
                         .notebook
@@ -207,7 +218,7 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorWordBack(n)) => {
+            MoveCursorWordBack(n) => {
                 for _ in 0..n {
                     self.context
                         .notebook
@@ -218,24 +229,22 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorLineStart) => {
+            MoveCursorLineStart => {
                 self.context.notebook.editor.move_cursor(CursorMove::Head);
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorLineEnd) => {
+            MoveCursorLineEnd => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
             }
-            NotebookTransition::EditingNormalMode(
-                NormalModeTransition::MoveCursorLineNonEmptyStart,
-            ) => {
+            MoveCursorLineNonEmptyStart => {
                 move_cursor_to_line_non_empty_start(&mut self.context.notebook.editor);
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorTop) => {
+            MoveCursorTop => {
                 self.context.notebook.editor.move_cursor(CursorMove::Top);
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorBottom) => {
+            MoveCursorBottom => {
                 self.context.notebook.editor.move_cursor(CursorMove::Bottom);
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorToLine(n)) => {
+            MoveCursorToLine(n) => {
                 self.context
                     .notebook
                     .editor
@@ -247,36 +256,36 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertNewLineBelow) => {
+            InsertNewLineBelow => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
                 self.context.notebook.editor.insert_newline();
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertNewLineAbove) => {
+            InsertNewLineAbove => {
                 self.context.notebook.editor.move_cursor(CursorMove::Head);
                 self.context.notebook.editor.insert_newline();
                 self.context.notebook.editor.move_cursor(CursorMove::Up);
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertAtCursor) => {
+            InsertAtCursor => {
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertAtLineStart) => {
+            InsertAtLineStart => {
                 self.context.notebook.editor.move_cursor(CursorMove::Head);
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertAfterCursor) => {
+            InsertAfterCursor => {
                 self.context
                     .notebook
                     .editor
                     .move_cursor(CursorMove::Forward);
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::InsertAtLineEnd) => {
+            InsertAtLineEnd => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::DeleteChars(n)) => {
+            DeleteChars(n) => {
                 let editor = &mut self.context.notebook.editor;
                 editor.start_selection();
                 let cursor_move = cursor_move_forward(editor, n);
@@ -287,9 +296,7 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(
-                NormalModeTransition::DeleteCharsAndInsertMode(n),
-            ) => {
+            NormalModeTransition::DeleteCharsAndInsertMode(n) => {
                 let editor = &mut self.context.notebook.editor;
                 editor.start_selection();
                 let cursor_move = cursor_move_forward(editor, n);
@@ -299,9 +306,7 @@ impl App {
 
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
-            NotebookTransition::EditingNormalMode(
-                NormalModeTransition::DeleteLineAndInsertMode(n),
-            ) => {
+            NormalModeTransition::DeleteLineAndInsertMode(n) => {
                 let editor = &mut self.context.notebook.editor;
                 editor.move_cursor(CursorMove::Head);
                 editor.start_selection();
@@ -312,7 +317,7 @@ impl App {
 
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::Paste) => {
+            Paste => {
                 let editor = &mut self.context.notebook.editor;
                 if self.context.notebook.line_yanked {
                     editor.move_cursor(CursorMove::End);
@@ -323,13 +328,13 @@ impl App {
                     editor.paste();
                 }
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::Undo) => {
+            Undo => {
                 self.context.notebook.editor.undo();
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::Redo) => {
+            Redo => {
                 self.context.notebook.editor.redo();
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::YankLines(n)) => {
+            YankLines(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor = editor.cursor();
                 editor.move_cursor(CursorMove::Head);
@@ -344,7 +349,7 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::DeleteLines(n)) => {
+            DeleteLines(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let (row, _) = editor.cursor();
 
@@ -369,15 +374,7 @@ impl App {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NotebookTransition::EditingVisualMode(transition) => {
-                self.handle_visual_mode_transition(transition);
-            }
-            NotebookTransition::Alert(message) => {
-                log!("[Alert] {message}");
-                self.context.alert = Some(message);
-            }
-            _ => {}
-        }
+        };
     }
 
     fn handle_visual_mode_transition(&mut self, transition: VisualModeTransition) {
