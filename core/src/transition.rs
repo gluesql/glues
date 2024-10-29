@@ -110,6 +110,8 @@ pub enum NormalModeTransition {
     DeleteCharsAndInsertMode(usize),
     DeleteLineAndInsertMode(usize),
     Paste,
+    Undo,
+    Redo,
     YankLines(usize),
     DeleteLines(usize),
 }

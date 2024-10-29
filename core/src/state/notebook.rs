@@ -203,7 +203,7 @@ impl NotebookState {
                     [O] insert new line above
                     [0] move to line start
                     [$] move to line end
-                    a, A, I, G, g, s, S, x, ^, y, d
+                    a, A, I, G, g, s, S, x, ^, y, d, u, Ctrl+r
                 */
 
                 vec![

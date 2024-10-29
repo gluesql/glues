@@ -10,7 +10,7 @@ use {
     },
     glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey},
     ratatui::{
-        crossterm::event::{Event as Input, KeyCode},
+        crossterm::event::{Event as Input, KeyCode, KeyModifiers},
         style::Stylize,
         text::Line,
     },
@@ -348,10 +348,12 @@ impl App {
 }
 
 fn to_event(input: Input) -> Option<KeyEvent> {
-    let code = match input {
-        Input::Key(key) => key.code,
+    let key = match input {
+        Input::Key(key) => key,
         _ => return None,
     };
+    let code = key.code;
+    let ctrl = key.modifiers == KeyModifiers::CONTROL;
 
     let event = match code {
         KeyCode::Char('a') => KeyEvent::A,
@@ -369,6 +371,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('o') => KeyEvent::O,
         KeyCode::Char('p') => KeyEvent::P,
         KeyCode::Char('s') => KeyEvent::S,
+        KeyCode::Char('u') => KeyEvent::U,
         KeyCode::Char('w') => KeyEvent::W,
         KeyCode::Char('x') => KeyEvent::X,
         KeyCode::Char('y') => KeyEvent::Y,
@@ -377,6 +380,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('I') => KeyEvent::CapI,
         KeyCode::Char('O') => KeyEvent::CapO,
         KeyCode::Char('S') => KeyEvent::CapS,
+        KeyCode::Char('r') if ctrl => KeyEvent::CtrlR,
         KeyCode::Char('1') => NumKey::One.into(),
         KeyCode::Char('2') => NumKey::Two.into(),
         KeyCode::Char('3') => NumKey::Three.into(),
