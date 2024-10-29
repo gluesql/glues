@@ -256,7 +256,7 @@ async fn consume_yank(
         Key(KeyEvent::Y) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Yank(n).into()
+            YankLines(n).into()
         }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
@@ -292,7 +292,7 @@ async fn consume_yank2(
         Key(KeyEvent::Y) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
-            Yank(n1 * n2).into()
+            YankLines(n1 * n2).into()
         }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
