@@ -3,7 +3,9 @@ use {
     crate::{
         db::Db,
         state::notebook::{directory, note, InnerState, NotebookState},
-        transition::{NormalModeTransition, NotebookTransition, VisualModeTransition},
+        transition::{
+            NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition,
+        },
         Error, Event, KeyEvent, NotebookEvent, NumKey, Result,
     },
 };
@@ -136,6 +138,7 @@ async fn consume_idle(
 
             NumberingMode.into()
         }
+        Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(VimKeymapKind::NormalIdle)),
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
@@ -227,6 +230,9 @@ async fn consume_numbering(
 
             IdleMode.into()
         }
+        Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(
+            VimKeymapKind::NormalNumbering,
+        )),
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 

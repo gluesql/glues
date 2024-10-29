@@ -55,6 +55,9 @@ impl App {
 
     pub(super) async fn handle_notebook_transition(&mut self, transition: NotebookTransition) {
         match transition {
+            NotebookTransition::ShowVimKeymap(kind) => {
+                self.context.vim_keymap = Some(kind);
+            }
             NotebookTransition::OpenDirectory { id, .. } => {
                 log!("Opening directory {id}");
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();

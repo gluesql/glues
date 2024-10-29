@@ -384,6 +384,8 @@ fn to_event(input: Input) -> Option<KeyEvent> {
     let ctrl = key.modifiers == KeyModifiers::CONTROL;
 
     let event = match code {
+        KeyCode::Char('h') if ctrl => KeyEvent::CtrlH,
+        KeyCode::Char('r') if ctrl => KeyEvent::CtrlR,
         KeyCode::Char('a') => KeyEvent::A,
         KeyCode::Char('b') => KeyEvent::B,
         KeyCode::Char('d') => KeyEvent::D,
@@ -409,7 +411,6 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('I') => KeyEvent::CapI,
         KeyCode::Char('O') => KeyEvent::CapO,
         KeyCode::Char('S') => KeyEvent::CapS,
-        KeyCode::Char('r') if ctrl => KeyEvent::CtrlR,
         KeyCode::Char('1') => NumKey::One.into(),
         KeyCode::Char('2') => NumKey::Two.into(),
         KeyCode::Char('3') => NumKey::Three.into(),
