@@ -322,6 +322,12 @@ impl App {
                     editor.paste();
                 }
             }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::Undo) => {
+                self.context.notebook.editor.undo();
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::Redo) => {
+                self.context.notebook.editor.redo();
+            }
             NotebookTransition::EditingNormalMode(NormalModeTransition::YankLines(n)) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor = editor.cursor();

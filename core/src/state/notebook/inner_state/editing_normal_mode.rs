@@ -52,6 +52,8 @@ async fn consume_idle(
             Ok(NotebookTransition::BrowseNoteTree)
         }
         Key(KeyEvent::P) => Paste.into(),
+        Key(KeyEvent::U) => Undo.into(),
+        Key(KeyEvent::CtrlR) => Redo.into(),
         Key(KeyEvent::J) => MoveCursorDown(1).into(),
         Key(KeyEvent::K) => MoveCursorUp(1).into(),
         Key(KeyEvent::H) => MoveCursorBack(1).into(),
