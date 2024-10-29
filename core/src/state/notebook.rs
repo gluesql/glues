@@ -218,7 +218,7 @@ impl NotebookState {
                 vec![
                     "[i] Insert mode".to_owned(),
                     "[v] Visual mode".to_owned(),
-                    "[n] Browse".to_owned(),
+                    "[n] Browse notes".to_owned(),
                     "[t] Toggle line number".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Quit".to_owned(),
