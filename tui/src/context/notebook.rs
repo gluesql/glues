@@ -63,6 +63,7 @@ pub struct NotebookContext {
     pub editor: TextArea<'static>,
     pub opened_note: Option<Note>,
     pub show_line_number: bool,
+    pub line_yanked: bool,
 }
 
 impl Default for NotebookContext {
@@ -78,6 +79,7 @@ impl Default for NotebookContext {
             editor: TextArea::new(vec!["Welcome to Glues :D".to_owned()]),
             opened_note: None,
             show_line_number: true,
+            line_yanked: false,
         }
     }
 }
@@ -268,26 +270,31 @@ impl NotebookContext {
     }
 
     fn consume_on_editor_insert(&mut self, input: &Input) -> Action {
-        let code = match input {
-            Input::Key(key) => key.code,
-            _ => return Action::None,
-        };
-
-        if code == KeyCode::Esc {
-            self.state = ContextState::EditorNormalMode { idle: true };
-            Action::Dispatch(NotebookEvent::ViewNote.into())
-        } else if matches!(
-            input,
+        match input {
+            Input::Key(KeyEvent {
+                code: KeyCode::Esc, ..
+            }) => {
+                self.state = ContextState::EditorNormalMode { idle: true };
+                Action::Dispatch(NotebookEvent::ViewNote.into())
+            }
             Input::Key(KeyEvent {
                 code: KeyCode::Char('h'),
                 modifiers: KeyModifiers::CONTROL,
                 ..
-            })
-        ) {
-            TuiAction::ShowEditorKeymap.into()
-        } else {
-            self.editor.input(input.clone());
-            Action::None
+            }) => TuiAction::ShowEditorKeymap.into(),
+            Input::Key(KeyEvent {
+                code: KeyCode::Char('c' | 'x' | 'w' | 'k' | 'j'),
+                modifiers: KeyModifiers::CONTROL,
+                ..
+            }) => {
+                self.line_yanked = false;
+                self.editor.input(input.clone());
+                Action::None
+            }
+            _ => {
+                self.editor.input(input.clone());
+                Action::None
+            }
         }
     }
 

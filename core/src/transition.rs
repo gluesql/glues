@@ -110,7 +110,7 @@ pub enum NormalModeTransition {
     DeleteCharsAndInsertMode(usize),
     DeleteLineAndInsertMode(usize),
     Paste,
-    Yank(usize),
+    YankLines(usize),
 }
 
 impl From<EntryTransition> for Transition {

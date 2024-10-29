@@ -230,7 +230,8 @@ impl App {
             NotebookTransition::EditingNormalMode(
                 NormalModeTransition::MoveCursorLineNonEmptyStart,
             ) => {
-                let editor = &mut self.context.notebook.editor;
+                move_cursor_to_line_non_empty_start(&mut self.context.notebook.editor);
+                /*
                 editor.move_cursor(CursorMove::Head);
 
                 let (row, _) = editor.cursor();
@@ -242,6 +243,7 @@ impl App {
                 if is_whitespace_at_first {
                     editor.move_cursor(CursorMove::WordForward);
                 }
+                */
             }
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorTop) => {
                 self.context.notebook.editor.move_cursor(CursorMove::Top);
@@ -327,9 +329,17 @@ impl App {
                 self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
             NotebookTransition::EditingNormalMode(NormalModeTransition::Paste) => {
-                self.context.notebook.editor.paste();
+                let editor = &mut self.context.notebook.editor;
+                if self.context.notebook.line_yanked {
+                    editor.move_cursor(CursorMove::End);
+                    editor.insert_newline();
+                    editor.paste();
+                    move_cursor_to_line_non_empty_start(editor);
+                } else {
+                    editor.paste();
+                }
             }
-            NotebookTransition::EditingNormalMode(NormalModeTransition::Yank(n)) => {
+            NotebookTransition::EditingNormalMode(NormalModeTransition::YankLines(n)) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor = editor.cursor();
                 editor.move_cursor(CursorMove::Head);
@@ -340,6 +350,7 @@ impl App {
                 editor.copy();
                 editor.cancel_selection();
                 editor.move_cursor(CursorMove::Jump(cursor.0 as u16, cursor.1 as u16));
+                self.context.notebook.line_yanked = true;
             }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");
@@ -364,6 +375,20 @@ impl App {
                 CursorMove::Bottom
             } else {
                 CursorMove::Jump((row + n) as u16, col as u16)
+            }
+        }
+
+        fn move_cursor_to_line_non_empty_start(editor: &mut TextArea) {
+            editor.move_cursor(CursorMove::Head);
+
+            let (row, _) = editor.cursor();
+            let is_whitespace_at_first = editor.lines()[row]
+                .chars()
+                .next()
+                .map(|c| c.is_whitespace())
+                .unwrap_or(false);
+            if is_whitespace_at_first {
+                editor.move_cursor(CursorMove::WordForward);
             }
         }
     }
