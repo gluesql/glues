@@ -73,6 +73,7 @@ pub enum NotebookEvent {
 pub enum KeyEvent {
     A,
     B,
+    D,
     E,
     G,
     H,

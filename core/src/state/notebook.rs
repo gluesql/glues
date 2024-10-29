@@ -132,6 +132,31 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - yank '{n1}y{n2}'")
             }
+            EditingNormalMode(VimState::Delete(n)) => {
+                let name = &self.get_selected_note()?.name;
+
+                let n = if *n >= 2 {
+                    format!("{n}")
+                } else {
+                    "".to_owned()
+                };
+                format!("Note '{name}' normal mode - delete '{n}d'")
+            }
+            EditingNormalMode(VimState::Delete2(n1, n2)) => {
+                let name = &self.get_selected_note()?.name;
+                let n1 = if *n1 >= 2 {
+                    format!("{n1}")
+                } else {
+                    "".to_owned()
+                };
+                let n2 = if *n2 >= 2 {
+                    format!("{n2}")
+                } else {
+                    "".to_owned()
+                };
+
+                format!("Note '{name}' normal mode - delete '{n1}d{n2}'")
+            }
             EditingInsertMode => {
                 let name = &self.get_selected_note()?.name;
 
@@ -221,6 +246,24 @@ impl NotebookState {
                         format!("[y] Yank {n2} lines")
                     } else {
                         format!("[y] Yank {n1}*{n2} lines")
+                    },
+                    "[0-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimState::Delete(n)) => {
+                vec![
+                    format!("[d] Delete {n} lines"),
+                    "[1-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimState::Delete2(n1, n2)) => {
+                vec![
+                    if *n1 == 1 {
+                        format!("[d] Delete {n2} lines")
+                    } else {
+                        format!("[d] Delete {n1}*{n2} lines")
                     },
                     "[0-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),

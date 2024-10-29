@@ -356,6 +356,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
     let event = match code {
         KeyCode::Char('a') => KeyEvent::A,
         KeyCode::Char('b') => KeyEvent::B,
+        KeyCode::Char('d') => KeyEvent::D,
         KeyCode::Char('e') => KeyEvent::E,
         KeyCode::Char('g') => KeyEvent::G,
         KeyCode::Char('h') => KeyEvent::H,

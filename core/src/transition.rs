@@ -86,7 +86,7 @@ pub enum NormalModeTransition {
     NumberingMode,
     GatewayMode,
     YankMode,
-    Yank2Mode,
+    DeleteMode,
     MoveCursorDown(usize),
     MoveCursorUp(usize),
     MoveCursorBack(usize),
@@ -111,6 +111,7 @@ pub enum NormalModeTransition {
     DeleteLineAndInsertMode(usize),
     Paste,
     YankLines(usize),
+    DeleteLines(usize),
 }
 
 impl From<EntryTransition> for Transition {

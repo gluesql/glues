@@ -141,7 +141,7 @@ impl App {
                 NormalModeTransition::NumberingMode
                 | NormalModeTransition::GatewayMode
                 | NormalModeTransition::YankMode
-                | NormalModeTransition::Yank2Mode,
+                | NormalModeTransition::DeleteMode,
             ) => {
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: false };
@@ -155,14 +155,10 @@ impl App {
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorUp(n)) => {
-                let (row, col) = self.context.notebook.editor.cursor();
-                let cursor_move = if row < n {
-                    CursorMove::Top
-                } else {
-                    CursorMove::Jump((row - n) as u16, col as u16)
-                };
+                let editor = &mut self.context.notebook.editor;
+                let cursor_move = cursor_move_up(editor, n);
 
-                self.context.notebook.editor.move_cursor(cursor_move);
+                editor.move_cursor(cursor_move);
                 self.context.notebook.state =
                     context::notebook::ContextState::EditorNormalMode { idle: true };
             }
@@ -231,19 +227,6 @@ impl App {
                 NormalModeTransition::MoveCursorLineNonEmptyStart,
             ) => {
                 move_cursor_to_line_non_empty_start(&mut self.context.notebook.editor);
-                /*
-                editor.move_cursor(CursorMove::Head);
-
-                let (row, _) = editor.cursor();
-                let is_whitespace_at_first = editor.lines()[row]
-                    .chars()
-                    .next()
-                    .map(|c| c.is_whitespace())
-                    .unwrap_or(false);
-                if is_whitespace_at_first {
-                    editor.move_cursor(CursorMove::WordForward);
-                }
-                */
             }
             NotebookTransition::EditingNormalMode(NormalModeTransition::MoveCursorTop) => {
                 self.context.notebook.editor.move_cursor(CursorMove::Top);
@@ -351,6 +334,33 @@ impl App {
                 editor.cancel_selection();
                 editor.move_cursor(CursorMove::Jump(cursor.0 as u16, cursor.1 as u16));
                 self.context.notebook.line_yanked = true;
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
+            }
+            NotebookTransition::EditingNormalMode(NormalModeTransition::DeleteLines(n)) => {
+                let editor = &mut self.context.notebook.editor;
+                let (row, _) = editor.cursor();
+
+                editor.move_cursor(CursorMove::Head);
+                editor.start_selection();
+                let cursor_move = cursor_move_down(editor, n - 1);
+                editor.move_cursor(cursor_move);
+                editor.move_cursor(CursorMove::End);
+                editor.cut();
+
+                if row == 0 {
+                    editor.move_cursor(CursorMove::Down);
+                    editor.move_cursor(CursorMove::Head);
+                    editor.delete_char();
+                } else {
+                    editor.delete_char();
+                    editor.move_cursor(CursorMove::Down);
+                }
+
+                move_cursor_to_line_non_empty_start(editor);
+                self.context.notebook.line_yanked = true;
+                self.context.notebook.state =
+                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");
@@ -375,6 +385,15 @@ impl App {
                 CursorMove::Bottom
             } else {
                 CursorMove::Jump((row + n) as u16, col as u16)
+            }
+        }
+
+        fn cursor_move_up(editor: &TextArea, n: usize) -> CursorMove {
+            let (row, col) = editor.cursor();
+            if row < n {
+                CursorMove::Top
+            } else {
+                CursorMove::Jump((row - n) as u16, col as u16)
             }
         }
 
