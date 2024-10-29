@@ -12,6 +12,8 @@ pub enum VimState {
     Gateway,
     Yank(usize),
     Yank2(usize, usize),
+    Delete(usize),
+    Delete2(usize, usize),
 }
 
 pub async fn consume(
@@ -26,6 +28,8 @@ pub async fn consume(
         VimState::Gateway => consume_gateway(db, state, event).await,
         VimState::Yank(n) => consume_yank(db, state, n, event).await,
         VimState::Yank2(n1, n2) => consume_yank2(db, state, n1, n2, event).await,
+        VimState::Delete(n) => consume_delete(db, state, n, event).await,
+        VimState::Delete2(n1, n2) => consume_delete2(db, state, n1, n2, event).await,
     }
 }
 
@@ -98,6 +102,11 @@ async fn consume_idle(
             state.inner_state = InnerState::EditingNormalMode(VimState::Yank(1));
 
             YankMode.into()
+        }
+        Key(KeyEvent::D) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Delete(1));
+
+            DeleteMode.into()
         }
         Key(KeyEvent::X) => DeleteChars(1).into(),
         Key(KeyEvent::S) => {
@@ -196,6 +205,11 @@ async fn consume_numbering(
 
             YankMode.into()
         }
+        Key(KeyEvent::D) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Delete(n));
+
+            DeleteMode.into()
+        }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
@@ -293,6 +307,76 @@ async fn consume_yank2(
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
 
             YankLines(n1 * n2).into()
+        }
+        Key(KeyEvent::Esc) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            IdleMode.into()
+        }
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            consume_idle(db, state, event).await
+        }
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+async fn consume_delete(
+    db: &mut Db,
+    state: &mut NotebookState,
+    n: usize,
+    event: Event,
+) -> Result<NotebookTransition> {
+    use Event::*;
+    use NormalModeTransition::*;
+
+    match event {
+        Key(KeyEvent::Num(n2)) if !matches!(n2, NumKey::Zero) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Delete2(n, n2.into()));
+
+            Ok(NotebookTransition::None)
+        }
+        Key(KeyEvent::D) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            DeleteLines(n).into()
+        }
+        Key(KeyEvent::Esc) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            IdleMode.into()
+        }
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            consume_idle(db, state, event).await
+        }
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+async fn consume_delete2(
+    db: &mut Db,
+    state: &mut NotebookState,
+    n1: usize,
+    n2: usize,
+    event: Event,
+) -> Result<NotebookTransition> {
+    use Event::*;
+    use NormalModeTransition::*;
+
+    match event {
+        Key(KeyEvent::Num(n)) => {
+            let n2 = n + n2.saturating_mul(10);
+            state.inner_state = InnerState::EditingNormalMode(VimState::Delete2(n1, n2));
+
+            Ok(NotebookTransition::None)
+        }
+        Key(KeyEvent::D) => {
+            state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
+
+            DeleteLines(n1 * n2).into()
         }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimState::Idle);
