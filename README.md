@@ -5,9 +5,9 @@
 ![Rust](https://github.com/gluesql/glues/workflows/Rust/badge.svg)
 [![Chat](https://img.shields.io/discord/780298017940176946?logo=discord&logoColor=white)](https://discord.gg/C6TDEgzDzY)
 
-## Flexible, privacy-first TUI note-taking app with multiple storage options
+## Vim-inspired, privacy-first TUI note-taking app with multiple storage options
 
-Glues is a lightweight, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can store your notes locally, choose Git for distributed version control, or opt for MongoDB for centralized data management. This flexibility allows you to manage your notes in the way that best suits your workflow, whether you prefer the simplicity of local files, the collaboration capabilities of Git, or the scalability of MongoDB. For additional support, log file formats such as CSV and JSON are also available.
+Glues is a Vim-inspired, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can store your notes locally, choose Git for distributed version control, or opt for MongoDB for centralized data management. This flexibility allows you to manage your notes in the way that best suits your workflow, whether you prefer the simplicity of local files, the collaboration capabilities of Git, or the scalability of MongoDB. For additional support, log file formats such as CSV and JSON are also available.
 
 Glues is designed with a core architecture that operates independently of the TUI, providing robust state management and action handling. Although the current frontend is TUI-based, the architecture allows for easy integration with other frontends such as GUI, iOS, Android, or even running headlessly without a UI. The TUI interface clearly displays the current state and available actions, making it intuitive and easy to use.
 
@@ -58,7 +58,7 @@ Here is our plan for Glues and the features we aim to implement. Below is a list
 * **Additional Package Manager Support:** Expand distribution beyond Cargo, making Glues available through more package managers like Homebrew, Snap, and APT for easier installation.
 * **Note and Directory Movement:** Add features to move notes and directories for better organization.
 * **Storage Migration:** Add a feature to migrate data between different storage options, such as from CSV to Git.
-* **Vim Keybindings:** Integrate Vim keybindings for users who prefer Vim-like shortcuts.
+* **More Vim Keybindings:** Integrate Vim keybindings for users who prefer Vim-like shortcuts.
 * **Additional Storage Backends:** Support more storage options like Redis and object storage for greater flexibility.
 
 ## License
