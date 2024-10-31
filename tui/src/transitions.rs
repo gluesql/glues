@@ -6,7 +6,10 @@ use {
     },
     glues_core::{
         data::{Directory, Note},
-        state::{GetInner, NotebookState},
+        state::{
+            notebook::{InnerState, VimNormalState},
+            GetInner, NotebookState,
+        },
         transition::{
             EntryTransition, NormalModeTransition, NotebookTransition, Transition,
             VisualModeTransition,
@@ -54,18 +57,40 @@ impl App {
     }
 
     pub(super) async fn handle_notebook_transition(&mut self, transition: NotebookTransition) {
+        use context::notebook::ContextState;
+
+        let NotebookState {
+            root, inner_state, ..
+        } = self.glues.state.get_inner().log_unwrap();
+        let new_state = match inner_state {
+            InnerState::NoteSelected | InnerState::DirectorySelected => {
+                ContextState::NoteTreeBrowsing
+            }
+            InnerState::NoteTreeNumber(_) => ContextState::NoteTreeNumbering,
+            InnerState::NoteMoreActions => ContextState::NoteActionsDialog,
+            InnerState::DirectoryMoreActions => ContextState::DirectoryActionsDialog,
+            InnerState::EditingNormalMode(VimNormalState::Idle) => {
+                ContextState::EditorNormalMode { idle: true }
+            }
+            InnerState::EditingNormalMode(_) => ContextState::EditorNormalMode { idle: false },
+            InnerState::EditingVisualMode(_) => ContextState::EditorVisualMode,
+            InnerState::EditingInsertMode => ContextState::EditorInsertMode,
+        };
+
+        if self.context.notebook.state != new_state {
+            self.context.notebook.state = new_state;
+        }
+
         match transition {
             NotebookTransition::ShowVimKeymap(kind) => {
                 self.context.vim_keymap = Some(kind);
             }
             NotebookTransition::OpenDirectory { id, .. } => {
                 log!("Opening directory {id}");
-                let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
                 self.context.notebook.update_items(root);
             }
             NotebookTransition::CloseDirectory(id) => {
                 log!("Closing directory {id}");
-                let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
                 self.context.notebook.update_items(root);
                 self.context.notebook.select_item(&id);
             }
@@ -75,25 +100,17 @@ impl App {
             NotebookTransition::ViewMode(_note) => {
                 self.save().await;
             }
-            NotebookTransition::BrowseNoteTree => {
-                self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
-            }
+            NotebookTransition::BrowseNoteTree => {}
             NotebookTransition::RemoveNote {
                 selected_directory, ..
             }
             | NotebookTransition::RemoveDirectory {
                 selected_directory, ..
             } => {
-                let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
-
                 self.context.notebook.select_item(&selected_directory.id);
-                self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
                 self.context.notebook.update_items(root);
             }
             NotebookTransition::RenameNote(_) | NotebookTransition::RenameDirectory(_) => {
-                let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
-
-                self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
                 self.context.notebook.update_items(root);
             }
             NotebookTransition::AddNote(Note {
@@ -108,7 +125,6 @@ impl App {
                     .log_unwrap();
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
 
-                self.context.notebook.state = context::notebook::ContextState::NoteTreeBrowsing;
                 self.context.notebook.update_items(root);
                 self.context.notebook.select_item(&id);
             }
@@ -156,28 +172,19 @@ impl App {
         match transition {
             IdleMode => {
                 self.context.notebook.editor.cancel_selection();
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
-            NumberingMode | GatewayMode | YankMode | DeleteMode => {
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: false };
-            }
+            NumberingMode | GatewayMode | YankMode | DeleteMode => {}
             MoveCursorDown(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_down(editor, n);
 
                 editor.move_cursor(cursor_move);
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             MoveCursorUp(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_up(editor, n);
 
                 editor.move_cursor(cursor_move);
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             MoveCursorBack(n) => {
                 let (row, col) = self.context.notebook.editor.cursor();
@@ -188,16 +195,12 @@ impl App {
                 };
 
                 self.context.notebook.editor.move_cursor(cursor_move);
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             MoveCursorForward(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_forward(editor, n);
 
                 editor.move_cursor(cursor_move);
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             MoveCursorWordForward(n) => {
                 for _ in 0..n {
@@ -206,9 +209,6 @@ impl App {
                         .editor
                         .move_cursor(CursorMove::WordForward);
                 }
-
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             MoveCursorWordEnd(n) => {
                 for _ in 0..n {
@@ -217,9 +217,6 @@ impl App {
                         .editor
                         .move_cursor(CursorMove::WordEnd);
                 }
-
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             MoveCursorWordBack(n) => {
                 for _ in 0..n {
@@ -228,9 +225,6 @@ impl App {
                         .editor
                         .move_cursor(CursorMove::WordBack);
                 }
-
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             MoveCursorLineStart => {
                 self.context.notebook.editor.move_cursor(CursorMove::Head);
@@ -256,37 +250,28 @@ impl App {
                     .notebook
                     .editor
                     .move_cursor(CursorMove::WordForward);
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             InsertNewLineBelow => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
                 self.context.notebook.editor.insert_newline();
-                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
             InsertNewLineAbove => {
                 self.context.notebook.editor.move_cursor(CursorMove::Head);
                 self.context.notebook.editor.insert_newline();
                 self.context.notebook.editor.move_cursor(CursorMove::Up);
-                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
-            InsertAtCursor => {
-                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
-            }
+            InsertAtCursor => {}
             InsertAtLineStart => {
                 self.context.notebook.editor.move_cursor(CursorMove::Head);
-                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
             InsertAfterCursor => {
                 self.context
                     .notebook
                     .editor
                     .move_cursor(CursorMove::Forward);
-                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
             InsertAtLineEnd => {
                 self.context.notebook.editor.move_cursor(CursorMove::End);
-                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
             DeleteChars(n) => {
                 let editor = &mut self.context.notebook.editor;
@@ -295,9 +280,6 @@ impl App {
 
                 editor.move_cursor(cursor_move);
                 editor.cut();
-
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             NormalModeTransition::DeleteCharsAndInsertMode(n) => {
                 let editor = &mut self.context.notebook.editor;
@@ -306,8 +288,6 @@ impl App {
 
                 editor.move_cursor(cursor_move);
                 editor.cut();
-
-                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
             NormalModeTransition::DeleteLineAndInsertMode(n) => {
                 let editor = &mut self.context.notebook.editor;
@@ -317,8 +297,6 @@ impl App {
                 editor.move_cursor(cursor_move);
                 editor.move_cursor(CursorMove::End);
                 editor.cut();
-
-                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
             Paste => {
                 let editor = &mut self.context.notebook.editor;
@@ -349,8 +327,6 @@ impl App {
                 editor.cancel_selection();
                 editor.move_cursor(CursorMove::Jump(cursor.0 as u16, cursor.1 as u16));
                 self.context.notebook.line_yanked = true;
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             DeleteLines(n) => {
                 let editor = &mut self.context.notebook.editor;
@@ -374,8 +350,6 @@ impl App {
 
                 move_cursor_to_line_non_empty_start(editor);
                 self.context.notebook.line_yanked = true;
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
         };
     }
@@ -386,7 +360,6 @@ impl App {
         match transition {
             IdleMode => {
                 self.context.notebook.editor.start_selection();
-                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
             NumberingMode | GatewayMode => {}
             MoveCursorDown(n) => {
@@ -394,14 +367,12 @@ impl App {
                 let cursor_move = cursor_move_down(editor, n);
 
                 editor.move_cursor(cursor_move);
-                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
             MoveCursorUp(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_up(editor, n);
 
                 editor.move_cursor(cursor_move);
-                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
             MoveCursorBack(n) => {
                 let (row, col) = self.context.notebook.editor.cursor();
@@ -412,14 +383,12 @@ impl App {
                 };
 
                 self.context.notebook.editor.move_cursor(cursor_move);
-                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
             MoveCursorForward(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_forward(editor, n);
 
                 editor.move_cursor(cursor_move);
-                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
             MoveCursorWordForward(n) => {
                 for _ in 0..n {
@@ -428,8 +397,6 @@ impl App {
                         .editor
                         .move_cursor(CursorMove::WordForward);
                 }
-
-                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
             MoveCursorWordEnd(n) => {
                 for _ in 0..n {
@@ -438,8 +405,6 @@ impl App {
                         .editor
                         .move_cursor(CursorMove::WordEnd);
                 }
-
-                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
             MoveCursorWordBack(n) => {
                 for _ in 0..n {
@@ -448,8 +413,6 @@ impl App {
                         .editor
                         .move_cursor(CursorMove::WordBack);
                 }
-
-                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
             MoveCursorLineStart => {
                 self.context.notebook.editor.move_cursor(CursorMove::Head);
@@ -475,30 +438,24 @@ impl App {
                     .notebook
                     .editor
                     .move_cursor(CursorMove::WordForward);
-                self.context.notebook.state = context::notebook::ContextState::EditorVisualMode;
             }
             YankSelection => {
                 let editor = &mut self.context.notebook.editor;
                 reselect_for_yank(editor);
                 editor.copy();
                 self.context.notebook.line_yanked = false;
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             DeleteSelection => {
                 let editor = &mut self.context.notebook.editor;
                 reselect_for_yank(editor);
                 editor.cut();
                 self.context.notebook.line_yanked = false;
-                self.context.notebook.state =
-                    context::notebook::ContextState::EditorNormalMode { idle: true };
             }
             DeleteSelectionAndInsertMode => {
                 let editor = &mut self.context.notebook.editor;
                 reselect_for_yank(editor);
                 self.context.notebook.editor.cut();
                 self.context.notebook.line_yanked = false;
-                self.context.notebook.state = context::notebook::ContextState::EditorInsertMode;
             }
         }
     }
