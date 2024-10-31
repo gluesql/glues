@@ -23,7 +23,13 @@ First, ensure [Rust](https://www.rust-lang.org/tools/install) is installed. Then
 cargo install glues
 ```
 
-We're working on making Glues available through more package managers soon. For now, installing via Cargo is the way to go.
+For Arch Linux users, Glues is available [in the AUR](https://aur.archlinux.org/packages/glues/):
+
+```bash
+paru -S glues # user your favorite AUR helper
+```
+
+We're working on making Glues available through more package managers soon.
 
 ## Usage
 
