@@ -131,7 +131,6 @@ impl NotebookContext {
     }
 
     pub fn open_note(&mut self, note: Note, content: String) {
-        self.state = ContextState::EditorNormalMode { idle: true };
         self.opened_note = Some(note);
         self.editor = TextArea::from(content.lines());
     }
@@ -211,13 +210,11 @@ impl NotebookContext {
             },
             KeyCode::Char('m') => match item!() {
                 TreeItem::Directory { .. } => {
-                    self.state = ContextState::DirectoryActionsDialog;
                     self.directory_actions_state.select_first();
 
                     Action::PassThrough
                 }
                 TreeItem::Note { .. } => {
-                    self.state = ContextState::NoteActionsDialog;
                     self.note_actions_state.select_first();
 
                     Action::PassThrough
@@ -225,7 +222,6 @@ impl NotebookContext {
             },
             KeyCode::Char('o' | 'b' | 'e' | 'h') => Action::PassThrough,
             KeyCode::Char('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') => {
-                self.state = ContextState::NoteTreeNumbering;
                 Action::PassThrough
             }
             KeyCode::Esc => TuiAction::Confirm {
@@ -242,10 +238,7 @@ impl NotebookContext {
             KeyCode::Char('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') => {
                 Action::PassThrough
             }
-            KeyCode::Char('j') | KeyCode::Char('k') | KeyCode::Esc => {
-                self.state = ContextState::NoteTreeBrowsing;
-                Action::PassThrough
-            }
+            KeyCode::Char('j') | KeyCode::Char('k') | KeyCode::Esc => Action::PassThrough,
             _ => Action::None,
         }
     }
@@ -276,10 +269,7 @@ impl NotebookContext {
         match input {
             Input::Key(KeyEvent {
                 code: KeyCode::Esc, ..
-            }) => {
-                self.state = ContextState::EditorNormalMode { idle: true };
-                Action::Dispatch(NotebookEvent::ViewNote.into())
-            }
+            }) => Action::Dispatch(NotebookEvent::ViewNote.into()),
             Input::Key(KeyEvent {
                 code: KeyCode::Char('h'),
                 modifiers: KeyModifiers::CONTROL,
@@ -311,11 +301,7 @@ impl NotebookContext {
                 self.note_actions_state.select_previous();
                 Action::None
             }
-            KeyCode::Esc => {
-                self.state = ContextState::NoteTreeBrowsing;
-
-                Action::Dispatch(NotebookEvent::CloseNoteActionsDialog.into())
-            }
+            KeyCode::Esc => Action::Dispatch(NotebookEvent::CloseNoteActionsDialog.into()),
             KeyCode::Enter => {
                 match NOTE_ACTIONS[self
                     .note_actions_state
@@ -333,11 +319,7 @@ impl NotebookContext {
                         action: Box::new(TuiAction::RemoveNote.into()),
                     }
                     .into(),
-                    CLOSE => {
-                        self.state = ContextState::NoteTreeBrowsing;
-
-                        Action::Dispatch(NotebookEvent::CloseNoteActionsDialog.into())
-                    }
+                    CLOSE => Action::Dispatch(NotebookEvent::CloseNoteActionsDialog.into()),
                     _ => Action::None,
                 }
             }
@@ -384,19 +366,11 @@ impl NotebookContext {
                         action: Box::new(TuiAction::RemoveDirectory.into()),
                     }
                     .into(),
-                    CLOSE => {
-                        self.state = ContextState::NoteTreeBrowsing;
-
-                        Action::Dispatch(NotebookEvent::CloseDirectoryActionsDialog.into())
-                    }
+                    CLOSE => Action::Dispatch(NotebookEvent::CloseDirectoryActionsDialog.into()),
                     _ => Action::None,
                 }
             }
-            KeyCode::Esc => {
-                self.state = ContextState::NoteTreeBrowsing;
-
-                Action::Dispatch(NotebookEvent::CloseDirectoryActionsDialog.into())
-            }
+            KeyCode::Esc => Action::Dispatch(NotebookEvent::CloseDirectoryActionsDialog.into()),
             _ => Action::None,
         }
     }

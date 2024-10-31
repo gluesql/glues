@@ -10,10 +10,11 @@ use {
         Error, Event, Glues, NotebookTransition, Result,
     },
     consume::{directory, note, traverse},
-    inner_state::{
-        InnerState::{self, *},
-        VimNormalState, VimVisualState,
-    },
+};
+
+pub use inner_state::{
+    InnerState::{self, *},
+    VimNormalState, VimVisualState,
 };
 
 pub use directory_item::{DirectoryItem, DirectoryItemChildren, TreeItem};
