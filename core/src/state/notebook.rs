@@ -143,7 +143,7 @@ impl NotebookState {
                 };
                 format!("Note '{name}' normal mode - delete '{n}d'")
             }
-            EditingNormalMode(VimNormalState::DeleteLines(n1, n2)) => {
+            EditingNormalMode(VimNormalState::Delete2(n1, n2)) => {
                 let name = &self.get_selected_note()?.name;
                 let n1 = if *n1 >= 2 {
                     format!("{n1}")
@@ -276,13 +276,14 @@ impl NotebookState {
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            EditingNormalMode(VimNormalState::DeleteLines(n1, n2)) => {
+            EditingNormalMode(VimNormalState::Delete2(n1, n2)) => {
                 vec![
                     if *n1 == 1 {
                         format!("[d] Delete {n2} lines")
                     } else {
                         format!("[d] Delete {n1}*{n2} lines")
                     },
+                    "[i] Inside mode".to_owned(),
                     "[0-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
