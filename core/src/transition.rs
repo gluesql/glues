@@ -97,6 +97,7 @@ pub enum NormalModeTransition {
     GatewayMode,
     YankMode,
     DeleteMode,
+    DeleteInsideMode,
     MoveCursorDown(usize),
     MoveCursorUp(usize),
     MoveCursorBack(usize),
@@ -124,6 +125,7 @@ pub enum NormalModeTransition {
     Redo,
     YankLines(usize),
     DeleteLines(usize),
+    DeleteInsideWord(usize),
 }
 
 #[derive(Display)]
