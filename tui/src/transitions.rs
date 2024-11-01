@@ -173,7 +173,7 @@ impl App {
             IdleMode => {
                 self.context.notebook.editor.cancel_selection();
             }
-            NumberingMode | GatewayMode | YankMode | DeleteMode => {}
+            NumberingMode | GatewayMode | YankMode | DeleteMode | DeleteInsideMode => {}
             MoveCursorDown(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_down(editor, n);
@@ -211,12 +211,7 @@ impl App {
                 }
             }
             MoveCursorWordEnd(n) => {
-                for _ in 0..n {
-                    self.context
-                        .notebook
-                        .editor
-                        .move_cursor(CursorMove::WordEnd);
-                }
+                move_cursor_word_end(&mut self.context.notebook.editor, n);
             }
             MoveCursorWordBack(n) => {
                 for _ in 0..n {
@@ -350,6 +345,25 @@ impl App {
 
                 move_cursor_to_line_non_empty_start(editor);
                 self.context.notebook.line_yanked = true;
+            }
+            DeleteInsideWord(n) => {
+                let editor = &mut self.context.notebook.editor;
+                let cursor = editor.cursor();
+                editor.move_cursor(CursorMove::WordBack);
+                editor.move_cursor(CursorMove::WordEnd);
+                let cursor_be = editor.cursor();
+                editor.move_cursor(CursorMove::Jump(cursor.0 as u16, cursor.1 as u16));
+
+                if cursor_be >= cursor {
+                    editor.move_cursor(CursorMove::WordBack);
+                }
+
+                editor.start_selection();
+                move_cursor_word_end(editor, n);
+                editor.move_cursor(CursorMove::Forward);
+                editor.cut();
+
+                self.context.notebook.line_yanked = false;
             }
         };
     }
@@ -507,6 +521,12 @@ fn move_cursor_to_line_non_empty_start(editor: &mut TextArea) {
         .unwrap_or(false);
     if is_whitespace_at_first {
         editor.move_cursor(CursorMove::WordForward);
+    }
+}
+
+fn move_cursor_word_end(editor: &mut TextArea, n: usize) {
+    for _ in 0..n {
+        editor.move_cursor(CursorMove::WordEnd);
     }
 }
 

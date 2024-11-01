@@ -158,6 +158,16 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - delete '{n1}d{n2}'")
             }
+            EditingNormalMode(VimNormalState::DeleteInside(n)) => {
+                let name = &self.get_selected_note()?.name;
+                let n = if *n >= 2 {
+                    format!("{n}")
+                } else {
+                    "".to_owned()
+                };
+
+                format!("Note '{name}' normal mode - delete inside {n}di")
+            }
             EditingVisualMode(VimVisualState::Idle) => {
                 let name = &self.get_selected_note()?.name;
 
@@ -260,6 +270,7 @@ impl NotebookState {
             }
             EditingNormalMode(VimNormalState::Delete(n)) => {
                 vec![
+                    format!("[i] Inside mode"),
                     format!("[d] Delete {n} lines"),
                     "[1-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
@@ -273,6 +284,16 @@ impl NotebookState {
                         format!("[d] Delete {n1}*{n2} lines")
                     },
                     "[0-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimNormalState::DeleteInside(n)) => {
+                vec![
+                    if *n == 1 {
+                        "[w] Delete the current word".to_owned()
+                    } else {
+                        format!("[w] Delete {n} words from cursor")
+                    },
                     "[Esc] Cancel".to_owned(),
                 ]
             }
