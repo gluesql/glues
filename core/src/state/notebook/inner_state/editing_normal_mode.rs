@@ -18,7 +18,7 @@ pub enum VimNormalState {
     Yank(usize),
     Yank2(usize, usize),
     Delete(usize),
-    Delete2(usize, usize),
+    DeleteLines(usize, usize),
 }
 
 pub async fn consume(
@@ -34,7 +34,7 @@ pub async fn consume(
         VimNormalState::Yank(n) => consume_yank(db, state, n, event).await,
         VimNormalState::Yank2(n1, n2) => consume_yank2(db, state, n1, n2, event).await,
         VimNormalState::Delete(n) => consume_delete(db, state, n, event).await,
-        VimNormalState::Delete2(n1, n2) => consume_delete2(db, state, n1, n2, event).await,
+        VimNormalState::DeleteLines(n1, n2) => consume_delete_lines(db, state, n1, n2, event).await,
     }
 }
 
@@ -352,7 +352,7 @@ async fn consume_delete(
     match event {
         Key(KeyEvent::Num(n2)) if !matches!(n2, NumKey::Zero) => {
             state.inner_state =
-                InnerState::EditingNormalMode(VimNormalState::Delete2(n, n2.into()));
+                InnerState::EditingNormalMode(VimNormalState::DeleteLines(n, n2.into()));
 
             Ok(NotebookTransition::None)
         }
@@ -375,7 +375,7 @@ async fn consume_delete(
     }
 }
 
-async fn consume_delete2(
+async fn consume_delete_lines(
     db: &mut Db,
     state: &mut NotebookState,
     n1: usize,
@@ -388,7 +388,7 @@ async fn consume_delete2(
     match event {
         Key(KeyEvent::Num(n)) => {
             let n2 = n + n2.saturating_mul(10);
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Delete2(n1, n2));
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::DeleteLines(n1, n2));
 
             Ok(NotebookTransition::None)
         }
