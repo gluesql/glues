@@ -388,6 +388,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('r') if ctrl => KeyEvent::CtrlR,
         KeyCode::Char('a') => KeyEvent::A,
         KeyCode::Char('b') => KeyEvent::B,
+        KeyCode::Char('c') => KeyEvent::C,
         KeyCode::Char('d') => KeyEvent::D,
         KeyCode::Char('e') => KeyEvent::E,
         KeyCode::Char('g') => KeyEvent::G,
