@@ -168,6 +168,16 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - delete inside {n}di")
             }
+            EditingNormalMode(VimNormalState::Change(n)) => {
+                let name = &self.get_selected_note()?.name;
+
+                let n = if *n >= 2 {
+                    format!("{n}")
+                } else {
+                    "".to_owned()
+                };
+                format!("Note '{name}' normal mode - change '{n}c'")
+            }
             EditingVisualMode(VimVisualState::Idle) => {
                 let name = &self.get_selected_note()?.name;
 
@@ -227,9 +237,10 @@ impl NotebookState {
                     a, A, I, G, g, s, S, x, ^, y, d, u, Ctrl+r
                 */
                 vec![
-                    "[i] Insert mode".to_owned(),
-                    "[v] Visual mode".to_owned(),
                     "[n] Browse notes".to_owned(),
+                    "[i] Insert".to_owned(),
+                    "[v] Visual".to_owned(),
+                    "[c] Change".to_owned(),
                     "[t] Toggle line number".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Quit".to_owned(),
@@ -295,6 +306,13 @@ impl NotebookState {
                     } else {
                         format!("[w] Delete {n} words from cursor")
                     },
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimNormalState::Change(n)) => {
+                vec![
+                    format!("[c] Delete {n} lines and insert mode"),
+                    "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }

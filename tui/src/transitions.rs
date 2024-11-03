@@ -173,7 +173,8 @@ impl App {
             IdleMode => {
                 self.context.notebook.editor.cancel_selection();
             }
-            NumberingMode | GatewayMode | YankMode | DeleteMode | DeleteInsideMode => {}
+            NumberingMode | GatewayMode | YankMode | DeleteMode | DeleteInsideMode | ChangeMode => {
+            }
             MoveCursorDown(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_down(editor, n);
@@ -214,12 +215,7 @@ impl App {
                 move_cursor_word_end(&mut self.context.notebook.editor, n);
             }
             MoveCursorWordBack(n) => {
-                for _ in 0..n {
-                    self.context
-                        .notebook
-                        .editor
-                        .move_cursor(CursorMove::WordBack);
-                }
+                move_cursor_word_back(&mut self.context.notebook.editor, n);
             }
             MoveCursorLineStart => {
                 self.context.notebook.editor.move_cursor(CursorMove::Head);
@@ -276,23 +272,6 @@ impl App {
                 editor.move_cursor(cursor_move);
                 editor.cut();
             }
-            NormalModeTransition::DeleteCharsAndInsertMode(n) => {
-                let editor = &mut self.context.notebook.editor;
-                editor.start_selection();
-                let cursor_move = cursor_move_forward(editor, n);
-
-                editor.move_cursor(cursor_move);
-                editor.cut();
-            }
-            NormalModeTransition::DeleteLineAndInsertMode(n) => {
-                let editor = &mut self.context.notebook.editor;
-                editor.move_cursor(CursorMove::Head);
-                editor.start_selection();
-                let cursor_move = cursor_move_down(editor, n - 1);
-                editor.move_cursor(cursor_move);
-                editor.move_cursor(CursorMove::End);
-                editor.cut();
-            }
             Paste => {
                 let editor = &mut self.context.notebook.editor;
                 if self.context.notebook.line_yanked {
@@ -346,6 +325,16 @@ impl App {
                 move_cursor_to_line_non_empty_start(editor);
                 self.context.notebook.line_yanked = true;
             }
+            DeleteLinesAndInsert(n) => {
+                let editor = &mut self.context.notebook.editor;
+                editor.move_cursor(CursorMove::Head);
+                editor.start_selection();
+                let cursor_move = cursor_move_down(editor, n - 1);
+                editor.move_cursor(cursor_move);
+                editor.move_cursor(CursorMove::End);
+                editor.cut();
+                self.context.notebook.line_yanked = true;
+            }
             DeleteInsideWord(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor = editor.cursor();
@@ -361,6 +350,41 @@ impl App {
                 editor.start_selection();
                 move_cursor_word_end(editor, n);
                 editor.move_cursor(CursorMove::Forward);
+                editor.cut();
+
+                self.context.notebook.line_yanked = false;
+            }
+            DeleteWordEnd(n) => {
+                let editor = &mut self.context.notebook.editor;
+                editor.start_selection();
+                move_cursor_word_end(editor, n);
+                editor.move_cursor(CursorMove::Forward);
+                editor.cut();
+
+                self.context.notebook.line_yanked = false;
+            }
+            DeleteWordBack(n) => {
+                let editor = &mut self.context.notebook.editor;
+                editor.start_selection();
+                move_cursor_word_back(editor, n);
+                editor.cut();
+
+                self.context.notebook.line_yanked = false;
+            }
+            DeleteLineStart => {
+                let editor = &mut self.context.notebook.editor;
+                editor.start_selection();
+                editor.move_cursor(CursorMove::Head);
+                editor.cut();
+
+                self.context.notebook.line_yanked = false;
+            }
+            DeleteLineEnd(n) => {
+                let editor = &mut self.context.notebook.editor;
+                editor.start_selection();
+                let cursor_move = cursor_move_down(editor, n - 1);
+                editor.move_cursor(cursor_move);
+                editor.move_cursor(CursorMove::End);
                 editor.cut();
 
                 self.context.notebook.line_yanked = false;
@@ -527,6 +551,12 @@ fn move_cursor_to_line_non_empty_start(editor: &mut TextArea) {
 fn move_cursor_word_end(editor: &mut TextArea, n: usize) {
     for _ in 0..n {
         editor.move_cursor(CursorMove::WordEnd);
+    }
+}
+
+fn move_cursor_word_back(editor: &mut TextArea, n: usize) {
+    for _ in 0..n {
+        editor.move_cursor(CursorMove::WordBack);
     }
 }
 

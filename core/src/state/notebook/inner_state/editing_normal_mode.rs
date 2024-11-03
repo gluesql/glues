@@ -20,6 +20,7 @@ pub enum VimNormalState {
     Delete(usize),
     Delete2(usize, usize),
     DeleteInside(usize),
+    Change(usize),
 }
 
 pub async fn consume(
@@ -37,6 +38,7 @@ pub async fn consume(
         VimNormalState::Delete(n) => consume_delete(db, state, n, event).await,
         VimNormalState::Delete2(n1, n2) => consume_delete2(db, state, n1, n2, event).await,
         VimNormalState::DeleteInside(n) => consume_delete_inside(db, state, n, event).await,
+        VimNormalState::Change(n) => consume_change(db, state, n, event).await,
     }
 }
 
@@ -124,16 +126,21 @@ async fn consume_idle(
 
             DeleteMode.into()
         }
+        Key(KeyEvent::C) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Change(1));
+
+            ChangeMode.into()
+        }
         Key(KeyEvent::X) => DeleteChars(1).into(),
         Key(KeyEvent::S) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            DeleteCharsAndInsertMode(1).into()
+            DeleteChars(1).into()
         }
         Key(KeyEvent::CapS) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            DeleteLineAndInsertMode(1).into()
+            DeleteLines(1).into()
         }
         Key(KeyEvent::Num(n)) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Numbering(n.into()));
@@ -210,12 +217,12 @@ async fn consume_numbering(
         Key(KeyEvent::S) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            DeleteCharsAndInsertMode(n).into()
+            DeleteChars(n).into()
         }
         Key(KeyEvent::CapS) => {
             state.inner_state = InnerState::EditingInsertMode;
 
-            DeleteLineAndInsertMode(n).into()
+            DeleteLines(n).into()
         }
         Key(KeyEvent::Y) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Yank(n));
@@ -226,6 +233,11 @@ async fn consume_numbering(
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Delete(n));
 
             DeleteMode.into()
+        }
+        Key(KeyEvent::C) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Change(n));
+
+            ChangeMode.into()
         }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
@@ -439,6 +451,49 @@ async fn consume_delete_inside(
 
             DeleteInsideWord(n).into()
         }
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            consume_idle(db, state, event).await
+        }
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+async fn consume_change(
+    db: &mut Db,
+    state: &mut NotebookState,
+    n: usize,
+    event: Event,
+) -> Result<NotebookTransition> {
+    use Event::*;
+    use NormalModeTransition::*;
+
+    match event {
+        Key(KeyEvent::Num(NumKey::Zero)) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            DeleteLineStart.into()
+        }
+        Key(KeyEvent::C) => {
+            state.inner_state = InnerState::EditingInsertMode;
+            DeleteLinesAndInsert(n).into()
+        }
+        Key(KeyEvent::E | KeyEvent::W) => {
+            state.inner_state = InnerState::EditingInsertMode;
+            DeleteWordEnd(n).into()
+        }
+        Key(KeyEvent::B) => {
+            state.inner_state = InnerState::EditingInsertMode;
+            DeleteWordBack(n).into()
+        }
+        Key(KeyEvent::DollarSign) => {
+            state.inner_state = InnerState::EditingInsertMode;
+            DeleteLineEnd(n).into()
+        }
+        Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(
+            VimKeymapKind::NormalChange,
+        )),
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 

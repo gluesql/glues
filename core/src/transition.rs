@@ -86,6 +86,7 @@ pub enum NotebookTransition {
 pub enum VimKeymapKind {
     NormalIdle,
     NormalNumbering,
+    NormalChange,
     VisualIdle,
     VisualNumbering,
 }
@@ -98,6 +99,7 @@ pub enum NormalModeTransition {
     YankMode,
     DeleteMode,
     DeleteInsideMode,
+    ChangeMode,
     MoveCursorDown(usize),
     MoveCursorUp(usize),
     MoveCursorBack(usize),
@@ -118,13 +120,16 @@ pub enum NormalModeTransition {
     InsertNewLineBelow,
     InsertNewLineAbove,
     DeleteChars(usize),
-    DeleteCharsAndInsertMode(usize),
-    DeleteLineAndInsertMode(usize),
+    DeleteLines(usize),
+    DeleteLinesAndInsert(usize),
+    DeleteWordEnd(usize),
+    DeleteWordBack(usize),
+    DeleteLineStart,
+    DeleteLineEnd(usize),
     Paste,
     Undo,
     Redo,
     YankLines(usize),
-    DeleteLines(usize),
     DeleteInsideWord(usize),
 }
 
