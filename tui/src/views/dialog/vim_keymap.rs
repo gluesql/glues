@@ -10,10 +10,9 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
-    let (title, height, message) = match keymap_kind {
+    let (title, message) = match keymap_kind {
         VimKeymapKind::NormalIdle => (
             "VIM NORMAL MODE KEYMAP",
-            42,
             vec![
                 Line::from("TO INSERT MODE".white().on_dark_gray()),
                 Line::raw("[i] Go to insert mode"),
@@ -52,7 +51,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[Ctrl+r] Redo the last undone change"),
             ],
         ),
-        VimKeymapKind::NormalNumbering => ("VIM NORMAL MODE KEYMAP - NUMBERING", 31, vec![
+        VimKeymapKind::NormalNumbering => ("VIM NORMAL MODE KEYMAP - NUMBERING", vec![
             Line::from("EXTENDING NUMBERING MODE".white().on_dark_gray()),
             Line::raw("[0-9] Append additional digits to extend the current command"),
             Line::raw(""),
@@ -77,9 +76,8 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw(""),
             Line::from("EDIT TEXT AND RETURN TO NORMAL MODE".white().on_dark_gray()),
             Line::raw("[x] Delete specified number of characters and return to normal mode"),
-            Line::raw(""),
         ]),
-        VimKeymapKind::NormalChange => ("VIM NORMAL MODE KEYMAP - CHANGE", 15, vec![
+        VimKeymapKind::NormalChange => ("VIM NORMAL MODE KEYMAP - CHANGE", vec![
             Line::from("CHANGE TEXT AND GO TO INSERT MODE".white().on_dark_gray()),
             Line::raw("[c] Delete the specified number of lines"),
             Line::from(vec![
@@ -90,8 +88,9 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw("[b] Delete to the start of the previous word, repeated by the specified number"),
             Line::raw("[0] Delete to the beginning of the line"),
             Line::raw("[$] Delete to the end of the line, repeated by the specified number"),
+            Line::raw(""),
         ]),
-        VimKeymapKind::VisualIdle => ("VIM VISUAL MODE KEYMAP", 30, vec![
+        VimKeymapKind::VisualIdle => ("VIM VISUAL MODE KEYMAP", vec![
             Line::from("MOVE CURSOR".white().on_dark_gray()),
             Line::raw("[h] Move cursor left"),
             Line::raw("[j] Move cursor down"),
@@ -124,7 +123,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             ]),
             Line::raw("[y] Yank (copy) selected text"),
         ]),
-        VimKeymapKind::VisualNumbering => ("VIM VISUAL MODE KEYMAP - NUMBERING", 20, vec![
+        VimKeymapKind::VisualNumbering => ("VIM VISUAL MODE KEYMAP - NUMBERING", vec![
             Line::from("EXTENDING NUMBERING MODE".white().on_dark_gray()),
             Line::raw("[0-9] Append additional digits to extend the current command"),
             Line::raw(""),
@@ -139,6 +138,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw("[G] Move cursor to the specified line number"),
         ]),
     };
+    let height = message.len() as u16 + 7;
 
     let [area] = Layout::horizontal([Length(90)])
         .flex(Flex::Center)
