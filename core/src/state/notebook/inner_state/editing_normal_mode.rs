@@ -366,7 +366,12 @@ async fn consume_delete(
     use NormalModeTransition::*;
 
     match event {
-        Key(KeyEvent::Num(n2)) if !matches!(n2, NumKey::Zero) => {
+        Key(KeyEvent::Num(NumKey::Zero)) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            DeleteLineStart.into()
+        }
+        Key(KeyEvent::Num(n2)) => {
             state.inner_state =
                 InnerState::EditingNormalMode(VimNormalState::Delete2(n, n2.into()));
 
