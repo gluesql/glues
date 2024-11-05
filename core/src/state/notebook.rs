@@ -178,6 +178,21 @@ impl NotebookState {
                 };
                 format!("Note '{name}' normal mode - change '{n}c'")
             }
+            EditingNormalMode(VimNormalState::Change2(n1, n2)) => {
+                let name = &self.get_selected_note()?.name;
+                let n1 = if *n1 >= 2 {
+                    format!("{n1}")
+                } else {
+                    "".to_owned()
+                };
+                let n2 = if *n2 >= 2 {
+                    format!("{n2}")
+                } else {
+                    "".to_owned()
+                };
+
+                format!("Note '{name}' normal mode - change '{n1}c{n2}'")
+            }
             EditingVisualMode(VimVisualState::Idle) => {
                 let name = &self.get_selected_note()?.name;
 
@@ -312,6 +327,18 @@ impl NotebookState {
             EditingNormalMode(VimNormalState::Change(n)) => {
                 vec![
                     format!("[c] Delete {n} lines and insert mode"),
+                    "[Ctrl+h] Show Vim keymap".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimNormalState::Change2(n1, n2)) => {
+                vec![
+                    if *n1 == 1 {
+                        format!("[c] Delete {n2} lines and insert mode")
+                    } else {
+                        format!("[c] Delete {n1}*{n2} lines and insert mode")
+                    },
+                    "[0-9] Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]

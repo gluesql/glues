@@ -21,6 +21,7 @@ pub enum VimNormalState {
     Delete2(usize, usize),
     DeleteInside(usize),
     Change(usize),
+    Change2(usize, usize),
 }
 
 pub async fn consume(
@@ -39,6 +40,7 @@ pub async fn consume(
         VimNormalState::Delete2(n1, n2) => consume_delete2(db, state, n1, n2, event).await,
         VimNormalState::DeleteInside(n) => consume_delete_inside(db, state, n, event).await,
         VimNormalState::Change(n) => consume_change(db, state, n, event).await,
+        VimNormalState::Change2(n1, n2) => consume_change2(db, state, n1, n2, event).await,
     }
 }
 
@@ -475,6 +477,12 @@ async fn consume_change(
 
             DeleteLineStart.into()
         }
+        Key(KeyEvent::Num(n2)) => {
+            state.inner_state =
+                InnerState::EditingNormalMode(VimNormalState::Change2(n, n2.into()));
+
+            Ok(NotebookTransition::None)
+        }
         Key(KeyEvent::C) => {
             state.inner_state = InnerState::EditingInsertMode;
             DeleteLinesAndInsert(n).into()
@@ -494,6 +502,60 @@ async fn consume_change(
         Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(
             VimKeymapKind::NormalChange,
         )),
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            consume_idle(db, state, event).await
+        }
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+async fn consume_change2(
+    db: &mut Db,
+    state: &mut NotebookState,
+    n1: usize,
+    n2: usize,
+    event: Event,
+) -> Result<NotebookTransition> {
+    use Event::*;
+    use NormalModeTransition::*;
+
+    match event {
+        Key(KeyEvent::Num(n)) => {
+            let n2 = n + n2.saturating_mul(10);
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Change2(n1, n2));
+
+            Ok(NotebookTransition::None)
+        }
+        Key(KeyEvent::C) => {
+            let n = n1.saturating_mul(n2);
+            state.inner_state = InnerState::EditingInsertMode;
+            DeleteLinesAndInsert(n).into()
+        }
+        Key(KeyEvent::E | KeyEvent::W) => {
+            let n = n1.saturating_mul(n2);
+            state.inner_state = InnerState::EditingInsertMode;
+            DeleteWordEnd(n).into()
+        }
+        Key(KeyEvent::B) => {
+            let n = n1.saturating_mul(n2);
+            state.inner_state = InnerState::EditingInsertMode;
+            DeleteWordBack(n).into()
+        }
+        Key(KeyEvent::DollarSign) => {
+            let n = n1.saturating_mul(n2);
+            state.inner_state = InnerState::EditingInsertMode;
+            DeleteLineEnd(n).into()
+        }
+        Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(
+            VimKeymapKind::NormalChange2,
+        )),
+        Key(KeyEvent::Esc) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            IdleMode.into()
+        }
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
