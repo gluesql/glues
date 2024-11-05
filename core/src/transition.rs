@@ -87,6 +87,7 @@ pub enum VimKeymapKind {
     NormalIdle,
     NormalNumbering,
     NormalChange,
+    NormalChange2,
     VisualIdle,
     VisualNumbering,
 }

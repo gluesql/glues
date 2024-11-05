@@ -90,6 +90,21 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw("[$] Delete to the end of the line, repeated by the specified number"),
             Line::raw(""),
         ]),
+        VimKeymapKind::NormalChange2 => ("VIM NORMAL MODE KEYMAP - CHANGE NUMBERING", vec![
+            Line::from("EXTENDING NUMBERING MODE".white().on_dark_gray()),
+            Line::raw("[0-9] Append additional digits to extend the current command"),
+            Line::raw(""),
+            Line::from("CHANGE TEXT AND GO TO INSERT MODE".white().on_dark_gray()),
+            Line::raw("[c] Delete the specified number of lines"),
+            Line::from(vec![
+                "[e] ".into(),
+                "or ".dark_gray(),
+                "[w] Delete to the end of the word by the specified number of times".into(),
+            ]),
+            Line::raw("[b] Delete to the start of the previous word, repeated by the specified number"),
+            Line::raw("[$] Delete to the end of the line, repeated by the specified number"),
+            Line::raw(""),
+        ]),
         VimKeymapKind::VisualIdle => ("VIM VISUAL MODE KEYMAP", vec![
             Line::from("MOVE CURSOR".white().on_dark_gray()),
             Line::raw("[h] Move cursor left"),
