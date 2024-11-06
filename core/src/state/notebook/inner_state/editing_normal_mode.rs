@@ -22,6 +22,7 @@ pub enum VimNormalState {
     DeleteInside(usize),
     Change(usize),
     Change2(usize, usize),
+    ChangeInside(usize),
 }
 
 pub async fn consume(
@@ -41,6 +42,7 @@ pub async fn consume(
         VimNormalState::DeleteInside(n) => consume_delete_inside(db, state, n, event).await,
         VimNormalState::Change(n) => consume_change(db, state, n, event).await,
         VimNormalState::Change2(n1, n2) => consume_change2(db, state, n1, n2, event).await,
+        VimNormalState::ChangeInside(n) => consume_change_inside(db, state, n, event).await,
     }
 }
 
@@ -488,6 +490,11 @@ async fn consume_change(
 
             Ok(NotebookTransition::None)
         }
+        Key(KeyEvent::I) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::ChangeInside(n));
+
+            ChangeInsideMode.into()
+        }
         Key(KeyEvent::C) => {
             state.inner_state = InnerState::EditingInsertMode;
             DeleteLinesAndInsert(n).into()
@@ -533,6 +540,12 @@ async fn consume_change2(
 
             Ok(NotebookTransition::None)
         }
+        Key(KeyEvent::I) => {
+            let n = n1.saturating_mul(n2);
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::ChangeInside(n));
+
+            ChangeInsideMode.into()
+        }
         Key(KeyEvent::C) => {
             let n = n1.saturating_mul(n2);
             state.inner_state = InnerState::EditingInsertMode;
@@ -560,6 +573,30 @@ async fn consume_change2(
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
             IdleMode.into()
+        }
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            consume_idle(db, state, event).await
+        }
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+async fn consume_change_inside(
+    db: &mut Db,
+    state: &mut NotebookState,
+    n: usize,
+    event: Event,
+) -> Result<NotebookTransition> {
+    use Event::*;
+    use NormalModeTransition::*;
+
+    match event {
+        Key(KeyEvent::W) => {
+            state.inner_state = InnerState::EditingInsertMode;
+
+            DeleteInsideWord(n).into()
         }
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);

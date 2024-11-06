@@ -193,6 +193,16 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - change '{n1}c{n2}'")
             }
+            EditingNormalMode(VimNormalState::ChangeInside(n)) => {
+                let name = &self.get_selected_note()?.name;
+                let n = if *n >= 2 {
+                    format!("{n}")
+                } else {
+                    "".to_owned()
+                };
+
+                format!("Note '{name}' normal mode - change inside {n}ci")
+            }
             EditingVisualMode(VimVisualState::Idle) => {
                 let name = &self.get_selected_note()?.name;
 
@@ -327,6 +337,7 @@ impl NotebookState {
             }
             EditingNormalMode(VimNormalState::Change(n)) => {
                 vec![
+                    "[i] Inside mode".to_owned(),
                     format!("[c] Delete {n} lines and insert mode"),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Cancel".to_owned(),
@@ -339,8 +350,19 @@ impl NotebookState {
                     } else {
                         format!("[c] Delete {n1}*{n2} lines and insert mode")
                     },
+                    "[i] Inside mode".to_owned(),
                     "[0-9] Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimNormalState::ChangeInside(n)) => {
+                vec![
+                    if *n == 1 {
+                        "[w] Delete the current word and insert mode".to_owned()
+                    } else {
+                        format!("[w] Delete {n} words from cursor and insert mode")
+                    },
                     "[Esc] Cancel".to_owned(),
                 ]
             }

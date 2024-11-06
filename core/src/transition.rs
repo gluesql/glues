@@ -101,6 +101,7 @@ pub enum NormalModeTransition {
     DeleteMode,
     DeleteInsideMode,
     ChangeMode,
+    ChangeInsideMode,
     MoveCursorDown(usize),
     MoveCursorUp(usize),
     MoveCursorBack(usize),

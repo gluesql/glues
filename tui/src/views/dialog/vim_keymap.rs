@@ -78,6 +78,9 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw("[x] Delete specified number of characters and return to normal mode"),
         ]),
         VimKeymapKind::NormalChange => ("VIM NORMAL MODE KEYMAP - CHANGE", vec![
+            Line::from("TO CHANGE INSIDE MODE".white().on_dark_gray()),
+            Line::raw("[i] Go to change inside mode"),
+            Line::raw(""),
             Line::from("CHANGE TEXT AND GO TO INSERT MODE".white().on_dark_gray()),
             Line::raw("[c] Delete the specified number of lines"),
             Line::from(vec![
@@ -88,11 +91,13 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw("[b] Delete to the start of the previous word, repeated by the specified number"),
             Line::raw("[0] Delete to the beginning of the line"),
             Line::raw("[$] Delete to the end of the line, repeated by the specified number"),
-            Line::raw(""),
         ]),
         VimKeymapKind::NormalChange2 => ("VIM NORMAL MODE KEYMAP - CHANGE NUMBERING", vec![
             Line::from("EXTENDING NUMBERING MODE".white().on_dark_gray()),
             Line::raw("[0-9] Append additional digits to extend the current command"),
+            Line::raw(""),
+            Line::from("TO CHANGE INSIDE MODE".white().on_dark_gray()),
+            Line::raw("[i] Go to change inside mode"),
             Line::raw(""),
             Line::from("CHANGE TEXT AND GO TO INSERT MODE".white().on_dark_gray()),
             Line::raw("[c] Delete the specified number of lines"),
@@ -103,7 +108,6 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             ]),
             Line::raw("[b] Delete to the start of the previous word, repeated by the specified number"),
             Line::raw("[$] Delete to the end of the line, repeated by the specified number"),
-            Line::raw(""),
         ]),
         VimKeymapKind::VisualIdle => ("VIM VISUAL MODE KEYMAP", vec![
             Line::from("MOVE CURSOR".white().on_dark_gray()),
