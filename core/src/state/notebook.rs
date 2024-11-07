@@ -309,6 +309,7 @@ impl NotebookState {
                     format!("[i] Inside mode"),
                     format!("[d] Delete {n} lines"),
                     "[0] Delete to line start".to_owned(),
+                    "[$] Delete to line end".to_owned(),
                     "[1-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
