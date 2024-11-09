@@ -206,7 +206,7 @@ impl NotebookContext {
 
                     Action::Dispatch(event.into())
                 }
-                TreeItem::Note { .. } => Action::None,
+                TreeItem::Note { .. } => Action::PassThrough,
             },
             KeyCode::Char('m') => match item!() {
                 TreeItem::Directory { .. } => {
@@ -220,16 +220,12 @@ impl NotebookContext {
                     Action::PassThrough
                 }
             },
-            KeyCode::Char('o' | 'b' | 'e' | 'h') => Action::PassThrough,
-            KeyCode::Char('1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') => {
-                Action::PassThrough
-            }
             KeyCode::Esc => TuiAction::Confirm {
                 message: "Do you want to quit?".to_owned(),
                 action: Box::new(TuiAction::Quit.into()),
             }
             .into(),
-            _ => Action::None,
+            _ => Action::PassThrough,
         }
     }
 

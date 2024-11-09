@@ -230,7 +230,7 @@ impl NotebookState {
         match &self.inner_state {
             NoteSelected => {
                 vec![
-                    "[o] Open note".to_owned(),
+                    "[l] Open note".to_owned(),
                     "[h] Close parent".to_owned(),
                     "[j|k] Down | Up".to_owned(),
                     "[1-9] Set steps".to_owned(),

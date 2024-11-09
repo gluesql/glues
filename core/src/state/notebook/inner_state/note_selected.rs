@@ -44,7 +44,7 @@ pub async fn consume(
         }
         Notebook(SelectNote(note)) => note::select(state, note),
         Notebook(SelectDirectory(directory)) => directory::select(state, directory),
-        Key(KeyEvent::O) | Notebook(OpenNote) => {
+        Key(KeyEvent::L | KeyEvent::Enter) | Notebook(OpenNote) => {
             let note = state.get_selected_note()?.clone();
 
             note::open(db, state, note).await
