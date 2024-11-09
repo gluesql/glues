@@ -104,6 +104,7 @@ pub enum KeyEvent {
     Num(NumKey),
     Left,
     Right,
+    Enter,
     Esc,
 }
 
