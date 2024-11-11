@@ -95,6 +95,7 @@ pub enum VimKeymapKind {
 #[derive(Display)]
 pub enum NormalModeTransition {
     IdleMode,
+    ToggleMode,
     NumberingMode,
     GatewayMode,
     YankMode,
@@ -102,6 +103,8 @@ pub enum NormalModeTransition {
     DeleteInsideMode,
     ChangeMode,
     ChangeInsideMode,
+    ToggleLineNumbers,
+    ToggleBrowser,
     MoveCursorDown(usize),
     MoveCursorUp(usize),
     MoveCursorBack(usize),

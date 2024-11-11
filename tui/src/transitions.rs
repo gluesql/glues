@@ -173,8 +173,14 @@ impl App {
             IdleMode => {
                 self.context.notebook.editor.cancel_selection();
             }
-            NumberingMode | GatewayMode | YankMode | DeleteMode | DeleteInsideMode | ChangeMode
-            | ChangeInsideMode => {}
+            ToggleMode | NumberingMode | GatewayMode | YankMode | DeleteMode | DeleteInsideMode
+            | ChangeMode | ChangeInsideMode => {}
+            ToggleLineNumbers => {
+                self.context.notebook.show_line_number = !self.context.notebook.show_line_number;
+            }
+            ToggleBrowser => {
+                self.context.notebook.show_browser = !self.context.notebook.show_browser;
+            }
             MoveCursorDown(n) => {
                 let editor = &mut self.context.notebook.editor;
                 let cursor_move = cursor_move_down(editor, n);

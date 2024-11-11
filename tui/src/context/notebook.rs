@@ -64,6 +64,7 @@ pub struct NotebookContext {
     pub editor: TextArea<'static>,
     pub opened_note: Option<Note>,
     pub show_line_number: bool,
+    pub show_browser: bool,
     pub line_yanked: bool,
 }
 
@@ -80,6 +81,7 @@ impl Default for NotebookContext {
             editor: TextArea::new(vec!["Welcome to Glues :D".to_owned()]),
             opened_note: None,
             show_line_number: true,
+            show_browser: true,
             line_yanked: false,
         }
     }
@@ -246,17 +248,16 @@ impl NotebookContext {
         };
 
         match code {
-            KeyCode::Char('t') => {
-                self.show_line_number = !self.show_line_number;
-
-                Action::None
-            }
             KeyCode::Esc if idle => TuiAction::SaveAndConfirm {
                 message: "Do you want to quit?".to_owned(),
                 action: Box::new(TuiAction::Quit.into()),
             }
             .into(),
-            KeyCode::Char('n') => TuiAction::SaveAndPassThrough.into(),
+            KeyCode::Char('n') if idle => {
+                self.show_browser = true;
+
+                TuiAction::SaveAndPassThrough.into()
+            }
             _ => Action::PassThrough,
         }
     }

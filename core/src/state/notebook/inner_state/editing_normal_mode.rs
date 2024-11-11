@@ -13,6 +13,7 @@ use {
 #[derive(Clone, Copy)]
 pub enum VimNormalState {
     Idle,
+    Toggle,
     Numbering(usize),
     Gateway,
     Yank(usize),
@@ -33,6 +34,7 @@ pub async fn consume(
 ) -> Result<NotebookTransition> {
     match vim_state {
         VimNormalState::Idle => consume_idle(db, state, event).await,
+        VimNormalState::Toggle => consume_toggle(db, state, event).await,
         VimNormalState::Numbering(n) => consume_numbering(db, state, n, event).await,
         VimNormalState::Gateway => consume_gateway(db, state, event).await,
         VimNormalState::Yank(n) => consume_yank(db, state, n, event).await,
@@ -63,6 +65,11 @@ async fn consume_idle(
             state.inner_state = InnerState::NoteSelected;
 
             Ok(NotebookTransition::BrowseNoteTree)
+        }
+        Key(KeyEvent::T) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Toggle);
+
+            ToggleMode.into()
         }
         Key(KeyEvent::P) => Paste.into(),
         Key(KeyEvent::U) => Undo.into(),
@@ -153,6 +160,34 @@ async fn consume_idle(
         }
         Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(VimKeymapKind::NormalIdle)),
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+async fn consume_toggle(
+    db: &mut Db,
+    state: &mut NotebookState,
+    event: Event,
+) -> Result<NotebookTransition> {
+    use Event::*;
+    use NormalModeTransition::*;
+
+    match event {
+        Key(KeyEvent::N) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            ToggleLineNumbers.into()
+        }
+        Key(KeyEvent::B) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            ToggleBrowser.into()
+        }
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            consume_idle(db, state, event).await
+        }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
