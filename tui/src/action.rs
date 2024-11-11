@@ -402,6 +402,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('o') => KeyEvent::O,
         KeyCode::Char('p') => KeyEvent::P,
         KeyCode::Char('s') => KeyEvent::S,
+        KeyCode::Char('t') => KeyEvent::T,
         KeyCode::Char('u') => KeyEvent::U,
         KeyCode::Char('v') => KeyEvent::V,
         KeyCode::Char('w') => KeyEvent::W,

@@ -13,6 +13,12 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
+    if !context.notebook.show_browser {
+        editor::draw(frame, area, context);
+
+        return;
+    }
+
     let horizontal = Layout::horizontal([Length(45), Percentage(100)]);
     let [note_tree_area, editor_area] = horizontal.areas(area);
 

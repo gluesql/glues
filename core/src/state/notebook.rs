@@ -98,6 +98,11 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode")
             }
+            EditingNormalMode(VimNormalState::Toggle) => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' normal mode - toggle")
+            }
             EditingNormalMode(VimNormalState::Numbering(n)) => {
                 let name = &self.get_selected_note()?.name;
 
@@ -266,9 +271,16 @@ impl NotebookState {
                     "[i] Insert".to_owned(),
                     "[v] Visual".to_owned(),
                     "[c] Change".to_owned(),
-                    "[t] Toggle line number".to_owned(),
+                    "[t] Toggle".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Quit".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimNormalState::Toggle) => {
+                vec![
+                    "[b] Toggle note browser".to_owned(),
+                    "[n] Toggle line numbers".to_owned(),
+                    "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Numbering(n)) => {
