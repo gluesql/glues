@@ -134,6 +134,13 @@ impl NotebookContext {
             .log_expect("[NotebookContext::selected] selected must not be empty")
     }
 
+    pub fn selected_name(&self) -> String {
+        match self.selected() {
+            TreeItem::Directory { value, .. } => value.name.clone(),
+            TreeItem::Note { value, .. } => value.name.clone(),
+        }
+    }
+
     pub fn open_note(&mut self, note: Note, content: String) {
         self.opened_note = Some(note);
         self.editor = TextArea::from(content.lines());
@@ -304,7 +311,7 @@ impl NotebookContext {
                     RENAME_NOTE => TuiAction::Prompt {
                         message: vec![Line::raw("Enter new note name:")],
                         action: Box::new(TuiAction::RenameNote.into()),
-                        default: None,
+                        default: Some(self.selected_name()),
                     }
                     .into(),
                     REMOVE_NOTE => TuiAction::Confirm {
@@ -351,7 +358,7 @@ impl NotebookContext {
                     RENAME_DIRECTORY => TuiAction::Prompt {
                         message: vec![Line::raw("Enter new directory name:")],
                         action: Box::new(TuiAction::RenameDirectory.into()),
-                        default: None,
+                        default: Some(self.selected_name()),
                     }
                     .into(),
                     REMOVE_DIRECTORY => TuiAction::Confirm {
