@@ -150,7 +150,7 @@ impl NotebookContext {
 
         match self.state {
             ContextState::NoteTreeBrowsing => self.consume_on_note_tree_browsing(code),
-            ContextState::NoteTreeNumbering => self.consume_on_note_tree_numbering(code),
+            ContextState::NoteTreeNumbering => Action::PassThrough,
             ContextState::EditorNormalMode { idle } => self.consume_on_editor_normal(input, idle),
             ContextState::EditorVisualMode => Action::PassThrough,
             ContextState::EditorInsertMode => self.consume_on_editor_insert(input),
@@ -233,16 +233,6 @@ impl NotebookContext {
             }
             .into(),
             _ => Action::PassThrough,
-        }
-    }
-
-    fn consume_on_note_tree_numbering(&mut self, code: KeyCode) -> Action {
-        match code {
-            KeyCode::Char('0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9') => {
-                Action::PassThrough
-            }
-            KeyCode::Char('j') | KeyCode::Char('k') | KeyCode::Esc => Action::PassThrough,
-            _ => Action::None,
         }
     }
 

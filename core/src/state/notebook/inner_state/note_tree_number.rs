@@ -13,6 +13,18 @@ pub async fn consume(
     use Event::*;
     use NotebookEvent::*;
 
+    let reset_state = |state: &mut NotebookState| {
+        match state.selected {
+            SelectedItem::Note { .. } => {
+                state.inner_state = InnerState::NoteSelected;
+            }
+            SelectedItem::Directory { .. } => {
+                state.inner_state = InnerState::DirectorySelected;
+            }
+            SelectedItem::None => {}
+        };
+    };
+
     match event {
         Notebook(SelectNote(note)) => note::select(state, note),
         Notebook(SelectDirectory(directory)) => directory::select(state, directory),
@@ -23,21 +35,21 @@ pub async fn consume(
             Ok(NotebookTransition::None)
         }
         Key(KeyEvent::Esc) => {
-            match state.selected {
-                SelectedItem::Note { .. } => {
-                    state.inner_state = InnerState::NoteSelected;
-                }
-                SelectedItem::Directory { .. } => {
-                    state.inner_state = InnerState::DirectorySelected;
-                }
-                SelectedItem::None => {}
-            };
-
+            reset_state(state);
             Ok(NotebookTransition::None)
         }
-        Key(KeyEvent::J) => Ok(NotebookTransition::SelectNext(n)),
-        Key(KeyEvent::K) => Ok(NotebookTransition::SelectPrev(n)),
-        event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
+        Key(KeyEvent::J) => {
+            reset_state(state);
+            Ok(NotebookTransition::SelectNext(n))
+        }
+        Key(KeyEvent::K) => {
+            reset_state(state);
+            Ok(NotebookTransition::SelectPrev(n))
+        }
+        event @ Key(_) => {
+            reset_state(state);
+            Ok(NotebookTransition::Inedible(event))
+        }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
