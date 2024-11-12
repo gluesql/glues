@@ -66,6 +66,7 @@ pub struct NotebookContext {
     pub show_line_number: bool,
     pub show_browser: bool,
     pub line_yanked: bool,
+    pub yank: Option<String>,
 }
 
 impl Default for NotebookContext {
@@ -83,6 +84,7 @@ impl Default for NotebookContext {
             show_line_number: true,
             show_browser: true,
             line_yanked: false,
+            yank: None,
         }
     }
 }
@@ -135,6 +137,9 @@ impl NotebookContext {
     pub fn open_note(&mut self, note: Note, content: String) {
         self.opened_note = Some(note);
         self.editor = TextArea::from(content.lines());
+        if let Some(yank) = self.yank.as_ref() {
+            self.editor.set_yank_text(yank);
+        }
     }
 
     pub fn consume(&mut self, input: &Input) -> Action {
@@ -255,6 +260,7 @@ impl NotebookContext {
             .into(),
             KeyCode::Char('n') if idle => {
                 self.show_browser = true;
+                self.yank = Some(self.editor.yank_text());
 
                 TuiAction::SaveAndPassThrough.into()
             }
