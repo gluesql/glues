@@ -2,7 +2,7 @@ use {
     super::VimVisualState,
     crate::{
         db::Db,
-        state::notebook::{directory, note, InnerState, NotebookState},
+        state::notebook::{directory, note, tabs, InnerState, NotebookState},
         transition::{
             NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition,
         },
@@ -173,6 +173,9 @@ async fn consume_toggle(
     use NormalModeTransition::*;
 
     match event {
+        Key(KeyEvent::L) => tabs::select_prev(db, state).await,
+        Key(KeyEvent::H) => tabs::select_next(db, state).await,
+        Key(KeyEvent::X) => tabs::close(db, state).await,
         Key(KeyEvent::N) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 

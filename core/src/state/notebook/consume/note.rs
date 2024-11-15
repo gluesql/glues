@@ -92,7 +92,21 @@ pub async fn open(
 ) -> Result<NotebookTransition> {
     let content = db.fetch_note_content(note.id.clone()).await?;
 
-    state.editing = Some(note.clone());
+    let i = state.tabs.iter().enumerate().find_map(|(i, tab_note)| {
+        if tab_note.id == note.id {
+            Some(i)
+        } else {
+            None
+        }
+    });
+
+    if let Some(i) = i {
+        state.tab_index = Some(i);
+    } else {
+        state.tabs.push(note.clone());
+        state.tab_index = Some(state.tabs.len() - 1);
+    }
+
     state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
     Ok(NotebookTransition::OpenNote { note, content })

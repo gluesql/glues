@@ -60,7 +60,10 @@ impl App {
         use context::notebook::ContextState;
 
         let NotebookState {
-            root, inner_state, ..
+            root,
+            inner_state,
+            tab_index,
+            ..
         } = self.glues.state.get_inner().log_unwrap();
         let new_state = match inner_state {
             InnerState::NoteSelected | InnerState::DirectorySelected => {
@@ -79,6 +82,10 @@ impl App {
 
         if self.context.notebook.state != new_state {
             self.context.notebook.state = new_state;
+        }
+
+        if &self.context.notebook.tab_index != tab_index {
+            self.context.notebook.tab_index = *tab_index;
         }
 
         match transition {
@@ -171,10 +178,26 @@ impl App {
 
         match transition {
             IdleMode => {
-                self.context.notebook.editor.cancel_selection();
+                self.context.notebook.get_editor_mut().cancel_selection();
             }
             ToggleMode | NumberingMode | GatewayMode | YankMode | DeleteMode | DeleteInsideMode
             | ChangeMode | ChangeInsideMode => {}
+            NextTab(note_id) | PrevTab(note_id) => {
+                let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
+
+                self.context.notebook.update_items(root);
+                self.context.notebook.select_item(&note_id);
+            }
+            CloseTab(note_id) => {
+                self.context.notebook.close_tab(&note_id);
+
+                let state: &NotebookState = self.glues.state.get_inner().log_unwrap();
+                self.context.notebook.update_items(&state.root);
+
+                let note_id = &state.get_selected_note().log_unwrap().id;
+                self.context.notebook.update_items(&state.root);
+                self.context.notebook.select_item(note_id);
+            }
             ToggleLineNumbers => {
                 self.context.notebook.show_line_number = !self.context.notebook.show_line_number;
             }
@@ -182,96 +205,111 @@ impl App {
                 self.context.notebook.show_browser = !self.context.notebook.show_browser;
             }
             MoveCursorDown(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 let cursor_move = cursor_move_down(editor, n);
 
                 editor.move_cursor(cursor_move);
             }
             MoveCursorUp(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 let cursor_move = cursor_move_up(editor, n);
 
                 editor.move_cursor(cursor_move);
             }
             MoveCursorBack(n) => {
-                let (row, col) = self.context.notebook.editor.cursor();
+                let editor = self.context.notebook.get_editor_mut();
+                let (row, col) = editor.cursor();
                 let cursor_move = if col < n {
                     CursorMove::Head
                 } else {
                     CursorMove::Jump(row as u16, (col - n) as u16)
                 };
 
-                self.context.notebook.editor.move_cursor(cursor_move);
+                editor.move_cursor(cursor_move);
             }
             MoveCursorForward(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 let cursor_move = cursor_move_forward(editor, n);
 
                 editor.move_cursor(cursor_move);
             }
             MoveCursorWordForward(n) => {
+                let editor = self.context.notebook.get_editor_mut();
+
                 for _ in 0..n {
-                    self.context
-                        .notebook
-                        .editor
-                        .move_cursor(CursorMove::WordForward);
+                    editor.move_cursor(CursorMove::WordForward);
                 }
             }
             MoveCursorWordEnd(n) => {
-                move_cursor_word_end(&mut self.context.notebook.editor, n);
+                move_cursor_word_end(self.context.notebook.get_editor_mut(), n);
             }
             MoveCursorWordBack(n) => {
-                move_cursor_word_back(&mut self.context.notebook.editor, n);
+                move_cursor_word_back(self.context.notebook.get_editor_mut(), n);
             }
             MoveCursorLineStart => {
-                self.context.notebook.editor.move_cursor(CursorMove::Head);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::Head);
             }
             MoveCursorLineEnd => {
-                self.context.notebook.editor.move_cursor(CursorMove::End);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::End);
             }
             MoveCursorLineNonEmptyStart => {
-                move_cursor_to_line_non_empty_start(&mut self.context.notebook.editor);
+                move_cursor_to_line_non_empty_start(self.context.notebook.get_editor_mut());
             }
             MoveCursorTop => {
-                self.context.notebook.editor.move_cursor(CursorMove::Top);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::Top);
             }
             MoveCursorBottom => {
-                self.context.notebook.editor.move_cursor(CursorMove::Bottom);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::Bottom);
             }
             MoveCursorToLine(n) => {
-                self.context
-                    .notebook
-                    .editor
-                    .move_cursor(CursorMove::Jump((n - 1) as u16, 0));
-                self.context
-                    .notebook
-                    .editor
-                    .move_cursor(CursorMove::WordForward);
+                let editor = self.context.notebook.get_editor_mut();
+                editor.move_cursor(CursorMove::Jump((n - 1) as u16, 0));
+                editor.move_cursor(CursorMove::WordForward);
             }
             InsertNewLineBelow => {
-                self.context.notebook.editor.move_cursor(CursorMove::End);
-                self.context.notebook.editor.insert_newline();
+                let editor = self.context.notebook.get_editor_mut();
+                editor.move_cursor(CursorMove::End);
+                editor.insert_newline();
             }
             InsertNewLineAbove => {
-                self.context.notebook.editor.move_cursor(CursorMove::Head);
-                self.context.notebook.editor.insert_newline();
-                self.context.notebook.editor.move_cursor(CursorMove::Up);
+                let editor = self.context.notebook.get_editor_mut();
+                editor.move_cursor(CursorMove::Head);
+                editor.insert_newline();
+                editor.move_cursor(CursorMove::Up);
             }
             InsertAtCursor => {}
             InsertAtLineStart => {
-                self.context.notebook.editor.move_cursor(CursorMove::Head);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::Head);
             }
             InsertAfterCursor => {
                 self.context
                     .notebook
-                    .editor
+                    .get_editor_mut()
                     .move_cursor(CursorMove::Forward);
             }
             InsertAtLineEnd => {
-                self.context.notebook.editor.move_cursor(CursorMove::End);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::End);
             }
             DeleteChars(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 editor.start_selection();
                 let cursor_move = cursor_move_forward(editor, n);
 
@@ -279,8 +317,9 @@ impl App {
                 editor.cut();
             }
             Paste => {
-                let editor = &mut self.context.notebook.editor;
-                if self.context.notebook.line_yanked {
+                let line_yanked = self.context.notebook.line_yanked;
+                let editor = self.context.notebook.get_editor_mut();
+                if line_yanked {
                     editor.move_cursor(CursorMove::End);
                     editor.insert_newline();
                     editor.paste();
@@ -290,13 +329,13 @@ impl App {
                 }
             }
             Undo => {
-                self.context.notebook.editor.undo();
+                self.context.notebook.get_editor_mut().undo();
             }
             Redo => {
-                self.context.notebook.editor.redo();
+                self.context.notebook.get_editor_mut().redo();
             }
             YankLines(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 let cursor = editor.cursor();
                 editor.move_cursor(CursorMove::Head);
                 editor.start_selection();
@@ -309,7 +348,7 @@ impl App {
                 self.context.notebook.line_yanked = true;
             }
             DeleteLines(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 let (row, _) = editor.cursor();
 
                 editor.move_cursor(CursorMove::Head);
@@ -332,7 +371,7 @@ impl App {
                 self.context.notebook.line_yanked = true;
             }
             DeleteLinesAndInsert(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 editor.move_cursor(CursorMove::Head);
                 editor.start_selection();
                 let cursor_move = cursor_move_down(editor, n - 1);
@@ -342,7 +381,7 @@ impl App {
                 self.context.notebook.line_yanked = true;
             }
             DeleteInsideWord(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 let cursor = editor.cursor();
                 editor.move_cursor(CursorMove::WordBack);
                 editor.move_cursor(CursorMove::WordEnd);
@@ -361,7 +400,7 @@ impl App {
                 self.context.notebook.line_yanked = false;
             }
             DeleteWordEnd(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 editor.start_selection();
                 move_cursor_word_end(editor, n);
                 editor.move_cursor(CursorMove::Forward);
@@ -370,7 +409,7 @@ impl App {
                 self.context.notebook.line_yanked = false;
             }
             DeleteWordBack(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 editor.start_selection();
                 move_cursor_word_back(editor, n);
                 editor.cut();
@@ -378,7 +417,7 @@ impl App {
                 self.context.notebook.line_yanked = false;
             }
             DeleteLineStart => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 editor.start_selection();
                 editor.move_cursor(CursorMove::Head);
                 editor.cut();
@@ -386,7 +425,7 @@ impl App {
                 self.context.notebook.line_yanked = false;
             }
             DeleteLineEnd(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 editor.start_selection();
                 let cursor_move = cursor_move_down(editor, n - 1);
                 editor.move_cursor(cursor_move);
@@ -403,109 +442,114 @@ impl App {
 
         match transition {
             IdleMode => {
-                self.context.notebook.editor.start_selection();
+                self.context.notebook.get_editor_mut().start_selection();
             }
             NumberingMode | GatewayMode => {}
             MoveCursorDown(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 let cursor_move = cursor_move_down(editor, n);
 
                 editor.move_cursor(cursor_move);
             }
             MoveCursorUp(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 let cursor_move = cursor_move_up(editor, n);
 
                 editor.move_cursor(cursor_move);
             }
             MoveCursorBack(n) => {
-                let (row, col) = self.context.notebook.editor.cursor();
+                let editor = self.context.notebook.get_editor_mut();
+                let (row, col) = editor.cursor();
                 let cursor_move = if col < n {
                     CursorMove::Head
                 } else {
                     CursorMove::Jump(row as u16, (col - n) as u16)
                 };
 
-                self.context.notebook.editor.move_cursor(cursor_move);
+                editor.move_cursor(cursor_move);
             }
             MoveCursorForward(n) => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 let cursor_move = cursor_move_forward(editor, n);
 
                 editor.move_cursor(cursor_move);
             }
             MoveCursorWordForward(n) => {
+                let editor = self.context.notebook.get_editor_mut();
+
                 for _ in 0..n {
-                    self.context
-                        .notebook
-                        .editor
-                        .move_cursor(CursorMove::WordForward);
+                    editor.move_cursor(CursorMove::WordForward);
                 }
             }
             MoveCursorWordEnd(n) => {
+                let editor = self.context.notebook.get_editor_mut();
+
                 for _ in 0..n {
-                    self.context
-                        .notebook
-                        .editor
-                        .move_cursor(CursorMove::WordEnd);
+                    editor.move_cursor(CursorMove::WordEnd);
                 }
             }
             MoveCursorWordBack(n) => {
+                let editor = self.context.notebook.get_editor_mut();
+
                 for _ in 0..n {
-                    self.context
-                        .notebook
-                        .editor
-                        .move_cursor(CursorMove::WordBack);
+                    editor.move_cursor(CursorMove::WordBack);
                 }
             }
             MoveCursorLineStart => {
-                self.context.notebook.editor.move_cursor(CursorMove::Head);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::Head);
             }
             MoveCursorLineEnd => {
-                self.context.notebook.editor.move_cursor(CursorMove::End);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::End);
             }
             MoveCursorLineNonEmptyStart => {
-                move_cursor_to_line_non_empty_start(&mut self.context.notebook.editor);
+                move_cursor_to_line_non_empty_start(self.context.notebook.get_editor_mut());
             }
             MoveCursorBottom => {
-                self.context.notebook.editor.move_cursor(CursorMove::Bottom);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::Bottom);
             }
             MoveCursorTop => {
-                self.context.notebook.editor.move_cursor(CursorMove::Top);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .move_cursor(CursorMove::Top);
             }
             MoveCursorToLine(n) => {
-                self.context
-                    .notebook
-                    .editor
-                    .move_cursor(CursorMove::Jump((n - 1) as u16, 0));
-                self.context
-                    .notebook
-                    .editor
-                    .move_cursor(CursorMove::WordForward);
+                let editor = self.context.notebook.get_editor_mut();
+                editor.move_cursor(CursorMove::Jump((n - 1) as u16, 0));
+                editor.move_cursor(CursorMove::WordForward);
             }
             YankSelection => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 reselect_for_yank(editor);
                 editor.copy();
                 self.context.notebook.line_yanked = false;
             }
             DeleteSelection => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 reselect_for_yank(editor);
                 editor.cut();
                 self.context.notebook.line_yanked = false;
             }
             DeleteSelectionAndInsertMode => {
-                let editor = &mut self.context.notebook.editor;
+                let editor = self.context.notebook.get_editor_mut();
                 reselect_for_yank(editor);
-                self.context.notebook.editor.cut();
+                editor.cut();
                 self.context.notebook.line_yanked = false;
             }
         }
     }
 
     pub(crate) async fn save(&mut self) {
-        let content = self.context.notebook.editor.lines().join("\n");
+        let content = self.context.notebook.get_editor().lines().join("\n");
         let event = NotebookEvent::UpdateNoteContent(content).into();
 
         self.glues.dispatch(event).await.log_unwrap();

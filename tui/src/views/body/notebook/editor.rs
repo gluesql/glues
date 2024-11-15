@@ -7,22 +7,34 @@ use {
         widgets::{Block, Padding},
         Frame,
     },
+    tui_textarea::TextArea,
 };
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
-    let title = match context.notebook.opened_note {
-        Some(ref note) => format!("[Editor: {}]", note.name),
-        None => "[Editor]".to_string(),
-    };
-    let title = if matches!(
-        context.notebook.state,
-        ContextState::EditorNormalMode { .. }
-            | ContextState::EditorInsertMode
-            | ContextState::EditorVisualMode
-    ) {
-        title.light_blue()
+    let title = if let Some(tab_index) = context.notebook.tab_index {
+        let mut title = vec!["[".into()];
+        for (i, tab) in context.notebook.tabs.iter().enumerate() {
+            let name = tab.note.name.clone();
+            let name = if i == tab_index {
+                if context.notebook.state.is_editor() {
+                    name.white().on_blue()
+                } else {
+                    name.white().on_dark_gray()
+                }
+            } else {
+                name.dark_gray()
+            };
+
+            if i != 0 {
+                title.push("|".into());
+            }
+            title.push(name);
+        }
+        title.push("]".into());
+
+        Line::from(title)
     } else {
-        title.dark_gray()
+        Line::from("[Editor]".dark_gray())
     };
 
     let block = Block::bordered().title(title);
@@ -36,9 +48,18 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         Padding::left(1)
     });
 
-    context.notebook.editor.set_block(block);
+    let show_line_number = context.notebook.show_line_number;
+    let state = context.notebook.state;
+    let mut editor = TextArea::from("Welcome to Glues :D".lines());
+    let editor = if context.notebook.tab_index.is_some() {
+        context.notebook.get_editor_mut()
+    } else {
+        &mut editor
+    };
 
-    let (cursor_style, cursor_line_style) = match context.notebook.state {
+    editor.set_block(block);
+
+    let (cursor_style, cursor_line_style) = match state {
         ContextState::EditorNormalMode { .. }
         | ContextState::EditorInsertMode
         | ContextState::EditorVisualMode => (
@@ -48,14 +69,13 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         _ => (Style::default(), Style::default()),
     };
 
-    let editor = &mut context.notebook.editor;
     editor.set_cursor_style(cursor_style);
     editor.set_cursor_line_style(cursor_line_style);
-    if context.notebook.show_line_number {
+    if show_line_number {
         editor.set_line_number_style(Style::default().dark_gray().dim());
     } else {
         editor.remove_line_number();
     }
 
-    frame.render_widget(&context.notebook.editor, area);
+    frame.render_widget(&*editor, area);
 }

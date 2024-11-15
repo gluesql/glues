@@ -6,7 +6,7 @@ use {
     glues_core::{
         data::{Directory, Note},
         state::notebook::DirectoryItem,
-        types::Id,
+        types::{Id, NoteId},
         NotebookEvent,
     },
     ratatui::{
@@ -47,6 +47,17 @@ pub enum ContextState {
     EditorInsertMode,
 }
 
+impl ContextState {
+    pub fn is_editor(&self) -> bool {
+        matches!(
+            self,
+            ContextState::EditorNormalMode { .. }
+                | ContextState::EditorInsertMode
+                | ContextState::EditorVisualMode
+        )
+    }
+}
+
 pub struct NotebookContext {
     pub state: ContextState,
 
@@ -61,12 +72,17 @@ pub struct NotebookContext {
     pub directory_actions_state: ListState,
 
     // editor
-    pub editor: TextArea<'static>,
-    pub opened_note: Option<Note>,
+    pub tabs: Vec<EditorTab>,
+    pub tab_index: Option<usize>,
     pub show_line_number: bool,
     pub show_browser: bool,
     pub line_yanked: bool,
     pub yank: Option<String>,
+}
+
+pub struct EditorTab {
+    pub note: Note,
+    pub editor: TextArea<'static>,
 }
 
 impl Default for NotebookContext {
@@ -79,8 +95,8 @@ impl Default for NotebookContext {
             note_actions_state: ListState::default(),
             directory_actions_state: ListState::default(),
 
-            editor: TextArea::new(vec!["Welcome to Glues :D".to_owned()]),
-            opened_note: None,
+            tabs: vec![],
+            tab_index: None,
             show_line_number: true,
             show_browser: true,
             line_yanked: false,
@@ -90,6 +106,32 @@ impl Default for NotebookContext {
 }
 
 impl NotebookContext {
+    pub fn get_opened_note(&self) -> Option<&Note> {
+        self.tab_index
+            .and_then(|i| self.tabs.get(i))
+            .map(|t| &t.note)
+    }
+
+    pub fn get_editor(&self) -> &TextArea<'static> {
+        &self
+            .tab_index
+            .and_then(|i| self.tabs.get(i))
+            .log_expect("no opened note")
+            .editor
+    }
+
+    pub fn get_editor_mut(&mut self) -> &mut TextArea<'static> {
+        &mut self
+            .tab_index
+            .and_then(|i| self.tabs.get_mut(i))
+            .log_expect("no opened note")
+            .editor
+    }
+
+    pub fn close_tab(&mut self, note_id: &NoteId) {
+        self.tabs.retain(|tab| &tab.note.id != note_id);
+    }
+
     pub fn update_items(&mut self, directory_item: &DirectoryItem) {
         self.tree_items = flatten(directory_item, 0);
     }
@@ -142,10 +184,28 @@ impl NotebookContext {
     }
 
     pub fn open_note(&mut self, note: Note, content: String) {
-        self.opened_note = Some(note);
-        self.editor = TextArea::from(content.lines());
-        if let Some(yank) = self.yank.as_ref() {
-            self.editor.set_yank_text(yank);
+        let i = self.tabs.iter().enumerate().find_map(|(i, tab)| {
+            if tab.note.id == note.id {
+                Some(i)
+            } else {
+                None
+            }
+        });
+
+        if let Some(i) = i {
+            self.tab_index = Some(i);
+        } else {
+            let tab = EditorTab {
+                note,
+                editor: TextArea::from(content.lines()),
+            };
+            self.tabs.push(tab);
+            self.tab_index = Some(self.tabs.len() - 1);
+        }
+
+        let yank = self.yank.clone();
+        if let Some(yank) = yank {
+            self.get_editor_mut().set_yank_text(yank);
         }
     }
 
@@ -257,7 +317,7 @@ impl NotebookContext {
             .into(),
             KeyCode::Char('n') if idle => {
                 self.show_browser = true;
-                self.yank = Some(self.editor.yank_text());
+                self.yank = Some(self.get_editor_mut().yank_text());
 
                 TuiAction::SaveAndPassThrough.into()
             }
@@ -281,11 +341,11 @@ impl NotebookContext {
                 ..
             }) => {
                 self.line_yanked = false;
-                self.editor.input(input.clone());
+                self.get_editor_mut().input(input.clone());
                 Action::None
             }
             _ => {
-                self.editor.input(input.clone());
+                self.get_editor_mut().input(input.clone());
                 Action::None
             }
         }

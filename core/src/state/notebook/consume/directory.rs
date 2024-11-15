@@ -1,11 +1,14 @@
-use crate::{
-    data::Directory,
-    db::Db,
-    state::notebook::{
-        DirectoryItem, DirectoryItemChildren, InnerState, NotebookState, SelectedItem,
+use {
+    crate::{
+        data::Directory,
+        db::Db,
+        state::notebook::{
+            DirectoryItem, DirectoryItemChildren, InnerState, NotebookState, SelectedItem,
+        },
+        types::DirectoryId,
+        Error, NotebookTransition, Result,
     },
-    types::DirectoryId,
-    Error, NotebookTransition, Result,
+    async_recursion::async_recursion,
 };
 
 pub async fn open(
@@ -38,6 +41,22 @@ pub async fn open(
         notes,
         directories,
     })
+}
+
+#[async_recursion(?Send)]
+pub async fn open_all(
+    db: &mut Db,
+    state: &mut NotebookState,
+    directory_id: DirectoryId,
+) -> Result<NotebookTransition> {
+    if state.check_opened(&directory_id) {
+        return Ok(NotebookTransition::None);
+    }
+
+    let directory = db.fetch_directory(directory_id).await?;
+
+    open_all(db, state, directory.parent_id).await?;
+    open(db, state, directory.id).await
 }
 
 pub fn close(state: &mut NotebookState, directory: Directory) -> Result<NotebookTransition> {
