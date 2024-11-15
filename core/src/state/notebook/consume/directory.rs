@@ -51,12 +51,12 @@ pub async fn open_all(
 ) -> Result<NotebookTransition> {
     if state.check_opened(&directory_id) {
         return Ok(NotebookTransition::None);
-    } else {
-        let directory = db.fetch_directory(directory_id).await?;
-
-        open_all(db, state, directory.parent_id).await?;
-        open(db, state, directory.id).await
     }
+
+    let directory = db.fetch_directory(directory_id).await?;
+
+    open_all(db, state, directory.parent_id).await?;
+    open(db, state, directory.id).await
 }
 
 pub fn close(state: &mut NotebookState, directory: Directory) -> Result<NotebookTransition> {
