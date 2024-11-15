@@ -9,7 +9,7 @@ use {
         types::DirectoryId,
         Error, Event, Glues, NotebookTransition, Result,
     },
-    consume::{directory, note, traverse},
+    consume::{directory, note, tabs, traverse},
 };
 
 pub use inner_state::{
@@ -22,7 +22,8 @@ pub use directory_item::{DirectoryItem, DirectoryItemChildren, TreeItem};
 pub struct NotebookState {
     pub root: DirectoryItem,
     pub selected: SelectedItem,
-    pub editing: Option<Note>,
+    pub tabs: Vec<Note>,
+    pub tab_index: Option<usize>,
 
     pub inner_state: InnerState,
 }
@@ -62,7 +63,8 @@ impl NotebookState {
             inner_state: DirectorySelected,
             root,
             selected,
-            editing: None,
+            tabs: Vec::new(),
+            tab_index: None,
         })
     }
 
@@ -268,18 +270,20 @@ impl NotebookState {
                 */
                 vec![
                     "[n] Browse notes".to_owned(),
+                    "[t] Toggle | Tabs".to_owned(),
                     "[i] Insert".to_owned(),
                     "[v] Visual".to_owned(),
                     "[c] Change".to_owned(),
-                    "[t] Toggle".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Quit".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Toggle) => {
                 vec![
-                    "[b] Toggle note browser".to_owned(),
-                    "[n] Toggle line numbers".to_owned(),
+                    "[h|l] Prev | Next Tab".to_owned(),
+                    "[x] Close".to_owned(),
+                    "[b] Toggle browser".to_owned(),
+                    "[n] Toggle line number".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
@@ -435,9 +439,12 @@ impl NotebookState {
     }
 
     pub fn get_editing(&self) -> Result<&Note> {
-        self.editing
-            .as_ref()
-            .ok_or_else(|| Error::Wip("editing is none".to_owned()))
+        let i = self
+            .tab_index
+            .ok_or_else(|| Error::Wip("tab index is none".to_owned()))?;
+        self.tabs
+            .get(i)
+            .ok_or_else(|| Error::Wip("tab not found".to_owned()))
     }
 }
 

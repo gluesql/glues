@@ -2,7 +2,7 @@ use {
     crate::{
         data::{Directory, Note},
         state::notebook::DirectoryItem,
-        types::DirectoryId,
+        types::{DirectoryId, NoteId},
         Event,
     },
     strum_macros::Display,
@@ -103,6 +103,9 @@ pub enum NormalModeTransition {
     DeleteInsideMode,
     ChangeMode,
     ChangeInsideMode,
+    NextTab(NoteId),
+    PrevTab(NoteId),
+    CloseTab(NoteId),
     ToggleLineNumbers,
     ToggleBrowser,
     MoveCursorDown(usize),
