@@ -126,8 +126,12 @@ pub async fn update_content(
     content: String,
 ) -> Result<NotebookTransition> {
     let id = state.get_editing()?.id.clone();
+    let current = db.fetch_note_content(id.clone()).await?;
 
-    db.update_note_content(id, content).await?;
-
-    Ok(NotebookTransition::UpdateNoteContent)
+    if current == content {
+        Ok(NotebookTransition::None)
+    } else {
+        db.update_note_content(id, content).await?;
+        Ok(NotebookTransition::UpdateNoteContent)
+    }
 }
