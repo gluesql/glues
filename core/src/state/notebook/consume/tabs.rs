@@ -1,6 +1,5 @@
 use {
     crate::{
-        data::Note,
         db::Db,
         state::notebook::{directory, InnerState, NotebookState, SelectedItem, VimNormalState},
         transition::NormalModeTransition,
@@ -18,14 +17,15 @@ pub async fn select_prev(db: &mut Db, state: &mut NotebookState) -> Result<Noteb
     let i = if i + 1 >= state.tabs.len() { 0 } else { i + 1 };
     state.tab_index = Some(i);
 
-    let Note {
-        id, directory_id, ..
-    } = &state.tabs[i];
-    let id = id.clone();
+    let note = &state.tabs[i];
+    state.selected = SelectedItem::Note(note.clone());
 
-    directory::open_all(db, state, directory_id.clone()).await?;
+    let note_id = note.id.clone();
+    let directory_id = note.directory_id.clone();
+
+    directory::open_all(db, state, directory_id).await?;
     Ok(NotebookTransition::EditingNormalMode(
-        NormalModeTransition::NextTab(id),
+        NormalModeTransition::NextTab(note_id),
     ))
 }
 
@@ -38,14 +38,15 @@ pub async fn select_next(db: &mut Db, state: &mut NotebookState) -> Result<Noteb
     let i = if i == 0 { state.tabs.len() - 1 } else { i - 1 };
     state.tab_index = Some(i);
 
-    let Note {
-        id, directory_id, ..
-    } = &state.tabs[i];
-    let id = id.clone();
+    let note = &state.tabs[i];
+    state.selected = SelectedItem::Note(note.clone());
 
-    directory::open_all(db, state, directory_id.clone()).await?;
+    let note_id = note.id.clone();
+    let directory_id = note.directory_id.clone();
+
+    directory::open_all(db, state, directory_id).await?;
     Ok(NotebookTransition::EditingNormalMode(
-        NormalModeTransition::PrevTab(id),
+        NormalModeTransition::PrevTab(note_id),
     ))
 }
 
