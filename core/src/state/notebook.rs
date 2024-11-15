@@ -273,7 +273,6 @@ impl NotebookState {
                     "[t] Toggle | Tabs".to_owned(),
                     "[i] Insert".to_owned(),
                     "[v] Visual".to_owned(),
-                    "[c] Change".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Quit".to_owned(),
                 ]
