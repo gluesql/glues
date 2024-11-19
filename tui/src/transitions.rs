@@ -190,6 +190,7 @@ impl App {
 
                 self.context.notebook.update_items(root);
                 self.context.notebook.select_item(&note_id);
+                self.context.notebook.apply_yank();
             }
             CloseTab(note_id) => {
                 self.context.notebook.close_tab(&note_id);
@@ -200,6 +201,7 @@ impl App {
                 let note_id = &state.get_selected_note().log_unwrap().id;
                 self.context.notebook.update_items(&state.root);
                 self.context.notebook.select_item(note_id);
+                self.context.notebook.apply_yank();
             }
             ToggleLineNumbers => {
                 self.context.notebook.show_line_number = !self.context.notebook.show_line_number;
@@ -319,6 +321,7 @@ impl App {
                 editor.move_cursor(cursor_move);
                 editor.cut();
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
             Paste => {
                 let line_yanked = self.context.notebook.line_yanked;
@@ -354,6 +357,7 @@ impl App {
                 editor.cancel_selection();
                 editor.move_cursor(CursorMove::Jump(cursor.0 as u16, cursor.1 as u16));
                 self.context.notebook.line_yanked = true;
+                self.context.notebook.update_yank();
             }
             DeleteLines(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -378,6 +382,7 @@ impl App {
                 move_cursor_to_line_non_empty_start(editor);
                 self.context.notebook.line_yanked = true;
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
             DeleteLinesAndInsert(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -389,6 +394,7 @@ impl App {
                 editor.cut();
                 self.context.notebook.line_yanked = true;
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
             DeleteInsideWord(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -409,6 +415,7 @@ impl App {
 
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
             DeleteWordEnd(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -419,6 +426,7 @@ impl App {
 
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
             DeleteWordBack(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -428,6 +436,7 @@ impl App {
 
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
             DeleteLineStart => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -437,6 +446,7 @@ impl App {
 
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
             DeleteLineEnd(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -448,6 +458,7 @@ impl App {
 
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
         };
     }
@@ -547,6 +558,7 @@ impl App {
                 reselect_for_yank(editor);
                 editor.copy();
                 self.context.notebook.line_yanked = false;
+                self.context.notebook.update_yank();
             }
             DeleteSelection => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -554,6 +566,7 @@ impl App {
                 editor.cut();
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
             DeleteSelectionAndInsertMode => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -561,6 +574,7 @@ impl App {
                 editor.cut();
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
             }
         }
     }
