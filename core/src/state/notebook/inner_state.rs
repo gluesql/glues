@@ -7,7 +7,11 @@ mod note_more_actions;
 mod note_selected;
 mod note_tree_number;
 
-use crate::{db::Db, state::notebook::NotebookState, Event, NotebookTransition, Result};
+use crate::{
+    db::Db,
+    state::notebook::{note, NotebookState},
+    Event, NotebookEvent, NotebookTransition, Result,
+};
 pub use editing_normal_mode::VimNormalState;
 pub use editing_visual_mode::VimVisualState;
 
@@ -29,6 +33,10 @@ pub async fn consume(
     event: Event,
 ) -> Result<NotebookTransition> {
     use InnerState::*;
+
+    if let Event::Notebook(NotebookEvent::UpdateNoteContent { note_id, content }) = event {
+        return note::update_content(db, note_id, content).await;
+    }
 
     match &state.inner_state {
         NoteSelected => note_selected::consume(db, state, event).await,

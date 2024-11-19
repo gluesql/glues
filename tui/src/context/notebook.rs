@@ -83,6 +83,7 @@ pub struct NotebookContext {
 pub struct EditorTab {
     pub note: Note,
     pub editor: TextArea<'static>,
+    pub dirty: bool,
 }
 
 impl Default for NotebookContext {
@@ -126,6 +127,21 @@ impl NotebookContext {
             .and_then(|i| self.tabs.get_mut(i))
             .log_expect("no opened note")
             .editor
+    }
+
+    pub fn mark_dirty(&mut self) {
+        if let Some(tab) = self.tab_index.and_then(|i| self.tabs.get_mut(i)) {
+            tab.dirty = true;
+        }
+    }
+
+    pub fn mark_clean(&mut self, note_id: &NoteId) {
+        for tab in self.tabs.iter_mut() {
+            if &tab.note.id == note_id {
+                tab.dirty = false;
+                break;
+            }
+        }
     }
 
     pub fn close_tab(&mut self, note_id: &NoteId) {
@@ -198,6 +214,7 @@ impl NotebookContext {
             let tab = EditorTab {
                 note,
                 editor: TextArea::from(content.lines()),
+                dirty: false,
             };
             self.tabs.push(tab);
             self.tab_index = Some(self.tabs.len() - 1);

@@ -1,7 +1,7 @@
 use {
     crate::{
         data::{Directory, Note},
-        types::DirectoryId,
+        types::{DirectoryId, NoteId},
     },
     strum_macros::Display,
 };
@@ -64,7 +64,7 @@ pub enum NotebookEvent {
     EditNote,
     ViewNote,
 
-    UpdateNoteContent(String),
+    UpdateNoteContent { note_id: NoteId, content: String },
 
     CloseEntryDialog,
 }
