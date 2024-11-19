@@ -2,6 +2,7 @@ use crate::{
     data::{Directory, Note},
     db::Db,
     state::notebook::{DirectoryItem, InnerState, NotebookState, SelectedItem, VimNormalState},
+    types::NoteId,
     Error, NotebookTransition, Result,
 };
 
@@ -122,16 +123,15 @@ pub async fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
 
 pub async fn update_content(
     db: &mut Db,
-    state: &mut NotebookState,
+    note_id: NoteId,
     content: String,
 ) -> Result<NotebookTransition> {
-    let id = state.get_editing()?.id.clone();
-    let current = db.fetch_note_content(id.clone()).await?;
+    let current = db.fetch_note_content(note_id.clone()).await?;
 
     if current == content {
         Ok(NotebookTransition::None)
     } else {
-        db.update_note_content(id, content).await?;
-        Ok(NotebookTransition::UpdateNoteContent)
+        db.update_note_content(note_id.clone(), content).await?;
+        Ok(NotebookTransition::UpdateNoteContent(note_id))
     }
 }

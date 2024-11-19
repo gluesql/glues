@@ -77,6 +77,7 @@ impl App {
                     self.handle_transition(transition).await;
                 }
 
+                self.save().await;
                 continue;
             }
 

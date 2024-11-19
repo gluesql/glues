@@ -105,7 +105,10 @@ impl App {
                 self.context.notebook.open_note(note, content);
             }
             NotebookTransition::ViewMode(_note) => {
-                self.save().await;
+                self.context.notebook.mark_dirty();
+            }
+            NotebookTransition::UpdateNoteContent(note_id) => {
+                self.context.notebook.mark_clean(&note_id);
             }
             NotebookTransition::BrowseNoteTree => {}
             NotebookTransition::RemoveNote {
@@ -315,6 +318,7 @@ impl App {
 
                 editor.move_cursor(cursor_move);
                 editor.cut();
+                self.context.notebook.mark_dirty();
             }
             Paste => {
                 let line_yanked = self.context.notebook.line_yanked;
@@ -327,12 +331,16 @@ impl App {
                 } else {
                     editor.paste();
                 }
+
+                self.context.notebook.mark_dirty();
             }
             Undo => {
                 self.context.notebook.get_editor_mut().undo();
+                self.context.notebook.mark_dirty();
             }
             Redo => {
                 self.context.notebook.get_editor_mut().redo();
+                self.context.notebook.mark_dirty();
             }
             YankLines(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -369,6 +377,7 @@ impl App {
 
                 move_cursor_to_line_non_empty_start(editor);
                 self.context.notebook.line_yanked = true;
+                self.context.notebook.mark_dirty();
             }
             DeleteLinesAndInsert(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -379,6 +388,7 @@ impl App {
                 editor.move_cursor(CursorMove::End);
                 editor.cut();
                 self.context.notebook.line_yanked = true;
+                self.context.notebook.mark_dirty();
             }
             DeleteInsideWord(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -398,6 +408,7 @@ impl App {
                 editor.cut();
 
                 self.context.notebook.line_yanked = false;
+                self.context.notebook.mark_dirty();
             }
             DeleteWordEnd(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -407,6 +418,7 @@ impl App {
                 editor.cut();
 
                 self.context.notebook.line_yanked = false;
+                self.context.notebook.mark_dirty();
             }
             DeleteWordBack(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -415,6 +427,7 @@ impl App {
                 editor.cut();
 
                 self.context.notebook.line_yanked = false;
+                self.context.notebook.mark_dirty();
             }
             DeleteLineStart => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -423,6 +436,7 @@ impl App {
                 editor.cut();
 
                 self.context.notebook.line_yanked = false;
+                self.context.notebook.mark_dirty();
             }
             DeleteLineEnd(n) => {
                 let editor = self.context.notebook.get_editor_mut();
@@ -433,6 +447,7 @@ impl App {
                 editor.cut();
 
                 self.context.notebook.line_yanked = false;
+                self.context.notebook.mark_dirty();
             }
         };
     }
@@ -538,21 +553,39 @@ impl App {
                 reselect_for_yank(editor);
                 editor.cut();
                 self.context.notebook.line_yanked = false;
+                self.context.notebook.mark_dirty();
             }
             DeleteSelectionAndInsertMode => {
                 let editor = self.context.notebook.get_editor_mut();
                 reselect_for_yank(editor);
                 editor.cut();
                 self.context.notebook.line_yanked = false;
+                self.context.notebook.mark_dirty();
             }
         }
     }
 
     pub(crate) async fn save(&mut self) {
-        let content = self.context.notebook.get_editor().lines().join("\n");
-        let event = NotebookEvent::UpdateNoteContent(content).into();
+        let mut transitions = vec![];
 
-        self.glues.dispatch(event).await.log_unwrap();
+        for tab in self.context.notebook.tabs.iter() {
+            if !tab.dirty {
+                continue;
+            }
+
+            let event = NotebookEvent::UpdateNoteContent {
+                note_id: tab.note.id.clone(),
+                content: tab.editor.lines().join("\n"),
+            }
+            .into();
+
+            let transition = self.glues.dispatch(event).await.log_unwrap();
+            transitions.push(transition);
+        }
+
+        for transition in transitions {
+            self.handle_transition(transition).await;
+        }
     }
 }
 

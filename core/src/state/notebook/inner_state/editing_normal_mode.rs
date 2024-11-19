@@ -33,26 +33,22 @@ pub async fn consume(
     event: Event,
 ) -> Result<NotebookTransition> {
     match vim_state {
-        VimNormalState::Idle => consume_idle(db, state, event).await,
+        VimNormalState::Idle => consume_idle(state, event).await,
         VimNormalState::Toggle => consume_toggle(db, state, event).await,
-        VimNormalState::Numbering(n) => consume_numbering(db, state, n, event).await,
-        VimNormalState::Gateway => consume_gateway(db, state, event).await,
-        VimNormalState::Yank(n) => consume_yank(db, state, n, event).await,
-        VimNormalState::Yank2(n1, n2) => consume_yank2(db, state, n1, n2, event).await,
-        VimNormalState::Delete(n) => consume_delete(db, state, n, event).await,
-        VimNormalState::Delete2(n1, n2) => consume_delete2(db, state, n1, n2, event).await,
-        VimNormalState::DeleteInside(n) => consume_delete_inside(db, state, n, event).await,
-        VimNormalState::Change(n) => consume_change(db, state, n, event).await,
-        VimNormalState::Change2(n1, n2) => consume_change2(db, state, n1, n2, event).await,
-        VimNormalState::ChangeInside(n) => consume_change_inside(db, state, n, event).await,
+        VimNormalState::Numbering(n) => consume_numbering(state, n, event).await,
+        VimNormalState::Gateway => consume_gateway(state, event).await,
+        VimNormalState::Yank(n) => consume_yank(state, n, event).await,
+        VimNormalState::Yank2(n1, n2) => consume_yank2(state, n1, n2, event).await,
+        VimNormalState::Delete(n) => consume_delete(state, n, event).await,
+        VimNormalState::Delete2(n1, n2) => consume_delete2(state, n1, n2, event).await,
+        VimNormalState::DeleteInside(n) => consume_delete_inside(state, n, event).await,
+        VimNormalState::Change(n) => consume_change(state, n, event).await,
+        VimNormalState::Change2(n1, n2) => consume_change2(state, n1, n2, event).await,
+        VimNormalState::ChangeInside(n) => consume_change_inside(state, n, event).await,
     }
 }
 
-async fn consume_idle(
-    db: &mut Db,
-    state: &mut NotebookState,
-    event: Event,
-) -> Result<NotebookTransition> {
+async fn consume_idle(state: &mut NotebookState, event: Event) -> Result<NotebookTransition> {
     use Event::*;
     use NormalModeTransition::*;
     use NotebookEvent as NE;
@@ -60,7 +56,6 @@ async fn consume_idle(
     match event {
         Notebook(NE::SelectNote(note)) => note::select(state, note),
         Notebook(NE::SelectDirectory(directory)) => directory::select(state, directory),
-        Notebook(NE::UpdateNoteContent(content)) => note::update_content(db, state, content).await,
         Key(KeyEvent::N) => {
             state.inner_state = InnerState::NoteSelected;
 
@@ -189,14 +184,13 @@ async fn consume_toggle(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
 async fn consume_numbering(
-    db: &mut Db,
     state: &mut NotebookState,
     n: usize,
     event: Event,
@@ -292,17 +286,13 @@ async fn consume_numbering(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
-async fn consume_gateway(
-    db: &mut Db,
-    state: &mut NotebookState,
-    event: Event,
-) -> Result<NotebookTransition> {
+async fn consume_gateway(state: &mut NotebookState, event: Event) -> Result<NotebookTransition> {
     use Event::*;
     use NormalModeTransition::*;
 
@@ -320,14 +310,13 @@ async fn consume_gateway(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
 async fn consume_yank(
-    db: &mut Db,
     state: &mut NotebookState,
     n: usize,
     event: Event,
@@ -354,14 +343,13 @@ async fn consume_yank(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
 async fn consume_yank2(
-    db: &mut Db,
     state: &mut NotebookState,
     n1: usize,
     n2: usize,
@@ -390,14 +378,13 @@ async fn consume_yank2(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
 async fn consume_delete(
-    db: &mut Db,
     state: &mut NotebookState,
     n: usize,
     event: Event,
@@ -440,14 +427,13 @@ async fn consume_delete(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
 async fn consume_delete2(
-    db: &mut Db,
     state: &mut NotebookState,
     n1: usize,
     n2: usize,
@@ -482,14 +468,13 @@ async fn consume_delete2(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
 async fn consume_delete_inside(
-    db: &mut Db,
     state: &mut NotebookState,
     n: usize,
     event: Event,
@@ -506,14 +491,13 @@ async fn consume_delete_inside(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
 async fn consume_change(
-    db: &mut Db,
     state: &mut NotebookState,
     n: usize,
     event: Event,
@@ -560,14 +544,13 @@ async fn consume_change(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
 async fn consume_change2(
-    db: &mut Db,
     state: &mut NotebookState,
     n1: usize,
     n2: usize,
@@ -620,14 +603,13 @@ async fn consume_change2(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
 }
 
 async fn consume_change_inside(
-    db: &mut Db,
     state: &mut NotebookState,
     n: usize,
     event: Event,
@@ -644,7 +626,7 @@ async fn consume_change_inside(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            consume_idle(db, state, event).await
+            consume_idle(state, event).await
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }

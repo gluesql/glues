@@ -7,6 +7,7 @@ use {
         widgets::{Block, Padding},
         Frame,
     },
+    throbber_widgets_tui::Throbber,
     tui_textarea::TextArea,
 };
 
@@ -38,9 +39,20 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     };
 
     let block = Block::bordered().title(title);
-    let block = match context.last_log.as_ref() {
-        Some((log, _)) => block.title_bottom(Line::from(log.clone().green()).right_aligned()),
-        None => block,
+    let block = match (
+        context.last_log.as_ref(),
+        context.notebook.tabs.iter().any(|tab| tab.dirty),
+    ) {
+        (_, true) => {
+            let throbber = Throbber::default()
+                .label("Saving...")
+                .style(Style::default().yellow());
+            block.title_bottom(Line::from(throbber).right_aligned())
+        }
+        (Some((log, _)), false) => {
+            block.title_bottom(Line::from(log.clone().green()).right_aligned())
+        }
+        (None, false) => block,
     }
     .padding(if context.notebook.show_line_number {
         Padding::ZERO

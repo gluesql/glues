@@ -66,7 +66,7 @@ pub enum NotebookTransition {
 
     SelectNote(Note),
     SelectDirectory(Directory),
-    UpdateNoteContent,
+    UpdateNoteContent(NoteId),
 
     Alert(String),
 
