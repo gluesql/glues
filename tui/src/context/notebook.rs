@@ -220,10 +220,17 @@ impl NotebookContext {
             self.tab_index = Some(self.tabs.len() - 1);
         }
 
-        let yank = self.yank.clone();
-        if let Some(yank) = yank {
+        self.apply_yank();
+    }
+
+    pub fn apply_yank(&mut self) {
+        if let Some(yank) = self.yank.clone() {
             self.get_editor_mut().set_yank_text(yank);
         }
+    }
+
+    pub fn update_yank(&mut self) {
+        self.yank = Some(self.get_editor().yank_text());
     }
 
     pub fn consume(&mut self, input: &Input) -> Action {
@@ -334,7 +341,7 @@ impl NotebookContext {
             .into(),
             KeyCode::Char('n') if idle => {
                 self.show_browser = true;
-                self.yank = Some(self.get_editor_mut().yank_text());
+                self.update_yank();
 
                 TuiAction::SaveAndPassThrough.into()
             }
