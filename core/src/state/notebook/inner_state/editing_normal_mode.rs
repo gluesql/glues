@@ -424,6 +424,9 @@ async fn consume_delete(
 
             IdleMode.into()
         }
+        Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(
+            VimKeymapKind::NormalDelete,
+        )),
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
@@ -465,6 +468,9 @@ async fn consume_delete2(
 
             IdleMode.into()
         }
+        Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(
+            VimKeymapKind::NormalDelete2,
+        )),
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 

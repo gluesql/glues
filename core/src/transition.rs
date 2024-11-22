@@ -86,6 +86,8 @@ pub enum NotebookTransition {
 pub enum VimKeymapKind {
     NormalIdle,
     NormalNumbering,
+    NormalDelete,
+    NormalDelete2,
     NormalChange,
     NormalChange2,
     VisualIdle,
