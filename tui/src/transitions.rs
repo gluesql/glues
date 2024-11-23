@@ -163,10 +163,10 @@ impl App {
                 self.glues.dispatch(event).await.log_unwrap();
             }
             NotebookTransition::EditingNormalMode(transition) => {
-                self.handle_normal_mode_transition(transition);
+                self.handle_normal_mode_transition(transition).await;
             }
             NotebookTransition::EditingVisualMode(transition) => {
-                self.handle_visual_mode_transition(transition);
+                self.handle_visual_mode_transition(transition).await;
             }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");
@@ -176,7 +176,7 @@ impl App {
         }
     }
 
-    fn handle_normal_mode_transition(&mut self, transition: NormalModeTransition) {
+    async fn handle_normal_mode_transition(&mut self, transition: NormalModeTransition) {
         use NormalModeTransition::*;
 
         match transition {
@@ -463,7 +463,7 @@ impl App {
         };
     }
 
-    fn handle_visual_mode_transition(&mut self, transition: VisualModeTransition) {
+    async fn handle_visual_mode_transition(&mut self, transition: VisualModeTransition) {
         use VisualModeTransition::*;
 
         match transition {
