@@ -14,7 +14,7 @@ pub async fn consume(
 
     match event {
         Notebook(OpenDirectory(directory_id)) => directory::open(db, state, directory_id).await,
-        Key(KeyEvent::L) | Key(KeyEvent::Right) => {
+        Key(KeyEvent::L | KeyEvent::Right | KeyEvent::Enter) => {
             let directory = state.get_selected_directory()?.clone();
             let directory_item = state.root.find(&directory.id).ok_or(Error::Wip(
                 "[Key::L] failed to find the target directory".to_owned(),
