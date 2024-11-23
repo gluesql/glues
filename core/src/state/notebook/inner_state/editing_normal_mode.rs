@@ -409,6 +409,15 @@ async fn consume_delete(
 
             DeleteLines(n).into()
         }
+        Key(KeyEvent::B) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            DeleteWordBack(n).into()
+        }
+        Key(KeyEvent::E) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            DeleteWordEnd(n).into()
+        }
         Key(KeyEvent::DollarSign) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
