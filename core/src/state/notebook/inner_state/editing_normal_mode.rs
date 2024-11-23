@@ -414,7 +414,7 @@ async fn consume_delete(
 
             DeleteWordBack(n).into()
         }
-        Key(KeyEvent::E | KeyEvent::W) => {
+        Key(KeyEvent::E) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
             DeleteWordEnd(n).into()
         }

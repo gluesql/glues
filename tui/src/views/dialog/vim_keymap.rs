@@ -86,6 +86,8 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw(""),
             Line::from("DELETE TEXT".white().on_dark_gray()),
             Line::raw("[d] Delete the specified number of lines"),
+            Line::raw("[de] Deletes the word from the cursor to the end of the current word."),
+            Line::raw("[db] Deletes the word before the cursor."),
             Line::raw("[0] Delete to the beginning of the line"),
             Line::raw("[$] Delete to the end of the line, repeated by the specified number"),
         ]),
