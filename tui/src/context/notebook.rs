@@ -293,19 +293,6 @@ impl NotebookContext {
                     }
                 }
             }
-            KeyCode::Char('l') => match item!() {
-                TreeItem::Directory { value, opened, .. } => {
-                    let directory_id = value.id.clone();
-                    let event = if *opened {
-                        NotebookEvent::CloseDirectory(directory_id)
-                    } else {
-                        NotebookEvent::OpenDirectory(directory_id)
-                    };
-
-                    Action::Dispatch(event.into())
-                }
-                TreeItem::Note { .. } => Action::PassThrough,
-            },
             KeyCode::Char('m') => match item!() {
                 TreeItem::Directory { .. } => {
                     self.directory_actions_state.select_first();
