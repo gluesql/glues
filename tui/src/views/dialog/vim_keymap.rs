@@ -38,7 +38,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[k] Move cursor up"),
                 Line::raw("[l] Move cursor right"),
                 Line::raw("[w] Move cursor to the start of the next word"),
-                Line::raw("[e] Move cursor to the end of the next word"),
+                Line::raw("[e] Move cursor to the end of the current word"),
                 Line::raw("[b] Move cursor to the start of the previous word"),
                 Line::raw("[0] Move cursor to the start of the line"),
                 Line::raw("[$] Move cursor to the end of the line"),
