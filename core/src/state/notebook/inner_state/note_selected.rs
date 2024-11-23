@@ -35,8 +35,8 @@ pub async fn consume(
 
             directory::close(state, directory)
         }
-        Key(KeyEvent::J) => traverse::select_next(state),
-        Key(KeyEvent::K) => traverse::select_prev(state),
+        Key(KeyEvent::J | KeyEvent::Down) => traverse::select_next(state),
+        Key(KeyEvent::K | KeyEvent::Up) => traverse::select_prev(state),
         Key(KeyEvent::M) => {
             let note = state.get_selected_note()?.clone();
 

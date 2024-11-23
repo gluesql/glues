@@ -34,10 +34,10 @@ async fn consume_idle(
     use VisualModeTransition::*;
 
     match event {
-        Key(KeyEvent::J) => MoveCursorDown(1).into(),
-        Key(KeyEvent::K) => MoveCursorUp(1).into(),
-        Key(KeyEvent::H) => MoveCursorBack(1).into(),
-        Key(KeyEvent::L) => MoveCursorForward(1).into(),
+        Key(KeyEvent::J | KeyEvent::Down) => MoveCursorDown(1).into(),
+        Key(KeyEvent::K | KeyEvent::Up) => MoveCursorUp(1).into(),
+        Key(KeyEvent::H | KeyEvent::Left) => MoveCursorBack(1).into(),
+        Key(KeyEvent::L | KeyEvent::Right) => MoveCursorForward(1).into(),
         Key(KeyEvent::W) => MoveCursorWordForward(1).into(),
         Key(KeyEvent::E) => MoveCursorWordEnd(1).into(),
         Key(KeyEvent::B) => MoveCursorWordBack(1).into(),
@@ -128,22 +128,22 @@ async fn consume_numbering(
 
             Ok(NotebookTransition::None)
         }
-        Key(KeyEvent::J) => {
+        Key(KeyEvent::J | KeyEvent::Down) => {
             state.inner_state = InnerState::EditingVisualMode(VimVisualState::Idle);
 
             MoveCursorDown(n).into()
         }
-        Key(KeyEvent::K) => {
+        Key(KeyEvent::K | KeyEvent::Up) => {
             state.inner_state = InnerState::EditingVisualMode(VimVisualState::Idle);
 
             MoveCursorUp(n).into()
         }
-        Key(KeyEvent::H) => {
+        Key(KeyEvent::H | KeyEvent::Left) => {
             state.inner_state = InnerState::EditingVisualMode(VimVisualState::Idle);
 
             NormalModeTransition::MoveCursorBack(n).into()
         }
-        Key(KeyEvent::L) => {
+        Key(KeyEvent::L | KeyEvent::Right) => {
             state.inner_state = InnerState::EditingVisualMode(VimVisualState::Idle);
 
             MoveCursorForward(n).into()

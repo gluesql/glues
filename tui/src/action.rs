@@ -427,6 +427,8 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('^') => KeyEvent::Caret,
         KeyCode::Left => KeyEvent::Left,
         KeyCode::Right => KeyEvent::Right,
+        KeyCode::Up => KeyEvent::Up,
+        KeyCode::Down => KeyEvent::Down,
         KeyCode::Enter => KeyEvent::Enter,
         KeyCode::Esc => KeyEvent::Esc,
         _ => return None,

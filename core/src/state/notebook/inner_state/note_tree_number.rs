@@ -38,11 +38,11 @@ pub async fn consume(
             reset_state(state);
             Ok(NotebookTransition::None)
         }
-        Key(KeyEvent::J) => {
+        Key(KeyEvent::J | KeyEvent::Down) => {
             reset_state(state);
             Ok(NotebookTransition::SelectNext(n))
         }
-        Key(KeyEvent::K) => {
+        Key(KeyEvent::K | KeyEvent::Up) => {
             reset_state(state);
             Ok(NotebookTransition::SelectPrev(n))
         }

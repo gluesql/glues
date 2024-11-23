@@ -364,11 +364,11 @@ impl NotebookContext {
 
     fn consume_on_note_actions(&mut self, code: KeyCode) -> Action {
         match code {
-            KeyCode::Char('j') => {
+            KeyCode::Char('j') | KeyCode::Down => {
                 self.note_actions_state.select_next();
                 Action::None
             }
-            KeyCode::Char('k') => {
+            KeyCode::Char('k') | KeyCode::Up => {
                 self.note_actions_state.select_previous();
                 Action::None
             }
@@ -400,11 +400,11 @@ impl NotebookContext {
 
     fn consume_on_directory_actions(&mut self, code: KeyCode) -> Action {
         match code {
-            KeyCode::Char('j') => {
+            KeyCode::Char('j') | KeyCode::Down => {
                 self.directory_actions_state.select_next();
                 Action::None
             }
-            KeyCode::Char('k') => {
+            KeyCode::Char('k') | KeyCode::Up => {
                 self.directory_actions_state.select_previous();
                 Action::None
             }
