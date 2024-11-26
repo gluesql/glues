@@ -4,6 +4,7 @@ use {
         logger::*,
         App,
     },
+    async_recursion::async_recursion,
     glues_core::{
         data::{Directory, Note},
         state::{
@@ -193,6 +194,7 @@ impl App {
                 self.context.notebook.apply_yank();
             }
             CloseTab(note_id) => {
+                self.save().await;
                 self.context.notebook.close_tab(&note_id);
 
                 let state: &NotebookState = self.glues.state.get_inner().log_unwrap();
@@ -579,6 +581,7 @@ impl App {
         }
     }
 
+    #[async_recursion(?Send)]
     pub(crate) async fn save(&mut self) {
         let mut transitions = vec![];
 
