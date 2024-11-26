@@ -827,6 +827,7 @@ checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 name = "glues"
 version = "0.5.1"
 dependencies = [
+ "async-recursion",
  "color-eyre",
  "glues-core",
  "gluesql",
