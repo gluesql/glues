@@ -63,6 +63,7 @@ pub enum NotebookTransition {
     },
     ViewMode(Note),
     BrowseNoteTree,
+    FocusEditor,
 
     SelectNote(Note),
     SelectDirectory(Directory),

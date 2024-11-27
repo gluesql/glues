@@ -56,7 +56,7 @@ async fn consume_idle(state: &mut NotebookState, event: Event) -> Result<Noteboo
     match event {
         Notebook(NE::SelectNote(note)) => note::select(state, note),
         Notebook(NE::SelectDirectory(directory)) => directory::select(state, directory),
-        Key(KeyEvent::N) => {
+        Key(KeyEvent::Tab) => {
             state.inner_state = InnerState::NoteSelected;
 
             Ok(NotebookTransition::BrowseNoteTree)

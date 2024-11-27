@@ -236,24 +236,37 @@ impl NotebookState {
     pub fn shortcuts(&self) -> Vec<String> {
         match &self.inner_state {
             NoteSelected => {
-                vec![
+                let mut shortcuts = vec![
                     "[l] Open note".to_owned(),
                     "[h] Close parent".to_owned(),
                     "[j|k] Down | Up".to_owned(),
                     "[1-9] Set steps".to_owned(),
                     "[m] More actions".to_owned(),
-                    "[Esc] Quit".to_owned(),
-                ]
+                ];
+
+                if !self.tabs.is_empty() {
+                    shortcuts.push("[Tab] Focus Editor".to_owned());
+                }
+
+                shortcuts.push("[Esc] Quit".to_owned());
+                shortcuts
             }
             DirectorySelected => {
-                vec![
+                let mut shortcuts = vec![
                     "[l] Toggle".to_owned(),
                     "[h] Close parent".to_owned(),
                     "[j|k] Down | Up".to_owned(),
                     "[1-9] Set steps".to_owned(),
                     "[m] More actions".to_owned(),
                     "[Esc] Quit".to_owned(),
-                ]
+                ];
+
+                if !self.tabs.is_empty() {
+                    shortcuts.push("[Tab] Focus Editor".to_owned());
+                }
+
+                shortcuts.push("[Esc] Quit".to_owned());
+                shortcuts
             }
             NoteTreeNumber(n) => {
                 vec![
@@ -269,7 +282,7 @@ impl NotebookState {
                     a, A, I, G, g, s, S, x, ^, y, d, u, Ctrl+r
                 */
                 vec![
-                    "[n] Browse notes".to_owned(),
+                    "[Tab] Browse notes".to_owned(),
                     "[t] Toggle | Tabs".to_owned(),
                     "[i] Insert".to_owned(),
                     "[v] Visual".to_owned(),

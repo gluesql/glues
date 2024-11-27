@@ -79,3 +79,13 @@ pub async fn close(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTra
         NormalModeTransition::CloseTab(note_id),
     ))
 }
+
+pub async fn focus_editor(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTransition> {
+    let note = state.get_editing()?.clone();
+    directory::open_all(db, state, note.directory_id.clone()).await?;
+
+    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+    state.selected = SelectedItem::Note(note);
+
+    Ok(NotebookTransition::FocusEditor)
+}

@@ -112,6 +112,18 @@ impl App {
                 self.context.notebook.mark_clean(&note_id);
             }
             NotebookTransition::BrowseNoteTree => {}
+            NotebookTransition::FocusEditor => {
+                let note_id = self
+                    .context
+                    .notebook
+                    .get_opened_note()
+                    .log_expect("No note opened")
+                    .id
+                    .clone();
+
+                self.context.notebook.update_items(root);
+                self.context.notebook.select_item(&note_id);
+            }
             NotebookTransition::RemoveNote {
                 selected_directory, ..
             }

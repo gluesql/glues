@@ -430,6 +430,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Up => KeyEvent::Up,
         KeyCode::Down => KeyEvent::Down,
         KeyCode::Enter => KeyEvent::Enter,
+        KeyCode::Tab => KeyEvent::Tab,
         KeyCode::Esc => KeyEvent::Esc,
         _ => return None,
     };
