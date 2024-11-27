@@ -16,9 +16,12 @@ pub async fn open(
     state: &mut NotebookState,
     directory_id: DirectoryId,
 ) -> Result<NotebookTransition> {
-    let item = state.root.find_mut(&directory_id).ok_or(Error::Wip(
-        "[state::notebook::open] directory not found".to_owned(),
-    ))?;
+    let item = state
+        .root
+        .find_mut(&directory_id)
+        .ok_or(Error::Wip(format!(
+            "[directory::open] directory not found: {directory_id}"
+        )))?;
 
     let notes = db.fetch_notes(directory_id.clone()).await?;
     let directories = db
@@ -55,7 +58,9 @@ pub async fn open_all(
 
     let directory = db.fetch_directory(directory_id).await?;
 
-    open_all(db, state, directory.parent_id).await?;
+    if state.root.directory.id != directory.id {
+        open_all(db, state, directory.parent_id).await?;
+    }
     open(db, state, directory.id).await
 }
 
