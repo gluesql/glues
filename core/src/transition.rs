@@ -65,8 +65,6 @@ pub enum NotebookTransition {
     BrowseNoteTree,
     FocusEditor,
 
-    SelectNote(Note),
-    SelectDirectory(Directory),
     UpdateNoteContent(NoteId),
 
     Alert(String),

@@ -255,49 +255,13 @@ impl NotebookContext {
     }
 
     fn consume_on_note_tree_browsing(&mut self, code: KeyCode) -> Action {
-        macro_rules! item {
-            () => {
-                self.tree_state
-                    .selected()
-                    .and_then(|idx| self.tree_items.get(idx))
-                    .log_expect("[NotebookContext::consume] selected must not be empty")
-            };
-        }
-
         match code {
-            KeyCode::Char('j') | KeyCode::Down => {
-                self.tree_state.select_next();
-
-                match self
-                    .tree_state
-                    .selected()
-                    .and_then(|i| self.tree_items.get(i))
-                {
-                    Some(TreeItem::Directory { value, .. }) => {
-                        Action::Dispatch(NotebookEvent::SelectDirectory(value.clone()).into())
-                    }
-                    Some(TreeItem::Note { value, .. }) => {
-                        Action::Dispatch(NotebookEvent::SelectNote(value.clone()).into())
-                    }
-                    None => {
-                        self.tree_state.select_last();
-                        Action::None
-                    }
-                }
-            }
-            KeyCode::Char('k') | KeyCode::Up => {
-                self.tree_state.select_previous();
-
-                match item!() {
-                    TreeItem::Directory { value, .. } => {
-                        Action::Dispatch(NotebookEvent::SelectDirectory(value.clone()).into())
-                    }
-                    TreeItem::Note { value, .. } => {
-                        Action::Dispatch(NotebookEvent::SelectNote(value.clone()).into())
-                    }
-                }
-            }
-            KeyCode::Char('m') => match item!() {
+            KeyCode::Char('m') => match self
+                .tree_state
+                .selected()
+                .and_then(|idx| self.tree_items.get(idx))
+                .log_expect("[NotebookContext::consume] selected must not be empty")
+            {
                 TreeItem::Directory { .. } => {
                     self.directory_actions_state.select_first();
 
