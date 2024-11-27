@@ -108,6 +108,7 @@ pub enum KeyEvent {
     Up,
     Down,
     Enter,
+    Tab,
     Esc,
 }
 

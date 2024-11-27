@@ -1,6 +1,6 @@
 use crate::{
     db::Db,
-    state::notebook::{directory, note, traverse, InnerState, NotebookState},
+    state::notebook::{directory, note, tabs, traverse, InnerState, NotebookState},
     Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
 };
 
@@ -54,6 +54,7 @@ pub async fn consume(
 
             Ok(NotebookTransition::None)
         }
+        Key(KeyEvent::Tab) if !state.tabs.is_empty() => tabs::focus_editor(db, state).await,
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }

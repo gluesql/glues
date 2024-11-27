@@ -330,7 +330,7 @@ impl NotebookContext {
                 action: Box::new(TuiAction::Quit.into()),
             }
             .into(),
-            KeyCode::Char('n') if idle => {
+            KeyCode::Tab if idle => {
                 self.show_browser = true;
                 self.update_yank();
 
