@@ -117,7 +117,7 @@ impl NotebookContext {
         &self
             .tab_index
             .and_then(|i| self.tabs.get(i))
-            .log_expect("no opened note")
+            .log_expect("[NotebookContext::get_editor] no opened note")
             .editor
     }
 
@@ -125,7 +125,7 @@ impl NotebookContext {
         &mut self
             .tab_index
             .and_then(|i| self.tabs.get_mut(i))
-            .log_expect("no opened note")
+            .log_expect("[NotebookContext::get_editor_mut] no opened note")
             .editor
     }
 
@@ -224,6 +224,10 @@ impl NotebookContext {
     }
 
     pub fn apply_yank(&mut self) {
+        if self.tabs.is_empty() {
+            return;
+        }
+
         if let Some(yank) = self.yank.clone() {
             self.get_editor_mut().set_yank_text(yank);
         }
