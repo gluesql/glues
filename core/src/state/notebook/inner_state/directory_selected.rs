@@ -1,6 +1,6 @@
 use crate::{
     db::Db,
-    state::notebook::{directory, note, tabs, traverse, InnerState, NotebookState},
+    state::notebook::{directory, note, tabs, InnerState, NotebookState},
     Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
 };
 
@@ -51,8 +51,8 @@ pub async fn consume(
 
             directory::close(state, parent)
         }
-        Key(KeyEvent::J | KeyEvent::Down) => traverse::select_next(state),
-        Key(KeyEvent::K | KeyEvent::Up) => traverse::select_prev(state),
+        Key(KeyEvent::J | KeyEvent::Down) => Ok(NotebookTransition::SelectNext(1)),
+        Key(KeyEvent::K | KeyEvent::Up) => Ok(NotebookTransition::SelectPrev(1)),
         Key(KeyEvent::M) => {
             let directory = state.get_selected_directory()?.clone();
 

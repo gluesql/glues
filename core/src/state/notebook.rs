@@ -9,7 +9,7 @@ use {
         types::DirectoryId,
         Error, Event, Glues, NotebookTransition, Result,
     },
-    consume::{directory, note, tabs, traverse},
+    consume::{directory, note, tabs},
 };
 
 pub use inner_state::{
