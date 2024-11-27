@@ -185,7 +185,10 @@ impl App {
                 log!("[Alert] {message}");
                 self.context.alert = Some(message);
             }
-            _ => {}
+            NotebookTransition::ShowNoteActionsDialog(_)
+            | NotebookTransition::ShowDirectoryActionsDialog(_)
+            | NotebookTransition::Inedible(_)
+            | NotebookTransition::None => {}
         }
     }
 
