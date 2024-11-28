@@ -425,6 +425,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('0') => NumKey::Zero.into(),
         KeyCode::Char('$') => KeyEvent::DollarSign,
         KeyCode::Char('^') => KeyEvent::Caret,
+        KeyCode::Char('~') => KeyEvent::Tilde,
         KeyCode::Left => KeyEvent::Left,
         KeyCode::Right => KeyEvent::Right,
         KeyCode::Up => KeyEvent::Up,

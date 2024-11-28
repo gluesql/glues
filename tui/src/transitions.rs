@@ -477,6 +477,13 @@ impl App {
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
+            SwitchCase => {
+                let editor = self.context.notebook.get_editor_mut();
+                editor.start_selection();
+                switch_case(editor);
+
+                self.context.notebook.mark_dirty();
+            }
         };
     }
 
@@ -593,6 +600,12 @@ impl App {
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
+            SwitchCase => {
+                let editor = self.context.notebook.get_editor_mut();
+                switch_case(editor);
+
+                self.context.notebook.mark_dirty();
+            }
         }
     }
 
@@ -686,4 +699,25 @@ fn reselect_for_yank(editor: &mut TextArea) {
     editor.start_selection();
     editor.move_cursor(CursorMove::Jump(end.0 as u16, end.1 as u16));
     editor.move_cursor(CursorMove::Forward);
+}
+
+fn switch_case(editor: &mut TextArea) {
+    let yank = editor.yank_text();
+    reselect_for_yank(editor);
+    editor.cut();
+
+    let changed = editor
+        .yank_text()
+        .chars()
+        .map(|c| {
+            if c.is_uppercase() {
+                c.to_lowercase().to_string()
+            } else {
+                c.to_uppercase().to_string()
+            }
+        })
+        .collect::<String>();
+
+    editor.insert_str(changed);
+    editor.set_yank_text(yank);
 }

@@ -78,6 +78,7 @@ async fn consume_idle(state: &mut NotebookState, event: Event) -> Result<Noteboo
         Key(KeyEvent::B) => MoveCursorWordBack(1).into(),
         Key(KeyEvent::Num(NumKey::Zero)) => MoveCursorLineStart.into(),
         Key(KeyEvent::DollarSign) => MoveCursorLineEnd.into(),
+        Key(KeyEvent::Tilde) => SwitchCase.into(),
         Key(KeyEvent::Caret) => MoveCursorLineNonEmptyStart.into(),
         Key(KeyEvent::CapG) => MoveCursorBottom.into(),
         Key(KeyEvent::I) => {

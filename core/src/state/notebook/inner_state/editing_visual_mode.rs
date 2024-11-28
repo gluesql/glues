@@ -45,6 +45,11 @@ async fn consume_idle(
         Key(KeyEvent::DollarSign) => MoveCursorLineEnd.into(),
         Key(KeyEvent::Caret) => MoveCursorLineNonEmptyStart.into(),
         Key(KeyEvent::CapG) => MoveCursorBottom.into(),
+        Key(KeyEvent::Tilde) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            SwitchCase.into()
+        }
         Key(KeyEvent::D | KeyEvent::X) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 

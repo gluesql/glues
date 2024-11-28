@@ -140,6 +140,7 @@ pub enum NormalModeTransition {
     Redo,
     YankLines(usize),
     DeleteInsideWord(usize),
+    SwitchCase,
 }
 
 #[derive(Display)]
@@ -163,6 +164,7 @@ pub enum VisualModeTransition {
     YankSelection,
     DeleteSelection,
     DeleteSelectionAndInsertMode,
+    SwitchCase,
 }
 
 impl From<EntryTransition> for Transition {
