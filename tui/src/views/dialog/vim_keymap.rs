@@ -46,6 +46,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[G] Move cursor to the end of the file"),
                 Line::raw(""),
                 Line::from("EDIT TEXT".white().on_dark_gray()),
+                Line::raw("[~] Toggle the case of the current character"),
                 Line::raw("[x] Delete character under the cursor"),
                 Line::raw("[u] Undo the last change"),
                 Line::raw("[Ctrl+r] Redo the last undone change"),
@@ -165,6 +166,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 "[x] Delete selected text".into(),
             ]),
             Line::raw("[y] Yank (copy) selected text"),
+            Line::raw("[~] Toggle the case of the select text"),
         ]),
         VimKeymapKind::VisualNumbering => ("VIM VISUAL MODE KEYMAP - NUMBERING", vec![
             Line::from("EXTENDING NUMBERING MODE".white().on_dark_gray()),
