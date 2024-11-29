@@ -50,6 +50,16 @@ async fn consume_idle(
 
             SwitchCase.into()
         }
+        Key(KeyEvent::U) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            ToLowercase.into()
+        }
+        Key(KeyEvent::CapU) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            ToUppercase.into()
+        }
         Key(KeyEvent::D | KeyEvent::X) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 

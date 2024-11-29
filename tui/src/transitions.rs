@@ -606,6 +606,28 @@ impl App {
 
                 self.context.notebook.mark_dirty();
             }
+            ToLowercase => {
+                let editor = self.context.notebook.get_editor_mut();
+                let yank = editor.yank_text();
+                reselect_for_yank(editor);
+                editor.cut();
+
+                let changed = editor.yank_text().as_str().to_lowercase();
+
+                editor.insert_str(changed);
+                editor.set_yank_text(yank);
+            }
+            ToUppercase => {
+                let editor = self.context.notebook.get_editor_mut();
+                let yank = editor.yank_text();
+                reselect_for_yank(editor);
+                editor.cut();
+
+                let changed = editor.yank_text().as_str().to_uppercase();
+
+                editor.insert_str(changed);
+                editor.set_yank_text(yank);
+            }
         }
     }
 
