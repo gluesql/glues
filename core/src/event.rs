@@ -98,6 +98,7 @@ pub enum KeyEvent {
     CapI,
     CapO,
     CapS,
+    CapU,
     CtrlH,
     CtrlR,
     DollarSign,

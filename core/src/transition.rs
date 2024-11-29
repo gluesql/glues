@@ -165,6 +165,8 @@ pub enum VisualModeTransition {
     DeleteSelection,
     DeleteSelectionAndInsertMode,
     SwitchCase,
+    ToUppercase,
+    ToLowercase,
 }
 
 impl From<EntryTransition> for Transition {
