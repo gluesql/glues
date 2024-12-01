@@ -91,6 +91,8 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw("[b] Delete the word before the cursor."),
             Line::raw("[0] Delete to the beginning of the line"),
             Line::raw("[$] Delete to the end of the line, repeated by the specified number"),
+            Line::raw("[h] Delete the specified number of characters to the left"),
+            Line::raw("[l] Delete the specified number of characters to the right"),
         ]),
         VimKeymapKind::NormalDelete2 => ("VIM NORMAL MODE KEYMAP - DELETE NUMBERING", vec![
             Line::from("EXTENDING NUMBERING MODE".white().on_dark_gray()),
@@ -101,6 +103,8 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw(""),
             Line::from("DELETE TEXT".white().on_dark_gray()),
             Line::raw("[d] Delete the specified number of lines"),
+            Line::raw("[h] Delete the specified number of characters to the left"),
+            Line::raw("[l] Delete the specified number of characters to the right"),
         ]),
         VimKeymapKind::NormalChange => ("VIM NORMAL MODE KEYMAP - CHANGE", vec![
             Line::from("TO CHANGE INSIDE MODE".white().on_dark_gray()),

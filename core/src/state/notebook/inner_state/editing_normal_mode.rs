@@ -419,6 +419,14 @@ async fn consume_delete(
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
             DeleteWordEnd(n).into()
         }
+        Key(KeyEvent::H) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            DeleteCharsBack(n).into()
+        }
+        Key(KeyEvent::L) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            DeleteChars(n).into()
+        }
         Key(KeyEvent::DollarSign) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
@@ -472,6 +480,14 @@ async fn consume_delete2(
                 InnerState::EditingNormalMode(VimNormalState::DeleteInside(n1 * n2));
 
             DeleteInsideMode.into()
+        }
+        Key(KeyEvent::H) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            DeleteCharsBack(n1 * n2).into()
+        }
+        Key(KeyEvent::L) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            DeleteChars(n1 * n2).into()
         }
         Key(KeyEvent::Esc) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
