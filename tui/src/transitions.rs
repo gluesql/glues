@@ -240,12 +240,7 @@ impl App {
             }
             MoveCursorBack(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                let (row, col) = editor.cursor();
-                let cursor_move = if col < n {
-                    CursorMove::Head
-                } else {
-                    CursorMove::Jump(row as u16, (col - n) as u16)
-                };
+                let cursor_move = cursor_move_back(editor, n);
 
                 editor.move_cursor(cursor_move);
             }
@@ -334,6 +329,16 @@ impl App {
                 let editor = self.context.notebook.get_editor_mut();
                 editor.start_selection();
                 let cursor_move = cursor_move_forward(editor, n);
+
+                editor.move_cursor(cursor_move);
+                editor.cut();
+                self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
+            }
+            DeleteCharsBack(n) => {
+                let editor = self.context.notebook.get_editor_mut();
+                editor.start_selection();
+                let cursor_move = cursor_move_back(editor, n);
 
                 editor.move_cursor(cursor_move);
                 editor.cut();
@@ -662,6 +667,15 @@ fn cursor_move_forward(editor: &TextArea, n: usize) -> CursorMove {
         CursorMove::End
     } else {
         CursorMove::Jump(row as u16, (col + n) as u16)
+    }
+}
+
+fn cursor_move_back(editor: &TextArea, n: usize) -> CursorMove {
+    let (row, col) = editor.cursor();
+    if col < n {
+        CursorMove::Head
+    } else {
+        CursorMove::Jump(row as u16, (col - n) as u16)
     }
 }
 
