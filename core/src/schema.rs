@@ -9,6 +9,14 @@ use {
 };
 
 pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
+    table("Meta")
+        .create_table_if_not_exists()
+        .add_column("key TEXT PRIMARY KEY")
+        .add_column("value TEXT NOT NULL")
+        .add_column("updated_at TIMESTAMP NOT NULL DEFAULT NOW()")
+        .execute(storage)
+        .await?;
+
     table("Directory")
         .create_table_if_not_exists()
         .add_column("id UUID PRIMARY KEY DEFAULT GENERATE_UUID()")
@@ -29,6 +37,26 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .add_column("content TEXT NOT NULL DEFAULT ''")
         .execute(storage)
         .await?;
+
+    let schema_version_not_exists = table("Meta")
+        .select()
+        .filter(col("key").eq(text("schema_version")))
+        .project("id")
+        .execute(storage)
+        .await?
+        .select()
+        .unwrap()
+        .count()
+        == 0;
+
+    if schema_version_not_exists {
+        table("Meta")
+            .insert()
+            .columns(vec!["key", "value"])
+            .values(vec![vec![text("schema_version"), text("1")]])
+            .execute(storage)
+            .await?;
+    }
 
     let root_not_exists = table("Directory")
         .select()
