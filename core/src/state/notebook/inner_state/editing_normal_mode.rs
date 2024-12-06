@@ -481,6 +481,14 @@ async fn consume_delete2(
 
             DeleteInsideMode.into()
         }
+        Key(KeyEvent::B) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            DeleteWordBack(n1 * n2).into()
+        }
+        Key(KeyEvent::E) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            DeleteWordEnd(n1 * n2).into()
+        }
         Key(KeyEvent::H) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
             DeleteCharsBack(n1 * n2).into()
