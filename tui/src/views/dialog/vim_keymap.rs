@@ -103,6 +103,8 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw(""),
             Line::from("DELETE TEXT".white().on_dark_gray()),
             Line::raw("[d] Delete the specified number of lines"),
+            Line::raw("[e] Delete the word from the cursor to the end of the current word."),
+            Line::raw("[b] Delete the word before the cursor."),
             Line::raw("[$] Delete to the end of the line, repeated by the specified number"),
             Line::raw("[h] Delete the specified number of characters to the left"),
             Line::raw("[l] Delete the specified number of characters to the right"),
