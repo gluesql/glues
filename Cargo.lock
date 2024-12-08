@@ -962,9 +962,9 @@ dependencies = [
 
 [[package]]
 name = "gluesql-mongo-storage"
-version = "0.16.2"
+version = "0.16.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ca65ec95f67779ef9a4d67cf094061c024f9dabac21494056d8e52f2bdbd142"
+checksum = "c7ab303c3fc5b51b2efda03bcc61f05a4db8566518d285e5604f549fdbbe488c"
 dependencies = [
  "async-trait",
  "bson",
