@@ -30,6 +30,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[g] Go to gateway mode (access extended commands)"),
                 Line::raw("[y] Go to yank mode (prepare to copy text)"),
                 Line::raw("[d] Go to delete mode (prepare to delete text)"),
+                Line::raw("[z] Go to scroll mode (adjust viewport)"),
                 Line::raw("[1-9] Go to numbering mode (repeat or extend actions with numbers)"),
                 Line::raw(""),
                 Line::from("MOVE CURSOR".white().on_dark_gray()),
