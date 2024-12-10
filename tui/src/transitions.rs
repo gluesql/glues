@@ -18,7 +18,7 @@ use {
         NotebookEvent,
     },
     std::time::SystemTime,
-    tui_textarea::{CursorMove, TextArea},
+    tui_textarea::{CursorMove, Scrolling, TextArea},
 };
 
 impl App {
@@ -200,7 +200,7 @@ impl App {
                 self.context.notebook.get_editor_mut().cancel_selection();
             }
             ToggleMode | NumberingMode | GatewayMode | YankMode | DeleteMode | DeleteInsideMode
-            | ChangeMode | ChangeInsideMode => {}
+            | ChangeMode | ChangeInsideMode | ScrollMode => {}
             NextTab(note_id) | PrevTab(note_id) => {
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
 
@@ -488,6 +488,34 @@ impl App {
                 switch_case(editor);
 
                 self.context.notebook.mark_dirty();
+            }
+            ScrollCenter => {
+                let height = self.context.notebook.editor_height;
+                let editor = self.context.notebook.get_editor_mut();
+                let (row, col) = editor.cursor();
+                editor.scroll((i16::MIN / 2, 0));
+                editor.scroll(Scrolling::Delta {
+                    rows: (row as i16 - height as i16 / 2),
+                    cols: 0,
+                });
+                editor.move_cursor(CursorMove::Jump(row as u16, col as u16));
+            }
+            ScrollTop => {
+                let editor = self.context.notebook.get_editor_mut();
+                let (row, col) = editor.cursor();
+                editor.move_cursor(CursorMove::Top);
+                editor.scroll(Scrolling::Delta {
+                    rows: row as i16,
+                    cols: 0,
+                });
+                editor.move_cursor(CursorMove::Head);
+                editor.move_cursor(CursorMove::Jump(row as u16, col as u16));
+            }
+            ScrollBottom => {
+                let editor = self.context.notebook.get_editor_mut();
+                let (row, col) = editor.cursor();
+                editor.scroll((i16::MIN / 2, 0));
+                editor.move_cursor(CursorMove::Jump(row as u16, col as u16));
             }
         };
     }
