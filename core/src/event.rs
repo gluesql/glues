@@ -93,6 +93,7 @@ pub enum KeyEvent {
     W,
     X,
     Y,
+    Z,
     CapA,
     CapG,
     CapI,
@@ -111,6 +112,8 @@ pub enum KeyEvent {
     Enter,
     Tab,
     Tilde,
+    Dot,
+    Dash,
     Esc,
 }
 

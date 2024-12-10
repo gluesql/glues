@@ -12,6 +12,8 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
+    context.notebook.editor_height = area.height - 2;
+
     let title = if let Some(tab_index) = context.notebook.tab_index {
         let mut title = vec!["[".into()];
         for (i, tab) in context.notebook.tabs.iter().enumerate() {

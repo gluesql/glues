@@ -72,6 +72,7 @@ pub struct NotebookContext {
     pub directory_actions_state: ListState,
 
     // editor
+    pub editor_height: u16,
     pub tabs: Vec<EditorTab>,
     pub tab_index: Option<usize>,
     pub show_line_number: bool,
@@ -96,6 +97,7 @@ impl Default for NotebookContext {
             note_actions_state: ListState::default(),
             directory_actions_state: ListState::default(),
 
+            editor_height: 0,
             tabs: vec![],
             tab_index: None,
             show_line_number: true,

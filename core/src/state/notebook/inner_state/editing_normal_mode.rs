@@ -24,6 +24,7 @@ pub enum VimNormalState {
     Change(usize),
     Change2(usize, usize),
     ChangeInside(usize),
+    Scroll,
 }
 
 pub async fn consume(
@@ -45,6 +46,7 @@ pub async fn consume(
         VimNormalState::Change(n) => consume_change(state, n, event).await,
         VimNormalState::Change2(n1, n2) => consume_change2(state, n1, n2, event).await,
         VimNormalState::ChangeInside(n) => consume_change_inside(state, n, event).await,
+        VimNormalState::Scroll => consume_scroll(state, event).await,
     }
 }
 
@@ -65,6 +67,11 @@ async fn consume_idle(state: &mut NotebookState, event: Event) -> Result<Noteboo
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Toggle);
 
             ToggleMode.into()
+        }
+        Key(KeyEvent::Z) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Scroll);
+
+            ScrollMode.into()
         }
         Key(KeyEvent::P) => Paste.into(),
         Key(KeyEvent::U) => Undo.into(),
@@ -667,6 +674,35 @@ async fn consume_change_inside(
             state.inner_state = InnerState::EditingInsertMode;
 
             DeleteInsideWord(n).into()
+        }
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            consume_idle(state, event).await
+        }
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+async fn consume_scroll(state: &mut NotebookState, event: Event) -> Result<NotebookTransition> {
+    use Event::*;
+    use NormalModeTransition::*;
+
+    match event {
+        Key(KeyEvent::Z | KeyEvent::Dot) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            ScrollCenter.into()
+        }
+        Key(KeyEvent::T | KeyEvent::Enter) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            ScrollTop.into()
+        }
+        Key(KeyEvent::B | KeyEvent::Dash) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            ScrollBottom.into()
         }
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);

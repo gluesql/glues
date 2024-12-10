@@ -210,6 +210,11 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - change inside {n}ci")
             }
+            EditingNormalMode(VimNormalState::Scroll) => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' normal mode - scroll")
+            }
             EditingVisualMode(VimVisualState::Idle) => {
                 let name = &self.get_selected_note()?.name;
 
@@ -392,6 +397,14 @@ impl NotebookState {
                     } else {
                         format!("[w] Delete {n} words from cursor and insert mode")
                     },
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            EditingNormalMode(VimNormalState::Scroll) => {
+                vec![
+                    "[z|.] Scroll to center".to_owned(),
+                    "[t|Enter] Scroll to top".to_owned(),
+                    "[b|-] Scroll to bottom".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
