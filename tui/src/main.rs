@@ -98,6 +98,7 @@ impl App {
                     modifiers: KeyModifiers::CONTROL,
                     ..
                 }) => {
+                    self.save().await;
                     return Ok(());
                 }
                 _ => {
