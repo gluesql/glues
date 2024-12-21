@@ -208,6 +208,14 @@ impl App {
                 self.context.notebook.select_item(&note_id);
                 self.context.notebook.apply_yank();
             }
+            MoveTabNext(i) => {
+                let tab = self.context.notebook.tabs.remove(i);
+                self.context.notebook.tabs.insert(i + 1, tab);
+            }
+            MoveTabPrev(i) => {
+                let tab = self.context.notebook.tabs.remove(i);
+                self.context.notebook.tabs.insert(i - 1, tab);
+            }
             CloseTab(note_id) => {
                 self.save().await;
                 self.context.notebook.close_tab(&note_id);

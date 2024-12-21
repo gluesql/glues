@@ -50,6 +50,42 @@ pub async fn select_next(db: &mut Db, state: &mut NotebookState) -> Result<Noteb
     ))
 }
 
+pub fn move_prev(state: &mut NotebookState) -> Result<NotebookTransition> {
+    let i = state
+        .tab_index
+        .ok_or(Error::Wip("opened note must exist".to_owned()))?;
+
+    if i == 0 {
+        return Ok(NotebookTransition::None);
+    }
+
+    let note = state.tabs.remove(i);
+    state.tabs.insert(i - 1, note);
+    state.tab_index = Some(i - 1);
+
+    Ok(NotebookTransition::EditingNormalMode(
+        NormalModeTransition::MoveTabPrev(i),
+    ))
+}
+
+pub fn move_next(state: &mut NotebookState) -> Result<NotebookTransition> {
+    let i = state
+        .tab_index
+        .ok_or(Error::Wip("opened note must exist".to_owned()))?;
+
+    if i >= state.tabs.len() - 1 {
+        return Ok(NotebookTransition::None);
+    }
+
+    let note = state.tabs.remove(i);
+    state.tabs.insert(i + 1, note);
+    state.tab_index = Some(i + 1);
+
+    Ok(NotebookTransition::EditingNormalMode(
+        NormalModeTransition::MoveTabNext(i),
+    ))
+}
+
 pub async fn close(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTransition> {
     state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
     let i = state
