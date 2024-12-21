@@ -298,6 +298,7 @@ impl NotebookState {
             EditingNormalMode(VimNormalState::Toggle) => {
                 vec![
                     "[h|l] Prev | Next Tab".to_owned(),
+                    "[H|L] Move Tab Prev | Next".to_owned(),
                     "[x] Close".to_owned(),
                     "[b] Toggle browser".to_owned(),
                     "[n] Toggle line number".to_owned(),

@@ -105,11 +105,16 @@ pub enum NormalModeTransition {
     ChangeMode,
     ChangeInsideMode,
     ScrollMode,
+
+    // toggle mode
     NextTab(NoteId),
     PrevTab(NoteId),
     CloseTab(NoteId),
+    MoveTabNext(usize),
+    MoveTabPrev(usize),
     ToggleLineNumbers,
     ToggleBrowser,
+
     MoveCursorDown(usize),
     MoveCursorUp(usize),
     MoveCursorBack(usize),
