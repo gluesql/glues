@@ -1,6 +1,6 @@
 use {
     crate::context::{
-        notebook::{ContextState, TreeItem},
+        notebook::{ContextState, TreeItem, TreeItemKind},
         NotebookContext,
     },
     ratatui::{
@@ -18,7 +18,7 @@ const OPEN_SYMBOL: &str = "▼ ";
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let note_tree_focused = matches!(
         context.state,
-        ContextState::NoteTreeBrowsing | ContextState::NoteTreeNumbering
+        ContextState::NoteTreeBrowsing | ContextState::NoteTreeNumbering | ContextState::MoveMode
     );
     let title = "[Browser]";
     let title = if note_tree_focused {
@@ -29,21 +29,38 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let block = Block::bordered().title(title);
     let inner_area = block.inner(area);
 
-    let tree_items = context.tree_items.iter().map(|item| match item {
-        TreeItem::Note { value, depth } => {
-            let pad = depth * 2 + 2;
-            Line::raw(format!("{:pad$}{}", "", value.name))
-        }
-        TreeItem::Directory {
-            value,
-            depth,
-            opened,
-        } => {
-            let pad = depth * 2;
-            let symbol = if *opened { OPEN_SYMBOL } else { CLOSED_SYMBOL };
-            Line::raw(format!("{:pad$}{symbol}{}", "", value.name))
-        }
-    });
+    let tree_items = context.tree_items.iter().map(
+        |TreeItem {
+             depth,
+             target,
+             selectable,
+             kind,
+         }| {
+            match kind {
+                TreeItemKind::Note { note } => {
+                    let pad = depth * 2 + 2;
+                    let line = Line::raw(format!("{:pad$}{}", "", note.name));
+
+                    match (selectable, target) {
+                        (true, _) => line,
+                        (false, true) => line.light_blue(),
+                        (false, false) => line.dim(),
+                    }
+                }
+                TreeItemKind::Directory { directory, opened } => {
+                    let pad = depth * 2;
+                    let symbol = if *opened { OPEN_SYMBOL } else { CLOSED_SYMBOL };
+                    let line = Line::raw(format!("{:pad$}{symbol}{}", "", directory.name));
+
+                    if !selectable {
+                        line.dim()
+                    } else {
+                        line
+                    }
+                }
+            }
+        },
+    );
 
     let list = List::new(tree_items)
         .highlight_style(Style::new().fg(Color::White).bg(if note_tree_focused {

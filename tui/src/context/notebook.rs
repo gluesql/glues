@@ -1,10 +1,12 @@
+mod tree_item;
+
 use {
     crate::{
         action::{Action, TuiAction},
         logger::*,
     },
     glues_core::{
-        data::{Directory, Note},
+        data::Note,
         state::notebook::DirectoryItem,
         types::{Id, NoteId},
         NotebookEvent,
@@ -16,6 +18,8 @@ use {
     },
     tui_textarea::TextArea,
 };
+
+pub use tree_item::{TreeItem, TreeItemKind};
 
 pub const REMOVE_NOTE: &str = "Remove note";
 pub const RENAME_NOTE: &str = "Rename note";
@@ -42,6 +46,7 @@ pub enum ContextState {
     NoteTreeNumbering,
     NoteActionsDialog,
     DirectoryActionsDialog,
+    MoveMode,
     EditorNormalMode { idle: bool },
     EditorVisualMode,
     EditorInsertMode,
@@ -151,17 +156,54 @@ impl NotebookContext {
     }
 
     pub fn update_items(&mut self, directory_item: &DirectoryItem) {
-        self.tree_items = flatten(directory_item, 0);
+        self.tree_items = self.flatten(directory_item, 0, true);
+    }
+
+    fn flatten(
+        &self,
+        directory_item: &DirectoryItem,
+        depth: usize,
+        selectable: bool,
+    ) -> Vec<TreeItem> {
+        let id = self
+            .tree_state
+            .selected()
+            .and_then(|i| self.tree_items.get(i))
+            .map(|item| item.id());
+        let is_move_mode = matches!(self.state, ContextState::MoveMode { .. });
+        let selectable = !is_move_mode || (selectable && Some(&directory_item.directory.id) != id);
+
+        let mut items = vec![TreeItem {
+            depth,
+            target: Some(&directory_item.directory.id) == id,
+            selectable,
+            kind: TreeItemKind::Directory {
+                directory: directory_item.directory.clone(),
+                opened: directory_item.children.is_some(),
+            },
+        }];
+
+        if let Some(children) = &directory_item.children {
+            for item in &children.directories {
+                items.extend(self.flatten(item, depth + 1, selectable));
+            }
+
+            for note in &children.notes {
+                items.push(TreeItem {
+                    depth: depth + 1,
+                    target: Some(&note.id) == id,
+                    selectable: !is_move_mode,
+                    kind: TreeItemKind::Note { note: note.clone() },
+                })
+            }
+        }
+
+        items
     }
 
     pub fn select_item(&mut self, id: &Id) {
         for (i, item) in self.tree_items.iter().enumerate() {
-            let item_id = match item {
-                TreeItem::Directory { value, .. } => &value.id,
-                TreeItem::Note { value, .. } => &value.id,
-            };
-
-            if item_id == id {
+            if item.id() == id {
                 self.tree_state.select(Some(i));
                 break;
             }
@@ -174,7 +216,17 @@ impl NotebookContext {
             i => i,
         };
 
-        self.tree_state.select(Some(i));
+        let i = self
+            .tree_items
+            .iter()
+            .enumerate()
+            .skip(i)
+            .find(|(_, item)| item.selectable)
+            .map(|(i, _)| i);
+
+        if i.is_some() {
+            self.tree_state.select(i);
+        }
     }
 
     pub fn select_prev(&mut self, step: usize) {
@@ -184,7 +236,18 @@ impl NotebookContext {
             .unwrap_or_default()
             .saturating_sub(step);
 
-        self.tree_state.select(Some(i));
+        let i = self
+            .tree_items
+            .iter()
+            .enumerate()
+            .rev()
+            .skip(self.tree_items.len() - i - 1)
+            .find(|(_, item)| item.selectable)
+            .map(|(i, _)| i);
+
+        if i.is_some() {
+            self.tree_state.select(i);
+        }
     }
 
     pub fn selected(&self) -> &TreeItem {
@@ -192,13 +255,6 @@ impl NotebookContext {
             .selected()
             .and_then(|i| self.tree_items.get(i))
             .log_expect("[NotebookContext::selected] selected must not be empty")
-    }
-
-    pub fn selected_name(&self) -> String {
-        match self.selected() {
-            TreeItem::Directory { value, .. } => value.name.clone(),
-            TreeItem::Note { value, .. } => value.name.clone(),
-        }
     }
 
     pub fn open_note(&mut self, note: Note, content: String) {
@@ -247,7 +303,7 @@ impl NotebookContext {
 
         match self.state {
             ContextState::NoteTreeBrowsing => self.consume_on_note_tree_browsing(code),
-            ContextState::NoteTreeNumbering => Action::PassThrough,
+            ContextState::NoteTreeNumbering | ContextState::MoveMode => Action::PassThrough,
             ContextState::EditorNormalMode { idle } => self.consume_on_editor_normal(input, idle),
             ContextState::EditorVisualMode => Action::PassThrough,
             ContextState::EditorInsertMode => self.consume_on_editor_insert(input),
@@ -258,23 +314,21 @@ impl NotebookContext {
 
     fn consume_on_note_tree_browsing(&mut self, code: KeyCode) -> Action {
         match code {
-            KeyCode::Char('m') => match self
-                .tree_state
-                .selected()
-                .and_then(|idx| self.tree_items.get(idx))
-                .log_expect("[NotebookContext::consume] selected must not be empty")
-            {
-                TreeItem::Directory { .. } => {
+            KeyCode::Char('m') => {
+                if self
+                    .tree_state
+                    .selected()
+                    .and_then(|idx| self.tree_items.get(idx))
+                    .log_expect("[NotebookContext::consume] selected must not be empty")
+                    .is_directory()
+                {
                     self.directory_actions_state.select_first();
-
-                    Action::PassThrough
-                }
-                TreeItem::Note { .. } => {
+                } else {
                     self.note_actions_state.select_first();
-
-                    Action::PassThrough
                 }
-            },
+
+                Action::PassThrough
+            }
             KeyCode::Esc => TuiAction::Confirm {
                 message: "Do you want to quit?".to_owned(),
                 action: Box::new(TuiAction::Quit.into()),
@@ -352,7 +406,7 @@ impl NotebookContext {
                     RENAME_NOTE => TuiAction::Prompt {
                         message: vec![Line::raw("Enter new note name:")],
                         action: Box::new(TuiAction::RenameNote.into()),
-                        default: Some(self.selected_name()),
+                        default: Some(self.selected().name()),
                     }
                     .into(),
                     REMOVE_NOTE => TuiAction::Confirm {
@@ -399,7 +453,7 @@ impl NotebookContext {
                     RENAME_DIRECTORY => TuiAction::Prompt {
                         message: vec![Line::raw("Enter new directory name:")],
                         action: Box::new(TuiAction::RenameDirectory.into()),
-                        default: Some(self.selected_name()),
+                        default: Some(self.selected().name()),
                     }
                     .into(),
                     REMOVE_DIRECTORY => TuiAction::Confirm {
@@ -415,40 +469,4 @@ impl NotebookContext {
             _ => Action::None,
         }
     }
-}
-
-#[derive(Clone)]
-pub enum TreeItem {
-    Note {
-        value: Note,
-        depth: usize,
-    },
-    Directory {
-        value: Directory,
-        depth: usize,
-        opened: bool,
-    },
-}
-
-fn flatten(directory_item: &DirectoryItem, depth: usize) -> Vec<TreeItem> {
-    let mut items = vec![TreeItem::Directory {
-        value: directory_item.directory.clone(),
-        depth,
-        opened: directory_item.children.is_some(),
-    }];
-
-    if let Some(children) = &directory_item.children {
-        for item in &children.directories {
-            items.extend(flatten(item, depth + 1));
-        }
-
-        for note in &children.notes {
-            items.push(TreeItem::Note {
-                value: note.clone(),
-                depth: depth + 1,
-            });
-        }
-    }
-
-    items
 }

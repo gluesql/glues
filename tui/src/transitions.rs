@@ -1,6 +1,10 @@
 use {
     super::{
-        context::{self, notebook::TreeItem, ContextState},
+        context::{
+            self,
+            notebook::{TreeItem, TreeItemKind},
+            ContextState,
+        },
         logger::*,
         App,
     },
@@ -12,8 +16,8 @@ use {
             GetInner, NotebookState,
         },
         transition::{
-            EntryTransition, NormalModeTransition, NotebookTransition, Transition,
-            VisualModeTransition,
+            EntryTransition, MoveModeTransition, NormalModeTransition, NotebookTransition,
+            Transition, VisualModeTransition,
         },
         NotebookEvent,
     },
@@ -22,6 +26,7 @@ use {
 };
 
 impl App {
+    #[async_recursion(?Send)]
     pub(super) async fn handle_transition(&mut self, transition: Transition) {
         match transition {
             Transition::Entry(transition) => {
@@ -73,6 +78,7 @@ impl App {
             InnerState::NoteTreeNumber(_) => ContextState::NoteTreeNumbering,
             InnerState::NoteMoreActions => ContextState::NoteActionsDialog,
             InnerState::DirectoryMoreActions => ContextState::DirectoryActionsDialog,
+            InnerState::MoveMode => ContextState::MoveMode,
             InnerState::EditingNormalMode(VimNormalState::Idle) => {
                 ContextState::EditorNormalMode { idle: true }
             }
@@ -155,10 +161,14 @@ impl App {
                 self.context.notebook.select_next(n);
 
                 let event = match self.context.notebook.selected() {
-                    TreeItem::Directory { value, .. } => {
-                        NotebookEvent::SelectDirectory(value.clone()).into()
-                    }
-                    TreeItem::Note { value, .. } => NotebookEvent::SelectNote(value.clone()).into(),
+                    TreeItem {
+                        kind: TreeItemKind::Directory { directory, .. },
+                        ..
+                    } => NotebookEvent::SelectDirectory(directory.clone()).into(),
+                    TreeItem {
+                        kind: TreeItemKind::Note { note },
+                        ..
+                    } => NotebookEvent::SelectNote(note.clone()).into(),
                 };
 
                 self.glues.dispatch(event).await.log_unwrap();
@@ -167,10 +177,14 @@ impl App {
                 self.context.notebook.select_prev(n);
 
                 let event = match self.context.notebook.selected() {
-                    TreeItem::Directory { value, .. } => {
-                        NotebookEvent::SelectDirectory(value.clone()).into()
-                    }
-                    TreeItem::Note { value, .. } => NotebookEvent::SelectNote(value.clone()).into(),
+                    TreeItem {
+                        kind: TreeItemKind::Directory { directory, .. },
+                        ..
+                    } => NotebookEvent::SelectDirectory(directory.clone()).into(),
+                    TreeItem {
+                        kind: TreeItemKind::Note { note },
+                        ..
+                    } => NotebookEvent::SelectNote(note.clone()).into(),
                 };
 
                 self.glues.dispatch(event).await.log_unwrap();
@@ -181,6 +195,9 @@ impl App {
             NotebookTransition::EditingVisualMode(transition) => {
                 self.handle_visual_mode_transition(transition).await;
             }
+            NotebookTransition::MoveMode(transition) => {
+                self.handle_move_mode_transition(transition).await;
+            }
             NotebookTransition::Alert(message) => {
                 log!("[Alert] {message}");
                 self.context.alert = Some(message);
@@ -189,6 +206,67 @@ impl App {
             | NotebookTransition::ShowDirectoryActionsDialog(_)
             | NotebookTransition::Inedible(_)
             | NotebookTransition::None => {}
+        }
+    }
+
+    async fn handle_move_mode_transition(&mut self, transition: MoveModeTransition) {
+        use MoveModeTransition::*;
+
+        match transition {
+            Enter => {
+                let state: &NotebookState = self.glues.state.get_inner().log_unwrap();
+
+                self.context.notebook.update_items(&state.root);
+                self.context.notebook.select_prev(1);
+            }
+            SelectNext => {
+                self.context.notebook.select_next(1);
+            }
+            SelectPrev => {
+                self.context.notebook.select_prev(1);
+            }
+            RequestCommit => {
+                let is_directory = self
+                    .context
+                    .notebook
+                    .tree_items
+                    .iter()
+                    .find(|item| item.target)
+                    .log_expect("No target selected")
+                    .is_directory();
+                let event = match self.context.notebook.selected() {
+                    TreeItem {
+                        kind: TreeItemKind::Directory { directory, .. },
+                        ..
+                    } => {
+                        if is_directory {
+                            NotebookEvent::MoveDirectory(directory.id.clone()).into()
+                        } else {
+                            NotebookEvent::MoveNote(directory.id.clone()).into()
+                        }
+                    }
+                    _ => {
+                        let message = format!(
+                            "Error - Cannot move {} to note",
+                            if is_directory { "directory" } else { "note" }
+                        );
+                        log!("{message}");
+                        self.context.alert = Some(message);
+
+                        return;
+                    }
+                };
+
+                let transition = self.glues.dispatch(event).await.log_unwrap();
+                self.handle_transition(transition).await;
+            }
+            Commit | Cancel => {
+                let state: &NotebookState = self.glues.state.get_inner().log_unwrap();
+                let id = state.get_selected_id().log_unwrap();
+
+                self.context.notebook.update_items(&state.root);
+                self.context.notebook.select_item(id);
+            }
         }
     }
 
@@ -672,7 +750,6 @@ impl App {
         }
     }
 
-    #[async_recursion(?Send)]
     pub(crate) async fn save(&mut self) {
         let mut transitions = vec![];
 
