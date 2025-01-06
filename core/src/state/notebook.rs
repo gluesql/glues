@@ -6,7 +6,7 @@ use {
     crate::{
         data::{Directory, Note},
         state::GetInner,
-        types::DirectoryId,
+        types::{DirectoryId, Id},
         Error, Event, Glues, NotebookTransition, Result,
     },
     consume::{directory, note, tabs},
@@ -95,6 +95,15 @@ impl NotebookState {
             NoteTreeNumber(n) => {
                 format!("Steps: '{n}' selected")
             }
+            MoveMode => match &self.selected {
+                SelectedItem::Note(Note { name, .. }) => {
+                    format!("Note move mode: '{name}'")
+                }
+                SelectedItem::Directory(Directory { name, .. }) => {
+                    format!("Directory move mode: '{name}'")
+                }
+                _ => "Move mode".to_owned(),
+            },
             EditingNormalMode(VimNormalState::Idle) => {
                 let name = &self.get_selected_note()?.name;
 
@@ -242,10 +251,11 @@ impl NotebookState {
         match &self.inner_state {
             NoteSelected => {
                 let mut shortcuts = vec![
-                    "[l] Open note".to_owned(),
+                    "[l] Open".to_owned(),
                     "[h] Close parent".to_owned(),
                     "[j|k] Down | Up".to_owned(),
-                    "[1-9] Set steps".to_owned(),
+                    "[1-9] Steps".to_owned(),
+                    "[Space] Move".to_owned(),
                     "[m] More actions".to_owned(),
                 ];
 
@@ -261,9 +271,9 @@ impl NotebookState {
                     "[l] Toggle".to_owned(),
                     "[h] Close parent".to_owned(),
                     "[j|k] Down | Up".to_owned(),
-                    "[1-9] Set steps".to_owned(),
+                    "[1-9] Steps".to_owned(),
+                    "[Space] Move".to_owned(),
                     "[m] More actions".to_owned(),
-                    "[Esc] Quit".to_owned(),
                 ];
 
                 if !self.tabs.is_empty() {
@@ -278,6 +288,14 @@ impl NotebookState {
                     format!("[j] Move {n} down"),
                     format!("[k] Move {n} up"),
                     "[0-9] Append steps".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
+            }
+            MoveMode => {
+                vec![
+                    "[j] Down".to_owned(),
+                    "[k] Up".to_owned(),
+                    "[Enter] Move".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
@@ -461,6 +479,14 @@ impl NotebookState {
         match &self.selected {
             SelectedItem::Directory(ref directory) => Ok(directory),
             _ => Err(Error::Wip("selected directory not found".to_owned())),
+        }
+    }
+
+    pub fn get_selected_id(&self) -> Result<&Id> {
+        match &self.selected {
+            SelectedItem::Note(ref note) => Ok(&note.id),
+            SelectedItem::Directory(ref directory) => Ok(&directory.id),
+            _ => Err(Error::Wip("selected item not found".to_owned())),
         }
     }
 

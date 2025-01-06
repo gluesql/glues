@@ -60,6 +60,9 @@ pub enum NotebookEvent {
     AddNote(String),
     AddDirectory(String),
 
+    MoveNote(DirectoryId),
+    MoveDirectory(DirectoryId),
+
     OpenNote,
     EditNote,
     ViewNote,
@@ -111,6 +114,7 @@ pub enum KeyEvent {
     Right,
     Up,
     Down,
+    Space,
     Enter,
     Tab,
     Tilde,

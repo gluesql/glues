@@ -1,6 +1,7 @@
 use crate::{
     db::Db,
     state::notebook::{directory, note, tabs, InnerState, NotebookState},
+    transition::MoveModeTransition,
     Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
 };
 
@@ -57,6 +58,11 @@ pub async fn consume(
             let directory = state.get_selected_directory()?.clone();
 
             directory::show_actions_dialog(state, directory)
+        }
+        Key(KeyEvent::Space) => {
+            state.inner_state = InnerState::MoveMode;
+
+            Ok(NotebookTransition::MoveMode(MoveModeTransition::Enter))
         }
         Notebook(SelectNote(note)) => note::select(state, note),
         Notebook(SelectDirectory(directory)) => directory::select(state, directory),

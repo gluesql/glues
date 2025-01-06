@@ -101,14 +101,15 @@ impl Db {
         self.sync()
     }
 
-    pub async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) {
+    pub async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) -> Result<()> {
         table("Note")
             .update()
             .filter(col("id").eq(uuid(note_id)))
-            .set("directory_id", directory_id)
+            .set("directory_id", uuid(directory_id))
             .set("updated_at", now())
             .execute(&mut self.storage)
-            .await
-            .unwrap();
+            .await?;
+
+        self.sync()
     }
 }

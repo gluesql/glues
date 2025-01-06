@@ -98,8 +98,9 @@ impl Db {
     ) -> Result<()> {
         table("Directory")
             .update()
-            .filter(col("directory_id").eq(uuid(directory_id)))
-            .set("parent_id", parent_id)
+            .filter(col("id").eq(uuid(directory_id)))
+            .set("parent_id", uuid(parent_id))
+            .set("updated_at", now())
             .execute(&mut self.storage)
             .await?;
 

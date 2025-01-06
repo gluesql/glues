@@ -3,6 +3,7 @@ mod directory_selected;
 mod editing_insert_mode;
 mod editing_normal_mode;
 mod editing_visual_mode;
+mod move_mode;
 mod note_more_actions;
 mod note_selected;
 mod note_tree_number;
@@ -22,6 +23,7 @@ pub enum InnerState {
     DirectorySelected,
     DirectoryMoreActions,
     NoteTreeNumber(usize),
+    MoveMode,
     EditingNormalMode(VimNormalState),
     EditingVisualMode(VimVisualState),
     EditingInsertMode,
@@ -44,6 +46,7 @@ pub async fn consume(
         NoteMoreActions => note_more_actions::consume(db, state, event).await,
         DirectoryMoreActions => directory_more_actions::consume(db, state, event).await,
         NoteTreeNumber(n) => note_tree_number::consume(db, state, *n, event).await,
+        MoveMode => move_mode::consume(db, state, event).await,
         EditingNormalMode(vim_state) => {
             editing_normal_mode::consume(db, state, *vim_state, event).await
         }

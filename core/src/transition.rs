@@ -57,6 +57,8 @@ pub enum NotebookTransition {
     ShowNoteActionsDialog(Note),
     ShowDirectoryActionsDialog(Directory),
 
+    MoveMode(MoveModeTransition),
+
     OpenNote {
         note: Note,
         content: String,
@@ -79,6 +81,15 @@ pub enum NotebookTransition {
     EditingNormalMode(NormalModeTransition),
     EditingVisualMode(VisualModeTransition),
     ShowVimKeymap(VimKeymapKind),
+}
+
+pub enum MoveModeTransition {
+    Enter,
+    SelectNext,
+    SelectPrev,
+    RequestCommit,
+    Commit,
+    Cancel,
 }
 
 #[derive(Clone, Copy, Display)]

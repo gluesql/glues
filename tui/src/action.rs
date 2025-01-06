@@ -432,6 +432,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('~') => KeyEvent::Tilde,
         KeyCode::Char('.') => KeyEvent::Dot,
         KeyCode::Char('-') => KeyEvent::Dash,
+        KeyCode::Char(' ') => KeyEvent::Space,
         KeyCode::Left => KeyEvent::Left,
         KeyCode::Right => KeyEvent::Right,
         KeyCode::Up => KeyEvent::Up,
