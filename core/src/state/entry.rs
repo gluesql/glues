@@ -14,33 +14,8 @@ impl EntryState {
             Entry(OpenMemory) => {
                 let mut db = Db::memory(glues.task_tx.clone()).await?;
                 let root_id = db.root_id.clone();
-                let _note_id = db
-                    .add_note(root_id.clone(), "Sample Note".to_owned())
-                    .await?
-                    .id;
-                let _note_id = db.add_note(root_id.clone(), "Hello".to_owned()).await?.id;
-                let _note_id = db.add_note(root_id.clone(), "World".to_owned()).await?.id;
-                let _note_id = db.add_note(root_id.clone(), "Good".to_owned()).await?.id;
-                let _note_id = db.add_note(root_id.clone(), "Night".to_owned()).await?.id;
-                let _note_id = db.add_note(root_id.clone(), "Friend".to_owned()).await?.id;
-                let _dir_id = db
-                    .add_directory(root_id.clone(), "Prev Directory".to_owned())
-                    .await?
-                    .id;
-                let dir_id = db
-                    .add_directory(root_id.clone(), "Sample Directory".to_owned())
-                    .await?
-                    .id;
-                let _note_id = db.add_note(dir_id.clone(), "Sub Sub".to_owned()).await?.id;
-                let _note_id = db.add_note(dir_id.clone(), "Sub 2024".to_owned()).await?.id;
-                let dir_id = db
-                    .add_directory(dir_id.clone(), "Sub Directory".to_owned())
-                    .await?
-                    .id;
-                let _note_id = db.add_note(dir_id.clone(), "well".to_owned()).await?.id;
-                let _note_id = db.add_note(dir_id.clone(), "okay".to_owned()).await?.id;
                 let note_id = db
-                    .add_note(dir_id.clone(), "nested note".to_owned())
+                    .add_note(root_id.clone(), "Sample Note".to_owned())
                     .await?
                     .id;
                 db.update_note_content(note_id, "Hi :D".to_owned()).await?;
