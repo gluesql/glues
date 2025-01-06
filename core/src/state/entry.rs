@@ -14,10 +14,7 @@ impl EntryState {
             Entry(OpenMemory) => {
                 let mut db = Db::memory(glues.task_tx.clone()).await?;
                 let root_id = db.root_id.clone();
-                let note_id = db
-                    .add_note(root_id.clone(), "Sample Note".to_owned())
-                    .await?
-                    .id;
+                let note_id = db.add_note(root_id, "Sample Note".to_owned()).await?.id;
                 db.update_note_content(note_id, "Hi :D".to_owned()).await?;
 
                 glues.db = Some(db);
