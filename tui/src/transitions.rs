@@ -139,8 +139,16 @@ impl App {
                 self.context.notebook.select_item(&selected_directory.id);
                 self.context.notebook.update_items(root);
             }
-            NotebookTransition::RenameNote(_) | NotebookTransition::RenameDirectory(_) => {
+            NotebookTransition::RenameDirectory(_) => {
                 self.context.notebook.update_items(root);
+            }
+            NotebookTransition::RenameNote(note) => {
+                self.context.notebook.update_items(root);
+                self.context.notebook.tabs.iter_mut().for_each(|tab| {
+                    if tab.note.id == note.id {
+                        tab.note.name = note.name.clone();
+                    }
+                });
             }
             NotebookTransition::AddNote(Note {
                 id,
