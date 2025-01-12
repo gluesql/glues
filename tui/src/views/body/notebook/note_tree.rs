@@ -7,7 +7,7 @@ use {
         layout::Rect,
         style::{Color, Style, Stylize},
         text::Line,
-        widgets::{Block, HighlightSpacing, List, ListDirection, Borders},
+        widgets::{Block, Borders, HighlightSpacing, List, ListDirection},
         Frame,
     },
 };
