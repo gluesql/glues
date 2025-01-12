@@ -14,7 +14,7 @@ use {
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     context.notebook.editor_height = area.height - 2;
 
-    let title = if let Some(tab_index) = context.notebook.tab_index {
+    let (title, breadcrumb) = if let Some(tab_index) = context.notebook.tab_index {
         let mut title = vec!["[".into()];
         for (i, tab) in context.notebook.tabs.iter().enumerate() {
             let name = tab.note.name.clone();
@@ -35,12 +35,14 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         }
         title.push("]".into());
 
-        Line::from(title)
+        let title = Line::from(title);
+        let breadcrumb = Line::from(context.notebook.tabs[tab_index].breadcrumb.join("/"));
+        (title, breadcrumb)
     } else {
-        Line::from("[Editor]".dark_gray())
+        (Line::from("[Editor]".dark_gray()), Line::default())
     };
 
-    let block = Block::bordered().title(title);
+    let block = Block::bordered().title(title).title_bottom(breadcrumb);
     let block = match (
         context.last_log.as_ref(),
         context.notebook.tabs.iter().any(|tab| tab.dirty),
