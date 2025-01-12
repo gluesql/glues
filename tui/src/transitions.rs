@@ -141,6 +141,7 @@ impl App {
             }
             NotebookTransition::RenameDirectory(_) => {
                 self.context.notebook.update_items(root);
+                self.context.notebook.refresh_breadcrumbs();
             }
             NotebookTransition::RenameNote(note) => {
                 self.context.notebook.update_items(root);
@@ -149,6 +150,7 @@ impl App {
                         tab.note.name = note.name.clone();
                     }
                 });
+                self.context.notebook.refresh_breadcrumbs();
             }
             NotebookTransition::AddNote(Note {
                 id,
@@ -268,7 +270,15 @@ impl App {
                 let transition = self.glues.dispatch(event).await.log_unwrap();
                 self.handle_transition(transition).await;
             }
-            Commit | Cancel => {
+            Commit => {
+                let state: &NotebookState = self.glues.state.get_inner().log_unwrap();
+                let id = state.get_selected_id().log_unwrap();
+
+                self.context.notebook.update_items(&state.root);
+                self.context.notebook.select_item(id);
+                self.context.notebook.refresh_breadcrumbs();
+            }
+            Cancel => {
                 let state: &NotebookState = self.glues.state.get_inner().log_unwrap();
                 let id = state.get_selected_id().log_unwrap();
 

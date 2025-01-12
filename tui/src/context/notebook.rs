@@ -90,6 +90,7 @@ pub struct EditorTab {
     pub note: Note,
     pub editor: TextArea<'static>,
     pub dirty: bool,
+    pub breadcrumb: Vec<String>,
 }
 
 impl Default for NotebookContext {
@@ -257,6 +258,43 @@ impl NotebookContext {
             .log_expect("[NotebookContext::selected] selected must not be empty")
     }
 
+    pub fn breadcrumb(&self, note: &Note) -> Vec<String> {
+        let mut breadcrumb = vec![note.name.clone()];
+        let (i, mut depth) = self
+            .tree_items
+            .iter()
+            .enumerate()
+            .find_map(|(i, item)| (item.id() == &note.id).then_some((i, item.depth)))
+            .log_expect("[NotebookContext::open_note] note not found");
+
+        self.tree_items[0..i].iter().rev().for_each(|item| {
+            if item.depth < depth {
+                depth = item.depth;
+
+                breadcrumb.push(item.name().clone());
+            }
+        });
+        breadcrumb.reverse();
+        breadcrumb
+    }
+
+    pub fn refresh_breadcrumbs(&mut self) {
+        let mut breadcrumbs = self
+            .tabs
+            .iter()
+            .map(|tab| self.breadcrumb(&tab.note))
+            .collect::<Vec<_>>();
+
+        breadcrumbs
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, breadcrumb)| {
+                if let Some(tab) = self.tabs.get_mut(i) {
+                    tab.breadcrumb = breadcrumb.clone();
+                }
+            });
+    }
+
     pub fn open_note(&mut self, note: Note, content: String) {
         let i = self.tabs.iter().enumerate().find_map(|(i, tab)| {
             if tab.note.id == note.id {
@@ -269,10 +307,12 @@ impl NotebookContext {
         if let Some(i) = i {
             self.tab_index = Some(i);
         } else {
+            let breadcrumb = self.breadcrumb(&note);
             let tab = EditorTab {
                 note,
                 editor: TextArea::from(content.lines()),
                 dirty: false,
+                breadcrumb,
             };
             self.tabs.push(tab);
             self.tab_index = Some(self.tabs.len() - 1);
