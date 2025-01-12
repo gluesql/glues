@@ -7,7 +7,7 @@ use {
         layout::Rect,
         style::{Color, Style, Stylize},
         text::Line,
-        widgets::{Block, HighlightSpacing, List, ListDirection},
+        widgets::{Block, Borders, HighlightSpacing, List, ListDirection},
         Frame,
     },
 };
@@ -26,7 +26,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     } else {
         title.dark_gray()
     };
-    let block = Block::bordered().title(title);
+    let block = Block::new().borders(Borders::RIGHT).title(title);
     let inner_area = block.inner(area);
 
     let tree_items = context.tree_items.iter().map(

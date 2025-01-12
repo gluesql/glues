@@ -55,7 +55,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     };
 
     let bottom_left = Line::from(vec![mode, breadcrumb]);
-    let block = Block::bordered().title(title).title_bottom(bottom_left);
+    let block = Block::new().title(title).title_bottom(bottom_left);
     let block = match (
         context.last_log.as_ref(),
         context.notebook.tabs.iter().any(|tab| tab.dirty),
