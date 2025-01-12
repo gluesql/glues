@@ -36,7 +36,12 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         title.push("]".into());
 
         let title = Line::from(title);
-        let breadcrumb = Line::from(context.notebook.tabs[tab_index].breadcrumb.join("/"));
+        let breadcrumb = Line::from(format!(
+            " {} ",
+            context.notebook.tabs[tab_index].breadcrumb.join("/")
+        ))
+        .black()
+        .on_green();
         (title, breadcrumb)
     } else {
         (Line::from("[Editor]".dark_gray()), Line::default())
