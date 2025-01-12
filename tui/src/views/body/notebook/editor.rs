@@ -15,7 +15,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     context.notebook.editor_height = area.height - 2;
 
     let (title, breadcrumb) = if let Some(tab_index) = context.notebook.tab_index {
-        let mut title = vec!["[".into()];
+        let mut title = vec![" ".into()];
         for (i, tab) in context.notebook.tabs.iter().enumerate() {
             let name = tab.note.name.clone();
             let name = if i == tab_index {
@@ -33,7 +33,6 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             }
             title.push(name);
         }
-        title.push("]".into());
 
         let title = Line::from(title);
         let breadcrumb = Span::raw(format!(
