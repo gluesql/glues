@@ -3,7 +3,7 @@ use {
     ratatui::{
         layout::Rect,
         style::{Style, Stylize},
-        text::Line,
+        text::{Line, Span},
         widgets::{Block, Padding},
         Frame,
     },
@@ -36,7 +36,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         title.push("]".into());
 
         let title = Line::from(title);
-        let breadcrumb = Line::from(format!(
+        let breadcrumb = Span::raw(format!(
             " {} ",
             context.notebook.tabs[tab_index].breadcrumb.join("/")
         ))
@@ -44,10 +44,18 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         .on_green();
         (title, breadcrumb)
     } else {
-        (Line::from("[Editor]".dark_gray()), Line::default())
+        (Line::from("[Editor]".dark_gray()), Span::default())
     };
 
-    let block = Block::bordered().title(title).title_bottom(breadcrumb);
+    let mode = match context.notebook.state {
+        ContextState::EditorNormalMode { .. } => Span::raw(" NORMAL ").white().on_black(),
+        ContextState::EditorInsertMode => Span::raw(" INSERT ").black().on_yellow(),
+        ContextState::EditorVisualMode => Span::raw(" VISUAL ").white().on_red(),
+        _ => Span::raw("        ").on_dark_gray(),
+    };
+
+    let bottom_left = Line::from(vec![mode, breadcrumb]);
+    let block = Block::bordered().title(title).title_bottom(bottom_left);
     let block = match (
         context.last_log.as_ref(),
         context.notebook.tabs.iter().any(|tab| tab.dirty),
