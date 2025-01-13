@@ -7,17 +7,18 @@ use {
         widgets::{Block, Padding},
         Frame,
     },
-    throbber_widgets_tui::Throbber,
     tui_textarea::TextArea,
 };
+
+const NOTE_SYMBOL: &str = "󱇗 ";
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     context.notebook.editor_height = area.height - 2;
 
     let (title, breadcrumb) = if let Some(tab_index) = context.notebook.tab_index {
-        let mut title = vec![" ".into()];
+        let mut title = vec![];
         for (i, tab) in context.notebook.tabs.iter().enumerate() {
-            let name = tab.note.name.clone();
+            let name = format!(" {NOTE_SYMBOL}{} ", tab.note.name.clone());
             let name = if i == tab_index {
                 if context.notebook.state.is_editor() {
                     name.white().on_blue()
@@ -28,9 +29,6 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
                 name.dark_gray()
             };
 
-            if i != 0 {
-                title.push("|".into());
-            }
             title.push(name);
         }
 
@@ -59,14 +57,14 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         context.last_log.as_ref(),
         context.notebook.tabs.iter().any(|tab| tab.dirty),
     ) {
-        (_, true) => {
-            let throbber = Throbber::default()
-                .label("Saving...")
-                .style(Style::default().yellow());
-            block.title_bottom(Line::from(throbber).right_aligned())
-        }
+        (_, true) => block.title_bottom(
+            Line::from(" 󰔚 Saving... ")
+                .black()
+                .on_yellow()
+                .right_aligned(),
+        ),
         (Some((log, _)), false) => {
-            block.title_bottom(Line::from(log.clone().green()).right_aligned())
+            block.title_bottom(Line::from(format!(" {} ", log).black().on_green()).right_aligned())
         }
         (None, false) => block,
     }

@@ -833,7 +833,6 @@ dependencies = [
  "gluesql",
  "home",
  "ratatui",
- "throbber-widgets-tui",
  "tokio",
  "tui-big-text",
  "tui-textarea",
@@ -2317,16 +2316,6 @@ checksum = "8b9ef9bad013ada3808854ceac7b46812a6465ba368859a37e2100283d2d719c"
 dependencies = [
  "cfg-if",
  "once_cell",
-]
-
-[[package]]
-name = "throbber-widgets-tui"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d36b5738d666a2b4c91b7c24998a8588db724b3107258343ebf8824bf55b06d"
-dependencies = [
- "rand",
- "ratatui",
 ]
 
 [[package]]
