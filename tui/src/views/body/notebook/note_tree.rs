@@ -12,8 +12,9 @@ use {
     },
 };
 
-const CLOSED_SYMBOL: &str = "▶ ";
-const OPEN_SYMBOL: &str = "▼ ";
+const CLOSED_SYMBOL: &str = "󰉋 ";
+const OPEN_SYMBOL: &str = "󰝰 ";
+const NOTE_SYMBOL: &str = "󱇗 ";
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let note_tree_focused = matches!(
@@ -38,8 +39,8 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
          }| {
             match kind {
                 TreeItemKind::Note { note } => {
-                    let pad = depth * 2 + 2;
-                    let line = Line::raw(format!("{:pad$}{}", "", note.name));
+                    let pad = depth * 2;
+                    let line = Line::raw(format!("{:pad$}{NOTE_SYMBOL}{}", "", note.name));
 
                     match (selectable, target) {
                         (true, _) => line,
