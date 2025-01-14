@@ -114,6 +114,11 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - toggle")
             }
+            EditingNormalMode(VimNormalState::ToggleTabClose) => {
+                let name = &self.get_selected_note()?.name;
+
+                format!("Note '{name}' normal mode - toggle tab close")
+            }
             EditingNormalMode(VimNormalState::Numbering(n)) => {
                 let name = &self.get_selected_note()?.name;
 
@@ -318,10 +323,14 @@ impl NotebookState {
                     "[h|l] Prev | Next Tab".to_owned(),
                     "[H|L] Move Tab Prev | Next".to_owned(),
                     "[x] Close".to_owned(),
+                    "[X] Tab close mode".to_owned(),
                     "[b] Toggle browser".to_owned(),
-                    "[n] Toggle line number".to_owned(),
+                    "[n] Toggle line no.".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
+            }
+            EditingNormalMode(VimNormalState::ToggleTabClose) => {
+                vec!["[l] Close right tabs".to_owned(), "[Esc] Cancel".to_owned()]
             }
             EditingNormalMode(VimNormalState::Numbering(n)) => {
                 // h j k l [0-9] s S x y d w e b G

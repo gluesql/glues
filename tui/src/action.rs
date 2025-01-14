@@ -417,6 +417,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('O') => KeyEvent::CapO,
         KeyCode::Char('S') => KeyEvent::CapS,
         KeyCode::Char('U') => KeyEvent::CapU,
+        KeyCode::Char('X') => KeyEvent::CapX,
         KeyCode::Char('1') => NumKey::One.into(),
         KeyCode::Char('2') => NumKey::Two.into(),
         KeyCode::Char('3') => NumKey::Three.into(),

@@ -108,6 +108,7 @@ pub enum VimKeymapKind {
 pub enum NormalModeTransition {
     IdleMode,
     ToggleMode,
+    ToggleTabCloseMode,
     NumberingMode,
     GatewayMode,
     YankMode,
@@ -125,6 +126,9 @@ pub enum NormalModeTransition {
     MoveTabPrev(usize),
     ToggleLineNumbers,
     ToggleBrowser,
+
+    // toggle tab close mode
+    CloseRightTabs(usize),
 
     MoveCursorDown(usize),
     MoveCursorUp(usize),

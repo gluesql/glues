@@ -295,8 +295,8 @@ impl App {
             IdleMode => {
                 self.context.notebook.get_editor_mut().cancel_selection();
             }
-            ToggleMode | NumberingMode | GatewayMode | YankMode | DeleteMode | DeleteInsideMode
-            | ChangeMode | ChangeInsideMode | ScrollMode => {}
+            ToggleMode | ToggleTabCloseMode | NumberingMode | GatewayMode | YankMode
+            | DeleteMode | DeleteInsideMode | ChangeMode | ChangeInsideMode | ScrollMode => {}
             NextTab(note_id) | PrevTab(note_id) => {
                 let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
 
@@ -323,6 +323,9 @@ impl App {
                 self.context.notebook.update_items(&state.root);
                 self.context.notebook.select_item(note_id);
                 self.context.notebook.apply_yank();
+            }
+            CloseRightTabs(index) => {
+                self.context.notebook.tabs.splice(index.., []);
             }
             ToggleLineNumbers => {
                 self.context.notebook.show_line_number = !self.context.notebook.show_line_number;

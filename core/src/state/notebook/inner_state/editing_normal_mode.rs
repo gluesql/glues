@@ -14,6 +14,7 @@ use {
 pub enum VimNormalState {
     Idle,
     Toggle,
+    ToggleTabClose,
     Numbering(usize),
     Gateway,
     Yank(usize),
@@ -36,6 +37,7 @@ pub async fn consume(
     match vim_state {
         VimNormalState::Idle => consume_idle(state, event).await,
         VimNormalState::Toggle => consume_toggle(db, state, event).await,
+        VimNormalState::ToggleTabClose => consume_toggle_tab_close(state, event).await,
         VimNormalState::Numbering(n) => consume_numbering(state, n, event).await,
         VimNormalState::Gateway => consume_gateway(state, event).await,
         VimNormalState::Yank(n) => consume_yank(state, n, event).await,
@@ -181,6 +183,11 @@ async fn consume_toggle(
         Key(KeyEvent::CapH) => tabs::move_prev(state),
         Key(KeyEvent::CapL) => tabs::move_next(state),
         Key(KeyEvent::X) => tabs::close(db, state).await,
+        Key(KeyEvent::CapX) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::ToggleTabClose);
+
+            ToggleTabCloseMode.into()
+        }
         Key(KeyEvent::N) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
@@ -190,6 +197,34 @@ async fn consume_toggle(
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
             ToggleBrowser.into()
+        }
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            consume_idle(state, event).await
+        }
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
+
+async fn consume_toggle_tab_close(
+    state: &mut NotebookState,
+    event: Event,
+) -> Result<NotebookTransition> {
+    use Event::*;
+    use NormalModeTransition::*;
+
+    match event {
+        Key(KeyEvent::L) => {
+            let i = state
+                .tab_index
+                .ok_or(Error::Wip("todo: tab index must exist".to_owned()))?
+                + 1;
+
+            state.tabs.splice(i.., []);
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            CloseRightTabs(i).into()
         }
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
