@@ -330,7 +330,11 @@ impl NotebookState {
                 ]
             }
             EditingNormalMode(VimNormalState::ToggleTabClose) => {
-                vec!["[l] Close right tabs".to_owned(), "[Esc] Cancel".to_owned()]
+                vec![
+                    "[h] Close left tabs".to_owned(),
+                    "[l] Close right tabs".to_owned(),
+                    "[Esc] Cancel".to_owned(),
+                ]
             }
             EditingNormalMode(VimNormalState::Numbering(n)) => {
                 // h j k l [0-9] s S x y d w e b G

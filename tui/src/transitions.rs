@@ -327,6 +327,9 @@ impl App {
             CloseRightTabs(index) => {
                 self.context.notebook.tabs.splice(index.., []);
             }
+            CloseLeftTabs(index) => {
+                self.context.notebook.tabs.splice(..index, []);
+            }
             ToggleLineNumbers => {
                 self.context.notebook.show_line_number = !self.context.notebook.show_line_number;
             }
