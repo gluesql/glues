@@ -129,6 +129,7 @@ pub enum NormalModeTransition {
 
     // toggle tab close mode
     CloseRightTabs(usize),
+    CloseLeftTabs(usize),
 
     MoveCursorDown(usize),
     MoveCursorUp(usize),

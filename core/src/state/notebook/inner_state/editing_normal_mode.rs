@@ -216,15 +216,25 @@ async fn consume_toggle_tab_close(
 
     match event {
         Key(KeyEvent::L) => {
-            let i = state
-                .tab_index
-                .ok_or(Error::Wip("todo: tab index must exist".to_owned()))?
-                + 1;
+            let i = state.tab_index.ok_or(Error::Wip(
+                "[ToggleTabClose::L] tab index must exist".to_owned(),
+            ))? + 1;
 
             state.tabs.splice(i.., []);
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
             CloseRightTabs(i).into()
+        }
+        Key(KeyEvent::H) => {
+            let i = state.tab_index.ok_or(Error::Wip(
+                "[ToggleTabClose::H] tab index must exist".to_owned(),
+            ))?;
+
+            state.tab_index = Some(0);
+            state.tabs.splice(..i, []);
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            CloseLeftTabs(i).into()
         }
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
