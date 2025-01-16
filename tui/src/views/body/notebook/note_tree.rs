@@ -6,7 +6,7 @@ use {
     ratatui::{
         layout::Rect,
         style::{Color, Style, Stylize},
-        text::Line,
+        text::{Line, Span},
         widgets::{Block, Borders, HighlightSpacing, List, ListDirection},
         Frame,
     },
@@ -40,7 +40,11 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
             match kind {
                 TreeItemKind::Note { note } => {
                     let pad = depth * 2;
-                    let line = Line::raw(format!("{:pad$}{NOTE_SYMBOL}{}", "", note.name));
+                    let line = Line::from(vec![
+                        format!("{:pad$}", "").into(),
+                        Span::raw(NOTE_SYMBOL).dim(),
+                        Span::raw(&note.name),
+                    ]);
 
                     match (selectable, target) {
                         (true, _) => line,
@@ -51,7 +55,11 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
                 TreeItemKind::Directory { directory, opened } => {
                     let pad = depth * 2;
                     let symbol = if *opened { OPEN_SYMBOL } else { CLOSED_SYMBOL };
-                    let line = Line::raw(format!("{:pad$}{symbol}{}", "", directory.name));
+                    let line = Line::from(vec![
+                        format!("{:pad$}", "").into(),
+                        Span::raw(symbol).yellow(),
+                        Span::raw(&directory.name),
+                    ]);
 
                     if !selectable {
                         line.dim()
