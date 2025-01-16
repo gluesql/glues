@@ -1,5 +1,6 @@
 use {
     super::{
+        color::*,
         config::{
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
             LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME,
@@ -120,7 +121,7 @@ impl App {
                     .take_prompt_input()
                     .log_expect("prompt must not be none");
                 let message = vec![
-                    Line::from(format!("path: {path}").dark_gray()),
+                    Line::from(format!("path: {path}").fg(GRAY_MEDIUM)),
                     Line::raw(""),
                     Line::raw("Enter the git remote:"),
                 ];
@@ -136,8 +137,8 @@ impl App {
                     .take_prompt_input()
                     .log_expect("prompt must not be none");
                 let message = vec![
-                    Line::from(format!("path: {path}").dark_gray()),
-                    Line::from(format!("remote: {remote}").dark_gray()),
+                    Line::from(format!("path: {path}").fg(GRAY_MEDIUM)),
+                    Line::from(format!("remote: {remote}").fg(GRAY_MEDIUM)),
                     Line::raw(""),
                     Line::raw("Enter the git branch:"),
                 ];
@@ -172,7 +173,7 @@ impl App {
                     .take_prompt_input()
                     .log_expect("conn str must not be none");
                 let message = vec![
-                    Line::from(format!("conn_str: {conn_str}").dark_gray()),
+                    Line::from(format!("conn_str: {conn_str}").fg(GRAY_MEDIUM)),
                     Line::raw(""),
                     Line::raw("Enter the database name:"),
                 ];

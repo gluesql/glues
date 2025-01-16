@@ -1,5 +1,8 @@
 use {
-    crate::context::{notebook::ContextState, Context},
+    crate::{
+        color::*,
+        context::{notebook::ContextState, Context},
+    },
     ratatui::{
         layout::Rect,
         style::{Style, Stylize},
@@ -21,12 +24,12 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             let name = format!(" {NOTE_SYMBOL}{} ", tab.note.name.clone());
             let name = if i == tab_index {
                 if context.notebook.state.is_editor() {
-                    name.white().on_blue()
+                    name.fg(WHITE).bg(BLUE)
                 } else {
-                    name.white().on_dark_gray()
+                    name.fg(WHITE).bg(GRAY_DIM)
                 }
             } else {
-                name.dark_gray()
+                name.fg(GRAY_MEDIUM)
             };
 
             title.push(name);
@@ -37,18 +40,18 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             " {} ",
             context.notebook.tabs[tab_index].breadcrumb.join("/")
         ))
-        .black()
-        .on_green();
+        .fg(BLACK)
+        .bg(GREEN);
         (title, breadcrumb)
     } else {
-        (Line::from("[Editor]".dark_gray()), Span::default())
+        (Line::from("[Editor]".fg(GRAY_DIM)), Span::default())
     };
 
     let mode = match context.notebook.state {
-        ContextState::EditorNormalMode { .. } => Span::raw(" NORMAL ").white().on_black(),
-        ContextState::EditorInsertMode => Span::raw(" INSERT ").black().on_yellow(),
-        ContextState::EditorVisualMode => Span::raw(" VISUAL ").white().on_red(),
-        _ => Span::raw("        ").on_dark_gray(),
+        ContextState::EditorNormalMode { .. } => Span::raw(" NORMAL ").fg(WHITE).bg(BLACK),
+        ContextState::EditorInsertMode => Span::raw(" INSERT ").fg(BLACK).bg(YELLOW),
+        ContextState::EditorVisualMode => Span::raw(" VISUAL ").fg(WHITE).bg(RED),
+        _ => Span::raw("        ").bg(GRAY_DARK),
     };
 
     let bottom_left = Line::from(vec![mode, breadcrumb]);
@@ -59,15 +62,17 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     ) {
         (_, true) => block.title_bottom(
             Line::from(" 󰔚 Saving... ")
-                .black()
-                .on_yellow()
+                .fg(BLACK)
+                .bg(YELLOW)
                 .right_aligned(),
         ),
         (Some((log, _)), false) => {
-            block.title_bottom(Line::from(format!(" {} ", log).black().on_green()).right_aligned())
+            block.title_bottom(Line::from(format!(" {} ", log).fg(BLACK).bg(GREEN)).right_aligned())
         }
         (None, false) => block,
     }
+    .fg(WHITE)
+    .bg(GRAY_BLACK)
     .padding(if context.notebook.show_line_number {
         Padding::ZERO
     } else {
@@ -89,7 +94,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         ContextState::EditorNormalMode { .. }
         | ContextState::EditorInsertMode
         | ContextState::EditorVisualMode => (
-            Style::default().white().on_blue(),
+            Style::default().fg(WHITE).bg(BLUE),
             Style::default().underlined(),
         ),
         _ => (Style::default(), Style::default()),
@@ -98,7 +103,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     editor.set_cursor_style(cursor_style);
     editor.set_cursor_line_style(cursor_line_style);
     if show_line_number {
-        editor.set_line_number_style(Style::default().dark_gray().dim());
+        editor.set_line_number_style(Style::default().fg(GRAY_DIM));
     } else {
         editor.remove_line_number();
     }

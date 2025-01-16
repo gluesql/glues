@@ -1,9 +1,12 @@
-use ratatui::{
-    layout::{Alignment, Constraint::Length, Flex, Layout},
-    style::{Style, Stylize},
-    text::Line,
-    widgets::{Block, Clear, Padding, Paragraph, Wrap},
-    Frame,
+use {
+    crate::color::*,
+    ratatui::{
+        layout::{Alignment, Constraint::Length, Flex, Layout},
+        style::{Style, Stylize},
+        text::Line,
+        widgets::{Block, Clear, Padding, Paragraph, Wrap},
+        Frame,
+    },
 };
 
 pub fn draw(frame: &mut Frame) {
@@ -15,6 +18,8 @@ pub fn draw(frame: &mut Frame) {
         .areas(area);
 
     let block = Block::bordered()
+        .fg(WHITE)
+        .bg(GRAY_DARK)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Editor Keymap")
         .title_alignment(Alignment::Center);
@@ -64,7 +69,7 @@ Thanks to tui-textarea
         .wrap(Wrap { trim: true })
         .style(Style::default())
         .alignment(Alignment::Left);
-    let control = Line::from("Press any key to close".dark_gray()).centered();
+    let control = Line::from("Press any key to close".fg(GRAY_MEDIUM)).centered();
 
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);

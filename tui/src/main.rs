@@ -2,6 +2,7 @@ mod action;
 pub mod context;
 #[macro_use]
 mod logger;
+mod color;
 mod config;
 mod transitions;
 mod views;

@@ -1,5 +1,6 @@
 use {
     crate::{
+        color::*,
         context::{Context, ContextPrompt},
         logger::*,
     },
@@ -28,6 +29,8 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .areas(area);
 
     let block = Block::bordered()
+        .bg(GRAY_DARK)
+        .fg(WHITE)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Prompt")
         .title_alignment(Alignment::Center);
@@ -40,8 +43,8 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .alignment(Alignment::Left);
 
     let lines = vec![
-        "[Enter] Submit".dark_gray().into(),
-        "[Esc] Cancel".dark_gray().into(),
+        "[Enter] Submit".fg(GRAY_LIGHT).into(),
+        "[Esc] Cancel".fg(GRAY_LIGHT).into(),
     ];
     let control = Paragraph::new(lines)
         .wrap(Wrap { trim: true })
