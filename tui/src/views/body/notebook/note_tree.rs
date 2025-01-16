@@ -1,11 +1,14 @@
 use {
-    crate::context::{
-        notebook::{ContextState, TreeItem, TreeItemKind},
-        NotebookContext,
+    crate::{
+        color::*,
+        context::{
+            notebook::{ContextState, TreeItem, TreeItemKind},
+            NotebookContext,
+        },
     },
     ratatui::{
         layout::Rect,
-        style::{Color, Style, Stylize},
+        style::{Style, Stylize},
         text::{Line, Span},
         widgets::{Block, Borders, HighlightSpacing, List, ListDirection},
         Frame,
@@ -23,9 +26,9 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     );
     let title = "[Browser]";
     let title = if note_tree_focused {
-        title.light_blue()
+        title.fg(SKY_BLUE)
     } else {
-        title.dark_gray()
+        title.fg(GRAY_DIM)
     };
     let block = Block::new().borders(Borders::RIGHT).title(title);
     let inner_area = block.inner(area);
@@ -37,50 +40,44 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
              selectable,
              kind,
          }| {
-            match kind {
+            let line = match kind {
                 TreeItemKind::Note { note } => {
                     let pad = depth * 2;
-                    let line = Line::from(vec![
+                    Line::from(vec![
                         format!("{:pad$}", "").into(),
                         Span::raw(NOTE_SYMBOL).dim(),
                         Span::raw(&note.name),
-                    ]);
-
-                    match (selectable, target) {
-                        (true, _) => line,
-                        (false, true) => line.light_blue(),
-                        (false, false) => line.dim(),
-                    }
+                    ])
                 }
                 TreeItemKind::Directory { directory, opened } => {
                     let pad = depth * 2;
                     let symbol = if *opened { OPEN_SYMBOL } else { CLOSED_SYMBOL };
-                    let line = Line::from(vec![
+                    Line::from(vec![
                         format!("{:pad$}", "").into(),
-                        Span::raw(symbol).yellow(),
+                        Span::raw(symbol).fg(YELLOW),
                         Span::raw(&directory.name),
-                    ]);
-
-                    if !selectable {
-                        line.dim()
-                    } else {
-                        line
-                    }
+                    ])
                 }
+            };
+
+            match (selectable, target) {
+                (true, _) => line.fg(WHITE),
+                (false, true) => line.fg(MAGENTA),
+                (false, false) => line.dim(),
             }
         },
     );
 
     let list = List::new(tree_items)
-        .highlight_style(Style::new().fg(Color::White).bg(if note_tree_focused {
-            Color::Blue
+        .highlight_style(Style::new().fg(GRAY_WHITE).bg(if note_tree_focused {
+            BLUE
         } else {
-            Color::DarkGray
+            GRAY_DARK
         }))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);
 
-    frame.render_widget(block, area);
+    frame.render_widget(block.bg(GRAY_BLACK), area);
     frame.render_stateful_widget(list, inner_area, &mut context.tree_state);
 }

@@ -1,8 +1,11 @@
 use {
-    crate::context::{entry::MENU_ITEMS, EntryContext},
+    crate::{
+        color::*,
+        context::{entry::MENU_ITEMS, EntryContext},
+    },
     ratatui::{
         layout::{Alignment, Constraint::Length, Flex, Layout, Rect},
-        style::{Color, Style, Stylize},
+        style::{Style, Stylize},
         widgets::{Block, HighlightSpacing, List, ListDirection, Padding},
         Frame,
     },
@@ -10,6 +13,9 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
+    let background = Block::default().bg(GRAY_BLACK);
+    frame.render_widget(background, area);
+
     let [area] = Layout::horizontal([Length(38)])
         .flex(Flex::Center)
         .areas(area);
@@ -18,23 +24,24 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
         .areas(area);
 
     let title = BigText::builder()
-        .lines(vec!["Glues".dark_gray().into()])
+        .lines(vec!["Glues".fg(YELLOW).into()])
         .build();
     let block = Block::bordered()
+        .fg(WHITE)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Open Notes")
         .title_alignment(Alignment::Center);
 
     let items = MENU_ITEMS.into_iter().map(|name| {
         if name.ends_with("CSV") || name.ends_with("JSON") {
-            name.dark_gray().dim()
+            name.fg(GRAY_DIM)
         } else {
-            name.into()
+            name.fg(GRAY_WHITE)
         }
     });
     let list = List::new(items)
         .block(block)
-        .highlight_style(Style::new().fg(Color::White).bg(Color::Blue))
+        .highlight_style(Style::new().fg(WHITE).bg(BLUE))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);

@@ -1,6 +1,7 @@
 use {
     crate::{
         action::{Action, OpenGitStep, OpenMongoStep, TuiAction},
+        color::*,
         config::{
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_PATH, LAST_JSON_PATH, LAST_MONGO_CONN_STR,
         },
@@ -39,7 +40,7 @@ impl EntryContext {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the path:"),
-                    Line::from("If path not exists, it will be created.".dark_gray()),
+                    Line::from("If path not exists, it will be created.".fg(GRAY_MEDIUM)),
                 ],
                 action: Box::new(action.into()),
                 default: config::get(key).await,
@@ -51,8 +52,10 @@ impl EntryContext {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the git repository path:"),
-                    Line::from("The path must contain an existing .git repository;".dark_gray()),
-                    Line::from("otherwise, an error will occur.".dark_gray()),
+                    Line::from(
+                        "The path must contain an existing .git repository.".fg(GRAY_MEDIUM),
+                    ),
+                    Line::from("otherwise, an error will occur.".fg(GRAY_MEDIUM)),
                 ],
                 action: Box::new(TuiAction::OpenGit(OpenGitStep::Path).into()),
                 default: config::get(LAST_GIT_PATH).await,
@@ -64,7 +67,7 @@ impl EntryContext {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the MongoDB connection string:"),
-                    Line::from("e.g. mongodb://localhost:27017".dark_gray()),
+                    Line::from("e.g. mongodb://localhost:27017".fg(GRAY_MEDIUM)),
                 ],
                 action: Box::new(TuiAction::OpenMongo(OpenMongoStep::ConnStr).into()),
                 default: config::get(LAST_MONGO_CONN_STR).await,

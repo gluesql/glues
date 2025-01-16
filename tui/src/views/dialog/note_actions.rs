@@ -1,8 +1,11 @@
 use {
-    crate::context::{notebook::NOTE_ACTIONS, NotebookContext},
+    crate::{
+        color::*,
+        context::{notebook::NOTE_ACTIONS, NotebookContext},
+    },
     ratatui::{
         layout::{Alignment, Constraint::Length, Flex, Layout},
-        style::{Color, Style},
+        style::{Style, Stylize},
         widgets::{Block, Clear, HighlightSpacing, List, ListDirection, Padding},
         Frame,
     },
@@ -15,12 +18,14 @@ pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
     let [area] = Layout::vertical([Length(7)]).flex(Flex::Center).areas(area);
 
     let block = Block::bordered()
+        .bg(GRAY_DARK)
+        .fg(WHITE)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Note Actions")
         .title_alignment(Alignment::Center);
     let list = List::new(NOTE_ACTIONS)
         .block(block)
-        .highlight_style(Style::new().fg(Color::White).bg(Color::Blue))
+        .highlight_style(Style::new().fg(WHITE).bg(BLUE))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);
