@@ -17,7 +17,7 @@ pub async fn select_prev(db: &mut Db, state: &mut NotebookState) -> Result<Noteb
     let i = if i + 1 >= state.tabs.len() { 0 } else { i + 1 };
     state.tab_index = Some(i);
 
-    let note = &state.tabs[i];
+    let note = &state.tabs[i].note;
     state.selected = SelectedItem::Note(note.clone());
 
     let note_id = note.id.clone();
@@ -38,7 +38,7 @@ pub async fn select_next(db: &mut Db, state: &mut NotebookState) -> Result<Noteb
     let i = if i == 0 { state.tabs.len() - 1 } else { i - 1 };
     state.tab_index = Some(i);
 
-    let note = &state.tabs[i];
+    let note = &state.tabs[i].note;
     state.selected = SelectedItem::Note(note.clone());
 
     let note_id = note.id.clone();
@@ -92,8 +92,8 @@ pub async fn close(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTra
         .tab_index
         .ok_or(Error::Wip("opened note must exist".to_owned()))?;
 
-    let note_id = state.tabs[i].id.clone();
-    state.tabs.retain(|note| note.id != note_id);
+    let note_id = state.tabs[i].note.id.clone();
+    state.tabs.retain(|tab| tab.note.id != note_id);
 
     if state.tabs.is_empty() {
         state.tab_index = None;
@@ -107,7 +107,7 @@ pub async fn close(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTra
     let i = min(i, state.tabs.len() - 1);
     state.tab_index = Some(i);
 
-    let note = state.tabs[i].clone();
+    let note = state.tabs[i].note.clone();
     state.selected = SelectedItem::Note(note.clone());
 
     directory::open_all(db, state, note.directory_id).await?;

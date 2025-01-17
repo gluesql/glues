@@ -7,7 +7,7 @@ use {
     },
     glues_core::{
         data::Note,
-        state::notebook::DirectoryItem,
+        state::notebook::{DirectoryItem, Tab},
         types::{Id, NoteId},
         NotebookEvent,
     },
@@ -16,6 +16,7 @@ use {
         text::Line,
         widgets::ListState,
     },
+    std::collections::HashMap,
     tui_textarea::TextArea,
 };
 
@@ -78,19 +79,19 @@ pub struct NotebookContext {
 
     // editor
     pub editor_height: u16,
-    pub tabs: Vec<EditorTab>,
+    pub tabs: Vec<Tab>,
     pub tab_index: Option<usize>,
+    pub editors: HashMap<NoteId, EditorItem>,
+
     pub show_line_number: bool,
     pub show_browser: bool,
     pub line_yanked: bool,
     pub yank: Option<String>,
 }
 
-pub struct EditorTab {
-    pub note: Note,
+pub struct EditorItem {
     pub editor: TextArea<'static>,
     pub dirty: bool,
-    pub breadcrumb: Vec<String>,
 }
 
 impl Default for NotebookContext {
@@ -106,6 +107,8 @@ impl Default for NotebookContext {
             editor_height: 0,
             tabs: vec![],
             tab_index: None,
+            editors: HashMap::new(),
+
             show_line_number: true,
             show_browser: true,
             line_yanked: false,
@@ -122,38 +125,49 @@ impl NotebookContext {
     }
 
     pub fn get_editor(&self) -> &TextArea<'static> {
-        &self
+        let note_id = &self
             .tab_index
             .and_then(|i| self.tabs.get(i))
             .log_expect("[NotebookContext::get_editor] no opened note")
+            .note
+            .id;
+
+        &self
+            .editors
+            .get(note_id)
+            .log_expect("[NotebookContext::get_editor] editor not found")
             .editor
     }
 
     pub fn get_editor_mut(&mut self) -> &mut TextArea<'static> {
-        &mut self
+        let note_id = &self
             .tab_index
-            .and_then(|i| self.tabs.get_mut(i))
+            .and_then(|i| self.tabs.get(i))
             .log_expect("[NotebookContext::get_editor_mut] no opened note")
+            .note
+            .id;
+
+        &mut self
+            .editors
+            .get_mut(note_id)
+            .log_expect("[NotebookContext::get_editor_mut] editor not found")
             .editor
     }
 
     pub fn mark_dirty(&mut self) {
-        if let Some(tab) = self.tab_index.and_then(|i| self.tabs.get_mut(i)) {
-            tab.dirty = true;
+        if let Some(editor_item) = self
+            .tab_index
+            .and_then(|i| self.tabs.get(i))
+            .and_then(|tab| self.editors.get_mut(&tab.note.id))
+        {
+            editor_item.dirty = true;
         }
     }
 
     pub fn mark_clean(&mut self, note_id: &NoteId) {
-        for tab in self.tabs.iter_mut() {
-            if &tab.note.id == note_id {
-                tab.dirty = false;
-                break;
-            }
+        if let Some(editor_item) = self.editors.get_mut(note_id) {
+            editor_item.dirty = false;
         }
-    }
-
-    pub fn close_tab(&mut self, note_id: &NoteId) {
-        self.tabs.retain(|tab| &tab.note.id != note_id);
     }
 
     pub fn update_items(&mut self, directory_item: &DirectoryItem) {
@@ -258,14 +272,16 @@ impl NotebookContext {
             .log_expect("[NotebookContext::selected] selected must not be empty")
     }
 
-    pub fn breadcrumb(&self, note: &Note) -> Vec<String> {
+    fn _breadcrumb(&self, note: &Note) -> Vec<String> {
         let mut breadcrumb = vec![note.name.clone()];
         let (i, mut depth) = self
             .tree_items
             .iter()
             .enumerate()
             .find_map(|(i, item)| (item.id() == &note.id).then_some((i, item.depth)))
-            .log_expect("[NotebookContext::open_note] note not found");
+            .log_expect(
+                format!("[NotebookContext::breadcrumb] note not found {}", note.name).as_str(),
+            );
 
         self.tree_items[0..i].iter().rev().for_each(|item| {
             if item.depth < depth {
@@ -278,47 +294,13 @@ impl NotebookContext {
         breadcrumb
     }
 
-    pub fn refresh_breadcrumbs(&mut self) {
-        let mut breadcrumbs = self
-            .tabs
-            .iter()
-            .map(|tab| self.breadcrumb(&tab.note))
-            .collect::<Vec<_>>();
+    pub fn open_note(&mut self, note_id: NoteId, content: String) {
+        let item = EditorItem {
+            editor: TextArea::from(content.lines()),
+            dirty: false,
+        };
 
-        breadcrumbs
-            .iter_mut()
-            .enumerate()
-            .for_each(|(i, breadcrumb)| {
-                if let Some(tab) = self.tabs.get_mut(i) {
-                    tab.breadcrumb = breadcrumb.clone();
-                }
-            });
-    }
-
-    pub fn open_note(&mut self, note: Note, content: String) {
-        let i = self.tabs.iter().enumerate().find_map(|(i, tab)| {
-            if tab.note.id == note.id {
-                Some(i)
-            } else {
-                None
-            }
-        });
-
-        if let Some(i) = i {
-            self.tab_index = Some(i);
-        } else {
-            let breadcrumb = self.breadcrumb(&note);
-            let tab = EditorTab {
-                note,
-                editor: TextArea::from(content.lines()),
-                dirty: false,
-                breadcrumb,
-            };
-            self.tabs.push(tab);
-            self.tab_index = Some(self.tabs.len() - 1);
-        }
-
-        self.apply_yank();
+        self.editors.insert(note_id, item);
     }
 
     pub fn apply_yank(&mut self) {

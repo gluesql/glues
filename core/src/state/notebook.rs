@@ -22,10 +22,16 @@ pub use directory_item::{DirectoryItem, DirectoryItemChildren, TreeItem};
 pub struct NotebookState {
     pub root: DirectoryItem,
     pub selected: SelectedItem,
-    pub tabs: Vec<Note>,
+    pub tabs: Vec<Tab>,
     pub tab_index: Option<usize>,
 
     pub inner_state: InnerState,
+}
+
+#[derive(Clone)]
+pub struct Tab {
+    pub note: Note,
+    pub breadcrumb: Vec<String>,
 }
 
 pub enum SelectedItem {
@@ -509,6 +515,7 @@ impl NotebookState {
             .ok_or_else(|| Error::Wip("tab index is none".to_owned()))?;
         self.tabs
             .get(i)
+            .map(|tab| &tab.note)
             .ok_or_else(|| Error::Wip("tab not found".to_owned()))
     }
 }
