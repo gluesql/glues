@@ -272,28 +272,6 @@ impl NotebookContext {
             .log_expect("[NotebookContext::selected] selected must not be empty")
     }
 
-    fn _breadcrumb(&self, note: &Note) -> Vec<String> {
-        let mut breadcrumb = vec![note.name.clone()];
-        let (i, mut depth) = self
-            .tree_items
-            .iter()
-            .enumerate()
-            .find_map(|(i, item)| (item.id() == &note.id).then_some((i, item.depth)))
-            .log_expect(
-                format!("[NotebookContext::breadcrumb] note not found {}", note.name).as_str(),
-            );
-
-        self.tree_items[0..i].iter().rev().for_each(|item| {
-            if item.depth < depth {
-                depth = item.depth;
-
-                breadcrumb.push(item.name().clone());
-            }
-        });
-        breadcrumb.reverse();
-        breadcrumb
-    }
-
     pub fn open_note(&mut self, note_id: NoteId, content: String) {
         let item = EditorItem {
             editor: TextArea::from(content.lines()),
