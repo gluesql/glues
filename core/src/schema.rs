@@ -9,6 +9,16 @@ use {
 };
 
 pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
+    table("Log")
+        .create_table_if_not_exists()
+        .add_column("category TEXT NULL")
+        .add_column("message TEXT NOT NULL")
+        .add_column("created_at TIMESTAMP NOT NULL DEFAULT NOW()")
+        .execute(storage)
+        .await?;
+
+    table("Log").delete().execute(storage).await?;
+
     table("Meta")
         .create_table_if_not_exists()
         .add_column("key TEXT PRIMARY KEY")
