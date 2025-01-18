@@ -18,7 +18,7 @@ const NOTE_SYMBOL: &str = "󱇗 ";
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     context.notebook.editor_height = area.height - 2;
 
-    let (title, breadcrumb) = if let Some(tab_index) = context.notebook.tab_index {
+    let (title, mut bottom_left) = if let Some(tab_index) = context.notebook.tab_index {
         let mut title = vec![];
         for (i, tab) in context.notebook.tabs.iter().enumerate() {
             let name = format!(" {NOTE_SYMBOL}{} ", tab.note.name.clone());
@@ -36,25 +36,55 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         }
 
         let title = Line::from(title);
-        let breadcrumb = Span::raw(format!(
-            " {} ",
-            context.notebook.tabs[tab_index].breadcrumb.join("/")
-        ))
-        .fg(BLACK)
-        .bg(GREEN);
+        let mut breadcrumb = vec![];
+        let last_index = context.notebook.tabs[tab_index].breadcrumb.len() - 1;
+
+        for (i, name) in context.notebook.tabs[tab_index]
+            .breadcrumb
+            .iter()
+            .enumerate()
+        {
+            let (color_a, color_b) = if i % 2 == 0 {
+                (GRAY_A, GRAY_B)
+            } else {
+                (GRAY_B, GRAY_A)
+            };
+
+            let name = if i == 0 {
+                breadcrumb.push(Span::raw("  󰝰 ").fg(YELLOW).bg(color_a));
+                format!("{name} ")
+            } else if i == last_index {
+                format!(" 󱇗 {name} ")
+            } else {
+                breadcrumb.push(Span::raw(" 󰝰 ").fg(YELLOW).bg(color_a));
+                format!("{name} ")
+            };
+
+            breadcrumb.push(Span::raw(name).fg(BLACK).bg(color_a));
+
+            if i < last_index {
+                breadcrumb.push(Span::raw("").fg(color_a).bg(color_b));
+            } else {
+                breadcrumb.push(Span::raw("").fg(color_a).bg(GRAY_BLACK));
+            }
+        }
+
         (title, breadcrumb)
     } else {
-        (Line::from("[Editor]".fg(GRAY_DIM)), Span::default())
+        (Line::from("[Editor]".fg(GRAY_DIM)), vec![Span::default()])
     };
 
-    let mode = match context.notebook.state {
-        ContextState::EditorNormalMode { .. } => Span::raw(" NORMAL ").fg(WHITE).bg(BLACK),
-        ContextState::EditorInsertMode => Span::raw(" INSERT ").fg(BLACK).bg(YELLOW),
-        ContextState::EditorVisualMode => Span::raw(" VISUAL ").fg(WHITE).bg(RED),
-        _ => Span::raw("        ").bg(GRAY_DARK),
+    let (mode, bg) = match context.notebook.state {
+        ContextState::EditorNormalMode { .. } => (Span::raw(" NORMAL ").fg(WHITE).bg(BLACK), BLACK),
+        ContextState::EditorInsertMode => (Span::raw(" INSERT ").fg(BLACK).bg(YELLOW), YELLOW),
+        ContextState::EditorVisualMode => (Span::raw(" VISUAL ").fg(WHITE).bg(RED), RED),
+        _ => (Span::raw("        ").bg(GRAY_DARK), GRAY_DARK),
     };
 
-    let bottom_left = Line::from(vec![mode, breadcrumb]);
+    bottom_left.insert(0, mode);
+    bottom_left.insert(1, Span::raw("").fg(bg).bg(GRAY_A));
+
+    let bottom_left = Line::from(bottom_left);
     let block = Block::new().title(title).title_bottom(bottom_left);
     let block = match (
         context.last_log.as_ref(),

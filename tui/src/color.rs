@@ -17,3 +17,6 @@ pub const GRAY_LIGHT: Color = Color::Indexed(250);
 pub const GRAY_WHITE: Color = Color::Indexed(253);
 pub const WHITE: Color = Color::White;
 pub const BLACK: Color = Color::Black;
+
+pub const GRAY_A: Color = Color::Indexed(246);
+pub const GRAY_B: Color = Color::Indexed(248);
