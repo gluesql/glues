@@ -1,4 +1,5 @@
 mod directory;
+mod log;
 mod note;
 
 use {

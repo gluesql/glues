@@ -32,6 +32,11 @@ pub async fn rename(
     new_name: String,
 ) -> Result<NotebookTransition> {
     db.rename_note(note.id.clone(), new_name.clone()).await?;
+    db.log(
+        "note::rename".to_owned(),
+        format!("  id: {}\nfrom: {}\n  to: {}", note.id, note.name, new_name),
+    )
+    .await?;
 
     note.name = new_name;
     state.root.rename_note(&note).ok_or(Error::Wip(

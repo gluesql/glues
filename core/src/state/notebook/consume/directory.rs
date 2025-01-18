@@ -115,6 +115,11 @@ pub async fn rename(
 
     db.rename_directory(directory.id.clone(), new_name.clone())
         .await?;
+    db.log(
+        "directory::rename".to_owned(),
+        format!("  id: {}\nfrom: {}\n  to: {}", directory.id, directory.name, new_name),
+    )
+    .await?;
 
     directory.name = new_name;
     state.root.rename_directory(&directory).ok_or(Error::Wip(
