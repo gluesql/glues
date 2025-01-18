@@ -159,7 +159,14 @@ pub async fn move_note(
     state: &mut NotebookState,
     directory_id: DirectoryId,
 ) -> Result<NotebookTransition> {
-    let note = state.get_selected_note()?.clone();
+    let mut note = state.get_selected_note()?.clone();
+    note.directory_id = directory_id.clone();
+
+    state.tabs.iter_mut().for_each(|tab| {
+        if tab.note.id == note.id {
+            tab.note.directory_id = directory_id.clone();
+        }
+    });
 
     db.move_note(note.id.clone(), directory_id.clone()).await?;
     directory::close(state, state.root.directory.clone())?;
