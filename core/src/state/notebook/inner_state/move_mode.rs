@@ -1,6 +1,6 @@
 use crate::{
     db::Db,
-    state::notebook::{directory, InnerState, NotebookState, SelectedItem},
+    state::notebook::{directory, note, InnerState, NotebookState, SelectedItem},
     transition::MoveModeTransition,
     Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
 };
@@ -30,31 +30,10 @@ pub async fn consume(
         }
         Key(KeyEvent::Enter) => MoveModeTransition::RequestCommit.into(),
         Notebook(NotebookEvent::MoveNote(directory_id)) => {
-            let note = state.get_selected_note()?.clone();
-
-            db.move_note(note.id.clone(), directory_id.clone()).await?;
-            directory::close(state, state.root.directory.clone())?;
-            directory::open_all(db, state, directory_id).await?;
-
-            state.selected = SelectedItem::Note(note);
-            state.inner_state = InnerState::NoteSelected;
-            MoveModeTransition::Commit.into()
+            note::move_note(db, state, directory_id).await
         }
         Notebook(NotebookEvent::MoveDirectory(target_directory_id)) => {
-            let directory = state.get_selected_directory()?.clone();
-            if directory.id == target_directory_id {
-                state.inner_state = InnerState::DirectorySelected;
-                return MoveModeTransition::Cancel.into();
-            }
-
-            db.move_directory(directory.id.clone(), target_directory_id.clone())
-                .await?;
-            directory::close(state, state.root.directory.clone())?;
-            directory::open_all(db, state, target_directory_id).await?;
-
-            state.selected = SelectedItem::Directory(directory);
-            state.inner_state = InnerState::DirectorySelected;
-            MoveModeTransition::Commit.into()
+            directory::move_directory(db, state, target_directory_id).await
         }
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),

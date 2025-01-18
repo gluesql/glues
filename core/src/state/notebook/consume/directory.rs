@@ -1,10 +1,12 @@
 use {
+    super::breadcrumb,
     crate::{
         data::Directory,
         db::Db,
         state::notebook::{
             DirectoryItem, DirectoryItemChildren, InnerState, NotebookState, SelectedItem,
         },
+        transition::MoveModeTransition,
         types::DirectoryId,
         Error, NotebookTransition, Result,
     },
@@ -120,6 +122,8 @@ pub async fn rename(
     ))?;
     state.inner_state = InnerState::DirectorySelected;
 
+    breadcrumb::update_breadcrumbs(db, state).await?;
+
     Ok(NotebookTransition::RenameDirectory(directory))
 }
 
@@ -189,4 +193,29 @@ pub async fn add(
     state.inner_state = InnerState::DirectorySelected;
 
     Ok(NotebookTransition::AddDirectory(directory))
+}
+
+pub async fn move_directory(
+    db: &mut Db,
+    state: &mut NotebookState,
+    target_directory_id: DirectoryId,
+) -> Result<NotebookTransition> {
+    let directory = state.get_selected_directory()?.clone();
+    if directory.id == target_directory_id {
+        state.inner_state = InnerState::DirectorySelected;
+
+        return Ok(NotebookTransition::MoveMode(MoveModeTransition::Cancel));
+    }
+
+    db.move_directory(directory.id.clone(), target_directory_id.clone())
+        .await?;
+    close(state, state.root.directory.clone())?;
+    open_all(db, state, target_directory_id).await?;
+
+    state.selected = SelectedItem::Directory(directory);
+    state.inner_state = InnerState::DirectorySelected;
+
+    breadcrumb::update_breadcrumbs(db, state).await?;
+
+    Ok(NotebookTransition::MoveMode(MoveModeTransition::Commit))
 }

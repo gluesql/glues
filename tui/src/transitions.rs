@@ -69,6 +69,7 @@ impl App {
             root,
             inner_state,
             tab_index,
+            tabs,
             ..
         } = self.glues.state.get_inner().log_unwrap();
         let new_state = match inner_state {
@@ -108,8 +109,10 @@ impl App {
                 self.context.notebook.update_items(root);
                 self.context.notebook.select_item(&id);
             }
-            NotebookTransition::OpenNote { note, content } => {
-                self.context.notebook.open_note(note, content);
+            NotebookTransition::OpenNote { note, content, .. } => {
+                self.context.notebook.open_note(note.id, content);
+                self.context.notebook.tabs = tabs.clone();
+                self.context.notebook.apply_yank();
             }
             NotebookTransition::ViewMode(_note) => {
                 self.context.notebook.mark_dirty();
@@ -141,16 +144,11 @@ impl App {
             }
             NotebookTransition::RenameDirectory(_) => {
                 self.context.notebook.update_items(root);
-                self.context.notebook.refresh_breadcrumbs();
+                self.context.notebook.tabs = tabs.clone();
             }
-            NotebookTransition::RenameNote(note) => {
+            NotebookTransition::RenameNote(_) => {
                 self.context.notebook.update_items(root);
-                self.context.notebook.tabs.iter_mut().for_each(|tab| {
-                    if tab.note.id == note.id {
-                        tab.note.name = note.name.clone();
-                    }
-                });
-                self.context.notebook.refresh_breadcrumbs();
+                self.context.notebook.tabs = tabs.clone();
             }
             NotebookTransition::AddNote(Note {
                 id,
@@ -276,7 +274,7 @@ impl App {
 
                 self.context.notebook.update_items(&state.root);
                 self.context.notebook.select_item(id);
-                self.context.notebook.refresh_breadcrumbs();
+                self.context.notebook.tabs = state.tabs.clone();
             }
             Cancel => {
                 let state: &NotebookState = self.glues.state.get_inner().log_unwrap();
@@ -290,6 +288,7 @@ impl App {
 
     async fn handle_normal_mode_transition(&mut self, transition: NormalModeTransition) {
         use NormalModeTransition::*;
+        let NotebookState { root, tabs, .. } = self.glues.state.get_inner().log_unwrap();
 
         match transition {
             IdleMode => {
@@ -298,23 +297,17 @@ impl App {
             ToggleMode | ToggleTabCloseMode | NumberingMode | GatewayMode | YankMode
             | DeleteMode | DeleteInsideMode | ChangeMode | ChangeInsideMode | ScrollMode => {}
             NextTab(note_id) | PrevTab(note_id) => {
-                let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
-
                 self.context.notebook.update_items(root);
                 self.context.notebook.select_item(&note_id);
                 self.context.notebook.apply_yank();
             }
-            MoveTabNext(i) => {
-                let tab = self.context.notebook.tabs.remove(i);
-                self.context.notebook.tabs.insert(i + 1, tab);
-            }
-            MoveTabPrev(i) => {
-                let tab = self.context.notebook.tabs.remove(i);
-                self.context.notebook.tabs.insert(i - 1, tab);
+            MoveTabNext(_) | MoveTabPrev(_) | CloseRightTabs(_) | CloseLeftTabs(_) => {
+                self.context.notebook.tabs = tabs.clone();
             }
             CloseTab(note_id) => {
+                self.context.notebook.tabs = tabs.clone();
                 self.save().await;
-                self.context.notebook.close_tab(&note_id);
+                self.context.notebook.editors.remove(&note_id);
 
                 let state: &NotebookState = self.glues.state.get_inner().log_unwrap();
                 self.context.notebook.update_items(&state.root);
@@ -323,12 +316,6 @@ impl App {
                 self.context.notebook.update_items(&state.root);
                 self.context.notebook.select_item(note_id);
                 self.context.notebook.apply_yank();
-            }
-            CloseRightTabs(index) => {
-                self.context.notebook.tabs.splice(index.., []);
-            }
-            CloseLeftTabs(index) => {
-                self.context.notebook.tabs.splice(..index, []);
             }
             ToggleLineNumbers => {
                 self.context.notebook.show_line_number = !self.context.notebook.show_line_number;
@@ -777,14 +764,14 @@ impl App {
     pub(crate) async fn save(&mut self) {
         let mut transitions = vec![];
 
-        for tab in self.context.notebook.tabs.iter() {
-            if !tab.dirty {
+        for (note_id, item) in self.context.notebook.editors.iter() {
+            if !item.dirty {
                 continue;
             }
 
             let event = NotebookEvent::UpdateNoteContent {
-                note_id: tab.note.id.clone(),
-                content: tab.editor.lines().join("\n"),
+                note_id: note_id.clone(),
+                content: item.editor.lines().join("\n"),
             }
             .into();
 

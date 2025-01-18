@@ -1,9 +1,15 @@
-use crate::{
-    data::{Directory, Note},
-    db::Db,
-    state::notebook::{DirectoryItem, InnerState, NotebookState, SelectedItem, VimNormalState},
-    types::NoteId,
-    Error, NotebookTransition, Result,
+use {
+    super::{breadcrumb, directory},
+    crate::{
+        data::{Directory, Note},
+        db::Db,
+        state::notebook::{
+            DirectoryItem, InnerState, NotebookState, SelectedItem, Tab, VimNormalState,
+        },
+        transition::MoveModeTransition,
+        types::{DirectoryId, NoteId},
+        Error, NotebookTransition, Result,
+    },
 };
 
 pub fn show_actions_dialog(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
@@ -32,8 +38,14 @@ pub async fn rename(
         "[note::rename] failed to find parent directory".to_owned(),
     ))?;
 
+    for tab in state.tabs.iter_mut().filter(|tab| tab.note.id == note.id) {
+        tab.note.name = note.name.clone();
+    }
+
     state.selected = SelectedItem::Note(note.clone());
     state.inner_state = InnerState::NoteSelected;
+
+    breadcrumb::update_breadcrumbs(db, state).await?;
 
     Ok(NotebookTransition::RenameNote(note))
 }
@@ -93,8 +105,8 @@ pub async fn open(
 ) -> Result<NotebookTransition> {
     let content = db.fetch_note_content(note.id.clone()).await?;
 
-    let i = state.tabs.iter().enumerate().find_map(|(i, tab_note)| {
-        if tab_note.id == note.id {
+    let i = state.tabs.iter().enumerate().find_map(|(i, tab)| {
+        if tab.note.id == note.id {
             Some(i)
         } else {
             None
@@ -104,11 +116,17 @@ pub async fn open(
     if let Some(i) = i {
         state.tab_index = Some(i);
     } else {
-        state.tabs.push(note.clone());
+        let tab = Tab {
+            note: note.clone(),
+            breadcrumb: vec![],
+        };
+        state.tabs.push(tab.clone());
         state.tab_index = Some(state.tabs.len() - 1);
-    }
+    };
 
     state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+    breadcrumb::update_breadcrumbs(db, state).await?;
 
     Ok(NotebookTransition::OpenNote { note, content })
 }
@@ -134,4 +152,30 @@ pub async fn update_content(
     }
 
     Ok(NotebookTransition::UpdateNoteContent(note_id))
+}
+
+pub async fn move_note(
+    db: &mut Db,
+    state: &mut NotebookState,
+    directory_id: DirectoryId,
+) -> Result<NotebookTransition> {
+    let mut note = state.get_selected_note()?.clone();
+    note.directory_id = directory_id.clone();
+
+    state.tabs.iter_mut().for_each(|tab| {
+        if tab.note.id == note.id {
+            tab.note.directory_id = directory_id.clone();
+        }
+    });
+
+    db.move_note(note.id.clone(), directory_id.clone()).await?;
+    directory::close(state, state.root.directory.clone())?;
+    directory::open_all(db, state, directory_id).await?;
+
+    state.selected = SelectedItem::Note(note);
+    state.inner_state = InnerState::NoteSelected;
+
+    breadcrumb::update_breadcrumbs(db, state).await?;
+
+    Ok(NotebookTransition::MoveMode(MoveModeTransition::Commit))
 }

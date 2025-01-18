@@ -83,45 +83,33 @@ impl DirectoryItem {
         Some(&directory_item.directory)
     }
 
-    fn tree_items(&self) -> Vec<TreeItem> {
-        let mut items = vec![TreeItem::Directory(&self.directory)];
+    pub(crate) fn tree_items(&self, depth: usize) -> Vec<TreeItem> {
+        let mut items = vec![TreeItem {
+            id: &self.directory.id,
+            name: &self.directory.name,
+            depth,
+        }];
 
         if let Some(children) = &self.children {
             for item in &children.directories {
-                items.extend(item.tree_items());
+                items.extend(item.tree_items(depth + 1));
             }
 
             for note in &children.notes {
-                items.push(TreeItem::Note(note));
+                items.push(TreeItem {
+                    id: &note.id,
+                    name: &note.name,
+                    depth: depth + 1,
+                });
             }
         }
 
         items
     }
-
-    pub fn find_prev(&self, id: &Id) -> Option<TreeItem> {
-        let tree_items = self.tree_items();
-        let i = tree_items.iter().position(|item| match item {
-            TreeItem::Directory(directory) => &directory.id == id,
-            TreeItem::Note(note) => &note.id == id,
-        })?;
-
-        tree_items.get(if i > 0 { i - 1 } else { 0 }).cloned()
-    }
-
-    pub fn find_next(&self, id: &Id) -> Option<TreeItem> {
-        let tree_items = self.tree_items();
-        let i = tree_items.iter().position(|item| match item {
-            TreeItem::Directory(directory) => &directory.id == id,
-            TreeItem::Note(note) => &note.id == id,
-        })?;
-
-        tree_items.get(i + 1).cloned()
-    }
 }
 
-#[derive(Clone)]
-pub enum TreeItem<'a> {
-    Note(&'a Note),
-    Directory(&'a Directory),
+pub struct TreeItem<'a> {
+    pub id: &'a Id,
+    pub name: &'a str,
+    pub depth: usize,
 }
