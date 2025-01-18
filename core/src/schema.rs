@@ -17,10 +17,7 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .execute(storage)
         .await?;
 
-    table("Log")
-        .delete()
-        .execute(storage)
-        .await?;
+    table("Log").delete().execute(storage).await?;
 
     table("Meta")
         .create_table_if_not_exists()

@@ -117,7 +117,10 @@ pub async fn rename(
         .await?;
     db.log(
         "directory::rename".to_owned(),
-        format!("  id: {}\nfrom: {}\n  to: {}", directory.id, directory.name, new_name),
+        format!(
+            "  id: {}\nfrom: {}\n  to: {}",
+            directory.id, directory.name, new_name
+        ),
     )
     .await?;
 
