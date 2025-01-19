@@ -91,10 +91,11 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         context.notebook.editors.iter().any(|(_, item)| item.dirty),
     ) {
         (_, true) => block.title_bottom(
-            Line::from(" 󰔚 Saving... ")
-                .fg(BLACK)
-                .bg(YELLOW)
-                .right_aligned(),
+            Line::from(vec![
+                Span::raw("").fg(YELLOW).bg(GRAY_BLACK),
+                Span::raw(" 󰔚 Saving... ").fg(BLACK).bg(YELLOW),
+            ])
+            .right_aligned(),
         ),
         (Some((log, _)), false) => {
             block.title_bottom(Line::from(format!(" {} ", log).fg(BLACK).bg(GREEN)).right_aligned())
