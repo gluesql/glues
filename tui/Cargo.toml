@@ -20,3 +20,4 @@ tui-big-text = "0.7.0"
 tui-textarea = "0.7.0"
 home = "0.5.9"
 tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread"] }
+arboard = "3.4.1"
