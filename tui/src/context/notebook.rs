@@ -5,6 +5,7 @@ use {
         action::{Action, TuiAction},
         logger::*,
     },
+    arboard::Clipboard,
     glues_core::{
         data::Note,
         state::notebook::{DirectoryItem, Tab},
@@ -292,7 +293,13 @@ impl NotebookContext {
     }
 
     pub fn update_yank(&mut self) {
-        self.yank = Some(self.get_editor().yank_text());
+        let text = self.get_editor().yank_text();
+
+        if let Ok(mut clipboard) = Clipboard::new() {
+            let _ = clipboard.set_text(&text);
+        }
+
+        self.yank = Some(text);
     }
 
     pub fn consume(&mut self, input: &Input) -> Action {
