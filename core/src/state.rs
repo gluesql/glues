@@ -6,8 +6,8 @@ use crate::{Error, Event, Glues, Result, Transition};
 pub use {entry::EntryState, notebook::NotebookState};
 
 pub enum State {
-    EntryState(EntryState),
-    NotebookState(NotebookState),
+    EntryState(Box<EntryState>),
+    NotebookState(Box<NotebookState>),
 }
 
 impl State {
@@ -61,7 +61,7 @@ macro_rules! impl_state_ext {
 
         impl From<$State> for State {
             fn from(state: $State) -> Self {
-                Self::$State(state)
+                Self::$State(Box::new(state))
             }
         }
     };
