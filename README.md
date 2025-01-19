@@ -60,7 +60,6 @@ Here is our plan for Glues and the features we aim to implement. Below is a list
 * **Search and Tagging Improvements:** Improve search with tag support and advanced filtering to make it easier to find specific notes.
 * **Customizable Themes:** Allow users to personalize the TUI interface with customizable themes.
 * **Additional Package Manager Support:** Expand distribution beyond Cargo, making Glues available through more package managers like Homebrew, Snap, and APT for easier installation.
-* **Note and Directory Movement:** Add features to move notes and directories for better organization.
 * **Storage Migration:** Add a feature to migrate data between different storage options, such as from CSV to Git.
 * **More Vim Keybindings:** Integrate Vim keybindings for users who prefer Vim-like shortcuts.
 * **Additional Storage Backends:** Support more storage options like Redis and object storage for greater flexibility.
