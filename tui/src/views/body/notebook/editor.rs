@@ -81,8 +81,10 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         _ => (Span::raw("        ").bg(GRAY_DARK), GRAY_DARK),
     };
 
-    bottom_left.insert(0, mode);
-    bottom_left.insert(1, Span::raw("").fg(bg).bg(GRAY_A));
+    if context.notebook.tab_index.is_some() {
+        bottom_left.insert(0, mode);
+        bottom_left.insert(1, Span::raw("").fg(bg).bg(GRAY_A));
+    }
 
     let bottom_left = Line::from(bottom_left);
     let block = Block::new().title(title).title_bottom(bottom_left);
