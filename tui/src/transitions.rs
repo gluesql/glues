@@ -411,10 +411,10 @@ impl App {
                     .move_cursor(CursorMove::Head);
             }
             InsertAfterCursor => {
-                self.context
-                    .notebook
-                    .get_editor_mut()
-                    .move_cursor(CursorMove::Forward);
+                let editor = self.context.notebook.get_editor_mut();
+                let cursor_move = cursor_move_forward(editor, 1);
+
+                editor.move_cursor(cursor_move);
             }
             InsertAtLineEnd => {
                 self.context
