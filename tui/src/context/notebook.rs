@@ -425,7 +425,7 @@ impl NotebookContext {
                     _ => Action::None,
                 }
             }
-            _ => Action::None,
+            _ => Action::PassThrough,
         }
     }
 
@@ -473,7 +473,7 @@ impl NotebookContext {
                 }
             }
             KeyCode::Esc => Action::Dispatch(NotebookEvent::CloseDirectoryActionsDialog.into()),
-            _ => Action::None,
+            _ => Action::PassThrough,
         }
     }
 }

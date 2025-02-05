@@ -57,6 +57,8 @@ pub struct Context {
     pub help: bool,
     pub editor_keymap: bool,
     pub vim_keymap: Option<VimKeymapKind>,
+
+    pub keymap: Option<Vec<String>>,
 }
 
 impl Default for Context {
@@ -74,6 +76,8 @@ impl Default for Context {
             help: false,
             editor_keymap: false,
             vim_keymap: None,
+
+            keymap: None,
         }
     }
 }
