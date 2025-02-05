@@ -10,7 +10,6 @@ impl App {
             KeymapTransition::Hide => {
                 self.context.keymap = None;
             }
-            KeymapTransition::None => {}
         }
     }
 }

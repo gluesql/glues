@@ -27,7 +27,6 @@ pub enum Transition {
 pub enum KeymapTransition {
     Show,
     Hide,
-    None,
 }
 
 #[derive(Display)]
