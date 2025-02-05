@@ -110,6 +110,7 @@ pub enum KeyEvent {
     CtrlR,
     DollarSign,
     Caret,
+    QuestionMark,
     Num(NumKey),
     Left,
     Right,

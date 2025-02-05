@@ -1,34 +1,53 @@
 mod entry;
 pub mod notebook;
 
-use crate::{Error, Event, Glues, Result, Transition};
+use crate::{transition::KeymapTransition, Error, Event, Glues, KeyEvent, Result, Transition};
 
 pub use {entry::EntryState, notebook::NotebookState};
 
-pub enum State {
+pub struct State {
+    pub keymap: bool,
+    inner: InnerState,
+}
+
+pub enum InnerState {
     EntryState(Box<EntryState>),
     NotebookState(Box<NotebookState>),
 }
 
 impl State {
     pub async fn consume(glues: &mut Glues, event: Event) -> Result<Transition> {
-        match &glues.state {
-            State::EntryState(_) => EntryState::consume(glues, event).await.map(Into::into),
-            State::NotebookState(_) => notebook::consume(glues, event).await.map(Into::into),
+        match event {
+            Event::Key(KeyEvent::QuestionMark) if glues.state.keymap => {
+                glues.state.keymap = false;
+
+                return Ok(KeymapTransition::Hide.into());
+            }
+            Event::Key(KeyEvent::QuestionMark) => {
+                glues.state.keymap = true;
+
+                return Ok(KeymapTransition::Show.into());
+            }
+            _ => {}
+        };
+
+        match &glues.state.inner {
+            InnerState::EntryState(_) => EntryState::consume(glues, event).await.map(Into::into),
+            InnerState::NotebookState(_) => notebook::consume(glues, event).await.map(Into::into),
         }
     }
 
     pub fn describe(&self) -> Result<String> {
-        match self {
-            Self::EntryState(state) => state.describe(),
-            Self::NotebookState(state) => state.describe(),
+        match &self.inner {
+            InnerState::EntryState(state) => state.describe(),
+            InnerState::NotebookState(state) => state.describe(),
         }
     }
 
     pub fn shortcuts(&self) -> Vec<String> {
-        match self {
-            Self::EntryState(state) => state.shortcuts(),
-            Self::NotebookState(state) => state.shortcuts(),
+        match &self.inner {
+            InnerState::EntryState(state) => state.shortcuts(),
+            InnerState::NotebookState(state) => state.shortcuts(),
         }
     }
 }
@@ -43,15 +62,15 @@ macro_rules! impl_state_ext {
     ($State: ident) => {
         impl GetInner<$State> for State {
             fn get_inner(&self) -> Result<&$State> {
-                match self {
-                    Self::$State(state) => Ok(&state),
+                match &self.inner {
+                    InnerState::$State(state) => Ok(&state),
                     _ => Err(Error::Wip("State::get_inner for $State failed".to_owned())),
                 }
             }
 
             fn get_inner_mut(&mut self) -> Result<&mut $State> {
-                match self {
-                    Self::$State(state) => Ok(state),
+                match &mut self.inner {
+                    InnerState::$State(state) => Ok(state),
                     _ => Err(Error::Wip(
                         "State::get_inner_mut for $State failed".to_owned(),
                     )),
@@ -61,7 +80,10 @@ macro_rules! impl_state_ext {
 
         impl From<$State> for State {
             fn from(state: $State) -> Self {
-                Self::$State(Box::new(state))
+                Self {
+                    keymap: false,
+                    inner: InnerState::$State(Box::new(state)),
+                }
             }
         }
     };

@@ -119,7 +119,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw("[c] Delete the specified number of lines"),
             Line::from(vec![
                 "[e] ".into(),
-                "or ".fg(GRAY_DARK),
+                "or ".fg(GRAY_DIM),
                 "[w] Delete to the end of the word by the specified number of times".into(),
             ]),
             Line::raw("[b] Delete to the start of the previous word, repeated by the specified number"),
@@ -137,7 +137,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::raw("[c] Delete the specified number of lines"),
             Line::from(vec![
                 "[e] ".into(),
-                "or ".fg(GRAY_DARK),
+                "or ".fg(GRAY_DIM),
                 "[w] Delete to the end of the word by the specified number of times".into(),
             ]),
             Line::raw("[b] Delete to the start of the previous word, repeated by the specified number"),
@@ -160,7 +160,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::from("TO INSERT MODE".fg(BLACK).bg(YELLOW)),
             Line::from(vec![
                 "[s] ".into(),
-                "or ".fg(GRAY_DARK),
+                "or ".fg(GRAY_DIM),
                 "[S] Substitute selected text and go to insert mode".into(),
             ]),
             Line::raw(""),
@@ -171,7 +171,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
             Line::from("EDIT TEXT AND RETURN TO NORMAL MODE".fg(BLACK).bg(YELLOW)),
             Line::from(vec![
                 "[d] ".into(),
-                "or ".fg(GRAY_DARK),
+                "or ".fg(GRAY_DIM),
                 "[x] Delete selected text".into(),
             ]),
             Line::raw("[y] Yank (copy) selected text"),
@@ -216,7 +216,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         .wrap(Wrap { trim: true })
         .style(Style::default())
         .alignment(Alignment::Left);
-    let control = Line::from("Press any key to close".fg(GRAY_DARK)).centered();
+    let control = Line::from("Press any key to close".fg(GRAY_MEDIUM)).centered();
 
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);

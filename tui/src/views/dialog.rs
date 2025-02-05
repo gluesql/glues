@@ -3,6 +3,7 @@ mod confirm;
 mod directory_actions;
 mod editor_keymap;
 mod help;
+mod keymap;
 mod note_actions;
 mod prompt;
 mod vim_keymap;
@@ -16,6 +17,10 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, context: &mut Context) {
+    if let Some(keymap) = context.keymap.as_ref() {
+        keymap::draw(frame, keymap.as_slice());
+    }
+
     if let Some(kind) = context.vim_keymap {
         vim_keymap::draw(frame, kind);
         return;

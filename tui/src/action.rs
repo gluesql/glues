@@ -432,6 +432,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('$') => KeyEvent::DollarSign,
         KeyCode::Char('^') => KeyEvent::Caret,
         KeyCode::Char('~') => KeyEvent::Tilde,
+        KeyCode::Char('?') => KeyEvent::QuestionMark,
         KeyCode::Char('.') => KeyEvent::Dot,
         KeyCode::Char('-') => KeyEvent::Dash,
         KeyCode::Char(' ') => KeyEvent::Space,

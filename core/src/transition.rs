@@ -10,6 +10,9 @@ use {
 
 #[derive(Display)]
 pub enum Transition {
+    #[strum(to_string = "Keymap::{0}")]
+    Keymap(KeymapTransition),
+
     #[strum(to_string = "Entry::{0}")]
     Entry(EntryTransition),
 
@@ -18,6 +21,12 @@ pub enum Transition {
 
     Log(String),
     Error(String),
+}
+
+#[derive(Display)]
+pub enum KeymapTransition {
+    Show,
+    Hide,
 }
 
 #[derive(Display)]
@@ -193,6 +202,12 @@ pub enum VisualModeTransition {
     SwitchCase,
     ToUppercase,
     ToLowercase,
+}
+
+impl From<KeymapTransition> for Transition {
+    fn from(t: KeymapTransition) -> Self {
+        Self::Keymap(t)
+    }
 }
 
 impl From<EntryTransition> for Transition {

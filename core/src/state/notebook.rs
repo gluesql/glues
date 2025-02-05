@@ -262,52 +262,54 @@ impl NotebookState {
         match &self.inner_state {
             NoteSelected => {
                 let mut shortcuts = vec![
-                    "[l] Open".to_owned(),
-                    "[h] Close parent".to_owned(),
-                    "[j|k] Down | Up".to_owned(),
-                    "[1-9] Steps".to_owned(),
-                    "[Space] Move".to_owned(),
-                    "[m] More actions".to_owned(),
+                    "[l]     Open note".to_owned(),
+                    "[h]     Close parent directory".to_owned(),
+                    "[j]     Select next".to_owned(),
+                    "[k]     Select previous".to_owned(),
+                    "[1-9]   Add steps".to_owned(),
+                    "[Space] Move note".to_owned(),
+                    "[m]     Show more actions".to_owned(),
                 ];
 
                 if !self.tabs.is_empty() {
-                    shortcuts.push("[Tab] Focus Editor".to_owned());
+                    shortcuts.push("[Tab]   Focus editor".to_owned());
                 }
 
-                shortcuts.push("[Esc] Quit".to_owned());
+                shortcuts.push("[Esc]   Quit".to_owned());
                 shortcuts
             }
             DirectorySelected => {
                 let mut shortcuts = vec![
-                    "[l] Toggle".to_owned(),
-                    "[h] Close parent".to_owned(),
-                    "[j|k] Down | Up".to_owned(),
-                    "[1-9] Steps".to_owned(),
-                    "[Space] Move".to_owned(),
-                    "[m] More actions".to_owned(),
+                    "[l]     Toggle directory".to_owned(),
+                    "[h]     Close parent directory".to_owned(),
+                    "[j]     Select next".to_owned(),
+                    "[k]     Select previous".to_owned(),
+                    "[1-9]   Add steps".to_owned(),
+                    "[Space] Move directory".to_owned(),
+                    "[m]     Show more actions".to_owned(),
                 ];
 
                 if !self.tabs.is_empty() {
-                    shortcuts.push("[Tab] Focus Editor".to_owned());
+                    shortcuts.push("[Tab]   Focus editor".to_owned());
                 }
 
-                shortcuts.push("[Esc] Quit".to_owned());
+                shortcuts.push("[Esc]   Quit".to_owned());
                 shortcuts
             }
             NoteTreeNumber(n) => {
                 vec![
-                    format!("[j] Move {n} down"),
-                    format!("[k] Move {n} up"),
+                    format!("[j]   Select {n} next"),
+                    format!("[k]   Select {n} previous"),
                     "[0-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
             MoveMode => {
                 vec![
-                    "[j] Down".to_owned(),
-                    "[k] Up".to_owned(),
-                    "[Enter] Move".to_owned(),
-                    "[Esc] Cancel".to_owned(),
+                    "[j]     Select next".to_owned(),
+                    "[k]     Select previous".to_owned(),
+                    "[Enter] Move to selected directory".to_owned(),
+                    "[Esc]   Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Idle) => {
@@ -316,50 +318,56 @@ impl NotebookState {
                     a, A, I, G, g, s, S, x, ^, y, d, u, Ctrl+r
                 */
                 vec![
-                    "[Tab] Browse notes".to_owned(),
-                    "[t] Toggle | Tabs".to_owned(),
-                    "[i] Insert".to_owned(),
-                    "[v] Visual".to_owned(),
+                    "[Tab]    Browse notes".to_owned(),
+                    "[t]      Enter toggle-tabs mode".to_owned(),
+                    "[i]      Enter insert mode".to_owned(),
+                    "[v]      Enter visual mode".to_owned(),
+                    "[z]      Enter scroll mode".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
-                    "[Esc] Quit".to_owned(),
+                    "[Esc]    Quit".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Toggle) => {
                 vec![
-                    "[h|l] Prev | Next Tab".to_owned(),
-                    "[H|L] Move Tab Prev | Next".to_owned(),
-                    "[x] Close".to_owned(),
-                    "[X] Tab close mode".to_owned(),
-                    "[b] Toggle browser".to_owned(),
-                    "[n] Toggle line no.".to_owned(),
+                    "[h]   select left tab".to_owned(),
+                    "[l]   select right tab".to_owned(),
+                    "[H]   Move current tab to left".to_owned(),
+                    "[L]   Move current tab to right".to_owned(),
+                    "[x]   Close current tab".to_owned(),
+                    "[X]   Enter tab close mode".to_owned(),
+                    "[b]   Toggle browser".to_owned(),
+                    "[n]   Toggle editor line number".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::ToggleTabClose) => {
                 vec![
-                    "[h] Close left tabs".to_owned(),
-                    "[l] Close right tabs".to_owned(),
+                    "[h]   Close left tabs".to_owned(),
+                    "[l]   Close right tabs".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Numbering(n)) => {
                 // h j k l [0-9] s S x y d w e b G
                 vec![
-                    format!("[h|j|k|l] Move cursor {n} steps"),
-                    "[0-9] Append steps".to_owned(),
+                    format!("[j]      Move cursor {n} steps down"),
+                    format!("[k]      Move cursor {n} steps up"),
+                    format!("[h]      Move cursor {n} steps left"),
+                    format!("[l]      Move cursor {n} steps right"),
+                    "[0-9]    Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
-                    "[Esc] Cancel".to_owned(),
+                    "[Esc]    Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Gateway) => {
                 vec![
-                    "[g] Move cursor to top".to_owned(),
+                    "[g]   Move cursor to top".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Yank(n)) => {
                 vec![
-                    format!("[y] Yank {n} lines"),
+                    format!("[y]   Yank {n} lines"),
                     "[1-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
@@ -367,9 +375,9 @@ impl NotebookState {
             EditingNormalMode(VimNormalState::Yank2(n1, n2)) => {
                 vec![
                     if *n1 == 1 {
-                        format!("[y] Yank {n2} lines")
+                        format!("[y]   Yank {n2} lines")
                     } else {
-                        format!("[y] Yank {n1}*{n2} lines")
+                        format!("[y]   Yank {n1}*{n2} lines")
                     },
                     "[0-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
@@ -377,111 +385,117 @@ impl NotebookState {
             }
             EditingNormalMode(VimNormalState::Delete(n)) => {
                 vec![
-                    format!("[i] Inside mode"),
-                    format!("[d] Delete {n} lines"),
-                    "[1-9] Append steps".to_owned(),
+                    format!("[i]      Enter delete inside mode"),
+                    format!("[d]      Delete {n} lines"),
+                    "[1-9]    Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
-                    "[Esc] Cancel".to_owned(),
+                    "[Esc]    Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Delete2(n1, n2)) => {
                 vec![
                     if *n1 == 1 {
-                        format!("[d] Delete {n2} lines")
+                        format!("[d]      Delete {n2} lines")
                     } else {
-                        format!("[d] Delete {n1}*{n2} lines")
+                        format!("[d]      Delete {n1}*{n2} lines")
                     },
-                    "[i] Inside mode".to_owned(),
-                    "[0-9] Append steps".to_owned(),
+                    "[i]      Enter delete inside mode".to_owned(),
+                    "[0-9]    Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
-                    "[Esc] Cancel".to_owned(),
+                    "[Esc]    Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::DeleteInside(n)) => {
                 vec![
                     if *n == 1 {
-                        "[w] Delete the current word".to_owned()
+                        "[w]   Delete the current word".to_owned()
                     } else {
-                        format!("[w] Delete {n} words from cursor")
+                        format!("[w]   Delete {n} words from cursor")
                     },
                     "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Change(n)) => {
                 vec![
-                    "[i] Inside mode".to_owned(),
-                    format!("[c] Delete {n} lines and insert mode"),
+                    "[i]      Enter change inside mode".to_owned(),
+                    format!("[c]      Delete {n} lines and enter insert mode"),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
-                    "[Esc] Cancel".to_owned(),
+                    "[Esc]    Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Change2(n1, n2)) => {
                 vec![
                     if *n1 == 1 {
-                        format!("[c] Delete {n2} lines and insert mode")
+                        format!("[c]      Delete {n2} lines and enter insert mode")
                     } else {
-                        format!("[c] Delete {n1}*{n2} lines and insert mode")
+                        format!("[c]      Delete {n1}*{n2} lines and enter insert mode")
                     },
-                    "[i] Inside mode".to_owned(),
-                    "[0-9] Append steps".to_owned(),
+                    "[i]      Enter change inside mode".to_owned(),
+                    "[0-9]    Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
-                    "[Esc] Cancel".to_owned(),
+                    "[Esc]    Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::ChangeInside(n)) => {
                 vec![
                     if *n == 1 {
-                        "[w] Delete the current word and insert mode".to_owned()
+                        "[w]   Delete the current word and enter insert mode".to_owned()
                     } else {
-                        format!("[w] Delete {n} words from cursor and insert mode")
+                        format!("[w]   Delete {n} words from cursor and enter insert mode")
                     },
                     "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingNormalMode(VimNormalState::Scroll) => {
                 vec![
-                    "[z|.] Scroll to center".to_owned(),
+                    "[z|.]     Scroll to center".to_owned(),
                     "[t|Enter] Scroll to top".to_owned(),
-                    "[b|-] Scroll to bottom".to_owned(),
-                    "[Esc] Cancel".to_owned(),
+                    "[b|-]     Scroll to bottom".to_owned(),
+                    "[Esc]     Cancel".to_owned(),
                 ]
             }
             EditingVisualMode(VimVisualState::Idle) => {
                 // more in the keymap
                 vec![
-                    "[h|j|k|l] Move cursor".to_owned(),
-                    "[1-9] Append steps".to_owned(),
+                    "[j]      Move cursor down".to_owned(),
+                    "[k]      Move cursor up".to_owned(),
+                    "[h]      Move cursor left".to_owned(),
+                    "[l]      Move cursor right".to_owned(),
+                    "[1-9]    Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
-                    "[Esc] Cancel".to_owned(),
+                    "[Esc]    Cancel".to_owned(),
                 ]
             }
             EditingVisualMode(VimVisualState::Numbering(n)) => {
                 // more in the keymap
                 vec![
-                    format!("[h|j|k|l] move cursor {n} steps"),
-                    "[0-9] append steps".to_owned(),
+                    format!("[j]      Move cursor {n} steps down"),
+                    format!("[k]      Move cursor {n} steps up"),
+                    format!("[h]      Move cursor {n} steps left"),
+                    format!("[l]      Move cursor {n} steps right"),
+                    "[0-9]    Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
-                    "[Esc] Cancel".to_owned(),
+                    "[Esc]    Cancel".to_owned(),
                 ]
             }
             EditingVisualMode(VimVisualState::Gateway) => {
                 vec![
-                    "[g] Move cursor to top".to_owned(),
+                    "[g]   Move cursor to top".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
             EditingInsertMode => {
                 vec![
-                    "[Esc] Save note & Normal mode".to_owned(),
+                    "[Esc]    Save note and enter normal mode".to_owned(),
                     "[Ctrl+h] Show editor keymap".to_owned(),
                 ]
             }
             DirectoryMoreActions | NoteMoreActions => {
                 vec![
-                    "[j] Next".to_owned(),
-                    "[k] Previous".to_owned(),
-                    "[Enter] Select".to_owned(),
-                    "[Esc] Close".to_owned(),
+                    "[j]     Select next".to_owned(),
+                    "[k]     Select Previous".to_owned(),
+                    "[Enter] Run selected item".to_owned(),
+                    "[Esc]   Close".to_owned(),
                 ]
             }
         }

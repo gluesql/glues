@@ -74,10 +74,10 @@ impl EntryState {
 
     pub fn shortcuts(&self) -> Vec<String> {
         vec![
-            "[j] Next".to_owned(),
-            "[k] Previous".to_owned(),
-            "[Enter] Select".to_owned(),
-            "[q] Quit".to_owned(),
+            "[j]     Select next".to_owned(),
+            "[k]     Select previous".to_owned(),
+            "[Enter] Run selected item".to_owned(),
+            "[q]     Quit".to_owned(),
         ]
     }
 }

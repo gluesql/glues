@@ -91,7 +91,7 @@ impl EntryContext {
             KeyCode::Char('4') => open_git().await,
             KeyCode::Char('5') => open(LAST_CSV_PATH, TuiAction::OpenCsv).await,
             KeyCode::Char('6') => open(LAST_JSON_PATH, TuiAction::OpenJson).await,
-            KeyCode::Char('h') => TuiAction::Help.into(),
+            KeyCode::Char('a') => TuiAction::Help.into(),
 
             KeyCode::Enter => {
                 let i = self
@@ -110,7 +110,7 @@ impl EntryContext {
                     _ => Action::None,
                 }
             }
-            _ => Action::None,
+            _ => Action::PassThrough,
         }
     }
 }
