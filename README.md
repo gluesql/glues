@@ -13,7 +13,7 @@ Glues is designed with a core architecture that operates independently of the TU
 
 With no reliance on third-party services, Glues ensures that your data remains private and fully under your control. Currently, it supports Git and MongoDB for storage, and we plan to integrate additional storage options through [GlueSQL](https://github.com/gluesql/gluesql), giving you even more flexibility in managing your data. The core concept behind Glues is to empower users to choose how their data is handled—whether through local files, Git, MongoDB, or future storage options—without any dependence on a central authority. This makes Glues a sync-enabled application that prioritizes user autonomy and privacy.
 
-<img width="975" alt="image" src="https://github.com/user-attachments/assets/7024b698-dc4e-49a1-8941-03fb078ce423">
+<img width="1497" alt="image" src="https://github.com/user-attachments/assets/581c0586-67d9-4e13-9200-454b6ae8c50c" />
 
 ## Installation
 
