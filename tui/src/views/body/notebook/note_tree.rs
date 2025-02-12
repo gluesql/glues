@@ -10,7 +10,7 @@ use {
         layout::Rect,
         style::{Style, Stylize},
         text::{Line, Span},
-        widgets::{Block, Borders, HighlightSpacing, List, ListDirection},
+        widgets::{Block, BorderType, Borders, HighlightSpacing, List, ListDirection},
         Frame,
     },
 };
@@ -30,7 +30,11 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     } else {
         title.fg(GRAY_DIM)
     };
-    let block = Block::new().borders(Borders::RIGHT).title(title);
+    let block = Block::new()
+        .borders(Borders::RIGHT)
+        .border_type(BorderType::QuadrantOutside)
+        .fg(GRAY_DARK)
+        .title(title);
     let inner_area = block.inner(area);
 
     let tree_items = context.tree_items.iter().map(
