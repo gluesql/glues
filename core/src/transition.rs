@@ -41,6 +41,25 @@ pub enum EntryTransition {
 
 #[derive(Display)]
 pub enum NotebookTransition {
+    ViewMode(Note),
+    BrowseNoteTree,
+    FocusEditor,
+
+    UpdateNoteContent(NoteId),
+
+    Alert(String),
+
+    #[strum(to_string = "Inedible::{0}")]
+    Inedible(Event),
+    None,
+
+    NoteTree(NoteTreeTransition),
+    EditingNormalMode(NormalModeTransition),
+    EditingVisualMode(VisualModeTransition),
+    ShowVimKeymap(VimKeymapKind),
+}
+
+pub enum NoteTreeTransition {
     OpenDirectory {
         id: DirectoryId,
         notes: Vec<Note>,
@@ -72,24 +91,9 @@ pub enum NotebookTransition {
         note: Note,
         content: String,
     },
-    ViewMode(Note),
-    BrowseNoteTree,
-    FocusEditor,
 
-    UpdateNoteContent(NoteId),
-
-    Alert(String),
-
-    #[strum(to_string = "Inedible::{0}")]
-    Inedible(Event),
-    None,
-
-    // Additional frontend action required
     SelectNext(usize),
     SelectPrev(usize),
-    EditingNormalMode(NormalModeTransition),
-    EditingVisualMode(VisualModeTransition),
-    ShowVimKeymap(VimKeymapKind),
 }
 
 pub enum MoveModeTransition {

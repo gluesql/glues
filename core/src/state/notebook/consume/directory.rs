@@ -7,7 +7,7 @@ use {
             DirectoryItem, DirectoryItemChildren, InnerState, NoteTreeState, NotebookState,
             SelectedItem,
         },
-        transition::MoveModeTransition,
+        transition::{MoveModeTransition, NoteTreeTransition},
         types::DirectoryId,
         Error, NotebookTransition, Result,
     },
@@ -42,11 +42,13 @@ pub async fn open(
         directories: directories.clone(),
     });
 
-    Ok(NotebookTransition::OpenDirectory {
-        id: directory_id,
-        notes,
-        directories,
-    })
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::OpenDirectory {
+            id: directory_id,
+            notes,
+            directories,
+        },
+    ))
 }
 
 #[async_recursion(?Send)]
@@ -82,7 +84,9 @@ pub fn close(state: &mut NotebookState, directory: Directory) -> Result<Notebook
     state.selected = SelectedItem::Directory(directory);
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
-    Ok(NotebookTransition::CloseDirectory(directory_id))
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::CloseDirectory(directory_id),
+    ))
 }
 
 pub fn show_actions_dialog(
@@ -92,7 +96,9 @@ pub fn show_actions_dialog(
     state.selected = SelectedItem::Directory(directory.clone());
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectoryMoreActions);
 
-    Ok(NotebookTransition::ShowDirectoryActionsDialog(directory))
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::ShowDirectoryActionsDialog(directory),
+    ))
 }
 
 pub fn select(state: &mut NotebookState, directory: Directory) -> Result<NotebookTransition> {
@@ -133,7 +139,9 @@ pub async fn rename(
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
-    Ok(NotebookTransition::RenameDirectory(directory))
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::RenameDirectory(directory),
+    ))
 }
 
 pub async fn remove(
@@ -160,10 +168,12 @@ pub async fn remove(
     state.selected = SelectedItem::Directory(selected_directory.clone());
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
-    Ok(NotebookTransition::RemoveDirectory {
-        directory,
-        selected_directory,
-    })
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::RemoveDirectory {
+            directory,
+            selected_directory,
+        },
+    ))
 }
 
 pub async fn add(
@@ -201,7 +211,9 @@ pub async fn add(
     state.selected = SelectedItem::Directory(directory.clone());
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
-    Ok(NotebookTransition::AddDirectory(directory))
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::AddDirectory(directory),
+    ))
 }
 
 pub async fn move_directory(
@@ -213,7 +225,9 @@ pub async fn move_directory(
     if directory.id == target_directory_id {
         state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
-        return Ok(NotebookTransition::MoveMode(MoveModeTransition::Cancel));
+        return Ok(NotebookTransition::NoteTree(NoteTreeTransition::MoveMode(
+            MoveModeTransition::Cancel,
+        )));
     }
 
     db.move_directory(directory.id.clone(), target_directory_id.clone())
@@ -226,5 +240,7 @@ pub async fn move_directory(
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
-    Ok(NotebookTransition::MoveMode(MoveModeTransition::Commit))
+    Ok(NotebookTransition::NoteTree(NoteTreeTransition::MoveMode(
+        MoveModeTransition::Commit,
+    )))
 }

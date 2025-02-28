@@ -14,7 +14,8 @@ use {
             GetInner, NotebookState,
         },
         transition::{
-            MoveModeTransition, NormalModeTransition, NotebookTransition, VisualModeTransition,
+            MoveModeTransition, NormalModeTransition, NoteTreeTransition, NotebookTransition,
+            VisualModeTransition,
         },
         NotebookEvent,
     },
@@ -29,7 +30,6 @@ impl App {
             root,
             inner_state,
             tab_index,
-            tabs,
             ..
         } = self.glues.state.get_inner().log_unwrap();
         let new_state = match inner_state {
@@ -62,20 +62,6 @@ impl App {
             NotebookTransition::ShowVimKeymap(kind) => {
                 self.context.vim_keymap = Some(kind);
             }
-            NotebookTransition::OpenDirectory { id, .. } => {
-                log!("Opening directory {id}");
-                self.context.notebook.update_items(root);
-            }
-            NotebookTransition::CloseDirectory(id) => {
-                log!("Closing directory {id}");
-                self.context.notebook.update_items(root);
-                self.context.notebook.select_item(&id);
-            }
-            NotebookTransition::OpenNote { note, content, .. } => {
-                self.context.notebook.open_note(note.id, content);
-                self.context.notebook.tabs = tabs.clone();
-                self.context.notebook.apply_yank();
-            }
             NotebookTransition::ViewMode(_note) => {
                 self.context.notebook.mark_dirty();
             }
@@ -95,29 +81,64 @@ impl App {
                 self.context.notebook.update_items(root);
                 self.context.notebook.select_item(&note_id);
             }
-            NotebookTransition::RemoveNote {
+            NotebookTransition::NoteTree(transition) => {
+                self.handle_note_tree_transition(transition).await;
+            }
+            NotebookTransition::EditingNormalMode(transition) => {
+                self.handle_normal_mode_transition(transition).await;
+            }
+            NotebookTransition::EditingVisualMode(transition) => {
+                self.handle_visual_mode_transition(transition).await;
+            }
+            NotebookTransition::Alert(message) => {
+                log!("[Alert] {message}");
+                self.context.alert = Some(message);
+            }
+            NotebookTransition::Inedible(_) | NotebookTransition::None => {}
+        }
+    }
+
+    async fn handle_note_tree_transition(&mut self, transition: NoteTreeTransition) {
+        let NotebookState { root, tabs, .. } = self.glues.state.get_inner().log_unwrap();
+
+        match transition {
+            NoteTreeTransition::OpenDirectory { id, .. } => {
+                log!("Opening directory {id}");
+                self.context.notebook.update_items(root);
+            }
+            NoteTreeTransition::CloseDirectory(id) => {
+                log!("Closing directory {id}");
+                self.context.notebook.update_items(root);
+                self.context.notebook.select_item(&id);
+            }
+            NoteTreeTransition::OpenNote { note, content, .. } => {
+                self.context.notebook.open_note(note.id, content);
+                self.context.notebook.tabs = tabs.clone();
+                self.context.notebook.apply_yank();
+            }
+            NoteTreeTransition::RemoveNote {
                 selected_directory, ..
             }
-            | NotebookTransition::RemoveDirectory {
+            | NoteTreeTransition::RemoveDirectory {
                 selected_directory, ..
             } => {
                 self.context.notebook.select_item(&selected_directory.id);
                 self.context.notebook.update_items(root);
             }
-            NotebookTransition::RenameDirectory(_) => {
+            NoteTreeTransition::RenameDirectory(_) => {
                 self.context.notebook.update_items(root);
                 self.context.notebook.tabs = tabs.clone();
             }
-            NotebookTransition::RenameNote(_) => {
+            NoteTreeTransition::RenameNote(_) => {
                 self.context.notebook.update_items(root);
                 self.context.notebook.tabs = tabs.clone();
             }
-            NotebookTransition::AddNote(Note {
+            NoteTreeTransition::AddNote(Note {
                 id,
                 directory_id: parent_id,
                 ..
             })
-            | NotebookTransition::AddDirectory(Directory { id, parent_id, .. }) => {
+            | NoteTreeTransition::AddDirectory(Directory { id, parent_id, .. }) => {
                 self.glues
                     .dispatch(NotebookEvent::OpenDirectory(parent_id.clone()).into())
                     .await
@@ -127,7 +148,10 @@ impl App {
                 self.context.notebook.update_items(root);
                 self.context.notebook.select_item(&id);
             }
-            NotebookTransition::SelectNext(n) => {
+            NoteTreeTransition::MoveMode(transition) => {
+                self.handle_move_mode_transition(transition).await;
+            }
+            NoteTreeTransition::SelectNext(n) => {
                 self.context.notebook.select_next(n);
 
                 let event = match self.context.notebook.selected() {
@@ -143,7 +167,7 @@ impl App {
 
                 self.glues.dispatch(event).await.log_unwrap();
             }
-            NotebookTransition::SelectPrev(n) => {
+            NoteTreeTransition::SelectPrev(n) => {
                 self.context.notebook.select_prev(n);
 
                 let event = match self.context.notebook.selected() {
@@ -159,23 +183,8 @@ impl App {
 
                 self.glues.dispatch(event).await.log_unwrap();
             }
-            NotebookTransition::EditingNormalMode(transition) => {
-                self.handle_normal_mode_transition(transition).await;
-            }
-            NotebookTransition::EditingVisualMode(transition) => {
-                self.handle_visual_mode_transition(transition).await;
-            }
-            NotebookTransition::MoveMode(transition) => {
-                self.handle_move_mode_transition(transition).await;
-            }
-            NotebookTransition::Alert(message) => {
-                log!("[Alert] {message}");
-                self.context.alert = Some(message);
-            }
-            NotebookTransition::ShowNoteActionsDialog(_)
-            | NotebookTransition::ShowDirectoryActionsDialog(_)
-            | NotebookTransition::Inedible(_)
-            | NotebookTransition::None => {}
+            NoteTreeTransition::ShowNoteActionsDialog(_)
+            | NoteTreeTransition::ShowDirectoryActionsDialog(_) => {}
         }
     }
 
