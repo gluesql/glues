@@ -2,7 +2,7 @@ use {
     super::VimVisualState,
     crate::{
         db::Db,
-        state::notebook::{directory, note, tabs, InnerState, NotebookState},
+        state::notebook::{directory, note, tabs, InnerState, NoteTreeState, NotebookState},
         transition::{
             NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition,
         },
@@ -61,7 +61,7 @@ async fn consume_idle(state: &mut NotebookState, event: Event) -> Result<Noteboo
         Notebook(NE::SelectNote(note)) => note::select(state, note),
         Notebook(NE::SelectDirectory(directory)) => directory::select(state, directory),
         Key(KeyEvent::Tab) => {
-            state.inner_state = InnerState::NoteSelected;
+            state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 
             Ok(NotebookTransition::BrowseNoteTree)
         }

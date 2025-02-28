@@ -10,7 +10,7 @@ use {
     glues_core::{
         data::{Directory, Note},
         state::{
-            notebook::{InnerState, VimNormalState},
+            notebook::{InnerState, NoteTreeState, VimNormalState},
             GetInner, NotebookState,
         },
         transition::{
@@ -33,13 +33,15 @@ impl App {
             ..
         } = self.glues.state.get_inner().log_unwrap();
         let new_state = match inner_state {
-            InnerState::NoteSelected | InnerState::DirectorySelected => {
-                ContextState::NoteTreeBrowsing
+            InnerState::NoteTree(
+                NoteTreeState::NoteSelected | NoteTreeState::DirectorySelected,
+            ) => ContextState::NoteTreeBrowsing,
+            InnerState::NoteTree(NoteTreeState::Numbering(_)) => ContextState::NoteTreeNumbering,
+            InnerState::NoteTree(NoteTreeState::NoteMoreActions) => ContextState::NoteActionsDialog,
+            InnerState::NoteTree(NoteTreeState::DirectoryMoreActions) => {
+                ContextState::DirectoryActionsDialog
             }
-            InnerState::NoteTreeNumber(_) => ContextState::NoteTreeNumbering,
-            InnerState::NoteMoreActions => ContextState::NoteActionsDialog,
-            InnerState::DirectoryMoreActions => ContextState::DirectoryActionsDialog,
-            InnerState::MoveMode => ContextState::MoveMode,
+            InnerState::NoteTree(NoteTreeState::MoveMode) => ContextState::MoveMode,
             InnerState::EditingNormalMode(VimNormalState::Idle) => {
                 ContextState::EditorNormalMode { idle: true }
             }

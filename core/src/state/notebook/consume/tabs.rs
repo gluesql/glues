@@ -1,7 +1,9 @@
 use {
     crate::{
         db::Db,
-        state::notebook::{directory, InnerState, NotebookState, SelectedItem, VimNormalState},
+        state::notebook::{
+            directory, InnerState, NoteTreeState, NotebookState, SelectedItem, VimNormalState,
+        },
         transition::NormalModeTransition,
         Error, NotebookTransition, Result,
     },
@@ -97,7 +99,7 @@ pub async fn close(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTra
 
     if state.tabs.is_empty() {
         state.tab_index = None;
-        state.inner_state = InnerState::NoteSelected;
+        state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 
         return Ok(NotebookTransition::EditingNormalMode(
             NormalModeTransition::CloseTab(note_id),

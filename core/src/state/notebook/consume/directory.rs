@@ -4,7 +4,8 @@ use {
         data::Directory,
         db::Db,
         state::notebook::{
-            DirectoryItem, DirectoryItemChildren, InnerState, NotebookState, SelectedItem,
+            DirectoryItem, DirectoryItemChildren, InnerState, NoteTreeState, NotebookState,
+            SelectedItem,
         },
         transition::MoveModeTransition,
         types::DirectoryId,
@@ -79,7 +80,7 @@ pub fn close(state: &mut NotebookState, directory: Directory) -> Result<Notebook
     let directory_id = directory.id.clone();
 
     state.selected = SelectedItem::Directory(directory);
-    state.inner_state = InnerState::DirectorySelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
     Ok(NotebookTransition::CloseDirectory(directory_id))
 }
@@ -89,14 +90,14 @@ pub fn show_actions_dialog(
     directory: Directory,
 ) -> Result<NotebookTransition> {
     state.selected = SelectedItem::Directory(directory.clone());
-    state.inner_state = InnerState::DirectoryMoreActions;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::DirectoryMoreActions);
 
     Ok(NotebookTransition::ShowDirectoryActionsDialog(directory))
 }
 
 pub fn select(state: &mut NotebookState, directory: Directory) -> Result<NotebookTransition> {
     state.selected = SelectedItem::Directory(directory);
-    state.inner_state = InnerState::DirectorySelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
     Ok(NotebookTransition::None)
 }
@@ -128,7 +129,7 @@ pub async fn rename(
     state.root.rename_directory(&directory).ok_or(Error::Wip(
         "[directory::rename] failed to find directory".to_owned(),
     ))?;
-    state.inner_state = InnerState::DirectorySelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
@@ -157,7 +158,7 @@ pub async fn remove(
         .clone();
 
     state.selected = SelectedItem::Directory(selected_directory.clone());
-    state.inner_state = InnerState::DirectorySelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
     Ok(NotebookTransition::RemoveDirectory {
         directory,
@@ -198,7 +199,7 @@ pub async fn add(
     }
 
     state.selected = SelectedItem::Directory(directory.clone());
-    state.inner_state = InnerState::DirectorySelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
     Ok(NotebookTransition::AddDirectory(directory))
 }
@@ -210,7 +211,7 @@ pub async fn move_directory(
 ) -> Result<NotebookTransition> {
     let directory = state.get_selected_directory()?.clone();
     if directory.id == target_directory_id {
-        state.inner_state = InnerState::DirectorySelected;
+        state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
         return Ok(NotebookTransition::MoveMode(MoveModeTransition::Cancel));
     }
@@ -221,7 +222,7 @@ pub async fn move_directory(
     open_all(db, state, target_directory_id).await?;
 
     state.selected = SelectedItem::Directory(directory);
-    state.inner_state = InnerState::DirectorySelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 

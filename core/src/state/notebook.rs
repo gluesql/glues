@@ -14,7 +14,7 @@ use {
 
 pub use inner_state::{
     InnerState::{self, *},
-    VimNormalState, VimVisualState,
+    NoteTreeState, VimNormalState, VimVisualState,
 };
 
 pub use directory_item::{DirectoryItem, DirectoryItemChildren, TreeItem};
@@ -66,7 +66,7 @@ impl NotebookState {
         let selected = SelectedItem::Directory(root.directory.clone());
 
         Ok(Self {
-            inner_state: DirectorySelected,
+            inner_state: NoteTree(NoteTreeState::DirectorySelected),
             root,
             selected,
             tabs: Vec::new(),
@@ -86,22 +86,22 @@ impl NotebookState {
 
     pub fn describe(&self) -> Result<String> {
         Ok(match &self.inner_state {
-            NoteMoreActions => "Note actions dialog".to_owned(),
-            DirectoryMoreActions => "Directory actions dialog".to_owned(),
-            NoteSelected => {
+            NoteTree(NoteTreeState::NoteMoreActions) => "Note actions dialog".to_owned(),
+            NoteTree(NoteTreeState::DirectoryMoreActions) => "Directory actions dialog".to_owned(),
+            NoteTree(NoteTreeState::NoteSelected) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' selected")
             }
-            DirectorySelected => {
+            NoteTree(NoteTreeState::DirectorySelected) => {
                 let name = &self.get_selected_directory()?.name;
 
                 format!("Directory '{name}' selected")
             }
-            NoteTreeNumber(n) => {
+            NoteTree(NoteTreeState::Numbering(n)) => {
                 format!("Steps: '{n}' selected")
             }
-            MoveMode => match &self.selected {
+            NoteTree(NoteTreeState::MoveMode) => match &self.selected {
                 SelectedItem::Note(Note { name, .. }) => {
                     format!("Note move mode: '{name}'")
                 }
@@ -260,7 +260,7 @@ impl NotebookState {
 
     pub fn shortcuts(&self) -> Vec<String> {
         match &self.inner_state {
-            NoteSelected => {
+            NoteTree(NoteTreeState::NoteSelected) => {
                 let mut shortcuts = vec![
                     "[l]     Open note".to_owned(),
                     "[h]     Close parent directory".to_owned(),
@@ -278,7 +278,7 @@ impl NotebookState {
                 shortcuts.push("[Esc]   Quit".to_owned());
                 shortcuts
             }
-            DirectorySelected => {
+            NoteTree(NoteTreeState::DirectorySelected) => {
                 let mut shortcuts = vec![
                     "[l]     Toggle directory".to_owned(),
                     "[h]     Close parent directory".to_owned(),
@@ -296,7 +296,7 @@ impl NotebookState {
                 shortcuts.push("[Esc]   Quit".to_owned());
                 shortcuts
             }
-            NoteTreeNumber(n) => {
+            NoteTree(NoteTreeState::Numbering(n)) => {
                 vec![
                     format!("[j]   Select {n} next"),
                     format!("[k]   Select {n} previous"),
@@ -304,7 +304,7 @@ impl NotebookState {
                     "[Esc] Cancel".to_owned(),
                 ]
             }
-            MoveMode => {
+            NoteTree(NoteTreeState::MoveMode) => {
                 vec![
                     "[j]     Select next".to_owned(),
                     "[k]     Select previous".to_owned(),
@@ -490,7 +490,7 @@ impl NotebookState {
                     "[Ctrl+h] Show editor keymap".to_owned(),
                 ]
             }
-            DirectoryMoreActions | NoteMoreActions => {
+            NoteTree(NoteTreeState::DirectoryMoreActions | NoteTreeState::NoteMoreActions) => {
                 vec![
                     "[j]     Select next".to_owned(),
                     "[k]     Select Previous".to_owned(),
