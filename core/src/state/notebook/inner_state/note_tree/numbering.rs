@@ -2,6 +2,7 @@ use {
     super::NoteTreeState,
     crate::{
         state::notebook::{directory, note, InnerState, NotebookState, SelectedItem},
+        transition::NoteTreeTransition,
         Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
     },
 };
@@ -41,11 +42,15 @@ pub async fn consume(
         }
         Key(KeyEvent::J | KeyEvent::Down) => {
             reset_state(state);
-            Ok(NotebookTransition::SelectNext(n))
+            Ok(NotebookTransition::NoteTree(
+                NoteTreeTransition::SelectNext(n),
+            ))
         }
         Key(KeyEvent::K | KeyEvent::Up) => {
             reset_state(state);
-            Ok(NotebookTransition::SelectPrev(n))
+            Ok(NotebookTransition::NoteTree(
+                NoteTreeTransition::SelectPrev(n),
+            ))
         }
         event @ Key(_) => {
             reset_state(state);

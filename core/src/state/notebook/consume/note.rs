@@ -7,7 +7,7 @@ use {
             DirectoryItem, InnerState, NoteTreeState, NotebookState, SelectedItem, Tab,
             VimNormalState,
         },
-        transition::MoveModeTransition,
+        transition::{MoveModeTransition, NoteTreeTransition},
         types::{DirectoryId, NoteId},
         Error, NotebookTransition, Result,
     },
@@ -16,7 +16,9 @@ use {
 pub fn show_actions_dialog(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
     state.inner_state = InnerState::NoteTree(NoteTreeState::NoteMoreActions);
 
-    Ok(NotebookTransition::ShowNoteActionsDialog(note))
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::ShowNoteActionsDialog(note),
+    ))
 }
 
 pub fn select(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
@@ -53,7 +55,9 @@ pub async fn rename(
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
-    Ok(NotebookTransition::RenameNote(note))
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::RenameNote(note),
+    ))
 }
 
 pub async fn remove(
@@ -70,10 +74,12 @@ pub async fn remove(
     state.selected = SelectedItem::Directory(directory.clone());
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
-    Ok(NotebookTransition::RemoveNote {
-        note,
-        selected_directory: directory.clone(),
-    })
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::RemoveNote {
+            note,
+            selected_directory: directory.clone(),
+        },
+    ))
 }
 
 pub async fn add(
@@ -101,7 +107,9 @@ pub async fn add(
     state.selected = SelectedItem::Note(note.clone());
     state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 
-    Ok(NotebookTransition::AddNote(note))
+    Ok(NotebookTransition::NoteTree(NoteTreeTransition::AddNote(
+        note,
+    )))
 }
 
 pub async fn open(
@@ -134,7 +142,10 @@ pub async fn open(
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
-    Ok(NotebookTransition::OpenNote { note, content })
+    Ok(NotebookTransition::NoteTree(NoteTreeTransition::OpenNote {
+        note,
+        content,
+    }))
 }
 
 pub async fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
@@ -183,5 +194,7 @@ pub async fn move_note(
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
-    Ok(NotebookTransition::MoveMode(MoveModeTransition::Commit))
+    Ok(NotebookTransition::NoteTree(NoteTreeTransition::MoveMode(
+        MoveModeTransition::Commit,
+    )))
 }

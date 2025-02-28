@@ -3,7 +3,7 @@ use {
     crate::{
         db::Db,
         state::notebook::{directory, note, InnerState, NotebookState, SelectedItem},
-        transition::MoveModeTransition,
+        transition::{MoveModeTransition, NoteTreeTransition},
         Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
     },
 };
@@ -45,6 +45,8 @@ pub async fn consume(
 
 impl From<MoveModeTransition> for Result<NotebookTransition> {
     fn from(transition: MoveModeTransition) -> Self {
-        Ok(NotebookTransition::MoveMode(transition))
+        Ok(NotebookTransition::NoteTree(NoteTreeTransition::MoveMode(
+            transition,
+        )))
     }
 }

@@ -3,7 +3,7 @@ use {
     crate::{
         db::Db,
         state::notebook::{directory, note, tabs, InnerState, NotebookState},
-        transition::MoveModeTransition,
+        transition::{MoveModeTransition, NoteTreeTransition},
         Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
     },
 };
@@ -39,8 +39,12 @@ pub async fn consume(
 
             directory::close(state, directory)
         }
-        Key(KeyEvent::J | KeyEvent::Down) => Ok(NotebookTransition::SelectNext(1)),
-        Key(KeyEvent::K | KeyEvent::Up) => Ok(NotebookTransition::SelectPrev(1)),
+        Key(KeyEvent::J | KeyEvent::Down) => Ok(NotebookTransition::NoteTree(
+            NoteTreeTransition::SelectNext(1),
+        )),
+        Key(KeyEvent::K | KeyEvent::Up) => Ok(NotebookTransition::NoteTree(
+            NoteTreeTransition::SelectPrev(1),
+        )),
         Key(KeyEvent::M) => {
             let note = state.get_selected_note()?.clone();
 
@@ -49,7 +53,9 @@ pub async fn consume(
         Key(KeyEvent::Space) => {
             state.inner_state = InnerState::NoteTree(NoteTreeState::MoveMode);
 
-            Ok(NotebookTransition::MoveMode(MoveModeTransition::Enter))
+            Ok(NotebookTransition::NoteTree(NoteTreeTransition::MoveMode(
+                MoveModeTransition::Enter,
+            )))
         }
         Notebook(SelectNote(note)) => note::select(state, note),
         Notebook(SelectDirectory(directory)) => directory::select(state, directory),
