@@ -4,7 +4,8 @@ use {
         data::{Directory, Note},
         db::Db,
         state::notebook::{
-            DirectoryItem, InnerState, NotebookState, SelectedItem, Tab, VimNormalState,
+            DirectoryItem, InnerState, NoteTreeState, NotebookState, SelectedItem, Tab,
+            VimNormalState,
         },
         transition::MoveModeTransition,
         types::{DirectoryId, NoteId},
@@ -13,14 +14,14 @@ use {
 };
 
 pub fn show_actions_dialog(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
-    state.inner_state = InnerState::NoteMoreActions;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::NoteMoreActions);
 
     Ok(NotebookTransition::ShowNoteActionsDialog(note))
 }
 
 pub fn select(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
     state.selected = SelectedItem::Note(note);
-    state.inner_state = InnerState::NoteSelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 
     Ok(NotebookTransition::None)
 }
@@ -48,7 +49,7 @@ pub async fn rename(
     }
 
     state.selected = SelectedItem::Note(note.clone());
-    state.inner_state = InnerState::NoteSelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
@@ -67,7 +68,7 @@ pub async fn remove(
     ))?;
 
     state.selected = SelectedItem::Directory(directory.clone());
-    state.inner_state = InnerState::DirectorySelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
     Ok(NotebookTransition::RemoveNote {
         note,
@@ -98,7 +99,7 @@ pub async fn add(
     }
 
     state.selected = SelectedItem::Note(note.clone());
-    state.inner_state = InnerState::NoteSelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 
     Ok(NotebookTransition::AddNote(note))
 }
@@ -178,7 +179,7 @@ pub async fn move_note(
     directory::open_all(db, state, directory_id).await?;
 
     state.selected = SelectedItem::Note(note);
-    state.inner_state = InnerState::NoteSelected;
+    state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 

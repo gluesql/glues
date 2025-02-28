@@ -1,8 +1,11 @@
-use crate::{
-    db::Db,
-    state::notebook::{directory, note, InnerState, NotebookState, SelectedItem},
-    transition::MoveModeTransition,
-    Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
+use {
+    super::NoteTreeState,
+    crate::{
+        db::Db,
+        state::notebook::{directory, note, InnerState, NotebookState, SelectedItem},
+        transition::MoveModeTransition,
+        Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
+    },
 };
 
 pub async fn consume(
@@ -18,10 +21,10 @@ pub async fn consume(
         Key(KeyEvent::Esc) => {
             match state.selected {
                 SelectedItem::Directory(_) => {
-                    state.inner_state = InnerState::DirectorySelected;
+                    state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
                 }
                 SelectedItem::Note(_) => {
-                    state.inner_state = InnerState::NoteSelected;
+                    state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
                 }
                 SelectedItem::None => {}
             };

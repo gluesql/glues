@@ -1,11 +1,12 @@
-use crate::{
-    db::Db,
-    state::notebook::{directory, note, InnerState, NotebookState, SelectedItem},
-    Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
+use {
+    super::NoteTreeState,
+    crate::{
+        state::notebook::{directory, note, InnerState, NotebookState, SelectedItem},
+        Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
+    },
 };
 
 pub async fn consume(
-    _db: &mut Db,
     state: &mut NotebookState,
     n: usize,
     event: Event,
@@ -16,10 +17,10 @@ pub async fn consume(
     let reset_state = |state: &mut NotebookState| {
         match state.selected {
             SelectedItem::Note { .. } => {
-                state.inner_state = InnerState::NoteSelected;
+                state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
             }
             SelectedItem::Directory { .. } => {
-                state.inner_state = InnerState::DirectorySelected;
+                state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
             }
             SelectedItem::None => {}
         };
@@ -30,7 +31,7 @@ pub async fn consume(
         Notebook(SelectDirectory(directory)) => directory::select(state, directory),
         Key(KeyEvent::Num(n2)) => {
             let step = n2 + n.saturating_mul(10);
-            state.inner_state = InnerState::NoteTreeNumber(step);
+            state.inner_state = InnerState::NoteTree(NoteTreeState::Numbering(step));
 
             Ok(NotebookTransition::None)
         }
