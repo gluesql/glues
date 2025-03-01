@@ -1,6 +1,6 @@
 use {
     super::config::get_glue,
-    gluesql::core::ast_builder::{table, text, Execute},
+    gluesql::core::ast_builder::{Execute, table, text},
     std::fmt::{Debug, Display},
 };
 

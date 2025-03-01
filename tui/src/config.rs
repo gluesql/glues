@@ -1,7 +1,7 @@
 use {
     crate::logger::*,
     gluesql::{
-        core::ast_builder::{col, table, text, Execute},
+        core::ast_builder::{Execute, col, table, text},
         prelude::{CsvStorage, Glue},
     },
     home::home_dir,

@@ -1,5 +1,6 @@
 use {
     super::{
+        App,
         color::*,
         config::{
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
@@ -7,7 +8,6 @@ use {
         },
         context::ContextPrompt,
         logger::*,
-        App,
     },
     glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey},
     ratatui::{

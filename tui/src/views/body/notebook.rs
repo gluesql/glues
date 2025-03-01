@@ -4,11 +4,11 @@ mod note_tree;
 use {
     crate::context::Context,
     ratatui::{
+        Frame,
         layout::{
             Constraint::{Length, Percentage},
             Layout, Rect,
         },
-        Frame,
     },
 };
 

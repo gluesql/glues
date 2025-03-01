@@ -1,9 +1,9 @@
 use {
     super::NoteTreeState,
     crate::{
-        state::notebook::{directory, note, InnerState, NotebookState, SelectedItem},
-        transition::NoteTreeTransition,
         Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
+        state::notebook::{InnerState, NotebookState, SelectedItem, directory, note},
+        transition::NoteTreeTransition,
     },
 };
 

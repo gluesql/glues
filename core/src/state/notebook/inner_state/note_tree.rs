@@ -1,4 +1,4 @@
-use crate::{db::Db, state::notebook::NotebookState, Event, NotebookTransition, Result};
+use crate::{Event, NotebookTransition, Result, db::Db, state::notebook::NotebookState};
 
 mod directory_more_actions;
 mod directory_selected;

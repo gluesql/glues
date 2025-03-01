@@ -1,7 +1,7 @@
 use crate::{
-    db::Db,
-    state::notebook::{note, NotebookState},
     Error, Event, NotebookEvent, NotebookTransition, Result,
+    db::Db,
+    state::notebook::{NotebookState, note},
 };
 
 pub async fn consume(

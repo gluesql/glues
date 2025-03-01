@@ -7,10 +7,10 @@ use {
     },
     arboard::Clipboard,
     glues_core::{
+        NotebookEvent,
         data::Note,
         state::notebook::{DirectoryItem, Tab},
         types::{Id, NoteId},
-        NotebookEvent,
     },
     ratatui::{
         crossterm::event::{Event as Input, KeyCode, KeyEvent, KeyModifiers},

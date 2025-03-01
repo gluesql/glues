@@ -1,6 +1,6 @@
 use {
     super::textarea::*,
-    crate::{logger::*, App},
+    crate::{App, logger::*},
     glues_core::{
         state::{GetInner, NotebookState},
         transition::NormalModeTransition,

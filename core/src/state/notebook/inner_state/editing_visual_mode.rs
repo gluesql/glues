@@ -1,8 +1,8 @@
 use crate::{
+    Error, Event, KeyEvent, NumKey, Result,
     db::Db,
     state::notebook::{InnerState, NotebookState, VimNormalState},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition},
-    Error, Event, KeyEvent, NumKey, Result,
 };
 
 #[derive(Clone, Copy)]

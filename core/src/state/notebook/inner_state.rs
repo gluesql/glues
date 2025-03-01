@@ -4,9 +4,9 @@ mod editing_visual_mode;
 mod note_tree;
 
 use crate::{
-    db::Db,
-    state::notebook::{note, NotebookState},
     Event, NotebookEvent, NotebookTransition, Result,
+    db::Db,
+    state::notebook::{NotebookState, note},
 };
 pub use editing_normal_mode::VimNormalState;
 pub use editing_visual_mode::VimVisualState;

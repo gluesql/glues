@@ -14,6 +14,7 @@ use {
     glues_core::Glues,
     logger::*,
     ratatui::{
+        DefaultTerminal, Frame,
         crossterm::{
             self,
             event::{Event as Input, KeyCode, KeyEvent as CKeyEvent, KeyEventKind, KeyModifiers},
@@ -22,7 +23,6 @@ use {
             Constraint::{Length, Percentage},
             Layout,
         },
-        DefaultTerminal, Frame,
     },
     std::time::Duration,
 };

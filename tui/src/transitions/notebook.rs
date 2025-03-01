@@ -5,17 +5,17 @@ mod textarea;
 
 use {
     crate::{
+        App,
         context::{self},
         logger::*,
-        App,
     },
     glues_core::{
+        NotebookEvent,
         state::{
-            notebook::{InnerState, NoteTreeState, VimNormalState},
             GetInner, NotebookState,
+            notebook::{InnerState, NoteTreeState, VimNormalState},
         },
         transition::NotebookTransition,
-        NotebookEvent,
     },
 };
 

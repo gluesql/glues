@@ -2,16 +2,16 @@ use {
     crate::{
         color::*,
         context::{
-            notebook::{ContextState, TreeItem, TreeItemKind},
             NotebookContext,
+            notebook::{ContextState, TreeItem, TreeItemKind},
         },
     },
     ratatui::{
+        Frame,
         layout::Rect,
         style::{Style, Stylize},
         text::{Line, Span},
         widgets::{Block, BorderType, Borders, HighlightSpacing, List, ListDirection},
-        Frame,
     },
 };
 

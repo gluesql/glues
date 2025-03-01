@@ -1,14 +1,14 @@
 use {
     crate::{
         color::*,
-        context::{notebook::ContextState, Context},
+        context::{Context, notebook::ContextState},
     },
     ratatui::{
+        Frame,
         layout::Rect,
         style::{Style, Stylize},
         text::{Line, Span},
         widgets::{Block, Padding},
-        Frame,
     },
     tui_textarea::TextArea,
 };

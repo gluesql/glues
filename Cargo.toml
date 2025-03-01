@@ -6,7 +6,7 @@ default-members = ["tui", "core"]
 [workspace.package]
 authors = ["Taehoon Moon <taehoon.moon@outlook.com>"]
 version = "0.6.0"
-edition = "2021"
+edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/gluesql/glues"
 

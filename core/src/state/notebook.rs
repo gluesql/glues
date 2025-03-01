@@ -4,10 +4,10 @@ mod inner_state;
 
 use {
     crate::{
+        Error, Event, Glues, NotebookTransition, Result,
         data::{Directory, Note},
         state::GetInner,
         types::{DirectoryId, Id},
-        Error, Event, Glues, NotebookTransition, Result,
     },
     consume::{directory, note, tabs},
 };
@@ -503,22 +503,22 @@ impl NotebookState {
 
     pub fn get_selected_note(&self) -> Result<&Note> {
         match &self.selected {
-            SelectedItem::Note(ref note) => Ok(note),
+            SelectedItem::Note(note) => Ok(note),
             _ => Err(Error::Wip("selected note not found".to_owned())),
         }
     }
 
     pub fn get_selected_directory(&self) -> Result<&Directory> {
         match &self.selected {
-            SelectedItem::Directory(ref directory) => Ok(directory),
+            SelectedItem::Directory(directory) => Ok(directory),
             _ => Err(Error::Wip("selected directory not found".to_owned())),
         }
     }
 
     pub fn get_selected_id(&self) -> Result<&Id> {
         match &self.selected {
-            SelectedItem::Note(ref note) => Ok(&note.id),
-            SelectedItem::Directory(ref directory) => Ok(&directory.id),
+            SelectedItem::Note(note) => Ok(&note.id),
+            SelectedItem::Directory(directory) => Ok(&directory.id),
             _ => Err(Error::Wip("selected item not found".to_owned())),
         }
     }

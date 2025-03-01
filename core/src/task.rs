@@ -4,8 +4,8 @@ use {
     std::{
         collections::VecDeque,
         path::PathBuf,
-        sync::{mpsc::Receiver, Arc, Mutex},
-        thread::{spawn, JoinHandle},
+        sync::{Arc, Mutex, mpsc::Receiver},
+        thread::{JoinHandle, spawn},
     },
 };
 

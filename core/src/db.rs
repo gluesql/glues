@@ -3,7 +3,7 @@ mod log;
 mod note;
 
 use {
-    crate::{schema::setup, task::Task, types::DirectoryId, Result},
+    crate::{Result, schema::setup, task::Task, types::DirectoryId},
     async_trait::async_trait,
     gluesql::{
         core::ast_builder::Build,
