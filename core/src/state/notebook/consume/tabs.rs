@@ -1,11 +1,11 @@
 use {
     crate::{
+        Error, NotebookTransition, Result,
         db::Db,
         state::notebook::{
-            directory, InnerState, NoteTreeState, NotebookState, SelectedItem, VimNormalState,
+            InnerState, NoteTreeState, NotebookState, SelectedItem, VimNormalState, directory,
         },
         transition::NormalModeTransition,
-        Error, NotebookTransition, Result,
     },
     std::cmp::min,
 };

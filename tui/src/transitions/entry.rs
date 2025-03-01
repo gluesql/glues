@@ -1,5 +1,5 @@
 use {
-    crate::{context::ContextState, logger::*, App},
+    crate::{App, context::ContextState, logger::*},
     glues_core::{
         state::{GetInner, NotebookState},
         transition::EntryTransition,

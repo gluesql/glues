@@ -10,8 +10,8 @@ mod vim_keymap;
 
 use {
     crate::{
-        context::{self},
         Context,
+        context::{self},
     },
     ratatui::Frame,
 };

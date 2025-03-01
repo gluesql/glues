@@ -1,6 +1,6 @@
 use {
     super::directory,
-    crate::{db::Db, state::notebook::NotebookState, Error, Result},
+    crate::{Error, Result, db::Db, state::notebook::NotebookState},
 };
 
 pub(super) async fn update_breadcrumbs(db: &mut Db, state: &mut NotebookState) -> Result<()> {

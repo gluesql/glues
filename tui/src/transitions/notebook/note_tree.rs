@@ -1,14 +1,14 @@
 use {
     crate::{
+        App,
         context::notebook::{TreeItem, TreeItemKind},
         logger::*,
-        App,
     },
     glues_core::{
+        NotebookEvent,
         data::{Directory, Note},
         state::{GetInner, NotebookState},
         transition::{MoveModeTransition, NoteTreeTransition},
-        NotebookEvent,
     },
 };
 

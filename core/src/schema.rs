@@ -1,8 +1,8 @@
 use {
     crate::{
+        Error, Result,
         db::{Execute, Storage},
         types::DirectoryId,
-        Error, Result,
     },
     gluesql::core::ast_builder::{col, table, text},
     std::ops::Deref,

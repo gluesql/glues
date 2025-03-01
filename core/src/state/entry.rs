@@ -1,6 +1,6 @@
 use crate::{
-    db::Db, state::notebook::NotebookState, EntryEvent, EntryTransition, Error, Event, Glues,
-    Result,
+    EntryEvent, EntryTransition, Error, Event, Glues, Result, db::Db,
+    state::notebook::NotebookState,
 };
 
 pub struct EntryState;

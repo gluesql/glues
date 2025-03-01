@@ -5,10 +5,10 @@ use {
         logger::*,
     },
     ratatui::{
+        Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
         style::{Style, Stylize},
         widgets::{Block, Clear, Padding, Paragraph, Wrap},
-        Frame,
     },
 };
 

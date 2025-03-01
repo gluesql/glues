@@ -2,8 +2,8 @@ mod entry;
 mod notebook;
 
 use {
-    crate::{context::ContextState, Context},
-    ratatui::{layout::Rect, Frame},
+    crate::{Context, context::ContextState},
+    ratatui::{Frame, layout::Rect},
 };
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {

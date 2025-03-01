@@ -1,15 +1,15 @@
 use {
     crate::{
+        Event, Result, Transition,
         db::Db,
         state::{EntryState, State},
-        task::{handle_tasks, Task},
-        Event, Result, Transition,
+        task::{Task, handle_tasks},
     },
     std::{
         collections::VecDeque,
         sync::{
-            mpsc::{channel, Sender},
             Arc, Mutex,
+            mpsc::{Sender, channel},
         },
         thread::JoinHandle,
     },

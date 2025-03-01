@@ -1,7 +1,7 @@
 mod entry;
 pub mod notebook;
 
-use crate::{transition::KeymapTransition, Error, Event, Glues, KeyEvent, Result, Transition};
+use crate::{Error, Event, Glues, KeyEvent, Result, Transition, transition::KeymapTransition};
 
 pub use {entry::EntryState, notebook::NotebookState};
 

@@ -1,9 +1,9 @@
 use {
     crate::{
+        Event,
         data::{Directory, Note},
         state::notebook::DirectoryItem,
         types::{DirectoryId, NoteId},
-        Event,
     },
     strum_macros::Display,
 };

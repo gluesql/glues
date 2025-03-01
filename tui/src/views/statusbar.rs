@@ -1,18 +1,18 @@
 use {
     crate::{
         color::*,
-        context::{notebook::ContextState, NotebookContext},
+        context::{NotebookContext, notebook::ContextState},
         logger::*,
     },
     glues_core::state::State,
     ratatui::{
+        Frame,
         layout::{
             Constraint::{Length, Percentage},
             Layout, Rect,
         },
         style::Stylize,
         text::{Line, Span, Text},
-        Frame,
     },
 };
 

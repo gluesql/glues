@@ -1,6 +1,7 @@
 use {
     crate::color::*,
     ratatui::{
+        Frame,
         layout::{
             Alignment,
             Constraint::{Length, Percentage},
@@ -9,7 +10,6 @@ use {
         style::{Style, Stylize},
         text::{Line, Span},
         widgets::{Block, Clear, Padding, Paragraph, Wrap},
-        Frame,
     },
 };
 

@@ -1,10 +1,10 @@
 use {
     super::NoteTreeState,
     crate::{
-        db::Db,
-        state::notebook::{directory, note, tabs, InnerState, NotebookState},
-        transition::{MoveModeTransition, NoteTreeTransition},
         Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
+        db::Db,
+        state::notebook::{InnerState, NotebookState, directory, note, tabs},
+        transition::{MoveModeTransition, NoteTreeTransition},
     },
 };
 

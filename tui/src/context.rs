@@ -2,7 +2,7 @@ pub mod entry;
 pub mod notebook;
 
 use {
-    crate::{log, logger::*, Action},
+    crate::{Action, log, logger::*},
     glues_core::transition::VimKeymapKind,
     ratatui::{
         crossterm::event::{Event as Input, KeyCode, KeyEvent},

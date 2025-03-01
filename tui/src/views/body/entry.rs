@@ -1,13 +1,13 @@
 use {
     crate::{
         color::*,
-        context::{entry::MENU_ITEMS, EntryContext},
+        context::{EntryContext, entry::MENU_ITEMS},
     },
     ratatui::{
+        Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout, Rect},
         style::{Style, Stylize},
         widgets::{Block, HighlightSpacing, List, ListDirection, Padding},
-        Frame,
     },
     tui_big_text::BigText,
 };

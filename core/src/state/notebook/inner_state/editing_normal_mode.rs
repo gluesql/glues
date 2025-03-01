@@ -1,12 +1,12 @@
 use {
     super::VimVisualState,
     crate::{
+        Error, Event, KeyEvent, NotebookEvent, NumKey, Result,
         db::Db,
-        state::notebook::{directory, note, tabs, InnerState, NoteTreeState, NotebookState},
+        state::notebook::{InnerState, NoteTreeState, NotebookState, directory, note, tabs},
         transition::{
             NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition,
         },
-        Error, Event, KeyEvent, NotebookEvent, NumKey, Result,
     },
 };
 

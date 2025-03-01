@@ -1,9 +1,9 @@
 use {
     super::{Db, Execute},
     crate::{
+        Error, Result,
         data::Note,
         types::{DirectoryId, NoteId},
-        Error, Result,
     },
     gluesql::core::ast_builder::{col, function::now, table, text, uuid},
     std::ops::Deref,

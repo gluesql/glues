@@ -1,13 +1,13 @@
 use {
     crate::{
         color::*,
-        context::{notebook::NOTE_ACTIONS, NotebookContext},
+        context::{NotebookContext, notebook::NOTE_ACTIONS},
     },
     ratatui::{
+        Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
         style::{Style, Stylize},
         widgets::{Block, Clear, HighlightSpacing, List, ListDirection, Padding},
-        Frame,
     },
 };
 

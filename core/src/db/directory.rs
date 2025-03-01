@@ -1,6 +1,6 @@
 use {
     super::{Db, Execute},
-    crate::{data::Directory, types::DirectoryId, Result},
+    crate::{Result, data::Directory, types::DirectoryId},
     async_recursion::async_recursion,
     gluesql::core::ast_builder::{col, function::now, table, text, uuid},
     std::ops::Deref,

@@ -1,6 +1,7 @@
 use {
     super::breadcrumb,
     crate::{
+        Error, NotebookTransition, Result,
         data::Directory,
         db::Db,
         state::notebook::{
@@ -9,7 +10,6 @@ use {
         },
         transition::{MoveModeTransition, NoteTreeTransition},
         types::DirectoryId,
-        Error, NotebookTransition, Result,
     },
     async_recursion::async_recursion,
 };
@@ -191,7 +191,7 @@ pub async fn add(
         .ok_or(Error::Wip("todo: failed to find {parent_id}".to_owned()))?;
 
     if let DirectoryItem {
-        children: Some(ref mut children),
+        children: Some(children),
         ..
     } = item
     {
