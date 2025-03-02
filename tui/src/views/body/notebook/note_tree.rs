@@ -22,7 +22,7 @@ const NOTE_SYMBOL: &str = "󱇗 ";
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let note_tree_focused = matches!(
         context.state,
-        ContextState::NoteTreeBrowsing | ContextState::NoteTreeNumbering | ContextState::MoveMode
+        ContextState::NoteTreeBrowsing | ContextState::NoteTreeNumbering | ContextState::NoteTreeGateway | ContextState::MoveMode
     );
     let title = "[Browser]";
     let title = if note_tree_focused {

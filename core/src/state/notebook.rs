@@ -101,6 +101,7 @@ impl NotebookState {
             NoteTree(NoteTreeState::Numbering(n)) => {
                 format!("Steps: '{n}' selected")
             }
+            NoteTree(NoteTreeState::GatewayMode) => "Gateway mode".to_owned(),
             NoteTree(NoteTreeState::MoveMode) => match &self.selected {
                 SelectedItem::Note(Note { name, .. }) => {
                     format!("Note move mode: '{name}'")
@@ -267,6 +268,7 @@ impl NotebookState {
                     "[j]     Select next".to_owned(),
                     "[k]     Select previous".to_owned(),
                     "[G]     Select last".to_owned(),
+                    "[g]     Enter gateway mode".to_owned(),
                     "[1-9]   Add steps".to_owned(),
                     "[>]     Expand width".to_owned(),
                     "[<]     Shrink width".to_owned(),
@@ -312,6 +314,9 @@ impl NotebookState {
                     format!("[<]   Shrink width by {n}"),
                     "[Esc] Cancel".to_owned(),
                 ]
+            }
+            NoteTree(NoteTreeState::GatewayMode) => {
+                vec!["[g]   Select first".to_owned(), "[Esc] Cancel".to_owned()]
             }
             NoteTree(NoteTreeState::MoveMode) => {
                 vec![

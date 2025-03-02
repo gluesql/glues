@@ -34,6 +34,7 @@ impl App {
                 NoteTreeState::NoteSelected | NoteTreeState::DirectorySelected,
             ) => ContextState::NoteTreeBrowsing,
             InnerState::NoteTree(NoteTreeState::Numbering(_)) => ContextState::NoteTreeNumbering,
+            InnerState::NoteTree(NoteTreeState::GatewayMode) => ContextState::NoteTreeGateway,
             InnerState::NoteTree(NoteTreeState::NoteMoreActions) => ContextState::NoteActionsDialog,
             InnerState::NoteTree(NoteTreeState::DirectoryMoreActions) => {
                 ContextState::DirectoryActionsDialog

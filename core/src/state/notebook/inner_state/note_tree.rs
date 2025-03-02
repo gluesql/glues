@@ -6,6 +6,7 @@ mod move_mode;
 mod note_more_actions;
 mod note_selected;
 mod numbering;
+mod gateway;
 
 #[derive(Clone, Copy)]
 pub enum NoteTreeState {
@@ -14,6 +15,7 @@ pub enum NoteTreeState {
     DirectorySelected,
     DirectoryMoreActions,
     Numbering(usize),
+    GatewayMode,
     MoveMode,
 }
 
@@ -31,6 +33,7 @@ pub async fn consume(
         NoteMoreActions => note_more_actions::consume(db, state, event).await,
         DirectoryMoreActions => directory_more_actions::consume(db, state, event).await,
         Numbering(n) => numbering::consume(state, n, event).await,
+        GatewayMode => gateway::consume(state, event).await,
         MoveMode => move_mode::consume(db, state, event).await,
     }
 }
