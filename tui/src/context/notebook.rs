@@ -46,6 +46,7 @@ pub const DIRECTORY_ACTIONS: [&str; 5] = [
 pub enum ContextState {
     NoteTreeBrowsing,
     NoteTreeNumbering,
+    NoteTreeGateway,
     NoteActionsDialog,
     DirectoryActionsDialog,
     MoveMode,
@@ -228,6 +229,19 @@ impl NotebookContext {
         }
     }
 
+    pub fn select_first(&mut self) {
+        let i = self
+            .tree_items
+            .iter()
+            .enumerate()
+            .find(|(_, item)| item.selectable)
+            .map(|(i, _)| i);
+
+        if i.is_some() {
+            self.tree_state.select(i);
+        }
+    }
+
     pub fn select_last(&mut self) {
         let i = self
             .tree_items
@@ -326,7 +340,9 @@ impl NotebookContext {
 
         match self.state {
             ContextState::NoteTreeBrowsing => self.consume_on_note_tree_browsing(code),
-            ContextState::NoteTreeNumbering | ContextState::MoveMode => Action::PassThrough,
+            ContextState::NoteTreeGateway
+            | ContextState::NoteTreeNumbering
+            | ContextState::MoveMode => Action::PassThrough,
             ContextState::EditorNormalMode { idle } => self.consume_on_editor_normal(input, idle),
             ContextState::EditorVisualMode => Action::PassThrough,
             ContextState::EditorInsertMode => self.consume_on_editor_insert(input),

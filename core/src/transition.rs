@@ -94,9 +94,11 @@ pub enum NoteTreeTransition {
 
     SelectNext(usize),
     SelectPrev(usize),
+    SelectFirst,
     SelectLast,
     ExpandWidth(usize),
     ShrinkWidth(usize),
+    GatewayMode,
 }
 
 pub enum MoveModeTransition {

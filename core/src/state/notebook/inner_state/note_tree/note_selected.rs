@@ -70,6 +70,13 @@ pub async fn consume(
             Ok(NotebookTransition::None)
         }
         Key(KeyEvent::CapG) => Ok(NotebookTransition::NoteTree(NoteTreeTransition::SelectLast)),
+        Key(KeyEvent::G) => {
+            state.inner_state = InnerState::NoteTree(NoteTreeState::GatewayMode);
+
+            Ok(NotebookTransition::NoteTree(
+                NoteTreeTransition::GatewayMode,
+            ))
+        }
         Key(KeyEvent::AngleBracketOpen) => Ok(NotebookTransition::NoteTree(
             NoteTreeTransition::ShrinkWidth(1),
         )),

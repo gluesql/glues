@@ -2,6 +2,7 @@ use crate::{Event, NotebookTransition, Result, db::Db, state::notebook::Notebook
 
 mod directory_more_actions;
 mod directory_selected;
+mod gateway;
 mod move_mode;
 mod note_more_actions;
 mod note_selected;
@@ -14,6 +15,7 @@ pub enum NoteTreeState {
     DirectorySelected,
     DirectoryMoreActions,
     Numbering(usize),
+    GatewayMode,
     MoveMode,
 }
 
@@ -31,6 +33,7 @@ pub async fn consume(
         NoteMoreActions => note_more_actions::consume(db, state, event).await,
         DirectoryMoreActions => directory_more_actions::consume(db, state, event).await,
         Numbering(n) => numbering::consume(state, n, event).await,
+        GatewayMode => gateway::consume(state, event).await,
         MoveMode => move_mode::consume(db, state, event).await,
     }
 }

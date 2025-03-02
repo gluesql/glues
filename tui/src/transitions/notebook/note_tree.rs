@@ -80,6 +80,13 @@ impl App {
                 let event = get_select_event(selected);
                 self.glues.dispatch(event).await.log_unwrap();
             }
+            NoteTreeTransition::SelectFirst => {
+                self.context.notebook.select_first();
+
+                let selected = self.context.notebook.selected();
+                let event = get_select_event(selected);
+                self.glues.dispatch(event).await.log_unwrap();
+            }
             NoteTreeTransition::SelectLast => {
                 self.context.notebook.select_last();
 
@@ -100,7 +107,8 @@ impl App {
 
                 self.context.notebook.tree_width = width;
             }
-            NoteTreeTransition::ShowNoteActionsDialog(_)
+            NoteTreeTransition::GatewayMode
+            | NoteTreeTransition::ShowNoteActionsDialog(_)
             | NoteTreeTransition::ShowDirectoryActionsDialog(_) => {}
         }
 
