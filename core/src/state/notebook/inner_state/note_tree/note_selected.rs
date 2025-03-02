@@ -73,7 +73,9 @@ pub async fn consume(
         Key(KeyEvent::G) => {
             state.inner_state = InnerState::NoteTree(NoteTreeState::GatewayMode);
 
-            Ok(NotebookTransition::NoteTree(NoteTreeTransition::GatewayMode))
+            Ok(NotebookTransition::NoteTree(
+                NoteTreeTransition::GatewayMode,
+            ))
         }
         Key(KeyEvent::AngleBracketOpen) => Ok(NotebookTransition::NoteTree(
             NoteTreeTransition::ShrinkWidth(1),

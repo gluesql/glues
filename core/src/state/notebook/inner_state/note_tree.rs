@@ -2,11 +2,11 @@ use crate::{Event, NotebookTransition, Result, db::Db, state::notebook::Notebook
 
 mod directory_more_actions;
 mod directory_selected;
+mod gateway;
 mod move_mode;
 mod note_more_actions;
 mod note_selected;
 mod numbering;
-mod gateway;
 
 #[derive(Clone, Copy)]
 pub enum NoteTreeState {

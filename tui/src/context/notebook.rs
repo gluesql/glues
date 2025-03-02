@@ -344,7 +344,9 @@ impl NotebookContext {
 
         match self.state {
             ContextState::NoteTreeBrowsing => self.consume_on_note_tree_browsing(code),
-            ContextState::NoteTreeGateway | ContextState::NoteTreeNumbering | ContextState::MoveMode => Action::PassThrough,
+            ContextState::NoteTreeGateway
+            | ContextState::NoteTreeNumbering
+            | ContextState::MoveMode => Action::PassThrough,
             ContextState::EditorNormalMode { idle } => self.consume_on_editor_normal(input, idle),
             ContextState::EditorVisualMode => Action::PassThrough,
             ContextState::EditorInsertMode => self.consume_on_editor_insert(input),
