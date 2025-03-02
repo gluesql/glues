@@ -433,6 +433,8 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('^') => KeyEvent::Caret,
         KeyCode::Char('~') => KeyEvent::Tilde,
         KeyCode::Char('?') => KeyEvent::QuestionMark,
+        KeyCode::Char('<') => KeyEvent::AngleBracketOpen,
+        KeyCode::Char('>') => KeyEvent::AngleBracketClose,
         KeyCode::Char('.') => KeyEvent::Dot,
         KeyCode::Char('-') => KeyEvent::Dash,
         KeyCode::Char(' ') => KeyEvent::Space,

@@ -71,6 +71,7 @@ pub struct NotebookContext {
     // note tree
     pub tree_state: ListState,
     pub tree_items: Vec<TreeItem>,
+    pub tree_width: u16,
 
     // note actions
     pub note_actions_state: ListState,
@@ -101,6 +102,7 @@ impl Default for NotebookContext {
             state: ContextState::NoteTreeBrowsing,
             tree_state: ListState::default().with_selected(Some(0)),
             tree_items: vec![],
+            tree_width: 45,
 
             note_actions_state: ListState::default(),
             directory_actions_state: ListState::default(),
