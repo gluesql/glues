@@ -266,6 +266,7 @@ impl NotebookState {
                     "[h]     Close parent directory".to_owned(),
                     "[j]     Select next".to_owned(),
                     "[k]     Select previous".to_owned(),
+                    "[G]     Select last".to_owned(),
                     "[1-9]   Add steps".to_owned(),
                     "[Space] Move note".to_owned(),
                     "[m]     Show more actions".to_owned(),
@@ -284,6 +285,7 @@ impl NotebookState {
                     "[h]     Close parent directory".to_owned(),
                     "[j]     Select next".to_owned(),
                     "[k]     Select previous".to_owned(),
+                    "[G]     Select last".to_owned(),
                     "[1-9]   Add steps".to_owned(),
                     "[Space] Move directory".to_owned(),
                     "[m]     Show more actions".to_owned(),
@@ -300,6 +302,7 @@ impl NotebookState {
                 vec![
                     format!("[j]   Select {n} next"),
                     format!("[k]   Select {n} previous"),
+                    "[G]   Select last".to_owned(),
                     "[0-9] Append steps".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
@@ -308,6 +311,7 @@ impl NotebookState {
                 vec![
                     "[j]     Select next".to_owned(),
                     "[k]     Select previous".to_owned(),
+                    "[G]     Select last".to_owned(),
                     "[Enter] Move to selected directory".to_owned(),
                     "[Esc]   Cancel".to_owned(),
                 ]

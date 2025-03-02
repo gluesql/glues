@@ -18,6 +18,7 @@ pub async fn consume(
     match event {
         Key(KeyEvent::J | KeyEvent::Down) => MoveModeTransition::SelectNext.into(),
         Key(KeyEvent::K | KeyEvent::Up) => MoveModeTransition::SelectPrev.into(),
+        Key(KeyEvent::CapG) => MoveModeTransition::SelectLast.into(),
         Key(KeyEvent::Esc) => {
             match state.selected {
                 SelectedItem::Directory(_) => {

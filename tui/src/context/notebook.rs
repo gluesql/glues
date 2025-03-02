@@ -226,6 +226,20 @@ impl NotebookContext {
         }
     }
 
+    pub fn select_last(&mut self) {
+        let i = self
+            .tree_items
+            .iter()
+            .enumerate()
+            .rev()
+            .find(|(_, item)| item.selectable)
+            .map(|(i, _)| i);
+
+        if i.is_some() {
+            self.tree_state.select(i);
+        }
+    }
+
     pub fn select_next(&mut self, step: usize) {
         let i = match self.tree_state.selected().unwrap_or_default() + step {
             i if i >= self.tree_items.len() => self.tree_items.len() - 1,
