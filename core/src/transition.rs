@@ -94,12 +94,14 @@ pub enum NoteTreeTransition {
 
     SelectNext(usize),
     SelectPrev(usize),
+    SelectLast,
 }
 
 pub enum MoveModeTransition {
     Enter,
     SelectNext,
     SelectPrev,
+    SelectLast,
     RequestCommit,
     Commit,
     Cancel,

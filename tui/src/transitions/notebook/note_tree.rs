@@ -5,7 +5,7 @@ use {
         logger::*,
     },
     glues_core::{
-        NotebookEvent,
+        Event, NotebookEvent,
         data::{Directory, Note},
         state::{GetInner, NotebookState},
         transition::{MoveModeTransition, NoteTreeTransition},
@@ -69,37 +69,39 @@ impl App {
             NoteTreeTransition::SelectNext(n) => {
                 self.context.notebook.select_next(n);
 
-                let event = match self.context.notebook.selected() {
-                    TreeItem {
-                        kind: TreeItemKind::Directory { directory, .. },
-                        ..
-                    } => NotebookEvent::SelectDirectory(directory.clone()).into(),
-                    TreeItem {
-                        kind: TreeItemKind::Note { note },
-                        ..
-                    } => NotebookEvent::SelectNote(note.clone()).into(),
-                };
-
+                let selected = self.context.notebook.selected();
+                let event = get_select_event(selected);
                 self.glues.dispatch(event).await.log_unwrap();
             }
             NoteTreeTransition::SelectPrev(n) => {
                 self.context.notebook.select_prev(n);
 
-                let event = match self.context.notebook.selected() {
-                    TreeItem {
-                        kind: TreeItemKind::Directory { directory, .. },
-                        ..
-                    } => NotebookEvent::SelectDirectory(directory.clone()).into(),
-                    TreeItem {
-                        kind: TreeItemKind::Note { note },
-                        ..
-                    } => NotebookEvent::SelectNote(note.clone()).into(),
-                };
+                let selected = self.context.notebook.selected();
+                let event = get_select_event(selected);
+                self.glues.dispatch(event).await.log_unwrap();
+            }
+            NoteTreeTransition::SelectLast => {
+                self.context.notebook.select_last();
 
+                let selected = self.context.notebook.selected();
+                let event = get_select_event(selected);
                 self.glues.dispatch(event).await.log_unwrap();
             }
             NoteTreeTransition::ShowNoteActionsDialog(_)
             | NoteTreeTransition::ShowDirectoryActionsDialog(_) => {}
+        }
+
+        fn get_select_event(selected: &TreeItem) -> Event {
+            match selected {
+                TreeItem {
+                    kind: TreeItemKind::Directory { directory, .. },
+                    ..
+                } => NotebookEvent::SelectDirectory(directory.clone()).into(),
+                TreeItem {
+                    kind: TreeItemKind::Note { note },
+                    ..
+                } => NotebookEvent::SelectNote(note.clone()).into(),
+            }
         }
     }
 
@@ -118,6 +120,9 @@ impl App {
             }
             SelectPrev => {
                 self.context.notebook.select_prev(1);
+            }
+            SelectLast => {
+                self.context.notebook.select_last();
             }
             RequestCommit => {
                 let is_directory = self

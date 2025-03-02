@@ -52,6 +52,10 @@ pub async fn consume(
                 NoteTreeTransition::SelectPrev(n),
             ))
         }
+        Key(KeyEvent::CapG) => {
+            reset_state(state);
+            Ok(NotebookTransition::NoteTree(NoteTreeTransition::SelectLast))
+        }
         event @ Key(_) => {
             reset_state(state);
             Ok(NotebookTransition::Inedible(event))
