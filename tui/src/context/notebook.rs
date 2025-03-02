@@ -240,10 +240,6 @@ impl NotebookContext {
         if i.is_some() {
             self.tree_state.select(i);
         }
-
-        if i.is_some() {
-            self.tree_state.select(i);
-        }
     }
 
     pub fn select_last(&mut self) {
