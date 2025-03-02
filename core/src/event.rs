@@ -111,6 +111,8 @@ pub enum KeyEvent {
     DollarSign,
     Caret,
     QuestionMark,
+    AngleBracketOpen,
+    AngleBracketClose,
     Num(NumKey),
     Left,
     Right,

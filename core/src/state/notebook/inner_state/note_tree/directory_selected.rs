@@ -81,6 +81,12 @@ pub async fn consume(
             Ok(NotebookTransition::None)
         }
         Key(KeyEvent::CapG) => Ok(NotebookTransition::NoteTree(NoteTreeTransition::SelectLast)),
+        Key(KeyEvent::AngleBracketOpen) => Ok(NotebookTransition::NoteTree(
+            NoteTreeTransition::ShrinkWidth(1),
+        )),
+        Key(KeyEvent::AngleBracketClose) => Ok(NotebookTransition::NoteTree(
+            NoteTreeTransition::ExpandWidth(1),
+        )),
         Key(KeyEvent::Tab) if !state.tabs.is_empty() => tabs::focus_editor(db, state).await,
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),

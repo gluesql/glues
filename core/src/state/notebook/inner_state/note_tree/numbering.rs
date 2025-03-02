@@ -56,6 +56,18 @@ pub async fn consume(
             reset_state(state);
             Ok(NotebookTransition::NoteTree(NoteTreeTransition::SelectLast))
         }
+        Key(KeyEvent::AngleBracketOpen) => {
+            reset_state(state);
+            Ok(NotebookTransition::NoteTree(
+                NoteTreeTransition::ShrinkWidth(n),
+            ))
+        }
+        Key(KeyEvent::AngleBracketClose) => {
+            reset_state(state);
+            Ok(NotebookTransition::NoteTree(
+                NoteTreeTransition::ExpandWidth(n),
+            ))
+        }
         event @ Key(_) => {
             reset_state(state);
             Ok(NotebookTransition::Inedible(event))

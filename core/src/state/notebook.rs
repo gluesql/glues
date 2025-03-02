@@ -268,6 +268,8 @@ impl NotebookState {
                     "[k]     Select previous".to_owned(),
                     "[G]     Select last".to_owned(),
                     "[1-9]   Add steps".to_owned(),
+                    "[>]     Expand width".to_owned(),
+                    "[<]     Shrink width".to_owned(),
                     "[Space] Move note".to_owned(),
                     "[m]     Show more actions".to_owned(),
                 ];
@@ -287,6 +289,8 @@ impl NotebookState {
                     "[k]     Select previous".to_owned(),
                     "[G]     Select last".to_owned(),
                     "[1-9]   Add steps".to_owned(),
+                    "[>]     Expand width".to_owned(),
+                    "[<]     Shrink width".to_owned(),
                     "[Space] Move directory".to_owned(),
                     "[m]     Show more actions".to_owned(),
                 ];
@@ -304,6 +308,8 @@ impl NotebookState {
                     format!("[k]   Select {n} previous"),
                     "[G]   Select last".to_owned(),
                     "[0-9] Append steps".to_owned(),
+                    format!("[>]   Expand width by {n}"),
+                    format!("[<]   Shrink width by {n}"),
                     "[Esc] Cancel".to_owned(),
                 ]
             }

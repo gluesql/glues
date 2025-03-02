@@ -87,6 +87,19 @@ impl App {
                 let event = get_select_event(selected);
                 self.glues.dispatch(event).await.log_unwrap();
             }
+            NoteTreeTransition::ExpandWidth(n) => {
+                let n = n.try_into().unwrap_or_default();
+                let width = self.context.notebook.tree_width.saturating_add(n);
+
+                self.context.notebook.tree_width = width;
+            }
+            NoteTreeTransition::ShrinkWidth(n) => {
+                let n = n.try_into().unwrap_or_default();
+                let width = self.context.notebook.tree_width.saturating_sub(n);
+                let width = if width < 11 { 11 } else { width };
+
+                self.context.notebook.tree_width = width;
+            }
             NoteTreeTransition::ShowNoteActionsDialog(_)
             | NoteTreeTransition::ShowDirectoryActionsDialog(_) => {}
         }
