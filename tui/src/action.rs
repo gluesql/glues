@@ -414,6 +414,8 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         KeyCode::Char('G') => KeyEvent::CapG,
         KeyCode::Char('H') => KeyEvent::CapH,
         KeyCode::Char('I') => KeyEvent::CapI,
+        KeyCode::Char('J') => KeyEvent::CapJ,
+        KeyCode::Char('K') => KeyEvent::CapK,
         KeyCode::Char('L') => KeyEvent::CapL,
         KeyCode::Char('O') => KeyEvent::CapO,
         KeyCode::Char('S') => KeyEvent::CapS,

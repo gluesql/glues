@@ -296,6 +296,49 @@ impl NotebookContext {
         }
     }
 
+    pub fn select_next_dir(&mut self) {
+        let i = self.tree_state.selected().unwrap_or_default() + 1;
+
+        if i >= self.tree_items.len() {
+            return;
+        }
+
+        let i = self
+            .tree_items
+            .iter()
+            .enumerate()
+            .skip(i)
+            .filter(|(_, item)| item.is_directory())
+            .find(|(_, item)| item.selectable)
+            .map(|(i, _)| i);
+
+        if i.is_some() {
+            self.tree_state.select(i);
+        }
+    }
+
+    pub fn select_prev_dir(&mut self) {
+        let i = self
+            .tree_state
+            .selected()
+            .unwrap_or_default()
+            .saturating_sub(1);
+
+        let i = self
+            .tree_items
+            .iter()
+            .enumerate()
+            .rev()
+            .skip(self.tree_items.len() - i - 1)
+            .filter(|(_, item)| item.is_directory())
+            .find(|(_, item)| item.selectable)
+            .map(|(i, _)| i);
+
+        if i.is_some() {
+            self.tree_state.select(i);
+        }
+    }
+
     pub fn selected(&self) -> &TreeItem {
         self.tree_state
             .selected()

@@ -61,6 +61,12 @@ pub async fn consume(
         Key(KeyEvent::K | KeyEvent::Up) => Ok(NotebookTransition::NoteTree(
             NoteTreeTransition::SelectPrev(1),
         )),
+        Key(KeyEvent::CapJ) => Ok(NotebookTransition::NoteTree(
+            NoteTreeTransition::SelectNextDirectory,
+        )),
+        Key(KeyEvent::CapK) => Ok(NotebookTransition::NoteTree(
+            NoteTreeTransition::SelectPrevDirectory,
+        )),
         Key(KeyEvent::M) => {
             let directory = state.get_selected_directory()?.clone();
 
