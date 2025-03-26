@@ -121,6 +121,6 @@ impl App {
 
         views::statusbar::draw(frame, statusbar, state, &context.notebook);
         views::body::draw(frame, body, context);
-        views::dialog::draw(frame, context);
+        views::dialog::draw(frame, state, context);
     }
 }
