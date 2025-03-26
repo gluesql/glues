@@ -96,6 +96,10 @@ pub enum NoteTreeTransition {
     SelectPrev(usize),
     SelectFirst,
     SelectLast,
+
+    SelectNextDirectory,
+    SelectPrevDirectory,
+
     ExpandWidth(usize),
     ShrinkWidth(usize),
     GatewayMode,

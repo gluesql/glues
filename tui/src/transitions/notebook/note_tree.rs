@@ -87,6 +87,20 @@ impl App {
                 let event = get_select_event(selected);
                 self.glues.dispatch(event).await.log_unwrap();
             }
+            NoteTreeTransition::SelectNextDirectory => {
+                self.context.notebook.select_next_dir();
+
+                let selected = self.context.notebook.selected();
+                let event = get_select_event(selected);
+                self.glues.dispatch(event).await.log_unwrap();
+            }
+            NoteTreeTransition::SelectPrevDirectory => {
+                self.context.notebook.select_prev_dir();
+
+                let selected = self.context.notebook.selected();
+                let event = get_select_event(selected);
+                self.glues.dispatch(event).await.log_unwrap();
+            }
             NoteTreeTransition::SelectLast => {
                 self.context.notebook.select_last();
 
