@@ -13,12 +13,13 @@ use {
         Context,
         context::{self},
     },
+    glues_core::state::State,
     ratatui::Frame,
 };
 
-pub fn draw(frame: &mut Frame, context: &mut Context) {
-    if let Some(keymap) = context.keymap.as_ref() {
-        keymap::draw(frame, keymap.as_slice());
+pub fn draw(frame: &mut Frame, state: &State, context: &mut Context) {
+    if context.keymap {
+        keymap::draw(frame, state.shortcuts().as_slice());
     }
 
     if let Some(kind) = context.vim_keymap {

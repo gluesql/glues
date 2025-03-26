@@ -12,14 +12,6 @@ use {
 impl App {
     #[async_recursion(?Send)]
     pub(super) async fn handle_transition(&mut self, transition: Transition) {
-        if self.context.keymap.is_some() {
-            self.context.keymap = self
-                .glues
-                .state
-                .keymap
-                .then(|| self.glues.state.shortcuts());
-        }
-
         match transition {
             Transition::Keymap(transition) => {
                 self.handle_keymap_transition(transition).await;
