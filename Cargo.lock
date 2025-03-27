@@ -984,7 +984,7 @@ checksum = "4271d37baee1b8c7e4b708028c57d816cf9d2434acb33a549475f78c181f6253"
 
 [[package]]
 name = "glues"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "arboard",
  "async-recursion",
@@ -1000,7 +1000,7 @@ dependencies = [
 
 [[package]]
 name = "glues-core"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "async-recursion",
  "async-trait",
