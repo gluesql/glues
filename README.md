@@ -56,6 +56,11 @@ Glues offers various storage options to suit your needs:
 
 Here is our plan for Glues and the features we aim to implement. Below is a list of upcoming improvements to make Glues more useful and versatile. If you have suggestions for new features, please feel free to open a GitHub issue.
 
+* **[In Progress] MCP Server Integration**
+  - Integration with an MCP server is currently the top priority to enable secure interaction between Glues and external LLMs.
+  - The setup will include **API token-based access control**, allowing permission scoping such as directory-level access and note read/write operations.
+  - With this approach, LLMs will operate strictly within the boundaries defined by the user.
+  - The MCP server runs locally, ensuring that LLM-based features are fully managed and authorized by the user.
 * **Enhanced Note Content Support:** Add support for richer note content, including tables and images, in addition to plain text. This will help users create more detailed and organized notes.
 * **Search and Tagging Improvements:** Improve search with tag support and advanced filtering to make it easier to find specific notes.
 * **Customizable Themes:** Allow users to personalize the TUI interface with customizable themes.
