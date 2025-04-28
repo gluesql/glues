@@ -20,7 +20,11 @@ pub async fn consume(state: &mut NotebookState, event: Event) -> Result<Notebook
 
             Ok(NotebookTransition::None)
         }
-        event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
+        event @ Key(_) => {
+            state.inner_state = leave_gateway_mode(&state.selected)?;
+
+            Ok(NotebookTransition::Inedible(event))
+        }
         _ => Err(Error::Wip(
             "todo: NoteTree::GatewayMode::consume".to_owned(),
         )),
