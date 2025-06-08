@@ -93,7 +93,10 @@ pub async fn add(
     let item = state
         .root
         .find_mut(&directory.id)
-        .ok_or(Error::Wip("todo: failed to find".to_owned()))?;
+        .ok_or(Error::Wip(format!(
+            "[note::add] directory not found: {}",
+            directory.id
+        )))?;
 
     if let DirectoryItem {
         children: Some(children),
