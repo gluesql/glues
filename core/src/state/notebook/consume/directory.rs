@@ -185,13 +185,10 @@ pub async fn add(
     let parent_id = directory.id.clone();
     let directory = db.add_directory(parent_id.clone(), directory_name).await?;
 
-    let item = state
-        .root
-        .find_mut(&parent_id)
-        .ok_or(Error::Wip(format!(
-            "[directory::add] parent directory not found: {}",
-            parent_id
-        )))?;
+    let item = state.root.find_mut(&parent_id).ok_or(Error::Wip(format!(
+        "[directory::add] parent directory not found: {}",
+        parent_id
+    )))?;
 
     if let DirectoryItem {
         children: Some(children),
