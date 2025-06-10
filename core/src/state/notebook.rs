@@ -259,10 +259,10 @@ impl NotebookState {
         })
     }
 
-    pub fn shortcuts(&self) -> Vec<String> {
+    pub fn keymap(&self) -> Vec<String> {
         match &self.inner_state {
             NoteTree(NoteTreeState::NoteSelected) => {
-                let mut shortcuts = vec![
+                let mut keymap = vec![
                     "[l]     Open note".to_owned(),
                     "[h]     Close parent directory".to_owned(),
                     "[j]     Select next".to_owned(),
@@ -279,14 +279,14 @@ impl NotebookState {
                 ];
 
                 if !self.tabs.is_empty() {
-                    shortcuts.push("[Tab]   Focus editor".to_owned());
+                    keymap.push("[Tab]   Focus editor".to_owned());
                 }
 
-                shortcuts.push("[Esc]   Quit".to_owned());
-                shortcuts
+                keymap.push("[Esc]   Quit".to_owned());
+                keymap
             }
             NoteTree(NoteTreeState::DirectorySelected) => {
-                let mut shortcuts = vec![
+                let mut keymap = vec![
                     "[l]     Toggle directory".to_owned(),
                     "[h]     Close parent directory".to_owned(),
                     "[j]     Select next".to_owned(),
@@ -302,11 +302,11 @@ impl NotebookState {
                 ];
 
                 if !self.tabs.is_empty() {
-                    shortcuts.push("[Tab]   Focus editor".to_owned());
+                    keymap.push("[Tab]   Focus editor".to_owned());
                 }
 
-                shortcuts.push("[Esc]   Quit".to_owned());
-                shortcuts
+                keymap.push("[Esc]   Quit".to_owned());
+                keymap
             }
             NoteTree(NoteTreeState::Numbering(n)) => {
                 vec![
