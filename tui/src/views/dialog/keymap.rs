@@ -1,5 +1,6 @@
 use {
     crate::theme::THEME,
+    glues_core::types::KeymapItem,
     ratatui::{
         Frame,
         layout::{
@@ -13,8 +14,12 @@ use {
     },
 };
 
-pub fn draw(frame: &mut Frame, keymap: &[String]) {
-    let width = keymap.iter().map(|s| s.len()).max().unwrap_or_default() as u16;
+pub fn draw(frame: &mut Frame, keymap: &[KeymapItem]) {
+    let width = keymap
+        .iter()
+        .map(|item| item.to_string().len())
+        .max()
+        .unwrap_or_default() as u16;
     let width = width.max(20);
     let [area] = Layout::horizontal([Length(width + 5)])
         .flex(Flex::End)
@@ -38,7 +43,7 @@ pub fn draw(frame: &mut Frame, keymap: &[String]) {
         );
 
     let inner_area = block.inner(area);
-    let message: Vec<Line> = keymap.iter().map(|v| v.as_str().into()).collect();
+    let message: Vec<Line> = keymap.iter().map(|v| v.to_string().into()).collect();
     let paragraph = Paragraph::new(message)
         .wrap(Wrap { trim: true })
         .style(Style::default())
