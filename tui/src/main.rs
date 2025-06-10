@@ -10,11 +10,11 @@ mod views;
 
 use {
     action::Action,
+    clap::{Parser, ValueEnum},
     color_eyre::Result,
     context::Context,
     glues_core::Glues,
     logger::*,
-    clap::{Parser, ValueEnum},
     ratatui::{
         DefaultTerminal, Frame,
         crossterm::{
