@@ -406,6 +406,12 @@ impl NotebookState {
                 vec![
                     format!("[i]      Enter delete inside mode"),
                     format!("[d]      Delete {n} lines"),
+                    "[0]      Delete from start of line".to_owned(),
+                    "[b]      Delete previous word".to_owned(),
+                    "[e]      Delete to word end".to_owned(),
+                    "[h]      Delete previous character".to_owned(),
+                    "[l]      Delete next character".to_owned(),
+                    "[$]      Delete to line end".to_owned(),
                     "[1-9]    Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc]    Cancel".to_owned(),
@@ -419,6 +425,11 @@ impl NotebookState {
                         format!("[d]      Delete {n1}*{n2} lines")
                     },
                     "[i]      Enter delete inside mode".to_owned(),
+                    "[b]      Delete previous word".to_owned(),
+                    "[e]      Delete to word end".to_owned(),
+                    "[h]      Delete previous character".to_owned(),
+                    "[l]      Delete next character".to_owned(),
+                    "[$]      Delete to line end".to_owned(),
                     "[0-9]    Append steps".to_owned(),
                     "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc]    Cancel".to_owned(),
@@ -431,6 +442,7 @@ impl NotebookState {
                     } else {
                         format!("[w]   Delete {n} words from cursor")
                     },
+                    "[Ctrl+h] Show Vim keymap".to_owned(),
                     "[Esc] Cancel".to_owned(),
                 ]
             }
