@@ -12,10 +12,11 @@ use {
         text::{Line, Span},
         widgets::{Block, Clear, Padding, Paragraph, Wrap},
     },
+    textwrap::wrap,
 };
 
-const KEYMAP_WIDTH: u16 = 60;
-const KEY_WIDTH: usize = 12;
+const KEYMAP_WIDTH: u16 = 46;
+const KEY_WIDTH: u16 = 10;
 
 pub fn draw(frame: &mut Frame, keymap: &[KeymapItem]) {
     let [area] = Layout::horizontal([Length(KEYMAP_WIDTH)])
@@ -40,16 +41,35 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapItem]) {
         );
 
     let inner_area = block.inner(area);
-    let message: Vec<Line> = keymap
+    let desc_width = inner_area.width.saturating_sub(KEY_WIDTH + 1);
+
+    let heights: Vec<u16> = keymap
         .iter()
-        .map(|v| format!("[{:<key_width$}] {}", v.key, v.desc, key_width = KEY_WIDTH).into())
+        .map(|item| wrap(&item.desc, desc_width as usize).len() as u16)
         .collect();
-    let paragraph = Paragraph::new(message)
-        .wrap(Wrap { trim: true })
-        .style(Style::default())
-        .alignment(Alignment::Left);
+
+    let row_constraints = heights.iter().map(|h| Length(*h)).collect::<Vec<_>>();
+    let rows = Layout::vertical(row_constraints).split(inner_area);
 
     frame.render_widget(Clear, area);
-    frame.render_widget(block, area);
-    frame.render_widget(paragraph, inner_area);
+    frame.render_widget(block.clone(), area);
+
+    for (row_area, item) in rows.iter().zip(keymap) {
+        let [key_area, desc_area] =
+            Layout::horizontal([Length(KEY_WIDTH), Length(desc_width)]).areas(*row_area);
+
+        let key_paragraph = Paragraph::new(Line::from(vec![Span::raw(format!("[{}]", item.key))]))
+            .alignment(Alignment::Left);
+        let desc_lines: Vec<Line> = wrap(&item.desc, desc_width as usize)
+            .into_iter()
+            .map(|c| Line::from(c.into_owned()))
+            .collect();
+        let desc_paragraph = Paragraph::new(desc_lines)
+            .wrap(Wrap { trim: true })
+            .alignment(Alignment::Left)
+            .style(Style::default());
+
+        frame.render_widget(key_paragraph, key_area);
+        frame.render_widget(desc_paragraph, desc_area);
+    }
 }
