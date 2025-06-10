@@ -2,11 +2,11 @@ pub mod entry;
 pub mod notebook;
 
 use {
-    crate::{Action, log, logger::*},
+    crate::{Action, log, logger::*, theme::THEME},
     glues_core::transition::VimKeymapKind,
     ratatui::{
         crossterm::event::{Event as Input, KeyCode, KeyEvent},
-        style::{Style, Stylize},
+        style::Style,
         text::Line,
         widgets::{Block, Borders},
     },
@@ -29,7 +29,7 @@ pub struct ContextPrompt {
 impl ContextPrompt {
     pub fn new(message: Vec<Line<'static>>, action: Action, default: Option<String>) -> Self {
         let mut widget = TextArea::new(vec![default.unwrap_or_default()]);
-        widget.set_cursor_style(Style::default().white().on_blue());
+        widget.set_cursor_style(Style::default().fg(THEME.accent_text).bg(THEME.accent));
         widget.set_block(
             Block::default()
                 .border_style(Style::default())

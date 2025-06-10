@@ -1,5 +1,5 @@
 use {
-    crate::color::*,
+    crate::theme::THEME,
     ratatui::{
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
@@ -18,8 +18,8 @@ pub fn draw(frame: &mut Frame) {
         .areas(area);
 
     let block = Block::bordered()
-        .fg(WHITE)
-        .bg(GRAY_DARK)
+        .fg(THEME.text)
+        .bg(THEME.surface)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Editor Keymap")
         .title_alignment(Alignment::Center);
@@ -69,7 +69,7 @@ Thanks to tui-textarea
         .wrap(Wrap { trim: true })
         .style(Style::default())
         .alignment(Alignment::Left);
-    let control = Line::from("Press any key to close".fg(GRAY_MEDIUM)).centered();
+    let control = Line::from("Press any key to close".fg(THEME.medium)).centered();
 
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);
