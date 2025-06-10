@@ -24,7 +24,10 @@ pub struct Theme {
     pub success_text: Color,
     pub error: Color,
     pub error_text: Color,
-    pub dim: Color,
+    /// text for disabled or unfocused elements
+    pub inactive_text: Color,
+    /// background for inactive highlights such as tabs
+    pub inactive_bg: Color,
     /// alternating breadcrumb background colors
     pub crumb_a: Color,
     pub crumb_b: Color,
@@ -48,7 +51,8 @@ pub const DARK_THEME: Theme = Theme {
     success_text: BLACK,
     error: RED,
     error_text: WHITE,
-    dim: GRAY_DIM,
+    inactive_text: GRAY_DIM,
+    inactive_bg: GRAY_DIM,
     crumb_a: GRAY_A,
     crumb_b: GRAY_B,
 };
@@ -72,7 +76,8 @@ pub const LIGHT_THEME: Theme = Theme {
     success_text: BLACK,
     error: RED,
     error_text: WHITE,
-    dim: GRAY_DIM,
+    inactive_text: GRAY_MEDIUM,
+    inactive_bg: GRAY_LIGHT,
     crumb_a: GRAY_B,
     crumb_b: GRAY_A,
 };

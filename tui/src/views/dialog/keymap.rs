@@ -24,7 +24,7 @@ pub fn draw(frame: &mut Frame, keymap: &[String]) {
         .areas(area);
 
     let block = Block::default()
-        .fg(THEME.dim)
+        .fg(THEME.inactive_text)
         .bg(THEME.panel)
         .padding(Padding::new(2, 2, 1, 1))
         .title(

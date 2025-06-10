@@ -26,7 +26,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
                 if context.notebook.state.is_editor() {
                     name.fg(THEME.accent_text).bg(THEME.accent)
                 } else {
-                    name.fg(THEME.accent_text).bg(THEME.dim)
+                    name.fg(THEME.accent_text).bg(THEME.inactive_bg)
                 }
             } else {
                 name.fg(THEME.hint)
@@ -71,7 +71,10 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
 
         (title, breadcrumb)
     } else {
-        (Line::from("[Editor]".fg(THEME.dim)), vec![Span::default()])
+        (
+            Line::from("[Editor]".fg(THEME.inactive_text)),
+            vec![Span::default()],
+        )
     };
 
     let (mode, bg) = match context.notebook.state {
@@ -154,7 +157,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     editor.set_cursor_style(cursor_style);
     editor.set_cursor_line_style(cursor_line_style);
     if show_line_number {
-        editor.set_line_number_style(Style::default().fg(THEME.dim));
+        editor.set_line_number_style(Style::default().fg(THEME.inactive_text));
     } else {
         editor.remove_line_number();
     }

@@ -172,7 +172,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[c] Delete the specified number of lines"),
                 Line::from(vec![
                     "[e] ".into(),
-                    "or ".fg(THEME.dim),
+                    "or ".fg(THEME.inactive_text),
                     "[w] Delete to the end of the word by the specified number of times".into(),
                 ]),
                 Line::raw(
@@ -207,7 +207,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[c] Delete the specified number of lines"),
                 Line::from(vec![
                     "[e] ".into(),
-                    "or ".fg(THEME.dim),
+                    "or ".fg(THEME.inactive_text),
                     "[w] Delete to the end of the word by the specified number of times".into(),
                 ]),
                 Line::raw(
@@ -235,7 +235,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::from("TO INSERT MODE".fg(THEME.warning_text).bg(THEME.warning)),
                 Line::from(vec![
                     "[s] ".into(),
-                    "or ".fg(THEME.dim),
+                    "or ".fg(THEME.inactive_text),
                     "[S] Substitute selected text and go to insert mode".into(),
                 ]),
                 Line::raw(""),
@@ -250,7 +250,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 ),
                 Line::from(vec![
                     "[d] ".into(),
-                    "or ".fg(THEME.dim),
+                    "or ".fg(THEME.inactive_text),
                     "[x] Delete selected text".into(),
                 ]),
                 Line::raw("[y] Yank (copy) selected text"),

@@ -34,7 +34,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
 
     let items = MENU_ITEMS.into_iter().map(|name| {
         if name.ends_with("CSV") || name.ends_with("JSON") {
-            name.fg(THEME.dim)
+            name.fg(THEME.inactive_text)
         } else {
             name.fg(THEME.menu)
         }

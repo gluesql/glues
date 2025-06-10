@@ -24,7 +24,9 @@ pub fn draw(frame: &mut Frame, area: Rect, state: &State, context: &NotebookCont
             .areas(area);
 
     frame.render_widget(
-        Text::raw(description).fg(THEME.dim).bg(THEME.panel),
+        Text::raw(description)
+            .fg(THEME.inactive_text)
+            .bg(THEME.panel),
         desc_area,
     );
 

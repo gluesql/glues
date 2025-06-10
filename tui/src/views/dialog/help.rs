@@ -69,7 +69,7 @@ pub fn draw(frame: &mut Frame) {
         Line::raw(""),
         Line::from(vec![
             "CSV".fg(THEME.warning_text).bg(THEME.warning),
-            " or ".fg(THEME.dim),
+            " or ".fg(THEME.inactive_text),
             "JSON".fg(THEME.warning_text).bg(THEME.warning),
         ]),
         Line::raw(

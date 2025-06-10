@@ -31,7 +31,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let title = if note_tree_focused {
         title.fg(THEME.highlight)
     } else {
-        title.fg(THEME.dim)
+        title.fg(THEME.inactive_text)
     };
     let block = Block::new()
         .borders(Borders::RIGHT)
