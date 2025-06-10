@@ -40,7 +40,7 @@ impl EntryContext {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the path:"),
-                    Line::from("If path not exists, it will be created.".fg(GRAY_MEDIUM)),
+                    Line::from("If the path does not exist, it will be created.".fg(GRAY_MEDIUM)),
                 ],
                 action: Box::new(action.into()),
                 default: config::get(key).await,
