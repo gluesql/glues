@@ -138,7 +138,7 @@ impl Context {
                 _ => Action::None,
             };
 
-            if !matches!(result, Action::Tui(TuiAction::Quit)) {
+            if !matches!(result, Action::Tui(TuiAction::Quit)) && code != KeyCode::Esc {
                 self.menu = Some(menu);
             }
 
