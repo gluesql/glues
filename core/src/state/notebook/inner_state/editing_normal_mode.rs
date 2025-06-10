@@ -464,6 +464,16 @@ async fn consume_delete(
 
             DeleteLines(n).into()
         }
+        Key(KeyEvent::J | KeyEvent::Down) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            DeleteLines(n + 1).into()
+        }
+        Key(KeyEvent::K | KeyEvent::Up) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            DeleteLinesUp(n + 1).into()
+        }
         Key(KeyEvent::B) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
@@ -528,6 +538,16 @@ async fn consume_delete2(
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
             DeleteLines(n1 * n2).into()
+        }
+        Key(KeyEvent::J | KeyEvent::Down) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            DeleteLines(n1 * n2 + 1).into()
+        }
+        Key(KeyEvent::K | KeyEvent::Up) => {
+            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+            DeleteLinesUp(n1 * n2 + 1).into()
         }
         Key(KeyEvent::I) => {
             state.inner_state =
