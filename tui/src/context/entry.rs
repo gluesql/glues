@@ -87,8 +87,8 @@ impl EntryContext {
             }
             KeyCode::Char('1') => EntryEvent::OpenMemory.into(),
             KeyCode::Char('2') => open(LAST_FILE_PATH, TuiAction::OpenFile).await,
-            KeyCode::Char('3') => open_mongo().await,
-            KeyCode::Char('4') => open_git().await,
+            KeyCode::Char('3') => open_git().await,
+            KeyCode::Char('4') => open_mongo().await,
             KeyCode::Char('5') => open(LAST_CSV_PATH, TuiAction::OpenCsv).await,
             KeyCode::Char('6') => open(LAST_JSON_PATH, TuiAction::OpenJson).await,
             KeyCode::Char('a') => TuiAction::Help.into(),
