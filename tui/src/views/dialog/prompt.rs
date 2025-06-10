@@ -1,8 +1,8 @@
 use {
     crate::{
-        color::*,
         context::{Context, ContextPrompt},
         logger::*,
+        theme::THEME,
     },
     ratatui::{
         Frame,
@@ -29,8 +29,8 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .areas(area);
 
     let block = Block::bordered()
-        .bg(GRAY_DARK)
-        .fg(WHITE)
+        .bg(THEME.surface)
+        .fg(THEME.text)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Prompt")
         .title_alignment(Alignment::Center);
@@ -43,8 +43,8 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .alignment(Alignment::Left);
 
     let lines = vec![
-        "[Enter] Submit".fg(GRAY_LIGHT).into(),
-        "[Esc] Cancel".fg(GRAY_LIGHT).into(),
+        "[Enter] Submit".fg(THEME.text_secondary).into(),
+        "[Esc] Cancel".fg(THEME.text_secondary).into(),
     ];
     let control = Paragraph::new(lines)
         .wrap(Wrap { trim: true })

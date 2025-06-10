@@ -1,5 +1,5 @@
 use {
-    crate::{color::*, context::Context, logger::*},
+    crate::{context::Context, logger::*, theme::THEME},
     ratatui::{
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
@@ -16,8 +16,8 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
     let [area] = Layout::vertical([Length(8)]).flex(Flex::Center).areas(area);
 
     let block = Block::bordered()
-        .fg(WHITE)
-        .bg(GRAY_DARK)
+        .fg(THEME.text)
+        .bg(THEME.surface)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Alert")
         .title_alignment(Alignment::Center);
@@ -37,7 +37,7 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .wrap(Wrap { trim: true })
         .style(Style::default())
         .alignment(Alignment::Left);
-    let control = Line::from("Press any key to close".fg(GRAY_LIGHT)).centered();
+    let control = Line::from("Press any key to close".fg(THEME.text_secondary)).centered();
 
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);

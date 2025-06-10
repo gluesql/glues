@@ -1,7 +1,7 @@
 use {
     crate::{
-        color::*,
         context::{Context, notebook::ContextState},
+        theme::THEME,
     },
     ratatui::{
         Frame,
@@ -24,12 +24,12 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             let name = format!(" {NOTE_SYMBOL}{} ", tab.note.name.clone());
             let name = if i == tab_index {
                 if context.notebook.state.is_editor() {
-                    name.fg(WHITE).bg(BLUE)
+                    name.fg(THEME.accent_text).bg(THEME.accent)
                 } else {
-                    name.fg(WHITE).bg(GRAY_DIM)
+                    name.fg(THEME.accent_text).bg(THEME.inactive_bg)
                 }
             } else {
-                name.fg(GRAY_MEDIUM)
+                name.fg(THEME.hint)
             };
 
             title.push(name);
@@ -45,45 +45,59 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             .enumerate()
         {
             let (color_a, color_b) = if i % 2 == 0 {
-                (GRAY_A, GRAY_B)
+                (THEME.crumb_a, THEME.crumb_b)
             } else {
-                (GRAY_B, GRAY_A)
+                (THEME.crumb_b, THEME.crumb_a)
             };
 
             let name = if i == 0 {
-                breadcrumb.push(Span::raw("  󰝰 ").fg(YELLOW).bg(color_a));
+                breadcrumb.push(Span::raw("  󰝰 ").fg(THEME.warning).bg(color_a));
                 format!("{name} ")
             } else if i == last_index {
                 format!(" 󱇗 {name} ")
             } else {
-                breadcrumb.push(Span::raw(" 󰝰 ").fg(YELLOW).bg(color_a));
+                breadcrumb.push(Span::raw(" 󰝰 ").fg(THEME.warning).bg(color_a));
                 format!("{name} ")
             };
 
-            breadcrumb.push(Span::raw(name).fg(BLACK).bg(color_a));
+            breadcrumb.push(Span::raw(name).fg(THEME.warning_text).bg(color_a));
 
             if i < last_index {
                 breadcrumb.push(Span::raw("").fg(color_a).bg(color_b));
             } else {
-                breadcrumb.push(Span::raw("").fg(color_a).bg(GRAY_BLACK));
+                breadcrumb.push(Span::raw("").fg(color_a).bg(THEME.background));
             }
         }
 
         (title, breadcrumb)
     } else {
-        (Line::from("[Editor]".fg(GRAY_DIM)), vec![Span::default()])
+        (
+            Line::from("[Editor]".fg(THEME.inactive_text)),
+            vec![Span::default()],
+        )
     };
 
     let (mode, bg) = match context.notebook.state {
-        ContextState::EditorNormalMode { .. } => (Span::raw(" NORMAL ").fg(WHITE).bg(BLACK), BLACK),
-        ContextState::EditorInsertMode => (Span::raw(" INSERT ").fg(BLACK).bg(YELLOW), YELLOW),
-        ContextState::EditorVisualMode => (Span::raw(" VISUAL ").fg(WHITE).bg(RED), RED),
-        _ => (Span::raw("        ").bg(GRAY_DARK), GRAY_DARK),
+        ContextState::EditorNormalMode { .. } => (
+            Span::raw(" NORMAL ").fg(THEME.text).bg(THEME.background),
+            THEME.background,
+        ),
+        ContextState::EditorInsertMode => (
+            Span::raw(" INSERT ")
+                .fg(THEME.warning_text)
+                .bg(THEME.warning),
+            THEME.warning,
+        ),
+        ContextState::EditorVisualMode => (
+            Span::raw(" VISUAL ").fg(THEME.error_text).bg(THEME.error),
+            THEME.error,
+        ),
+        _ => (Span::raw("        ").bg(THEME.surface), THEME.surface),
     };
 
     if context.notebook.tab_index.is_some() {
         bottom_left.insert(0, mode);
-        bottom_left.insert(1, Span::raw("").fg(bg).bg(GRAY_A));
+        bottom_left.insert(1, Span::raw("").fg(bg).bg(THEME.crumb_a));
     }
 
     let bottom_left = Line::from(bottom_left);
@@ -94,18 +108,25 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     ) {
         (_, true) => block.title_bottom(
             Line::from(vec![
-                Span::raw("").fg(YELLOW).bg(GRAY_BLACK),
-                Span::raw(" 󰔚 Saving... ").fg(BLACK).bg(YELLOW),
+                Span::raw("").fg(THEME.warning).bg(THEME.background),
+                Span::raw(" 󰔚 Saving... ")
+                    .fg(THEME.warning_text)
+                    .bg(THEME.warning),
             ])
             .right_aligned(),
         ),
-        (Some((log, _)), false) => {
-            block.title_bottom(Line::from(format!(" {} ", log).fg(BLACK).bg(GREEN)).right_aligned())
-        }
+        (Some((log, _)), false) => block.title_bottom(
+            Line::from(
+                format!(" {} ", log)
+                    .fg(THEME.success_text)
+                    .bg(THEME.success),
+            )
+            .right_aligned(),
+        ),
         (None, false) => block,
     }
-    .fg(WHITE)
-    .bg(GRAY_BLACK)
+    .fg(THEME.text)
+    .bg(THEME.background)
     .padding(if context.notebook.show_line_number {
         Padding::ZERO
     } else {
@@ -127,7 +148,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         ContextState::EditorNormalMode { .. }
         | ContextState::EditorInsertMode
         | ContextState::EditorVisualMode => (
-            Style::default().fg(WHITE).bg(BLUE),
+            Style::default().fg(THEME.accent_text).bg(THEME.accent),
             Style::default().underlined(),
         ),
         _ => (Style::default(), Style::default()),
@@ -136,7 +157,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     editor.set_cursor_style(cursor_style);
     editor.set_cursor_line_style(cursor_line_style);
     if show_line_number {
-        editor.set_line_number_style(Style::default().fg(GRAY_DIM));
+        editor.set_line_number_style(Style::default().fg(THEME.inactive_text));
     } else {
         editor.remove_line_number();
     }

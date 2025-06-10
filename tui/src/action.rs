@@ -1,13 +1,13 @@
 use {
     super::{
         App,
-        color::*,
         config::{
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
             LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME,
         },
         context::ContextPrompt,
         logger::*,
+        theme::THEME,
     },
     glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey},
     ratatui::{
@@ -121,7 +121,7 @@ impl App {
                     .take_prompt_input()
                     .log_expect("prompt must not be none");
                 let message = vec![
-                    Line::from(format!("path: {path}").fg(GRAY_MEDIUM)),
+                    Line::from(format!("path: {path}").fg(THEME.hint)),
                     Line::raw(""),
                     Line::raw("Enter the git remote:"),
                 ];
@@ -137,8 +137,8 @@ impl App {
                     .take_prompt_input()
                     .log_expect("prompt must not be none");
                 let message = vec![
-                    Line::from(format!("path: {path}").fg(GRAY_MEDIUM)),
-                    Line::from(format!("remote: {remote}").fg(GRAY_MEDIUM)),
+                    Line::from(format!("path: {path}").fg(THEME.hint)),
+                    Line::from(format!("remote: {remote}").fg(THEME.hint)),
                     Line::raw(""),
                     Line::raw("Enter the git branch:"),
                 ];
@@ -173,7 +173,7 @@ impl App {
                     .take_prompt_input()
                     .log_expect("conn str must not be none");
                 let message = vec![
-                    Line::from(format!("conn_str: {conn_str}").fg(GRAY_MEDIUM)),
+                    Line::from(format!("conn_str: {conn_str}").fg(THEME.hint)),
                     Line::raw(""),
                     Line::raw("Enter the database name:"),
                 ];

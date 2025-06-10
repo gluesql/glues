@@ -1,5 +1,5 @@
 use {
-    crate::color::*,
+    crate::theme::THEME,
     ratatui::{
         Frame,
         layout::{
@@ -24,13 +24,15 @@ pub fn draw(frame: &mut Frame, keymap: &[String]) {
         .areas(area);
 
     let block = Block::default()
-        .fg(GRAY_DARK)
-        .bg(GRAY_WHITE)
+        .fg(THEME.inactive_text)
+        .bg(THEME.panel)
         .padding(Padding::new(2, 2, 1, 1))
         .title(
             Line::from(vec![
-                Span::raw("").fg(GREEN).bg(GRAY_WHITE),
-                Span::raw(" [?] Hide keymap ").fg(BLACK).bg(GREEN),
+                Span::raw("").fg(THEME.success).bg(THEME.panel),
+                Span::raw(" [?] Hide keymap ")
+                    .fg(THEME.success_text)
+                    .bg(THEME.success),
             ])
             .right_aligned(),
         );

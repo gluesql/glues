@@ -1,8 +1,8 @@
 use {
     crate::{
-        color::*,
         context::{NotebookContext, notebook::ContextState},
         logger::*,
+        theme::THEME,
     },
     glues_core::state::State,
     ratatui::{
@@ -24,20 +24,22 @@ pub fn draw(frame: &mut Frame, area: Rect, state: &State, context: &NotebookCont
             .areas(area);
 
     frame.render_widget(
-        Text::raw(description).fg(GRAY_DARK).bg(GRAY_WHITE),
+        Text::raw(description)
+            .fg(THEME.inactive_text)
+            .bg(THEME.panel),
         desc_area,
     );
 
     frame.render_widget(
         Line::from(vec![
-            Span::raw("").fg(GREEN).bg(GRAY_WHITE),
+            Span::raw("").fg(THEME.success).bg(THEME.panel),
             Span::raw(if insert_mode {
                 " [Ctrl+h] Show keymap "
             } else {
                 " [?] Show keymap "
             })
-            .fg(BLACK)
-            .bg(GREEN),
+            .fg(THEME.success_text)
+            .bg(THEME.success),
         ]),
         keymap_area,
     );

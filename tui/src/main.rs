@@ -4,6 +4,7 @@ pub mod context;
 mod logger;
 mod color;
 mod config;
+mod theme;
 mod transitions;
 mod views;
 

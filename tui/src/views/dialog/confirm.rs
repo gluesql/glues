@@ -1,5 +1,5 @@
 use {
-    crate::{color::*, context::Context, logger::*},
+    crate::{context::Context, logger::*, theme::THEME},
     ratatui::{
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
@@ -15,8 +15,8 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
     let [area] = Layout::vertical([Length(9)]).flex(Flex::Center).areas(area);
 
     let block = Block::bordered()
-        .bg(GRAY_DARK)
-        .fg(WHITE)
+        .bg(THEME.surface)
+        .fg(THEME.text)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Confirm")
         .title_alignment(Alignment::Center);
@@ -35,8 +35,8 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .alignment(Alignment::Left);
 
     let lines = vec![
-        "[y] Confirm".fg(GRAY_LIGHT).into(),
-        "[n] Cancel".fg(GRAY_LIGHT).into(),
+        "[y] Confirm".fg(THEME.text_secondary).into(),
+        "[n] Cancel".fg(THEME.text_secondary).into(),
     ];
     let control = Paragraph::new(lines)
         .wrap(Wrap { trim: true })

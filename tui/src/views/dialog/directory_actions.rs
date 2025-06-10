@@ -1,7 +1,7 @@
 use {
     crate::{
-        color::*,
         context::{NotebookContext, notebook::DIRECTORY_ACTIONS},
+        theme::THEME,
     },
     ratatui::{
         Frame,
@@ -18,14 +18,14 @@ pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
     let [area] = Layout::vertical([Length(9)]).flex(Flex::Center).areas(area);
 
     let block = Block::bordered()
-        .bg(GRAY_DARK)
-        .fg(WHITE)
+        .bg(THEME.surface)
+        .fg(THEME.text)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Directory Actions")
         .title_alignment(Alignment::Center);
     let list = List::new(DIRECTORY_ACTIONS)
         .block(block)
-        .highlight_style(Style::new().fg(WHITE).bg(BLUE))
+        .highlight_style(Style::new().fg(THEME.accent_text).bg(THEME.accent))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);

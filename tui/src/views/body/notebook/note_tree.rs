@@ -1,10 +1,10 @@
 use {
     crate::{
-        color::*,
         context::{
             NotebookContext,
             notebook::{ContextState, TreeItem, TreeItemKind},
         },
+        theme::THEME,
     },
     ratatui::{
         Frame,
@@ -29,14 +29,14 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     );
     let title = "[Browser]";
     let title = if note_tree_focused {
-        title.fg(SKY_BLUE)
+        title.fg(THEME.highlight)
     } else {
-        title.fg(GRAY_DIM)
+        title.fg(THEME.inactive_text)
     };
     let block = Block::new()
         .borders(Borders::RIGHT)
         .border_type(BorderType::QuadrantOutside)
-        .fg(GRAY_DARK)
+        .fg(THEME.hint)
         .title(title);
     let inner_area = block.inner(area);
 
@@ -61,30 +61,38 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
                     let symbol = if *opened { OPEN_SYMBOL } else { CLOSED_SYMBOL };
                     Line::from(vec![
                         format!("{:pad$}", "").into(),
-                        Span::raw(symbol).fg(YELLOW),
+                        Span::raw(symbol).fg(THEME.warning),
                         Span::raw(&directory.name),
                     ])
                 }
             };
 
             match (selectable, target) {
-                (true, _) => line.fg(WHITE),
-                (false, true) => line.fg(MAGENTA),
+                (true, _) => line.fg(THEME.text),
+                (false, true) => line.fg(THEME.target),
                 (false, false) => line.dim(),
             }
         },
     );
 
-    let list = List::new(tree_items)
-        .highlight_style(Style::new().fg(GRAY_WHITE).bg(if note_tree_focused {
-            BLUE
+    let highlight_style = Style::default()
+        .bg(if note_tree_focused {
+            THEME.accent
         } else {
-            GRAY_DARK
-        }))
+            THEME.surface
+        })
+        .fg(if note_tree_focused {
+            THEME.accent_text
+        } else {
+            THEME.text
+        });
+
+    let list = List::new(tree_items)
+        .highlight_style(highlight_style)
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);
 
-    frame.render_widget(block.bg(GRAY_BLACK), area);
+    frame.render_widget(block.bg(THEME.background), area);
     frame.render_stateful_widget(list, inner_area, &mut context.tree_state);
 }
