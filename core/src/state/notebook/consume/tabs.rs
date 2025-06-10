@@ -16,27 +16,6 @@ pub async fn select_prev(db: &mut Db, state: &mut NotebookState) -> Result<Noteb
     let i = state
         .tab_index
         .ok_or(Error::Wip("opened note must exist".to_owned()))?;
-    let i = if i + 1 >= state.tabs.len() { 0 } else { i + 1 };
-    state.tab_index = Some(i);
-
-    let note = &state.tabs[i].note;
-    state.selected = SelectedItem::Note(note.clone());
-
-    let note_id = note.id.clone();
-    let directory_id = note.directory_id.clone();
-
-    directory::open_all(db, state, directory_id).await?;
-    Ok(NotebookTransition::EditingNormalMode(
-        NormalModeTransition::NextTab(note_id),
-    ))
-}
-
-pub async fn select_next(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTransition> {
-    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
-
-    let i = state
-        .tab_index
-        .ok_or(Error::Wip("opened note must exist".to_owned()))?;
     let i = if i == 0 { state.tabs.len() - 1 } else { i - 1 };
     state.tab_index = Some(i);
 
@@ -49,6 +28,27 @@ pub async fn select_next(db: &mut Db, state: &mut NotebookState) -> Result<Noteb
     directory::open_all(db, state, directory_id).await?;
     Ok(NotebookTransition::EditingNormalMode(
         NormalModeTransition::PrevTab(note_id),
+    ))
+}
+
+pub async fn select_next(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTransition> {
+    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+
+    let i = state
+        .tab_index
+        .ok_or(Error::Wip("opened note must exist".to_owned()))?;
+    let i = if i + 1 >= state.tabs.len() { 0 } else { i + 1 };
+    state.tab_index = Some(i);
+
+    let note = &state.tabs[i].note;
+    state.selected = SelectedItem::Note(note.clone());
+
+    let note_id = note.id.clone();
+    let directory_id = note.directory_id.clone();
+
+    directory::open_all(db, state, directory_id).await?;
+    Ok(NotebookTransition::EditingNormalMode(
+        NormalModeTransition::NextTab(note_id),
     ))
 }
 
