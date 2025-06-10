@@ -58,7 +58,6 @@ pub const DARK_THEME: Theme = Theme {
     crumb_b: GRAY_B,
 };
 
-#[allow(dead_code)]
 pub const LIGHT_THEME: Theme = Theme {
     background: WHITE,
     surface: GRAY_WHITE,
