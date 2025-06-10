@@ -7,6 +7,7 @@ pub const BLUE: Color = Color::Indexed(27);
 pub const YELLOW: Color = Color::Indexed(220);
 pub const MAGENTA: Color = Color::Indexed(128);
 pub const SKY_BLUE: Color = Color::Indexed(32);
+pub const PINK: Color = Color::Indexed(205);
 
 // Neutral
 pub const GRAY_BLACK: Color = Color::Indexed(234);

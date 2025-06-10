@@ -75,12 +75,20 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
         },
     );
 
-    let list = List::new(tree_items)
-        .highlight_style(Style::new().fg(THEME.panel).bg(if note_tree_focused {
+    let highlight_style = Style::default()
+        .bg(if note_tree_focused {
             THEME.accent
         } else {
             THEME.surface
-        }))
+        })
+        .fg(if note_tree_focused {
+            THEME.accent_text
+        } else {
+            THEME.text
+        });
+
+    let list = List::new(tree_items)
+        .highlight_style(highlight_style)
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);
