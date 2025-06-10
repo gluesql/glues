@@ -29,7 +29,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     );
     let title = "[Browser]";
     let title = if note_tree_focused {
-        title.fg(THEME.accent)
+        title.fg(THEME.highlight)
     } else {
         title.fg(THEME.dim)
     };
@@ -69,7 +69,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
 
             match (selectable, target) {
                 (true, _) => line.fg(THEME.text),
-                (false, true) => line.fg(THEME.accent),
+                (false, true) => line.fg(THEME.target),
                 (false, false) => line.dim(),
             }
         },
