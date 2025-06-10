@@ -29,7 +29,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
                     name.fg(THEME.accent_text).bg(THEME.dim)
                 }
             } else {
-                name.fg(THEME.medium)
+                name.fg(THEME.hint)
             };
 
             title.push(name);
@@ -45,9 +45,9 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             .enumerate()
         {
             let (color_a, color_b) = if i % 2 == 0 {
-                (THEME.neutral_a, THEME.neutral_b)
+                (THEME.crumb_a, THEME.crumb_b)
             } else {
-                (THEME.neutral_b, THEME.neutral_a)
+                (THEME.crumb_b, THEME.crumb_a)
             };
 
             let name = if i == 0 {
@@ -94,7 +94,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
 
     if context.notebook.tab_index.is_some() {
         bottom_left.insert(0, mode);
-        bottom_left.insert(1, Span::raw("").fg(bg).bg(THEME.neutral_a));
+        bottom_left.insert(1, Span::raw("").fg(bg).bg(THEME.crumb_a));
     }
 
     let bottom_left = Line::from(bottom_left);

@@ -309,7 +309,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         .wrap(Wrap { trim: true })
         .style(Style::default())
         .alignment(Alignment::Left);
-    let control = Line::from("Press any key to close".fg(THEME.medium)).centered();
+    let control = Line::from("Press any key to close".fg(THEME.hint)).centered();
 
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);

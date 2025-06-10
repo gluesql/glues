@@ -36,7 +36,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     let block = Block::new()
         .borders(Borders::RIGHT)
         .border_type(BorderType::QuadrantOutside)
-        .fg(THEME.medium)
+        .fg(THEME.hint)
         .title(title);
     let inner_area = block.inner(area);
 
@@ -76,15 +76,11 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     );
 
     let list = List::new(tree_items)
-        .highlight_style(
-            Style::new()
-                .fg(THEME.neutral_white)
-                .bg(if note_tree_focused {
-                    THEME.accent
-                } else {
-                    THEME.surface
-                }),
-        )
+        .highlight_style(Style::new().fg(THEME.panel).bg(if note_tree_focused {
+            THEME.accent
+        } else {
+            THEME.surface
+        }))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);

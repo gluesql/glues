@@ -6,8 +6,14 @@ use ratatui::style::Color;
 pub struct Theme {
     pub background: Color,
     pub surface: Color,
+    /// background for status bars or popups
+    pub panel: Color,
     pub text: Color,
     pub text_secondary: Color,
+    /// hint or description text
+    pub hint: Color,
+    /// menu item text
+    pub menu: Color,
     pub accent: Color,
     pub accent_text: Color,
     pub highlight: Color,
@@ -19,18 +25,19 @@ pub struct Theme {
     pub error: Color,
     pub error_text: Color,
     pub dim: Color,
-    pub medium: Color,
-    pub light: Color,
-    pub neutral_a: Color,
-    pub neutral_b: Color,
-    pub neutral_white: Color,
+    /// alternating breadcrumb background colors
+    pub crumb_a: Color,
+    pub crumb_b: Color,
 }
 
 pub const DARK_THEME: Theme = Theme {
     background: GRAY_BLACK,
     surface: GRAY_DARK,
+    panel: GRAY_WHITE,
     text: WHITE,
     text_secondary: GRAY_LIGHT,
+    hint: GRAY_MEDIUM,
+    menu: GRAY_LIGHT,
     accent: BLUE,
     accent_text: WHITE,
     highlight: SKY_BLUE,
@@ -42,19 +49,19 @@ pub const DARK_THEME: Theme = Theme {
     error: RED,
     error_text: WHITE,
     dim: GRAY_DIM,
-    medium: GRAY_MEDIUM,
-    light: GRAY_LIGHT,
-    neutral_a: GRAY_A,
-    neutral_b: GRAY_B,
-    neutral_white: GRAY_WHITE,
+    crumb_a: GRAY_A,
+    crumb_b: GRAY_B,
 };
 
 #[allow(dead_code)]
 pub const LIGHT_THEME: Theme = Theme {
     background: WHITE,
     surface: GRAY_WHITE,
+    panel: GRAY_LIGHT,
     text: BLACK,
     text_secondary: GRAY_MEDIUM,
+    hint: GRAY_MEDIUM,
+    menu: GRAY_DARK,
     accent: BLUE,
     accent_text: WHITE,
     highlight: BLUE,
@@ -66,11 +73,8 @@ pub const LIGHT_THEME: Theme = Theme {
     error: RED,
     error_text: WHITE,
     dim: GRAY_DIM,
-    medium: GRAY_MEDIUM,
-    light: GRAY_LIGHT,
-    neutral_a: GRAY_A,
-    neutral_b: GRAY_B,
-    neutral_white: GRAY_WHITE,
+    crumb_a: GRAY_B,
+    crumb_b: GRAY_A,
 };
 
 pub static THEME: Theme = DARK_THEME;

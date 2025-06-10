@@ -121,7 +121,7 @@ impl App {
                     .take_prompt_input()
                     .log_expect("prompt must not be none");
                 let message = vec![
-                    Line::from(format!("path: {path}").fg(THEME.medium)),
+                    Line::from(format!("path: {path}").fg(THEME.hint)),
                     Line::raw(""),
                     Line::raw("Enter the git remote:"),
                 ];
@@ -137,8 +137,8 @@ impl App {
                     .take_prompt_input()
                     .log_expect("prompt must not be none");
                 let message = vec![
-                    Line::from(format!("path: {path}").fg(THEME.medium)),
-                    Line::from(format!("remote: {remote}").fg(THEME.medium)),
+                    Line::from(format!("path: {path}").fg(THEME.hint)),
+                    Line::from(format!("remote: {remote}").fg(THEME.hint)),
                     Line::raw(""),
                     Line::raw("Enter the git branch:"),
                 ];
@@ -173,7 +173,7 @@ impl App {
                     .take_prompt_input()
                     .log_expect("conn str must not be none");
                 let message = vec![
-                    Line::from(format!("conn_str: {conn_str}").fg(THEME.medium)),
+                    Line::from(format!("conn_str: {conn_str}").fg(THEME.hint)),
                     Line::raw(""),
                     Line::raw("Enter the database name:"),
                 ];

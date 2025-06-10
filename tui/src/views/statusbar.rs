@@ -24,13 +24,13 @@ pub fn draw(frame: &mut Frame, area: Rect, state: &State, context: &NotebookCont
             .areas(area);
 
     frame.render_widget(
-        Text::raw(description).fg(THEME.dim).bg(THEME.neutral_white),
+        Text::raw(description).fg(THEME.dim).bg(THEME.panel),
         desc_area,
     );
 
     frame.render_widget(
         Line::from(vec![
-            Span::raw("").fg(THEME.success).bg(THEME.neutral_white),
+            Span::raw("").fg(THEME.success).bg(THEME.panel),
             Span::raw(if insert_mode {
                 " [Ctrl+h] Show keymap "
             } else {

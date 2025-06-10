@@ -40,7 +40,7 @@ impl EntryContext {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the path:"),
-                    Line::from("If the path does not exist, it will be created.".fg(THEME.medium)),
+                    Line::from("If the path does not exist, it will be created.".fg(THEME.hint)),
                 ],
                 action: Box::new(action.into()),
                 default: config::get(key).await,
@@ -52,10 +52,8 @@ impl EntryContext {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the git repository path:"),
-                    Line::from(
-                        "The path must contain an existing .git repository.".fg(THEME.medium),
-                    ),
-                    Line::from("otherwise, an error will occur.".fg(THEME.medium)),
+                    Line::from("The path must contain an existing .git repository.".fg(THEME.hint)),
+                    Line::from("otherwise, an error will occur.".fg(THEME.hint)),
                 ],
                 action: Box::new(TuiAction::OpenGit(OpenGitStep::Path).into()),
                 default: config::get(LAST_GIT_PATH).await,
@@ -67,7 +65,7 @@ impl EntryContext {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the MongoDB connection string:"),
-                    Line::from("e.g. mongodb://localhost:27017".fg(THEME.medium)),
+                    Line::from("e.g. mongodb://localhost:27017".fg(THEME.hint)),
                 ],
                 action: Box::new(TuiAction::OpenMongo(OpenMongoStep::ConnStr).into()),
                 default: config::get(LAST_MONGO_CONN_STR).await,

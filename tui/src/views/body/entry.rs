@@ -36,7 +36,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
         if name.ends_with("CSV") || name.ends_with("JSON") {
             name.fg(THEME.dim)
         } else {
-            name.fg(THEME.light)
+            name.fg(THEME.menu)
         }
     });
     let list = List::new(items)

@@ -25,11 +25,11 @@ pub fn draw(frame: &mut Frame, keymap: &[String]) {
 
     let block = Block::default()
         .fg(THEME.dim)
-        .bg(THEME.neutral_white)
+        .bg(THEME.panel)
         .padding(Padding::new(2, 2, 1, 1))
         .title(
             Line::from(vec![
-                Span::raw("").fg(THEME.success).bg(THEME.neutral_white),
+                Span::raw("").fg(THEME.success).bg(THEME.panel),
                 Span::raw(" [?] Hide keymap ")
                     .fg(THEME.success_text)
                     .bg(THEME.success),
