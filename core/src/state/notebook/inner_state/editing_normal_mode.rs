@@ -178,8 +178,8 @@ async fn consume_toggle(
     use NormalModeTransition::*;
 
     match event {
-        Key(KeyEvent::L | KeyEvent::Right) => tabs::select_prev(db, state).await,
-        Key(KeyEvent::H | KeyEvent::Left) => tabs::select_next(db, state).await,
+        Key(KeyEvent::L | KeyEvent::Right) => tabs::select_next(db, state).await,
+        Key(KeyEvent::H | KeyEvent::Left) => tabs::select_prev(db, state).await,
         Key(KeyEvent::CapH) => tabs::move_prev(state),
         Key(KeyEvent::CapL) => tabs::move_next(state),
         Key(KeyEvent::X) => tabs::close(db, state).await,
