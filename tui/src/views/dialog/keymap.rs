@@ -10,7 +10,7 @@ use {
         },
         style::{Style, Stylize},
         text::{Line, Span},
-        widgets::{Block, Clear, Padding, Paragraph, Wrap},
+        widgets::{Block, Clear, Padding, Paragraph},
     },
     textwrap::wrap,
 };
@@ -65,7 +65,6 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapItem]) {
             .map(|c| Line::from(c.into_owned()))
             .collect();
         let desc_paragraph = Paragraph::new(desc_lines)
-            .wrap(Wrap { trim: true })
             .alignment(Alignment::Left)
             .style(Style::default());
 
