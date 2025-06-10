@@ -72,7 +72,7 @@ impl EntryState {
         )
     }
 
-    pub fn shortcuts(&self) -> Vec<String> {
+    pub fn keymap(&self) -> Vec<String> {
         vec![
             "[j]     Select next".to_owned(),
             "[k]     Select previous".to_owned(),

@@ -44,10 +44,10 @@ impl State {
         }
     }
 
-    pub fn shortcuts(&self) -> Vec<String> {
+    pub fn keymap(&self) -> Vec<String> {
         match &self.inner {
-            InnerState::EntryState(state) => state.shortcuts(),
-            InnerState::NotebookState(state) => state.shortcuts(),
+            InnerState::EntryState(state) => state.keymap(),
+            InnerState::NotebookState(state) => state.keymap(),
         }
     }
 }
