@@ -179,6 +179,7 @@ pub enum NormalModeTransition {
     DeleteChars(usize),
     DeleteCharsBack(usize),
     DeleteLines(usize),
+    DeleteLinesUp(usize),
     DeleteLinesAndInsert(usize),
     DeleteWordEnd(usize),
     DeleteWordBack(usize),

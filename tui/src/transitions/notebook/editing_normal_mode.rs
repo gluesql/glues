@@ -226,6 +226,24 @@ impl App {
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
+            DeleteLinesUp(n) => {
+                let editor = self.context.notebook.get_editor_mut();
+                let (row, _) = editor.cursor();
+
+                let start_row = row.saturating_sub(n - 1);
+                editor.move_cursor(CursorMove::Jump(start_row as u16, 0));
+                editor.start_selection();
+                let cursor_move = cursor_move_down(editor, n - 1);
+                editor.move_cursor(cursor_move);
+                editor.move_cursor(CursorMove::End);
+                editor.cut();
+
+                editor.move_cursor(CursorMove::Jump(start_row as u16, 0));
+                move_cursor_to_line_non_empty_start(editor);
+                self.context.notebook.line_yanked = true;
+                self.context.notebook.mark_dirty();
+                self.context.notebook.update_yank();
+            }
             DeleteLinesAndInsert(n) => {
                 let editor = self.context.notebook.get_editor_mut();
                 editor.move_cursor(CursorMove::Head);
