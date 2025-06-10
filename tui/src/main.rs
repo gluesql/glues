@@ -14,6 +14,7 @@ use {
     context::Context,
     glues_core::Glues,
     logger::*,
+    clap::{Parser, ValueEnum},
     ratatui::{
         DefaultTerminal, Frame,
         crossterm::{
@@ -28,8 +29,28 @@ use {
     std::time::Duration,
 };
 
+#[derive(Parser)]
+#[command(author, version, about)]
+struct Cli {
+    #[arg(long, value_enum, default_value_t = ThemeArg::Dark)]
+    theme: ThemeArg,
+}
+
+#[derive(Clone, Copy, ValueEnum)]
+enum ThemeArg {
+    Dark,
+    Light,
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
+    let cli = Cli::parse();
+
+    match cli.theme {
+        ThemeArg::Dark => theme::set_theme(theme::DARK_THEME),
+        ThemeArg::Light => theme::set_theme(theme::LIGHT_THEME),
+    }
+
     config::init().await;
     logger::init().await;
     color_eyre::install()?;

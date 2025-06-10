@@ -1,4 +1,5 @@
 use crate::color::*;
+use once_cell::sync::OnceCell;
 use ratatui::style::Color;
 
 #[derive(Clone, Copy, Debug)]
@@ -82,4 +83,20 @@ pub const LIGHT_THEME: Theme = Theme {
     crumb_b: GRAY_A,
 };
 
-pub static THEME: Theme = DARK_THEME;
+pub struct ThemeWrapper;
+
+static THEME_CELL: OnceCell<Theme> = OnceCell::new();
+
+impl std::ops::Deref for ThemeWrapper {
+    type Target = Theme;
+
+    fn deref(&self) -> &Self::Target {
+        THEME_CELL.get_or_init(|| DARK_THEME)
+    }
+}
+
+pub static THEME: ThemeWrapper = ThemeWrapper;
+
+pub fn set_theme(theme: Theme) {
+    let _ = THEME_CELL.set(theme);
+}
