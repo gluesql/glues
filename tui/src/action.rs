@@ -5,7 +5,7 @@ use {
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
             LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME,
         },
-        context::ContextPrompt,
+        context::{ContextPrompt, MenuContext},
         logger::*,
         theme::THEME,
     },
@@ -44,6 +44,8 @@ pub enum TuiAction {
     },
     Help,
     ShowEditorKeymap,
+    Menu,
+    SaveAndMenu,
     SaveAndPassThrough,
     Quit,
 
@@ -97,6 +99,13 @@ impl App {
             }
             Action::Tui(TuiAction::ShowEditorKeymap) => {
                 self.context.editor_keymap = true;
+            }
+            Action::Tui(TuiAction::Menu) => {
+                self.context.menu = Some(MenuContext::default());
+            }
+            Action::Tui(TuiAction::SaveAndMenu) => {
+                self.save().await;
+                self.context.menu = Some(MenuContext::default());
             }
             Action::Tui(TuiAction::Alert(message)) => {
                 self.context.alert = Some(message);

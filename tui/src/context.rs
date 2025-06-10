@@ -1,8 +1,9 @@
 pub mod entry;
+pub mod menu;
 pub mod notebook;
 
 use {
-    crate::{Action, log, logger::*, theme::THEME},
+    crate::{action::TuiAction, Action, log, logger::*, theme::THEME},
     glues_core::transition::VimKeymapKind,
     ratatui::{
         crossterm::event::{Event as Input, KeyCode, KeyEvent},
@@ -13,7 +14,7 @@ use {
     std::time::SystemTime,
     tui_textarea::TextArea,
 };
-pub use {entry::EntryContext, notebook::NotebookContext};
+pub use {entry::EntryContext, menu::MenuContext, notebook::NotebookContext};
 
 pub enum ContextState {
     Entry,
@@ -52,6 +53,7 @@ pub struct Context {
     pub confirm: Option<(String, Action)>,
     pub alert: Option<String>,
     pub prompt: Option<ContextPrompt>,
+    pub menu: Option<MenuContext>,
     pub last_log: Option<(String, SystemTime)>,
 
     pub help: bool,
@@ -71,6 +73,7 @@ impl Default for Context {
             confirm: None,
             alert: None,
             prompt: None,
+            menu: None,
             last_log: None,
 
             help: false,
@@ -106,6 +109,40 @@ impl Context {
             // any key pressed will close the alert
             self.alert = None;
             return Action::None;
+        } else if self.menu.is_some() {
+            let mut menu = self.menu.take().log_expect("menu must be some");
+            let code = match input {
+                Input::Key(key) => key.code,
+                _ => {
+                    self.menu = Some(menu);
+                    return Action::None;
+                }
+            };
+
+            let result = match code {
+                KeyCode::Left | KeyCode::Char('h') => {
+                    menu.list_state.select_previous();
+                    Action::None
+                }
+                KeyCode::Right | KeyCode::Char('l') => {
+                    menu.list_state.select_next();
+                    Action::None
+                }
+                KeyCode::Enter | KeyCode::Char('q') => match menu::MENU_ITEMS
+                    [menu.list_state.selected().unwrap_or(0)]
+                {
+                    menu::QUIT => Action::Tui(TuiAction::Quit),
+                    _ => Action::None,
+                },
+                KeyCode::Esc => Action::None,
+                _ => Action::None,
+            };
+
+            if !matches!(result, Action::Tui(TuiAction::Quit)) {
+                self.menu = Some(menu);
+            }
+
+            return result;
         } else if self.confirm.is_some() {
             let code = match input {
                 Input::Key(key) => key.code,
