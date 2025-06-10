@@ -16,9 +16,3 @@ impl KeymapItem {
         }
     }
 }
-
-impl core::fmt::Display for KeymapItem {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "[{}] {}", self.key, self.desc)
-    }
-}

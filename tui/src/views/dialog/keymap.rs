@@ -14,14 +14,11 @@ use {
     },
 };
 
+const KEYMAP_WIDTH: u16 = 60;
+const KEY_WIDTH: usize = 12;
+
 pub fn draw(frame: &mut Frame, keymap: &[KeymapItem]) {
-    let width = keymap
-        .iter()
-        .map(|item| item.to_string().len())
-        .max()
-        .unwrap_or_default() as u16;
-    let width = width.max(20);
-    let [area] = Layout::horizontal([Length(width + 5)])
+    let [area] = Layout::horizontal([Length(KEYMAP_WIDTH)])
         .flex(Flex::End)
         .areas(frame.area());
     let [area] = Layout::vertical([Percentage(100)])
@@ -43,7 +40,10 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapItem]) {
         );
 
     let inner_area = block.inner(area);
-    let message: Vec<Line> = keymap.iter().map(|v| v.to_string().into()).collect();
+    let message: Vec<Line> = keymap
+        .iter()
+        .map(|v| format!("[{:<key_width$}] {}", v.key, v.desc, key_width = KEY_WIDTH).into())
+        .collect();
     let paragraph = Paragraph::new(message)
         .wrap(Wrap { trim: true })
         .style(Style::default())
