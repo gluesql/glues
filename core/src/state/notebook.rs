@@ -46,7 +46,7 @@ impl NotebookState {
             .db
             .as_mut()
             .ok_or(Error::Wip("[NotebookState::new] empty db".to_owned()))?;
-        let root_id = db.root_id.clone();
+        let root_id = db.root_id();
         let root_directory = db.fetch_directory(root_id).await?;
         let notes = db.fetch_notes(root_directory.id.clone()).await?;
         let directories = db

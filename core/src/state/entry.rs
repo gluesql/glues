@@ -1,6 +1,7 @@
 use crate::{
     EntryEvent, EntryTransition, Error, Event, Glues, Result,
     db::Db,
+    proxy::ProxyClient,
     state::notebook::NotebookState,
     types::{KeymapGroup, KeymapItem},
 };
@@ -19,24 +20,24 @@ impl EntryState {
                 let note_id = db.add_note(root_id, "Sample Note".to_owned()).await?.id;
                 db.update_note_content(note_id, "Hi :D".to_owned()).await?;
 
-                glues.db = Some(db);
+                glues.db = Some(Box::new(db));
                 glues.state = NotebookState::new(glues).await?.into();
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenCsv(path)) => {
-                glues.db = Db::csv(glues.task_tx.clone(), &path).await.map(Some)?;
+                glues.db = Some(Box::new(Db::csv(glues.task_tx.clone(), &path).await?));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenJson(path)) => {
-                glues.db = Db::json(glues.task_tx.clone(), &path).await.map(Some)?;
+                glues.db = Some(Box::new(Db::json(glues.task_tx.clone(), &path).await?));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenFile(path)) => {
-                glues.db = Db::file(glues.task_tx.clone(), &path).await.map(Some)?;
+                glues.db = Some(Box::new(Db::file(glues.task_tx.clone(), &path).await?));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
@@ -46,17 +47,24 @@ impl EntryState {
                 remote,
                 branch,
             }) => {
-                glues.db = Db::git(glues.task_tx.clone(), &path, remote, branch)
-                    .await
-                    .map(Some)?;
+                glues.db = Some(Box::new(
+                    Db::git(glues.task_tx.clone(), &path, remote, branch).await?,
+                ));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenMongo { conn_str, db_name }) => {
-                glues.db = Db::mongo(glues.task_tx.clone(), &conn_str, &db_name)
-                    .await
-                    .map(Some)?;
+                glues.db = Some(Box::new(
+                    Db::mongo(glues.task_tx.clone(), &conn_str, &db_name).await?,
+                ));
+                glues.state = NotebookState::new(glues).await?.into();
+
+                Ok(EntryTransition::OpenNotebook)
+            }
+            Entry(OpenRemote(url)) => {
+                let client = ProxyClient::connect(url).await?;
+                glues.db = Some(Box::new(client));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
