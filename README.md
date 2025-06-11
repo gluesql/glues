@@ -55,16 +55,17 @@ Glues offers various storage options to suit your needs:
 ### Theme Presets
 
 Glues includes several built-in color schemes. The application starts with the
-`dark` palette by default, but you can switch to another preset with the
-`--theme` option:
+`dark` palette by default, but you can switch presets with the `--theme` option:
 
 ```bash
 glues --theme pastel
 ```
 
-Available presets are `dark`, `light`, and `pastel`. Glues does not load theme
-files at runtime. To contribute a new color scheme, copy
-`pastel-theme.toml` as a starting point and integrate it into the codebase.
+The built-in themes are:
+
+* `dark` – 256-color palette
+* `light` – 256-color palette
+* `pastel` – a light theme defined using RGB values
 
 ## Roadmap
 
