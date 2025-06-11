@@ -3,7 +3,7 @@ use {
     crate::{
         Error, NotebookTransition, Result,
         data::Directory,
-        db::Db,
+        db::CoreBackend,
         state::notebook::{
             DirectoryItem, DirectoryItemChildren, InnerState, NoteTreeState, NotebookState,
             SelectedItem,
@@ -14,8 +14,8 @@ use {
     async_recursion::async_recursion,
 };
 
-pub async fn open(
-    db: &mut Db,
+pub async fn open<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     directory_id: DirectoryId,
 ) -> Result<NotebookTransition> {
@@ -52,8 +52,8 @@ pub async fn open(
 }
 
 #[async_recursion(?Send)]
-pub async fn open_all(
-    db: &mut Db,
+pub async fn open_all<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     directory_id: DirectoryId,
 ) -> Result<NotebookTransition> {
@@ -108,8 +108,8 @@ pub fn select(state: &mut NotebookState, directory: Directory) -> Result<Noteboo
     Ok(NotebookTransition::None)
 }
 
-pub async fn rename(
-    db: &mut Db,
+pub async fn rename<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     mut directory: Directory,
     new_name: String,
@@ -144,8 +144,8 @@ pub async fn rename(
     ))
 }
 
-pub async fn remove(
-    db: &mut Db,
+pub async fn remove<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     directory: Directory,
 ) -> Result<NotebookTransition> {
@@ -176,8 +176,8 @@ pub async fn remove(
     ))
 }
 
-pub async fn add(
-    db: &mut Db,
+pub async fn add<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     directory: Directory,
     directory_name: String,
@@ -216,8 +216,8 @@ pub async fn add(
     ))
 }
 
-pub async fn move_directory(
-    db: &mut Db,
+pub async fn move_directory<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     target_directory_id: DirectoryId,
 ) -> Result<NotebookTransition> {

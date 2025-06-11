@@ -1,9 +1,12 @@
 use {
     super::directory,
-    crate::{Error, Result, db::Db, state::notebook::NotebookState},
+    crate::{Error, Result, db::CoreBackend, state::notebook::NotebookState},
 };
 
-pub(super) async fn update_breadcrumbs(db: &mut Db, state: &mut NotebookState) -> Result<()> {
+pub(super) async fn update_breadcrumbs<B: CoreBackend + ?Sized>(
+    db: &mut B,
+    state: &mut NotebookState,
+) -> Result<()> {
     let directory_ids = state
         .tabs
         .iter()

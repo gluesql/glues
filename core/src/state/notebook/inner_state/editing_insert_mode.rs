@@ -1,11 +1,11 @@
 use crate::{
     Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
-    db::Db,
+    db::CoreBackend,
     state::notebook::{NotebookState, note},
 };
 
-pub async fn consume(
-    _db: &mut Db,
+pub async fn consume<B: CoreBackend + ?Sized>(
+    _db: &mut B,
     state: &mut NotebookState,
     event: Event,
 ) -> Result<NotebookTransition> {

@@ -1,7 +1,7 @@
 use {
     crate::{
         Error, NotebookTransition, Result,
-        db::Db,
+        db::CoreBackend,
         state::notebook::{
             InnerState, NoteTreeState, NotebookState, SelectedItem, VimNormalState, directory,
         },
@@ -10,7 +10,10 @@ use {
     std::cmp::min,
 };
 
-pub async fn select_prev(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTransition> {
+pub async fn select_prev<B: CoreBackend + ?Sized>(
+    db: &mut B,
+    state: &mut NotebookState,
+) -> Result<NotebookTransition> {
     state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
     let i = state
@@ -31,7 +34,10 @@ pub async fn select_prev(db: &mut Db, state: &mut NotebookState) -> Result<Noteb
     ))
 }
 
-pub async fn select_next(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTransition> {
+pub async fn select_next<B: CoreBackend + ?Sized>(
+    db: &mut B,
+    state: &mut NotebookState,
+) -> Result<NotebookTransition> {
     state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
     let i = state
@@ -88,7 +94,10 @@ pub fn move_next(state: &mut NotebookState) -> Result<NotebookTransition> {
     ))
 }
 
-pub async fn close(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTransition> {
+pub async fn close<B: CoreBackend + ?Sized>(
+    db: &mut B,
+    state: &mut NotebookState,
+) -> Result<NotebookTransition> {
     state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
     let i = state
         .tab_index
@@ -118,7 +127,10 @@ pub async fn close(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTra
     ))
 }
 
-pub async fn focus_editor(db: &mut Db, state: &mut NotebookState) -> Result<NotebookTransition> {
+pub async fn focus_editor<B: CoreBackend + ?Sized>(
+    db: &mut B,
+    state: &mut NotebookState,
+) -> Result<NotebookTransition> {
     let note = state.get_editing()?.clone();
     directory::open_all(db, state, note.directory_id.clone()).await?;
 

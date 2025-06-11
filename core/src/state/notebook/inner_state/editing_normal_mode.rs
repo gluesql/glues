@@ -2,7 +2,7 @@ use {
     super::VimVisualState,
     crate::{
         Error, Event, KeyEvent, NotebookEvent, NumKey, Result,
-        db::Db,
+        db::CoreBackend,
         state::notebook::{InnerState, NoteTreeState, NotebookState, directory, note, tabs},
         transition::{
             NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition,
@@ -28,8 +28,8 @@ pub enum VimNormalState {
     Scroll,
 }
 
-pub async fn consume(
-    db: &mut Db,
+pub async fn consume<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     vim_state: VimNormalState,
     event: Event,
@@ -169,8 +169,8 @@ async fn consume_idle(state: &mut NotebookState, event: Event) -> Result<Noteboo
     }
 }
 
-async fn consume_toggle(
-    db: &mut Db,
+async fn consume_toggle<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     event: Event,
 ) -> Result<NotebookTransition> {

@@ -3,7 +3,7 @@ use {
     crate::{
         Error, NotebookTransition, Result,
         data::{Directory, Note},
-        db::Db,
+        db::CoreBackend,
         state::notebook::{
             DirectoryItem, InnerState, NoteTreeState, NotebookState, SelectedItem, Tab,
             VimNormalState,
@@ -28,8 +28,8 @@ pub fn select(state: &mut NotebookState, note: Note) -> Result<NotebookTransitio
     Ok(NotebookTransition::None)
 }
 
-pub async fn rename(
-    db: &mut Db,
+pub async fn rename<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     mut note: Note,
     new_name: String,
@@ -60,8 +60,8 @@ pub async fn rename(
     ))
 }
 
-pub async fn remove(
-    db: &mut Db,
+pub async fn remove<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     note: Note,
 ) -> Result<NotebookTransition> {
@@ -82,8 +82,8 @@ pub async fn remove(
     ))
 }
 
-pub async fn add(
-    db: &mut Db,
+pub async fn add<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     directory: Directory,
     note_name: String,
@@ -115,8 +115,8 @@ pub async fn add(
     )))
 }
 
-pub async fn open(
-    db: &mut Db,
+pub async fn open<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     note: Note,
 ) -> Result<NotebookTransition> {
@@ -159,8 +159,8 @@ pub async fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
     Ok(NotebookTransition::ViewMode(note))
 }
 
-pub async fn update_content(
-    db: &mut Db,
+pub async fn update_content<B: CoreBackend + ?Sized>(
+    db: &mut B,
     note_id: NoteId,
     content: String,
 ) -> Result<NotebookTransition> {
@@ -174,8 +174,8 @@ pub async fn update_content(
     Ok(NotebookTransition::UpdateNoteContent(note_id))
 }
 
-pub async fn move_note(
-    db: &mut Db,
+pub async fn move_note<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     directory_id: DirectoryId,
 ) -> Result<NotebookTransition> {
