@@ -74,8 +74,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     println!("Listening on http://{}", addr);
 
     let rt_handle = tokio::runtime::Handle::current();
-    for mut req in http.incoming_requests() {
-        let srv = server.clone();
         let handle = rt_handle.clone();
         tokio::task::spawn_blocking(move || {
             let mut body = String::new();
@@ -83,6 +81,25 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                 return;
             }
             let proxy_req: ProxyRequest = match serde_json::from_str(&body) {
+                Ok(req) => req,
+                Err(_) => {
+                    let _ = req.respond(Response::from_string("bad request"));
+                    return;
+                }
+            };
+
+            let response = handle.block_on(async {
+                let mut s = srv.lock().await;
+                s.handle(proxy_req).await
+            });
+
+            let body = match serde_json::to_string(&response) {
+                Ok(b) => b,
+                Err(_) => return,
+            };
+            let resp = Response::from_string(body)
+                .with_header(Header::from_bytes("Content-Type", "application/json").unwrap());
+            let _ = req.respond(resp);
                 Ok(req) => req,
                 Err(_) => {
                     let _ = req.respond(Response::from_string("bad request"));
