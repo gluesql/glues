@@ -23,6 +23,7 @@ struct Cli {
 }
 
 #[derive(Subcommand)]
+#[command(rename_all = "verbatim")]
 enum Storage {
     Memory,
     Csv {
