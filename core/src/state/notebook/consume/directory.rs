@@ -11,7 +11,6 @@ use {
         transition::{MoveModeTransition, NoteTreeTransition},
         types::DirectoryId,
     },
-    async_recursion::async_recursion,
 };
 
 pub async fn open<B: CoreBackend + ?Sized>(
@@ -51,7 +50,6 @@ pub async fn open<B: CoreBackend + ?Sized>(
     ))
 }
 
-#[async_recursion(?Send)]
 pub async fn open_all<B: CoreBackend + ?Sized>(
     db: &mut B,
     state: &mut NotebookState,
@@ -61,12 +59,25 @@ pub async fn open_all<B: CoreBackend + ?Sized>(
         return Ok(NotebookTransition::None);
     }
 
-    let directory = db.fetch_directory(directory_id).await?;
-
-    if state.root.directory.id != directory.id {
-        open_all(db, state, directory.parent_id).await?;
+    let mut path = Vec::new();
+    let mut current_id = directory_id;
+    loop {
+        let directory = db.fetch_directory(current_id.clone()).await?;
+        path.push(directory.id.clone());
+        if state.root.directory.id == directory.id {
+            break;
+        }
+        current_id = directory.parent_id;
     }
-    open(db, state, directory.id).await
+
+    path.reverse();
+
+    let mut transition = NotebookTransition::None;
+    for id in path {
+        transition = open(db, state, id).await?;
+    }
+
+    Ok(transition)
 }
 
 pub fn close(state: &mut NotebookState, directory: Directory) -> Result<NotebookTransition> {
