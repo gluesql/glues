@@ -75,14 +75,21 @@ impl EntryState {
     }
 
     pub fn keymap(&self) -> Vec<KeymapGroup> {
-        vec![KeymapGroup::new(
-            "General",
-            vec![
-                KeymapItem::new("j", "Select next"),
-                KeymapItem::new("k", "Select previous"),
-                KeymapItem::new("Enter", "Run selected item"),
-                KeymapItem::new("q", "Quit"),
-            ],
-        )]
+        vec![
+            KeymapGroup::new(
+                "Navigation",
+                vec![
+                    KeymapItem::new("j", "Select next"),
+                    KeymapItem::new("k", "Select previous"),
+                ],
+            ),
+            KeymapGroup::new(
+                "Actions",
+                vec![
+                    KeymapItem::new("Enter", "Run selected item"),
+                    KeymapItem::new("q", "Quit"),
+                ],
+            ),
+        ]
     }
 }

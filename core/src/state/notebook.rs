@@ -262,28 +262,35 @@ impl NotebookState {
     pub fn keymap(&self) -> Vec<KeymapGroup> {
         match &self.inner_state {
             NoteTree(NoteTreeState::NoteSelected) => {
-                let mut keymap = vec![
-                    KeymapItem::new("l", "Open note"),
-                    KeymapItem::new("h", "Close parent directory"),
+                let navigation = vec![
                     KeymapItem::new("j", "Select next"),
                     KeymapItem::new("k", "Select previous"),
                     KeymapItem::new("J", "Select next directory"),
                     KeymapItem::new("K", "Select parent directory"),
                     KeymapItem::new("G", "Select last"),
-                    KeymapItem::new("g", "Enter gateway mode"),
                     KeymapItem::new("1-9", "Add steps"),
                     KeymapItem::new(">", "Expand width"),
                     KeymapItem::new("<", "Shrink width"),
+                ];
+
+                let mut actions = vec![
+                    KeymapItem::new("l", "Open note"),
+                    KeymapItem::new("h", "Close parent directory"),
+                    KeymapItem::new("g", "Enter gateway mode"),
                     KeymapItem::new("Space", "Move note"),
                     KeymapItem::new("m", "Show more actions"),
                 ];
 
                 if !self.tabs.is_empty() {
-                    keymap.push(KeymapItem::new("Tab", "Focus editor"));
+                    actions.push(KeymapItem::new("Tab", "Focus editor"));
                 }
 
-                keymap.push(KeymapItem::new("Esc", "Quit"));
-                vec![KeymapGroup::new("General", keymap)]
+                actions.push(KeymapItem::new("Esc", "Quit"));
+
+                vec![
+                    KeymapGroup::new("Navigation", navigation),
+                    KeymapGroup::new("Actions", actions),
+                ]
             }
             NoteTree(NoteTreeState::DirectorySelected) => {
                 let mut keymap = vec![
@@ -358,20 +365,27 @@ impl NotebookState {
                 vec![KeymapGroup::new("General", items)]
             }
             EditingNormalMode(VimNormalState::Toggle) => {
-                vec![KeymapGroup::new(
-                    "General",
-                    vec![
-                        KeymapItem::new("h", "select left tab"),
-                        KeymapItem::new("l", "select right tab"),
-                        KeymapItem::new("H", "Move current tab to left"),
-                        KeymapItem::new("L", "Move current tab to right"),
-                        KeymapItem::new("x", "Close current tab"),
-                        KeymapItem::new("X", "Enter tab close mode"),
-                        KeymapItem::new("b", "Toggle browser"),
-                        KeymapItem::new("n", "Toggle editor line number"),
-                        KeymapItem::new("Esc", "Cancel"),
-                    ],
-                )]
+                vec![
+                    KeymapGroup::new(
+                        "Tabs",
+                        vec![
+                            KeymapItem::new("h", "select left tab"),
+                            KeymapItem::new("l", "select right tab"),
+                            KeymapItem::new("H", "Move current tab to left"),
+                            KeymapItem::new("L", "Move current tab to right"),
+                            KeymapItem::new("x", "Close current tab"),
+                            KeymapItem::new("X", "Enter tab close mode"),
+                        ],
+                    ),
+                    KeymapGroup::new(
+                        "Options",
+                        vec![
+                            KeymapItem::new("b", "Toggle browser"),
+                            KeymapItem::new("n", "Toggle editor line number"),
+                            KeymapItem::new("Esc", "Cancel"),
+                        ],
+                    ),
+                ]
             }
             EditingNormalMode(VimNormalState::ToggleTabClose) => {
                 vec![KeymapGroup::new(

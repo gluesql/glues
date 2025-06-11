@@ -70,7 +70,7 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapGroup]) {
     frame.render_widget(Clear, area);
     frame.render_widget(block.clone(), area);
 
-    for (row_area, row) in row_areas.into_iter().zip(rows) {
+    for (row_area, row) in row_areas.iter().zip(rows) {
         match row {
             Row::Title(title) => {
                 let line = Line::from(title.to_string())
