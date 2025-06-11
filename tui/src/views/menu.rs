@@ -2,24 +2,33 @@ use {
     crate::{context::menu::{MenuContext, MENU_ITEMS}, theme::THEME},
     ratatui::{
         Frame,
-        layout::Rect,
-        text::{Line, Span},
-        style::Stylize,
+        layout::{Alignment, Constraint::Length, Flex, Layout},
+        style::{Style, Stylize},
+        widgets::{Block, Clear, HighlightSpacing, List, ListDirection, Padding},
     },
 };
 
-pub fn draw(frame: &mut Frame, area: Rect, context: &mut MenuContext) {
-    let mut spans = Vec::new();
-    for (i, item) in MENU_ITEMS.iter().enumerate() {
-        if i > 0 {
-            spans.push(Span::raw(" "));
-        }
-        let span = if Some(i) == context.list_state.selected() {
-            Span::raw(*item).fg(THEME.accent_text).bg(THEME.accent)
-        } else {
-            Span::raw(*item).fg(THEME.menu).bg(THEME.panel)
-        };
-        spans.push(span);
-    }
-    frame.render_widget(Line::from(spans).bg(THEME.panel), area);
+pub fn draw(frame: &mut Frame, context: &mut MenuContext) {
+    let [area] = Layout::horizontal([Length(20)])
+        .flex(Flex::Center)
+        .areas(frame.area());
+    let [area] = Layout::vertical([Length(7)])
+        .flex(Flex::Center)
+        .areas(area);
+
+    let block = Block::bordered()
+        .bg(THEME.surface)
+        .fg(THEME.text)
+        .padding(Padding::new(2, 2, 1, 1))
+        .title("Menu")
+        .title_alignment(Alignment::Center);
+    let list = List::new(MENU_ITEMS)
+        .block(block)
+        .highlight_style(Style::new().fg(THEME.accent_text).bg(THEME.accent))
+        .highlight_symbol(" ")
+        .highlight_spacing(HighlightSpacing::Always)
+        .direction(ListDirection::TopToBottom);
+
+    frame.render_widget(Clear, area);
+    frame.render_stateful_widget(list, area, &mut context.list_state);
 }

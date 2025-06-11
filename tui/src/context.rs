@@ -119,6 +119,7 @@ impl Context {
                 }
             };
 
+            let selected = menu.list_state.selected().unwrap_or(0);
             let result = match code {
                 KeyCode::Left | KeyCode::Char('h') => {
                     menu.list_state.select_previous();
@@ -128,17 +129,21 @@ impl Context {
                     menu.list_state.select_next();
                     Action::None
                 }
-                KeyCode::Enter | KeyCode::Char('q') => match menu::MENU_ITEMS
-                    [menu.list_state.selected().unwrap_or(0)]
-                {
+                KeyCode::Enter => match menu::MENU_ITEMS[selected] {
                     menu::QUIT => Action::Tui(TuiAction::Quit),
                     _ => Action::None,
                 },
+                KeyCode::Char('q') => Action::Tui(TuiAction::Quit),
+                KeyCode::Char('c') if menu::MENU_ITEMS[selected] == menu::CANCEL => Action::None,
                 KeyCode::Esc => Action::None,
                 _ => Action::None,
             };
 
-            if !matches!(result, Action::Tui(TuiAction::Quit)) && code != KeyCode::Esc {
+            let should_close = code == KeyCode::Esc
+                || (code == KeyCode::Enter && menu::MENU_ITEMS[selected] == menu::CANCEL)
+                || (code == KeyCode::Char('c') && menu::MENU_ITEMS[selected] == menu::CANCEL);
+
+            if !matches!(result, Action::Tui(TuiAction::Quit)) && !should_close {
                 self.menu = Some(menu);
             }
 

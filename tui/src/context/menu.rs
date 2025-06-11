@@ -1,8 +1,9 @@
 use ratatui::widgets::ListState;
 
+pub const CANCEL: &str = "[Esc] Cancel";
 pub const QUIT: &str = "[q] Quit";
 
-pub const MENU_ITEMS: [&str; 1] = [QUIT];
+pub const MENU_ITEMS: [&str; 2] = [CANCEL, QUIT];
 
 pub struct MenuContext {
     pub list_state: ListState,

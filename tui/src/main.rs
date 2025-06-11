@@ -120,12 +120,11 @@ impl App {
         let vertical = Layout::vertical([Length(1), Percentage(100)]);
         let [statusbar, body] = vertical.areas(frame.area());
 
-        if let Some(menu) = context.menu.as_mut() {
-            views::menu::draw(frame, statusbar, menu);
-        } else {
-            views::statusbar::draw(frame, statusbar, state, &context.notebook);
-        }
+        views::statusbar::draw(frame, statusbar, state, &context.notebook);
         views::body::draw(frame, body, context);
+        if let Some(menu) = context.menu.as_mut() {
+            views::menu::draw(frame, menu);
+        }
         views::dialog::draw(frame, state, context);
     }
 }
