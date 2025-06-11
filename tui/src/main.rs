@@ -10,7 +10,7 @@ mod views;
 
 use {
     action::Action,
-    clap::Parser,
+    clap::{Parser, ValueEnum},
     color_eyre::Result,
     context::Context,
     glues_core::Glues,
@@ -32,22 +32,25 @@ use {
 #[derive(Parser)]
 #[command(author, version, about)]
 struct Cli {
-    /// Theme preset (dark, light) or path to custom theme file
-    #[arg(long, default_value = "dark")]
-    theme: String,
+    #[arg(long, value_enum, default_value_t = ThemeArg::Dark)]
+    theme: ThemeArg,
+}
+
+#[derive(Clone, Copy, ValueEnum)]
+enum ThemeArg {
+    Dark,
+    Light,
+    Pastel,
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    match cli.theme.as_str() {
-        "dark" => theme::set_theme(theme::DARK_THEME),
-        "light" => theme::set_theme(theme::LIGHT_THEME),
-        path => match theme::load_theme_from_path(std::path::Path::new(path)) {
-            Ok(custom) => theme::set_theme(custom),
-            Err(e) => eprintln!("Failed to load theme: {e}"),
-        },
+    match cli.theme {
+        ThemeArg::Dark => theme::set_theme(theme::DARK_THEME),
+        ThemeArg::Light => theme::set_theme(theme::LIGHT_THEME),
+        ThemeArg::Pastel => theme::set_theme(theme::PASTEL_THEME),
     }
 
     config::init().await;
