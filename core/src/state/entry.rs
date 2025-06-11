@@ -1,6 +1,8 @@
 use crate::{
-    EntryEvent, EntryTransition, Error, Event, Glues, Result, db::Db,
-    state::notebook::NotebookState, types::KeymapItem,
+    EntryEvent, EntryTransition, Error, Event, Glues, Result,
+    db::Db,
+    state::notebook::NotebookState,
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub struct EntryState;
@@ -72,12 +74,15 @@ impl EntryState {
         )
     }
 
-    pub fn keymap(&self) -> Vec<KeymapItem> {
-        vec![
-            KeymapItem::new("j", "Select next"),
-            KeymapItem::new("k", "Select previous"),
-            KeymapItem::new("Enter", "Run selected item"),
-            KeymapItem::new("q", "Quit"),
-        ]
+    pub fn keymap(&self) -> Vec<KeymapGroup> {
+        vec![KeymapGroup::new(
+            "General",
+            vec![
+                KeymapItem::new("j", "Select next"),
+                KeymapItem::new("k", "Select previous"),
+                KeymapItem::new("Enter", "Run selected item"),
+                KeymapItem::new("q", "Quit"),
+            ],
+        )]
     }
 }

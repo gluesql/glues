@@ -16,3 +16,18 @@ impl KeymapItem {
         }
     }
 }
+
+#[derive(Clone, Debug)]
+pub struct KeymapGroup {
+    pub title: String,
+    pub items: Vec<KeymapItem>,
+}
+
+impl KeymapGroup {
+    pub fn new<T: Into<String>>(title: T, items: Vec<KeymapItem>) -> Self {
+        Self {
+            title: title.into(),
+            items,
+        }
+    }
+}
