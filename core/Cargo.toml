@@ -17,10 +17,15 @@ uuid = { version = "1.10", features = ["v7"] }
 strum_macros = "0.26.4"
 serde = { version = "1.0", features = ["derive"] }
 reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
-tokio = { version = "1", features = ["rt", "macros"] }
-
-[dev-dependencies]
-tokio = { version = "1.41.0", features = ["macros", "rt"] }
+tokio = { version = "1", features = ["rt", "macros", "rt-multi-thread"] }
+clap = { version = "4.5.4", features = ["derive"] }
 axum = "0.7"
 tiny_http = "0.12"
 serde_json = "1.0"
+
+[dev-dependencies]
+tokio = { version = "1.41.0", features = ["macros", "rt"] }
+
+[[bin]]
+name = "glues-server"
+path = "src/bin/server.rs"

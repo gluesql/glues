@@ -1213,6 +1213,7 @@ dependencies = [
  "async-recursion",
  "async-trait",
  "axum",
+ "clap",
  "gluesql",
  "gluesql-mongo-storage",
  "reqwest",

@@ -1,7 +1,7 @@
 use {
     crate::{
         Event, Result, Transition,
-        db::Db,
+        db::CoreBackend,
         state::{EntryState, State},
         task::{Task, handle_tasks},
     },
@@ -16,7 +16,7 @@ use {
 };
 
 pub struct Glues {
-    pub db: Option<Db>,
+    pub db: Option<Box<dyn CoreBackend>>,
     pub state: State,
 
     pub task_tx: Sender<Task>,

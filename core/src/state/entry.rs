@@ -1,6 +1,6 @@
 use crate::{
     EntryEvent, EntryTransition, Error, Event, Glues, Result,
-    db::Db,
+    db::{Db, CoreBackend},
     state::notebook::NotebookState,
     types::{KeymapGroup, KeymapItem},
 };
@@ -15,28 +15,31 @@ impl EntryState {
         match event {
             Entry(OpenMemory) => {
                 let mut db = Db::memory(glues.task_tx.clone()).await?;
-                let root_id = db.root_id.clone();
+                let root_id = db.root_id();
                 let note_id = db.add_note(root_id, "Sample Note".to_owned()).await?.id;
                 db.update_note_content(note_id, "Hi :D".to_owned()).await?;
 
-                glues.db = Some(db);
+                glues.db = Some(Box::new(db));
                 glues.state = NotebookState::new(glues).await?.into();
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenCsv(path)) => {
-                glues.db = Db::csv(glues.task_tx.clone(), &path).await.map(Some)?;
+                let db = Db::csv(glues.task_tx.clone(), &path).await?;
+                glues.db = Some(Box::new(db));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenJson(path)) => {
-                glues.db = Db::json(glues.task_tx.clone(), &path).await.map(Some)?;
+                let db = Db::json(glues.task_tx.clone(), &path).await?;
+                glues.db = Some(Box::new(db));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenFile(path)) => {
-                glues.db = Db::file(glues.task_tx.clone(), &path).await.map(Some)?;
+                let db = Db::file(glues.task_tx.clone(), &path).await?;
+                glues.db = Some(Box::new(db));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
@@ -46,17 +49,17 @@ impl EntryState {
                 remote,
                 branch,
             }) => {
-                glues.db = Db::git(glues.task_tx.clone(), &path, remote, branch)
-                    .await
-                    .map(Some)?;
+                let db = Db::git(glues.task_tx.clone(), &path, remote, branch)
+                    .await?;
+                glues.db = Some(Box::new(db));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenMongo { conn_str, db_name }) => {
-                glues.db = Db::mongo(glues.task_tx.clone(), &conn_str, &db_name)
-                    .await
-                    .map(Some)?;
+                let db = Db::mongo(glues.task_tx.clone(), &conn_str, &db_name)
+                    .await?;
+                glues.db = Some(Box::new(db));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)

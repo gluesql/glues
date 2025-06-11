@@ -13,7 +13,7 @@ use {
     clap::{Parser, ValueEnum},
     color_eyre::Result,
     context::Context,
-    glues_core::Glues,
+    glues_core::{self, Glues, proxy::ProxyClient, state::notebook::NotebookState},
     logger::*,
     ratatui::{
         DefaultTerminal, Frame,
@@ -34,6 +34,8 @@ use {
 struct Cli {
     #[arg(long, value_enum, default_value_t = ThemeArg::Dark)]
     theme: ThemeArg,
+    #[arg(long)]
+    server: Option<String>,
 }
 
 #[derive(Clone, Copy, ValueEnum)]
@@ -66,7 +68,7 @@ async fn main() -> Result<()> {
     log!("Hello");
 
     let terminal = ratatui::init();
-    let app_result = App::new().await.run(terminal).await;
+    let app_result = App::new(cli.server).await.run(terminal).await;
     ratatui::restore();
     app_result
 }
@@ -77,10 +79,15 @@ struct App {
 }
 
 impl App {
-    async fn new() -> Self {
-        let glues = Glues::new().await;
+    async fn new(server: Option<String>) -> Self {
+        let mut glues = Glues::new().await;
+        if let Some(url) = server {
+            if let Ok(client) = ProxyClient::connect(url).await {
+                glues.db = Some(Box::new(client));
+                glues.state = NotebookState::new(&mut glues).await.unwrap().into();
+            }
+        }
         let context = Context::default();
-
         Self { glues, context }
     }
 

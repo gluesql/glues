@@ -52,6 +52,20 @@ Glues offers various storage options to suit your needs:
   - These formats store notes as simple log files, ideal for quick data exports or reading logs.
   - CSV saves data in comma-separated format, while JSON uses JSONL (JSON Lines) format.
 
+### Server Mode
+
+You can run Glues headlessly as an HTTP server using the `glues-server` binary from the `glues-core` crate:
+
+```bash
+cargo run -p glues-core --bin glues-server Memory --port 3000
+```
+
+Then launch the TUI and connect to the server with the `--server` flag:
+
+```bash
+glues --server http://localhost:3000
+```
+
 ### Theme Presets
 
 Glues includes several built-in color schemes. The application starts with the
@@ -59,6 +73,12 @@ Glues includes several built-in color schemes. The application starts with the
 
 ```bash
 glues --theme pastel
+```
+
+If you are running the `glues-server` separately, connect to it using the `--server` option:
+
+```bash
+glues --server http://localhost:3000
 ```
 
 The built-in themes are:

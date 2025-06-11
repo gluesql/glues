@@ -46,8 +46,8 @@ impl NotebookState {
             .db
             .as_mut()
             .ok_or(Error::Wip("[NotebookState::new] empty db".to_owned()))?;
-        let root_id = db.root_id.clone();
-        let root_directory = db.fetch_directory(root_id).await?;
+        let root_id = db.root_id();
+        let root_directory = db.fetch_directory(root_id.clone()).await?;
         let notes = db.fetch_notes(root_directory.id.clone()).await?;
         let directories = db
             .fetch_directories(root_directory.id.clone())
@@ -651,5 +651,5 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransiti
         .ok_or(Error::Wip("[consume] empty db".to_owned()))?;
     let state: &mut NotebookState = glues.state.get_inner_mut()?;
 
-    inner_state::consume(db, state, event).await
+    inner_state::consume(&mut **db, state, event).await
 }
