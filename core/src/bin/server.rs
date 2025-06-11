@@ -1,14 +1,14 @@
 use clap::{Parser, Subcommand};
 use glues_core::{
-    Task,
     db::Db,
     handle_tasks,
-    proxy::{ProxyServer, request::ProxyRequest},
+    proxy::{request::ProxyRequest, ProxyServer},
     transition::Transition,
+    Task,
 };
 use std::{
     collections::VecDeque,
-    sync::{Arc, Mutex, mpsc::channel},
+    sync::{mpsc::channel, Arc, Mutex},
 };
 use tiny_http::{Header, Response, Server};
 use tokio::sync::Mutex as AsyncMutex;
