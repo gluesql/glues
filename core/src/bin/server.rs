@@ -16,7 +16,7 @@ use tokio::sync::Mutex as AsyncMutex;
 #[derive(Parser)]
 #[command(author, version, about = "Glues HTTP server")]
 struct Cli {
-    #[arg(long, default_value_t = 3000)]
+    #[arg(long, default_value_t = 3000, global = true)]
     port: u16,
     #[command(subcommand)]
     storage: Storage,
