@@ -1,14 +1,8 @@
 use super::VimNormalState;
-use {
-    super::VimVisualState,
-    crate::{
-        Error, Event, KeyEvent, NotebookEvent, NumKey, Result,
-        db::CoreBackend,
-        state::notebook::{InnerState, NoteTreeState, NotebookState, directory, note, tabs},
-        transition::{
-            NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition,
-        },
-    },
+use crate::{
+    Error, Event, KeyEvent, Result,
+    state::notebook::{InnerState, NotebookState},
+    transition::{NormalModeTransition, NotebookTransition},
 };
 
 pub async fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransition> {

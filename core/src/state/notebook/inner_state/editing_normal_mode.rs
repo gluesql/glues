@@ -1,11 +1,8 @@
-use {
-    super::VimVisualState,
-    crate::{
-        Event, Result,
-        db::CoreBackend,
-        state::notebook::{InnerState, NotebookState},
-        transition::{NormalModeTransition, NotebookTransition},
-    },
+use crate::{
+    Event, Result,
+    db::CoreBackend,
+    state::notebook::NotebookState,
+    transition::{NormalModeTransition, NotebookTransition},
 };
 
 mod change;
