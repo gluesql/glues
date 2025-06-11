@@ -62,9 +62,9 @@ Glues includes several built-in color schemes. The application starts with the
 glues --theme pastel
 ```
 
-Available presets are `dark`, `light`, and `pastel`. Loading theme files at
-runtime is no longer supported; instead, copy `pastel-theme.toml` as a starting
-point when contributing a new color scheme.
+Available presets are `dark`, `light`, and `pastel`. Glues does not load theme
+files at runtime. To contribute a new color scheme, copy
+`pastel-theme.toml` as a starting point and integrate it into the codebase.
 
 ## Roadmap
 
