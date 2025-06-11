@@ -6,10 +6,10 @@ mod schema;
 mod task;
 
 pub mod data;
+pub mod proxy;
 pub mod state;
 pub mod transition;
 pub mod types;
-pub mod proxy;
 
 pub use error::Error;
 pub use event::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey};

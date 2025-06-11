@@ -26,22 +26,31 @@ where
                 Ok(dirs) => ProxyResponse::Ok(ResultPayload::Directories(dirs)),
                 Err(e) => ProxyResponse::Err(e.to_string()),
             },
-            AddDirectory { parent_id, name } => match self.db.add_directory(parent_id, name).await {
-                Ok(dir) => ProxyResponse::Ok(ResultPayload::Directory(dir)),
-                Err(e) => ProxyResponse::Err(e.to_string()),
-            },
-            RemoveDirectory { directory_id } => match self.db.remove_directory(directory_id).await {
+            AddDirectory { parent_id, name } => {
+                match self.db.add_directory(parent_id, name).await {
+                    Ok(dir) => ProxyResponse::Ok(ResultPayload::Directory(dir)),
+                    Err(e) => ProxyResponse::Err(e.to_string()),
+                }
+            }
+            RemoveDirectory { directory_id } => {
+                match self.db.remove_directory(directory_id).await {
+                    Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
+                    Err(e) => ProxyResponse::Err(e.to_string()),
+                }
+            }
+            MoveDirectory {
+                directory_id,
+                parent_id,
+            } => match self.db.move_directory(directory_id, parent_id).await {
                 Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
                 Err(e) => ProxyResponse::Err(e.to_string()),
             },
-            MoveDirectory { directory_id, parent_id } => match self.db.move_directory(directory_id, parent_id).await {
-                Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
-                Err(e) => ProxyResponse::Err(e.to_string()),
-            },
-            RenameDirectory { directory_id, name } => match self.db.rename_directory(directory_id, name).await {
-                Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
-                Err(e) => ProxyResponse::Err(e.to_string()),
-            },
+            RenameDirectory { directory_id, name } => {
+                match self.db.rename_directory(directory_id, name).await {
+                    Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
+                    Err(e) => ProxyResponse::Err(e.to_string()),
+                }
+            }
             FetchNotes { directory_id } => match self.db.fetch_notes(directory_id).await {
                 Ok(notes) => ProxyResponse::Ok(ResultPayload::Notes(notes)),
                 Err(e) => ProxyResponse::Err(e.to_string()),
@@ -62,11 +71,16 @@ where
                 Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
                 Err(e) => ProxyResponse::Err(e.to_string()),
             },
-            UpdateNoteContent { note_id, content } => match self.db.update_note_content(note_id, content).await {
-                Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
-                Err(e) => ProxyResponse::Err(e.to_string()),
-            },
-            MoveNote { note_id, directory_id } => match self.db.move_note(note_id, directory_id).await {
+            UpdateNoteContent { note_id, content } => {
+                match self.db.update_note_content(note_id, content).await {
+                    Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
+                    Err(e) => ProxyResponse::Err(e.to_string()),
+                }
+            }
+            MoveNote {
+                note_id,
+                directory_id,
+            } => match self.db.move_note(note_id, directory_id).await {
                 Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
                 Err(e) => ProxyResponse::Err(e.to_string()),
             },

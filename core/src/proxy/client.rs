@@ -1,10 +1,10 @@
 use super::request::ProxyRequest;
 use super::response::{ProxyResponse, ResultPayload};
 use crate::{
-    db::CoreBackend,
-    data::{Directory, Note},
-    types::{DirectoryId, NoteId},
     Error, Result,
+    data::{Directory, Note},
+    db::CoreBackend,
+    types::{DirectoryId, NoteId},
 };
 use async_trait::async_trait;
 use reqwest::Client;
@@ -19,11 +19,7 @@ impl ProxyClient {
     pub async fn connect<U: Into<String>>(url: U) -> Result<Self> {
         let url = url.into();
         let client = Client::new();
-        let resp = client
-            .post(&url)
-            .json(&ProxyRequest::RootId)
-            .send()
-            .await?;
+        let resp = client.post(&url).json(&ProxyRequest::RootId).send().await?;
         let resp: ProxyResponse = resp.json().await?;
         let root_id = match resp {
             ProxyResponse::Ok(ResultPayload::Id(id)) => id,
@@ -31,7 +27,11 @@ impl ProxyClient {
             _ => return Err(Error::Wip("invalid response".to_owned())),
         };
 
-        Ok(Self { url, client, root_id })
+        Ok(Self {
+            url,
+            client,
+            root_id,
+        })
     }
 
     async fn rpc(&self, req: ProxyRequest) -> Result<ProxyResponse> {
@@ -48,7 +48,10 @@ impl CoreBackend for ProxyClient {
     }
 
     async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Result<Directory> {
-        match self.rpc(ProxyRequest::FetchDirectory { directory_id }).await? {
+        match self
+            .rpc(ProxyRequest::FetchDirectory { directory_id })
+            .await?
+        {
             ProxyResponse::Ok(ResultPayload::Directory(dir)) => Ok(dir),
             ProxyResponse::Err(e) => Err(Error::Wip(e)),
             _ => Err(Error::Wip("invalid response".to_owned())),
@@ -88,9 +91,16 @@ impl CoreBackend for ProxyClient {
         }
     }
 
-    async fn move_directory(&mut self, directory_id: DirectoryId, parent_id: DirectoryId) -> Result<()> {
+    async fn move_directory(
+        &mut self,
+        directory_id: DirectoryId,
+        parent_id: DirectoryId,
+    ) -> Result<()> {
         match self
-            .rpc(ProxyRequest::MoveDirectory { directory_id, parent_id })
+            .rpc(ProxyRequest::MoveDirectory {
+                directory_id,
+                parent_id,
+            })
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
@@ -119,10 +129,7 @@ impl CoreBackend for ProxyClient {
     }
 
     async fn fetch_note_content(&mut self, note_id: NoteId) -> Result<String> {
-        match self
-            .rpc(ProxyRequest::FetchNoteContent { note_id })
-            .await?
-        {
+        match self.rpc(ProxyRequest::FetchNoteContent { note_id }).await? {
             ProxyResponse::Ok(ResultPayload::Text(text)) => Ok(text),
             ProxyResponse::Err(e) => Err(Error::Wip(e)),
             _ => Err(Error::Wip("invalid response".to_owned())),
@@ -149,10 +156,7 @@ impl CoreBackend for ProxyClient {
     }
 
     async fn rename_note(&mut self, note_id: NoteId, name: String) -> Result<()> {
-        match self
-            .rpc(ProxyRequest::RenameNote { note_id, name })
-            .await?
-        {
+        match self.rpc(ProxyRequest::RenameNote { note_id, name }).await? {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Wip(e)),
             _ => Err(Error::Wip("invalid response".to_owned())),
@@ -172,7 +176,10 @@ impl CoreBackend for ProxyClient {
 
     async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) -> Result<()> {
         match self
-            .rpc(ProxyRequest::MoveNote { note_id, directory_id })
+            .rpc(ProxyRequest::MoveNote {
+                note_id,
+                directory_id,
+            })
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
@@ -182,10 +189,7 @@ impl CoreBackend for ProxyClient {
     }
 
     async fn log(&mut self, category: String, message: String) -> Result<()> {
-        match self
-            .rpc(ProxyRequest::Log { category, message })
-            .await?
-        {
+        match self.rpc(ProxyRequest::Log { category, message }).await? {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Wip(e)),
             _ => Err(Error::Wip("invalid response".to_owned())),
