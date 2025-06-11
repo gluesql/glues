@@ -39,9 +39,6 @@ pub struct Theme {
     pub crumb_b: Color,
 }
 
-
-
-
 pub struct ThemeWrapper;
 
 static THEME_CELL: OnceCell<Theme> = OnceCell::new();

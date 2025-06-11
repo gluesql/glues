@@ -1,5 +1,5 @@
-use crate::color::*;
 use super::Theme;
+use crate::color::*;
 
 pub const DARK_THEME: Theme = Theme {
     background: GRAY_BLACK,

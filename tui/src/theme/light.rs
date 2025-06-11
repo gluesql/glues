@@ -1,5 +1,5 @@
-use crate::color::*;
 use super::Theme;
+use crate::color::*;
 
 pub const LIGHT_THEME: Theme = Theme {
     background: WHITE,
