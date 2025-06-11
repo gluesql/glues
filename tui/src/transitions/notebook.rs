@@ -58,6 +58,7 @@ impl App {
 
         match transition {
             NotebookTransition::ShowVimKeymap(kind) => {
+                self.context.keymap_scroll = 0;
                 self.context.vim_keymap = Some(kind);
             }
             NotebookTransition::ViewMode(_note) => {

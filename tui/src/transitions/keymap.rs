@@ -4,10 +4,12 @@ impl App {
     pub(super) async fn handle_keymap_transition(&mut self, transition: KeymapTransition) {
         match transition {
             KeymapTransition::Show => {
+                self.context.keymap_scroll = 0;
                 self.context.keymap = true;
             }
             KeymapTransition::Hide => {
                 self.context.keymap = false;
+                self.context.keymap_scroll = 0;
             }
         }
     }

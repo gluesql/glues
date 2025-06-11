@@ -19,12 +19,12 @@ use {
 
 pub fn draw(frame: &mut Frame, state: &State, context: &mut Context) {
     if context.keymap {
-        keymap::draw(frame, state.keymap().as_slice());
+        keymap::draw(frame, state.keymap().as_slice(), context.keymap_scroll);
     }
 
     if let Some(kind) = context.vim_keymap {
         let groups = vim_keymap::keymap(kind);
-        keymap::draw(frame, &groups);
+        keymap::draw(frame, &groups, context.keymap_scroll);
         return;
     } else if context.editor_keymap {
         editor_keymap::draw(frame);

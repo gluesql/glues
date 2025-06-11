@@ -59,6 +59,8 @@ pub struct Context {
     pub vim_keymap: Option<VimKeymapKind>,
 
     pub keymap: bool,
+
+    pub keymap_scroll: u16,
 }
 
 impl Default for Context {
@@ -78,6 +80,8 @@ impl Default for Context {
             vim_keymap: None,
 
             keymap: false,
+
+            keymap_scroll: 0,
         }
     }
 }
@@ -93,9 +97,32 @@ impl Context {
     }
 
     pub async fn consume(&mut self, input: &Input) -> Action {
-        if self.vim_keymap.is_some() {
-            self.vim_keymap = None;
+        if let Some(_) = self.vim_keymap {
+            match input {
+                Input::Key(KeyEvent { code: KeyCode::Char('j') | KeyCode::Down, .. }) => {
+                    self.keymap_scroll = self.keymap_scroll.saturating_add(1);
+                }
+                Input::Key(KeyEvent { code: KeyCode::Char('k') | KeyCode::Up, .. }) => {
+                    self.keymap_scroll = self.keymap_scroll.saturating_sub(1);
+                }
+                _ => {
+                    self.vim_keymap = None;
+                    self.keymap_scroll = 0;
+                }
+            }
             return Action::None;
+        } else if self.keymap {
+            match input {
+                Input::Key(KeyEvent { code: KeyCode::Char('j') | KeyCode::Down, .. }) => {
+                    self.keymap_scroll = self.keymap_scroll.saturating_add(1);
+                    return Action::None;
+                }
+                Input::Key(KeyEvent { code: KeyCode::Char('k') | KeyCode::Up, .. }) => {
+                    self.keymap_scroll = self.keymap_scroll.saturating_sub(1);
+                    return Action::None;
+                }
+                _ => {}
+            }
         } else if self.editor_keymap {
             self.editor_keymap = false;
             return Action::None;
