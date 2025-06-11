@@ -1226,6 +1226,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "glues-server"
+version = "0.6.3"
+dependencies = [
+ "glues-core",
+ "serde",
+ "serde_json",
+ "tiny_http",
+ "tokio",
+]
+
+[[package]]
 name = "gluesql"
 version = "0.16.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

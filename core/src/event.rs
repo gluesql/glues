@@ -35,6 +35,7 @@ pub enum EntryEvent {
         conn_str: String,
         db_name: String,
     },
+    OpenRemote(String),
 }
 
 #[derive(Clone, Debug, Display)]

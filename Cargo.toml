@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
-members = ["tui", "core"]
-default-members = ["tui", "core"]
+members = ["tui", "core", "server"]
+default-members = ["tui", "core", "server"]
 
 [workspace.package]
 authors = ["Taehoon Moon <taehoon.moon@outlook.com>"]

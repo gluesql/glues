@@ -1,0 +1,15 @@
+[package]
+name = "glues-server"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Glues notes server"
+
+[dependencies]
+glues-core.workspace = true
+tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tiny_http = "0.12"

@@ -3,7 +3,7 @@ use {
         App,
         config::{
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
-            LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME,
+            LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME, LAST_REMOTE_ADDR,
         },
         context::ContextPrompt,
         logger::*,
@@ -52,6 +52,7 @@ pub enum TuiAction {
     OpenFile,
     OpenGit(OpenGitStep),
     OpenMongo(OpenMongoStep),
+    OpenRemote,
 
     RenameNote,
     RemoveNote,
@@ -195,6 +196,25 @@ impl App {
                 let transition = self
                     .glues
                     .dispatch(EntryEvent::OpenMongo { conn_str, db_name }.into())
+                    .await
+                    .log_unwrap();
+                self.handle_transition(transition).await;
+            }
+            Action::Tui(TuiAction::OpenRemote) => {
+                let addr = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("prompt must not be none");
+                if addr.is_empty() {
+                    self.context.alert = Some("Address cannot be empty".to_string());
+                    return false;
+                }
+
+                config::update(LAST_REMOTE_ADDR, &addr).await;
+
+                let transition = self
+                    .glues
+                    .dispatch(EntryEvent::OpenRemote(addr).into())
                     .await
                     .log_unwrap();
                 self.handle_transition(transition).await;
