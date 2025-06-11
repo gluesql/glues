@@ -39,3 +39,11 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --all-features --verbose
 
+  rust_test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace --all-features --verbose
+
