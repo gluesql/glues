@@ -3,7 +3,7 @@ pub mod menu;
 pub mod notebook;
 
 use {
-    crate::{action::TuiAction, Action, log, logger::*, theme::THEME},
+    crate::{Action, action::TuiAction, log, logger::*, theme::THEME},
     glues_core::transition::VimKeymapKind,
     ratatui::{
         crossterm::event::{Event as Input, KeyCode, KeyEvent},

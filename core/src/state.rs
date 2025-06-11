@@ -1,7 +1,10 @@
 mod entry;
 pub mod notebook;
 
-use crate::{Error, Event, Glues, KeyEvent, Result, Transition, transition::KeymapTransition};
+use crate::{
+    Error, Event, Glues, KeyEvent, Result, Transition, transition::KeymapTransition,
+    types::KeymapItem,
+};
 
 pub use {entry::EntryState, notebook::NotebookState};
 
@@ -44,7 +47,7 @@ impl State {
         }
     }
 
-    pub fn keymap(&self) -> Vec<String> {
+    pub fn keymap(&self) -> Vec<KeymapItem> {
         match &self.inner {
             InnerState::EntryState(state) => state.keymap(),
             InnerState::NotebookState(state) => state.keymap(),

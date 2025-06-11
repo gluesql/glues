@@ -1,5 +1,8 @@
 use {
-    crate::{context::menu::{MenuContext, MENU_ITEMS}, theme::THEME},
+    crate::{
+        context::menu::{MENU_ITEMS, MenuContext},
+        theme::THEME,
+    },
     ratatui::{
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
@@ -12,9 +15,7 @@ pub fn draw(frame: &mut Frame, context: &mut MenuContext) {
     let [area] = Layout::horizontal([Length(20)])
         .flex(Flex::Center)
         .areas(frame.area());
-    let [area] = Layout::vertical([Length(7)])
-        .flex(Flex::Center)
-        .areas(area);
+    let [area] = Layout::vertical([Length(7)]).flex(Flex::Center).areas(area);
 
     let block = Block::bordered()
         .bg(THEME.surface)

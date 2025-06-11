@@ -1,6 +1,6 @@
 use crate::{
     EntryEvent, EntryTransition, Error, Event, Glues, Result, db::Db,
-    state::notebook::NotebookState,
+    state::notebook::NotebookState, types::KeymapItem,
 };
 
 pub struct EntryState;
@@ -72,12 +72,12 @@ impl EntryState {
         )
     }
 
-    pub fn keymap(&self) -> Vec<String> {
+    pub fn keymap(&self) -> Vec<KeymapItem> {
         vec![
-            "[j]     Select next".to_owned(),
-            "[k]     Select previous".to_owned(),
-            "[Enter] Run selected item".to_owned(),
-            "[q]     Quit".to_owned(),
+            KeymapItem::new("j", "Select next"),
+            KeymapItem::new("k", "Select previous"),
+            KeymapItem::new("Enter", "Run selected item"),
+            KeymapItem::new("q", "Quit"),
         ]
     }
 }
