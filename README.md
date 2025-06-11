@@ -52,6 +52,21 @@ Glues offers various storage options to suit your needs:
   - These formats store notes as simple log files, ideal for quick data exports or reading logs.
   - CSV saves data in comma-separated format, while JSON uses JSONL (JSON Lines) format.
 
+### Theme Presets
+
+Glues includes several built-in color schemes. The application starts with the
+`dark` palette by default, but you can switch presets with the `--theme` option:
+
+```bash
+glues --theme pastel
+```
+
+The built-in themes are:
+
+* `dark` – 256-color palette
+* `light` – 256-color palette
+* `pastel` – a light theme defined using RGB values
+
 ## Roadmap
 
 Here is our plan for Glues and the features we aim to implement. Below is a list of upcoming improvements to make Glues more useful and versatile. If you have suggestions for new features, please feel free to open a GitHub issue.

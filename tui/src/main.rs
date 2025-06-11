@@ -40,6 +40,7 @@ struct Cli {
 enum ThemeArg {
     Dark,
     Light,
+    Pastel,
 }
 
 #[tokio::main]
@@ -49,6 +50,7 @@ async fn main() -> Result<()> {
     match cli.theme {
         ThemeArg::Dark => theme::set_theme(theme::DARK_THEME),
         ThemeArg::Light => theme::set_theme(theme::LIGHT_THEME),
+        ThemeArg::Pastel => theme::set_theme(theme::PASTEL_THEME),
     }
 
     config::init().await;
