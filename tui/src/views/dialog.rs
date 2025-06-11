@@ -6,7 +6,6 @@ mod help;
 mod keymap;
 mod note_actions;
 mod prompt;
-mod vim_keymap;
 
 use {
     crate::{
@@ -14,6 +13,7 @@ use {
         context::{self},
     },
     glues_core::state::State,
+    glues_core::vim_keymap,
     ratatui::Frame,
 };
 
@@ -23,7 +23,8 @@ pub fn draw(frame: &mut Frame, state: &State, context: &mut Context) {
     }
 
     if let Some(kind) = context.vim_keymap {
-        vim_keymap::draw(frame, kind);
+        let groups = vim_keymap::keymap(kind);
+        keymap::draw(frame, &groups);
         return;
     } else if context.editor_keymap {
         editor_keymap::draw(frame);

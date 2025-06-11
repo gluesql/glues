@@ -10,6 +10,7 @@ pub mod proxy;
 pub mod state;
 pub mod transition;
 pub mod types;
+pub mod vim_keymap;
 
 pub use error::Error;
 pub use event::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey};
