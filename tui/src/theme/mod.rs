@@ -2,10 +2,16 @@ use once_cell::sync::OnceCell;
 use ratatui::style::Color;
 
 pub mod dark;
+pub mod forest;
 pub mod light;
+pub mod midnight;
 pub mod pastel;
+pub mod sunrise;
 
-pub use {dark::DARK_THEME, light::LIGHT_THEME, pastel::PASTEL_THEME};
+pub use {
+    dark::DARK_THEME, forest::FOREST_THEME, light::LIGHT_THEME, midnight::MIDNIGHT_THEME,
+    pastel::PASTEL_THEME, sunrise::SUNRISE_THEME,
+};
 
 #[derive(Clone, Copy, Debug)]
 #[allow(dead_code)]
