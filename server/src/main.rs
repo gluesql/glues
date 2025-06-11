@@ -1,26 +1,28 @@
 use glues_core::{
     db::Db,
-    proxy::{ProxyServer, request::ProxyRequest},
+    proxy::{request::ProxyRequest, ProxyServer},
 };
-use std::io::Read;
-use std::sync::{Arc, mpsc::channel};
+use std::sync::{mpsc::channel, Arc};
 use tiny_http::{Response, Server};
 use tokio::sync::Mutex;
 
-#[tokio::main]
-async fn main() {
+fn main() {
+    // Initialize a dedicated runtime for async operations
+    let rt = tokio::runtime::Runtime::new().expect("create runtime");
+
     let (tx, _rx) = channel();
-    let db = Db::memory(tx).await.expect("init db");
+    let db = rt
+        .block_on(Db::memory(tx))
+        .expect("init db");
     let server = Arc::new(Mutex::new(ProxyServer::new(db)));
 
     let http = Server::http("0.0.0.0:9001").unwrap();
-    let handle = tokio::runtime::Handle::current();
     for mut req in http.incoming_requests() {
         let mut body = String::new();
         req.as_reader().read_to_string(&mut body).unwrap();
         let proxy_req: ProxyRequest = serde_json::from_str(&body).unwrap();
         let srv = server.clone();
-        let response = handle.block_on(async {
+        let response = rt.block_on(async {
             let mut s = srv.lock().await;
             s.handle(proxy_req).await
         });
