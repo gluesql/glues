@@ -41,6 +41,9 @@ enum ThemeArg {
     Dark,
     Light,
     Pastel,
+    Sunrise,
+    Midnight,
+    Forest,
 }
 
 #[tokio::main]
@@ -51,6 +54,9 @@ async fn main() -> Result<()> {
         ThemeArg::Dark => theme::set_theme(theme::DARK_THEME),
         ThemeArg::Light => theme::set_theme(theme::LIGHT_THEME),
         ThemeArg::Pastel => theme::set_theme(theme::PASTEL_THEME),
+        ThemeArg::Sunrise => theme::set_theme(theme::SUNRISE_THEME),
+        ThemeArg::Midnight => theme::set_theme(theme::MIDNIGHT_THEME),
+        ThemeArg::Forest => theme::set_theme(theme::FOREST_THEME),
     }
 
     config::init().await;

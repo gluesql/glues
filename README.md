@@ -66,6 +66,9 @@ The built-in themes are:
 * `dark` – 256-color palette
 * `light` – 256-color palette
 * `pastel` – a light theme defined using RGB values
+* `sunrise` – a warm light theme defined using RGB values
+* `midnight` – a blue-toned dark theme defined using RGB values
+* `forest` – a nature-inspired dark theme defined using RGB values
 
 ## Roadmap
 
