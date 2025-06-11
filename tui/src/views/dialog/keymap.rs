@@ -6,11 +6,14 @@ use {
         layout::{
             Alignment,
             Constraint::{Length, Percentage},
-            Flex, Layout,
+            Flex, Layout, Margin,
         },
         style::Stylize,
         text::{Line, Span},
-        widgets::{Block, Clear, Padding, Paragraph, Wrap},
+        widgets::{
+            Block, Clear, Padding, Paragraph, Scrollbar, ScrollbarOrientation,
+            ScrollbarState, Wrap,
+        },
     },
     textwrap::wrap,
 };
@@ -68,12 +71,19 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapGroup], offset: u16) {
         }
     }
 
-    let paragraph = Paragraph::new(lines)
+    let paragraph = Paragraph::new(lines.clone())
         .alignment(Alignment::Left)
         .wrap(Wrap { trim: false })
         .scroll((offset, 0));
 
+    let mut scrollbar_state =
+        ScrollbarState::new(lines.len()).position(offset as usize).viewport_content_length(
+            inner_area.height as usize,
+        );
+    let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
+
     frame.render_widget(Clear, area);
     frame.render_widget(block.clone(), area);
     frame.render_widget(paragraph, inner_area);
+    frame.render_stateful_widget(scrollbar, inner_area.inner(Margin { vertical: 1, horizontal: 0 }), &mut scrollbar_state);
 }
