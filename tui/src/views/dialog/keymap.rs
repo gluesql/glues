@@ -43,28 +43,32 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapItem]) {
     let inner_area = block.inner(area);
     let desc_width = inner_area.width.saturating_sub(KEY_WIDTH + 1);
 
-    let heights: Vec<u16> = keymap
+    let wrapped_descs: Vec<Vec<Line>> = keymap
         .iter()
-        .map(|item| wrap(&item.desc, desc_width as usize).len() as u16)
+        .map(|item| {
+            wrap(&item.desc, desc_width as usize)
+                .into_iter()
+                .map(|c| Line::from(c.into_owned()))
+                .collect::<Vec<_>>()
+        })
         .collect();
 
-    let row_constraints = heights.iter().map(|h| Length(*h)).collect::<Vec<_>>();
+    let row_constraints = wrapped_descs
+        .iter()
+        .map(|lines| Length(lines.len() as u16))
+        .collect::<Vec<_>>();
     let rows = Layout::vertical(row_constraints).split(inner_area);
 
     frame.render_widget(Clear, area);
     frame.render_widget(block.clone(), area);
 
-    for (row_area, item) in rows.iter().zip(keymap) {
+    for ((row_area, desc_lines), item) in rows.iter().zip(wrapped_descs.iter()).zip(keymap) {
         let [key_area, desc_area] =
             Layout::horizontal([Length(KEY_WIDTH), Length(desc_width)]).areas(*row_area);
 
         let key_paragraph = Paragraph::new(Line::from(vec![Span::raw(format!("[{}]", item.key))]))
             .alignment(Alignment::Left);
-        let desc_lines: Vec<Line> = wrap(&item.desc, desc_width as usize)
-            .into_iter()
-            .map(|c| Line::from(c.into_owned()))
-            .collect();
-        let desc_paragraph = Paragraph::new(desc_lines)
+        let desc_paragraph = Paragraph::new(desc_lines.clone())
             .alignment(Alignment::Left)
             .style(Style::default());
 
