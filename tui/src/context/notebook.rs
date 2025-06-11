@@ -411,11 +411,7 @@ impl NotebookContext {
 
                 Action::PassThrough
             }
-            KeyCode::Esc => TuiAction::Confirm {
-                message: "Do you want to quit?".to_owned(),
-                action: Box::new(TuiAction::Quit.into()),
-            }
-            .into(),
+            KeyCode::Esc => TuiAction::Menu.into(),
             _ => Action::PassThrough,
         }
     }
@@ -427,11 +423,7 @@ impl NotebookContext {
         };
 
         match code {
-            KeyCode::Esc if idle => TuiAction::SaveAndConfirm {
-                message: "Do you want to quit?".to_owned(),
-                action: Box::new(TuiAction::Quit.into()),
-            }
-            .into(),
+            KeyCode::Esc if idle => TuiAction::SaveAndMenu.into(),
             KeyCode::Tab if idle => {
                 self.show_browser = true;
                 self.update_yank();

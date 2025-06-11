@@ -151,6 +151,9 @@ impl App {
 
         views::statusbar::draw(frame, statusbar, state, &context.notebook);
         views::body::draw(frame, body, context);
+        if let Some(menu) = context.menu.as_mut() {
+            views::menu::draw(frame, menu);
+        }
         views::dialog::draw(frame, state, context);
     }
 }
