@@ -72,20 +72,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let addr = format!("0.0.0.0:{}", cli.port);
     let http = Server::http(&addr)?;
     println!("Listening on http://{}", addr);
-    let handle = tokio::runtime::Handle::current();
+
+    let rt_handle = tokio::runtime::Handle::current();
     for mut req in http.incoming_requests() {
-        let mut body = String::new();
-        req.as_reader().read_to_string(&mut body)?;
-        let proxy_req: ProxyRequest = serde_json::from_str(&body)?;
         let srv = server.clone();
-        let response = handle.block_on(async {
-            let mut s = srv.lock().await;
-            s.handle(proxy_req).await
+        let handle = rt_handle.clone();
+        tokio::task::spawn_blocking(move || {
+            let mut body = String::new();
+            if req.as_reader().read_to_string(&mut body).is_err() {
+                return;
+            }
+            let proxy_req: ProxyRequest = match serde_json::from_str(&body) {
+                Ok(req) => req,
+                Err(_) => {
+                    let _ = req.respond(Response::from_string("bad request"));
+                    return;
+                }
+            };
+
+            let response = handle.block_on(async {
+                let mut s = srv.lock().await;
+                s.handle(proxy_req).await
+            });
+
+            let body = match serde_json::to_string(&response) {
+                Ok(b) => b,
+                Err(_) => return,
+            };
+            let resp = Response::from_string(body)
+                .with_header(Header::from_bytes("Content-Type", "application/json").unwrap());
+            let _ = req.respond(resp);
         });
-        let body = serde_json::to_string(&response)?;
-        let resp = Response::from_string(body)
-            .with_header(Header::from_bytes("Content-Type", "application/json").unwrap());
-        let _ = req.respond(resp);
     }
 
     Ok(())

@@ -4,7 +4,7 @@ mod event;
 mod glues;
 mod schema;
 mod task;
-pub use task::{handle_tasks, Task};
+pub use task::{Task, handle_tasks};
 
 pub mod data;
 pub mod proxy;

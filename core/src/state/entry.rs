@@ -1,6 +1,6 @@
 use crate::{
     EntryEvent, EntryTransition, Error, Event, Glues, Result,
-    db::{Db, CoreBackend},
+    db::{CoreBackend, Db},
     state::notebook::NotebookState,
     types::{KeymapGroup, KeymapItem},
 };
@@ -49,16 +49,14 @@ impl EntryState {
                 remote,
                 branch,
             }) => {
-                let db = Db::git(glues.task_tx.clone(), &path, remote, branch)
-                    .await?;
+                let db = Db::git(glues.task_tx.clone(), &path, remote, branch).await?;
                 glues.db = Some(Box::new(db));
                 glues.state = NotebookState::new(glues).await?.into();
 
                 Ok(EntryTransition::OpenNotebook)
             }
             Entry(OpenMongo { conn_str, db_name }) => {
-                let db = Db::mongo(glues.task_tx.clone(), &conn_str, &db_name)
-                    .await?;
+                let db = Db::mongo(glues.task_tx.clone(), &conn_str, &db_name).await?;
                 glues.db = Some(Box::new(db));
                 glues.state = NotebookState::new(glues).await?.into();
 
