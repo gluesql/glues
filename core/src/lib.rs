@@ -1,4 +1,4 @@
-mod db;
+pub mod db;
 mod error;
 mod event;
 mod glues;

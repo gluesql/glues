@@ -2,14 +2,14 @@ use {
     super::NoteTreeState,
     crate::{
         Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
-        db::Db,
+        db::CoreBackend,
         state::notebook::{InnerState, NotebookState, SelectedItem, directory, note},
         transition::{MoveModeTransition, NoteTreeTransition},
     },
 };
 
-pub async fn consume(
-    db: &mut Db,
+pub async fn consume<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     event: Event,
 ) -> Result<NotebookTransition> {

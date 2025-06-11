@@ -1,4 +1,4 @@
-use crate::{Event, NotebookTransition, Result, db::Db, state::notebook::NotebookState};
+use crate::{Event, NotebookTransition, Result, db::CoreBackend, state::notebook::NotebookState};
 
 mod directory_more_actions;
 mod directory_selected;
@@ -19,8 +19,8 @@ pub enum NoteTreeState {
     MoveMode,
 }
 
-pub async fn consume(
-    db: &mut Db,
+pub async fn consume<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     tree_state: NoteTreeState,
     event: Event,

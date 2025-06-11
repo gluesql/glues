@@ -5,7 +5,7 @@ mod note_tree;
 
 use crate::{
     Event, NotebookEvent, NotebookTransition, Result,
-    db::Db,
+    db::CoreBackend,
     state::notebook::{NotebookState, note},
 };
 pub use editing_normal_mode::VimNormalState;
@@ -21,8 +21,8 @@ pub enum InnerState {
     EditingInsertMode,
 }
 
-pub async fn consume(
-    db: &mut Db,
+pub async fn consume<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     event: Event,
 ) -> Result<NotebookTransition> {

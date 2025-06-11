@@ -1,6 +1,6 @@
 use crate::{
     Error, Event, KeyEvent, NumKey, Result,
-    db::Db,
+    db::CoreBackend,
     state::notebook::{InnerState, NotebookState, VimNormalState},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition},
 };
@@ -12,8 +12,8 @@ pub enum VimVisualState {
     Numbering(usize),
 }
 
-pub async fn consume(
-    db: &mut Db,
+pub async fn consume<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     vim_state: VimVisualState,
     event: Event,
@@ -25,8 +25,8 @@ pub async fn consume(
     }
 }
 
-async fn consume_idle(
-    _db: &mut Db,
+async fn consume_idle<B: CoreBackend + ?Sized>(
+    _db: &mut B,
     state: &mut NotebookState,
     event: Event,
 ) -> Result<NotebookTransition> {
@@ -99,8 +99,8 @@ async fn consume_idle(
     }
 }
 
-async fn consume_gateway(
-    db: &mut Db,
+async fn consume_gateway<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     event: Event,
 ) -> Result<NotebookTransition> {
@@ -127,8 +127,8 @@ async fn consume_gateway(
     }
 }
 
-async fn consume_numbering(
-    db: &mut Db,
+async fn consume_numbering<B: CoreBackend + ?Sized>(
+    db: &mut B,
     state: &mut NotebookState,
     n: usize,
     event: Event,
