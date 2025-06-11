@@ -2,6 +2,7 @@ use crate::{
     Error, Event, NotebookEvent, NotebookTransition, Result,
     db::CoreBackend,
     state::notebook::{NotebookState, directory, note},
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub async fn consume<B: CoreBackend + ?Sized>(
@@ -46,4 +47,16 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap() -> Vec<KeymapGroup> {
+    vec![KeymapGroup::new(
+        "General",
+        vec![
+            KeymapItem::new("j", "Select next"),
+            KeymapItem::new("k", "Select Previous"),
+            KeymapItem::new("Enter", "Run selected item"),
+            KeymapItem::new("Esc", "Close"),
+        ],
+    )]
 }

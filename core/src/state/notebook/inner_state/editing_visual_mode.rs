@@ -3,6 +3,7 @@ use crate::{
     db::CoreBackend,
     state::notebook::NotebookState,
     transition::{NotebookTransition, VisualModeTransition},
+    types::KeymapGroup,
 };
 
 mod gateway;
@@ -32,5 +33,13 @@ pub async fn consume<B: CoreBackend + ?Sized>(
 impl From<VisualModeTransition> for Result<NotebookTransition> {
     fn from(transition: VisualModeTransition) -> Self {
         Ok(NotebookTransition::EditingVisualMode(transition))
+    }
+}
+
+pub fn keymap(vim_state: VimVisualState) -> Vec<KeymapGroup> {
+    match vim_state {
+        VimVisualState::Idle => idle::keymap(),
+        VimVisualState::Gateway => gateway::keymap(),
+        VimVisualState::Numbering(n) => numbering::keymap(n),
     }
 }

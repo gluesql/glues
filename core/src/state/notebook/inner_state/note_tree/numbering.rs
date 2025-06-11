@@ -4,6 +4,7 @@ use {
         Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
         state::notebook::{InnerState, NotebookState, SelectedItem, directory, note},
         transition::NoteTreeTransition,
+        types::{KeymapGroup, KeymapItem},
     },
 };
 
@@ -74,4 +75,18 @@ pub async fn consume(
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap(n: usize) -> Vec<KeymapGroup> {
+    let items = vec![
+        KeymapItem::new("j", format!("Select {n} next")),
+        KeymapItem::new("k", format!("Select {n} previous")),
+        KeymapItem::new("G", "Select last"),
+        KeymapItem::new("0-9", "Append steps"),
+        KeymapItem::new(">", format!("Expand width by {n}")),
+        KeymapItem::new("<", format!("Shrink width by {n}")),
+        KeymapItem::new("Esc", "Cancel"),
+    ];
+
+    vec![KeymapGroup::new("General", items)]
 }

@@ -3,6 +3,7 @@ use crate::{
     db::CoreBackend,
     state::notebook::{InnerState, NotebookState, tabs},
     transition::{NormalModeTransition, NotebookTransition},
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub async fn consume<B: CoreBackend + ?Sized>(
@@ -42,4 +43,28 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap() -> Vec<KeymapGroup> {
+    vec![
+        KeymapGroup::new(
+            "Tabs",
+            vec![
+                KeymapItem::new("h", "select left tab"),
+                KeymapItem::new("l", "select right tab"),
+                KeymapItem::new("H", "Move current tab to left"),
+                KeymapItem::new("L", "Move current tab to right"),
+                KeymapItem::new("x", "Close current tab"),
+                KeymapItem::new("X", "Enter tab close mode"),
+            ],
+        ),
+        KeymapGroup::new(
+            "Options",
+            vec![
+                KeymapItem::new("b", "Toggle browser"),
+                KeymapItem::new("n", "Toggle editor line number"),
+                KeymapItem::new("Esc", "Cancel"),
+            ],
+        ),
+    ]
 }

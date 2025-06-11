@@ -3,6 +3,7 @@ use crate::{
     db::CoreBackend,
     state::notebook::NotebookState,
     transition::{NormalModeTransition, NotebookTransition},
+    types::KeymapGroup,
 };
 
 mod change;
@@ -65,5 +66,24 @@ pub async fn consume<B: CoreBackend + ?Sized>(
 impl From<NormalModeTransition> for Result<NotebookTransition> {
     fn from(transition: NormalModeTransition) -> Self {
         Ok(NotebookTransition::EditingNormalMode(transition))
+    }
+}
+
+pub fn keymap(vim_state: VimNormalState) -> Vec<KeymapGroup> {
+    match vim_state {
+        VimNormalState::Idle => idle::keymap(),
+        VimNormalState::Toggle => toggle::keymap(),
+        VimNormalState::ToggleTabClose => toggle_tab_close::keymap(),
+        VimNormalState::Numbering(n) => numbering::keymap(n),
+        VimNormalState::Gateway => gateway::keymap(),
+        VimNormalState::Yank(n) => yank::keymap(n),
+        VimNormalState::Yank2(n1, n2) => yank2::keymap(n1, n2),
+        VimNormalState::Delete(n) => delete::keymap(n),
+        VimNormalState::Delete2(n1, n2) => delete2::keymap(n1, n2),
+        VimNormalState::DeleteInside(n) => delete_inside::keymap(n),
+        VimNormalState::Change(n) => change::keymap(n),
+        VimNormalState::Change2(n1, n2) => change2::keymap(n1, n2),
+        VimNormalState::ChangeInside(n) => change_inside::keymap(n),
+        VimNormalState::Scroll => scroll::keymap(),
     }
 }

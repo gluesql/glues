@@ -2,6 +2,7 @@ use crate::{
     Error, Event, KeyEvent, Result,
     state::notebook::{InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition},
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub async fn consume(
@@ -25,4 +26,19 @@ pub async fn consume(
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap(n: usize) -> Vec<KeymapGroup> {
+    vec![KeymapGroup::new(
+        "General",
+        vec![
+            if n == 1 {
+                KeymapItem::new("w", "Delete the current word")
+            } else {
+                KeymapItem::new("w", format!("Delete {n} words from cursor"))
+            },
+            KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+            KeymapItem::new("Esc", "Cancel"),
+        ],
+    )]
 }

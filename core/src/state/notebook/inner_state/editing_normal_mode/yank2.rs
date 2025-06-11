@@ -2,6 +2,7 @@ use crate::{
     Error, Event, KeyEvent, Result,
     state::notebook::{InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition},
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub async fn consume(
@@ -37,4 +38,19 @@ pub async fn consume(
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap(n1: usize, n2: usize) -> Vec<KeymapGroup> {
+    vec![KeymapGroup::new(
+        "General",
+        vec![
+            if n1 == 1 {
+                KeymapItem::new("y", format!("Yank {n2} lines"))
+            } else {
+                KeymapItem::new("y", format!("Yank {n1}*{n2} lines"))
+            },
+            KeymapItem::new("0-9", "Append steps"),
+            KeymapItem::new("Esc", "Cancel"),
+        ],
+    )]
 }

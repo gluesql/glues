@@ -3,6 +3,7 @@ use crate::{
     db::CoreBackend,
     state::notebook::{InnerState, NotebookState, VimNormalState},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition},
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub async fn consume<B: CoreBackend + ?Sized>(
@@ -78,4 +79,18 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap() -> Vec<KeymapGroup> {
+    let items = vec![
+        KeymapItem::new("j", "Move cursor down"),
+        KeymapItem::new("k", "Move cursor up"),
+        KeymapItem::new("h", "Move cursor left"),
+        KeymapItem::new("l", "Move cursor right"),
+        KeymapItem::new("1-9", "Append steps"),
+        KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+        KeymapItem::new("Esc", "Cancel"),
+    ];
+
+    vec![KeymapGroup::new("General", items)]
 }

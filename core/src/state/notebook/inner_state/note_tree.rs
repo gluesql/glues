@@ -1,4 +1,7 @@
-use crate::{Event, NotebookTransition, Result, db::CoreBackend, state::notebook::NotebookState};
+use crate::{
+    Event, NotebookTransition, Result, db::CoreBackend, state::notebook::NotebookState,
+    types::KeymapGroup,
+};
 
 mod directory_more_actions;
 mod directory_selected;
@@ -35,5 +38,19 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         Numbering(n) => numbering::consume(state, n, event).await,
         GatewayMode => gateway::consume(state, event).await,
         MoveMode => move_mode::consume(db, state, event).await,
+    }
+}
+
+pub fn keymap(state: &NotebookState, tree_state: NoteTreeState) -> Vec<KeymapGroup> {
+    use NoteTreeState::*;
+
+    match tree_state {
+        NoteSelected => note_selected::keymap(state),
+        DirectorySelected => directory_selected::keymap(state),
+        NoteMoreActions => note_more_actions::keymap(),
+        DirectoryMoreActions => directory_more_actions::keymap(),
+        Numbering(n) => numbering::keymap(n),
+        GatewayMode => gateway::keymap(),
+        MoveMode => move_mode::keymap(),
     }
 }

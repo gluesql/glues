@@ -2,6 +2,7 @@ use crate::{
     Error, Event, KeyEvent, Result,
     state::notebook::{InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition},
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub async fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransition> {
@@ -37,4 +38,15 @@ pub async fn consume(state: &mut NotebookState, event: Event) -> Result<Notebook
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap() -> Vec<KeymapGroup> {
+    vec![KeymapGroup::new(
+        "General",
+        vec![
+            KeymapItem::new("h", "Close left tabs"),
+            KeymapItem::new("l", "Close right tabs"),
+            KeymapItem::new("Esc", "Cancel"),
+        ],
+    )]
 }

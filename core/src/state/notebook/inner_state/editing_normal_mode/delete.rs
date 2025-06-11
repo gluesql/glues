@@ -2,6 +2,7 @@ use crate::{
     Error, Event, KeyEvent, NumKey, Result,
     state::notebook::{InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind},
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub async fn consume(
@@ -82,4 +83,23 @@ pub async fn consume(
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap(n: usize) -> Vec<KeymapGroup> {
+    vec![KeymapGroup::new(
+        "General",
+        vec![
+            KeymapItem::new("i", "Enter delete inside mode"),
+            KeymapItem::new("d", format!("Delete {n} lines")),
+            KeymapItem::new("0", "Delete from start of line"),
+            KeymapItem::new("b", "Delete previous word"),
+            KeymapItem::new("e", "Delete to word end"),
+            KeymapItem::new("h", "Delete previous character"),
+            KeymapItem::new("l", "Delete next character"),
+            KeymapItem::new("$", "Delete to line end"),
+            KeymapItem::new("1-9", "Append steps"),
+            KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+            KeymapItem::new("Esc", "Cancel"),
+        ],
+    )]
 }
