@@ -5,6 +5,7 @@ use {
         db::CoreBackend,
         state::notebook::{InnerState, NotebookState, SelectedItem, directory, note},
         transition::{MoveModeTransition, NoteTreeTransition},
+        types::{KeymapGroup, KeymapItem},
     },
 };
 
@@ -50,4 +51,17 @@ impl From<MoveModeTransition> for Result<NotebookTransition> {
             transition,
         )))
     }
+}
+
+pub fn keymap() -> Vec<KeymapGroup> {
+    vec![KeymapGroup::new(
+        "General",
+        vec![
+            KeymapItem::new("j", "Select next"),
+            KeymapItem::new("k", "Select previous"),
+            KeymapItem::new("G", "Select last"),
+            KeymapItem::new("Enter", "Move to selected directory"),
+            KeymapItem::new("Esc", "Cancel"),
+        ],
+    )]
 }

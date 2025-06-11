@@ -5,6 +5,7 @@ use {
         db::CoreBackend,
         state::notebook::{InnerState, NotebookState, directory, note, tabs},
         transition::{MoveModeTransition, NoteTreeTransition},
+        types::{KeymapGroup, KeymapItem},
     },
 };
 
@@ -104,4 +105,29 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap(state: &NotebookState) -> Vec<KeymapGroup> {
+    let mut items = vec![
+        KeymapItem::new("l", "Toggle directory"),
+        KeymapItem::new("h", "Close parent directory"),
+        KeymapItem::new("j", "Select next"),
+        KeymapItem::new("k", "Select previous"),
+        KeymapItem::new("J", "Select next directory"),
+        KeymapItem::new("K", "Select previous directory"),
+        KeymapItem::new("G", "Select last"),
+        KeymapItem::new("1-9", "Add steps"),
+        KeymapItem::new(">", "Expand width"),
+        KeymapItem::new("<", "Shrink width"),
+        KeymapItem::new("Space", "Move directory"),
+        KeymapItem::new("m", "Show more actions"),
+    ];
+
+    if !state.tabs.is_empty() {
+        items.push(KeymapItem::new("Tab", "Focus editor"));
+    }
+
+    items.push(KeymapItem::new("Esc", "Quit"));
+
+    vec![KeymapGroup::new("General", items)]
 }

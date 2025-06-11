@@ -2,6 +2,7 @@ use crate::{
     Error, Event, KeyEvent, NumKey, Result,
     state::notebook::{InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind},
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub async fn consume(
@@ -56,4 +57,16 @@ pub async fn consume(
         }
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap(n: usize) -> Vec<KeymapGroup> {
+    vec![KeymapGroup::new(
+        "General",
+        vec![
+            KeymapItem::new("i", "Enter change inside mode"),
+            KeymapItem::new("c", format!("Delete {n} lines and enter insert mode")),
+            KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+            KeymapItem::new("Esc", "Cancel"),
+        ],
+    )]
 }

@@ -4,6 +4,7 @@ use crate::{
     Error, Event, KeyEvent, NotebookEvent, NumKey, Result,
     state::notebook::{InnerState, NoteTreeState, NotebookState, directory, note},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition},
+    types::{KeymapGroup, KeymapItem},
 };
 
 pub async fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransition> {
@@ -121,4 +122,18 @@ pub async fn consume(state: &mut NotebookState, event: Event) -> Result<Notebook
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
     }
+}
+
+pub fn keymap() -> Vec<KeymapGroup> {
+    let items = vec![
+        KeymapItem::new("Tab", "Browse notes"),
+        KeymapItem::new("t", "Enter toggle-tabs mode"),
+        KeymapItem::new("i", "Enter insert mode"),
+        KeymapItem::new("v", "Enter visual mode"),
+        KeymapItem::new("z", "Enter scroll mode"),
+        KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+        KeymapItem::new("Esc", "Quit"),
+    ];
+
+    vec![KeymapGroup::new("General", items)]
 }
