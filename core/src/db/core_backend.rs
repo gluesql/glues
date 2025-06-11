@@ -13,7 +13,11 @@ pub trait CoreBackend {
     async fn fetch_directories(&mut self, parent_id: DirectoryId) -> Result<Vec<Directory>>;
     async fn add_directory(&mut self, parent_id: DirectoryId, name: String) -> Result<Directory>;
     async fn remove_directory(&mut self, directory_id: DirectoryId) -> Result<()>;
-    async fn move_directory(&mut self, directory_id: DirectoryId, parent_id: DirectoryId) -> Result<()>;
+    async fn move_directory(
+        &mut self,
+        directory_id: DirectoryId,
+        parent_id: DirectoryId,
+    ) -> Result<()>;
     async fn rename_directory(&mut self, directory_id: DirectoryId, name: String) -> Result<()>;
 
     async fn fetch_notes(&mut self, directory_id: DirectoryId) -> Result<Vec<Note>>;
@@ -51,7 +55,11 @@ impl CoreBackend for Db {
         Db::remove_directory(self, directory_id).await
     }
 
-    async fn move_directory(&mut self, directory_id: DirectoryId, parent_id: DirectoryId) -> Result<()> {
+    async fn move_directory(
+        &mut self,
+        directory_id: DirectoryId,
+        parent_id: DirectoryId,
+    ) -> Result<()> {
         Db::move_directory(self, directory_id, parent_id).await
     }
 

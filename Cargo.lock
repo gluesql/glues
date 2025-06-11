@@ -1107,6 +1107,7 @@ dependencies = [
  "gluesql-mongo-storage",
  "strum_macros 0.26.4",
  "thiserror",
+ "tokio",
  "uuid",
 ]
 
