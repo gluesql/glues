@@ -7,7 +7,7 @@ use {
         Error, Event, Glues, NotebookTransition, Result,
         data::{Directory, Note},
         state::GetInner,
-        types::{DirectoryId, Id, KeymapItem},
+        types::{DirectoryId, Id, KeymapGroup, KeymapItem},
     },
     consume::{directory, note, tabs},
 };
@@ -259,31 +259,38 @@ impl NotebookState {
         })
     }
 
-    pub fn keymap(&self) -> Vec<KeymapItem> {
+    pub fn keymap(&self) -> Vec<KeymapGroup> {
         match &self.inner_state {
             NoteTree(NoteTreeState::NoteSelected) => {
-                let mut keymap = vec![
-                    KeymapItem::new("l", "Open note"),
-                    KeymapItem::new("h", "Close parent directory"),
+                let navigation = vec![
                     KeymapItem::new("j", "Select next"),
                     KeymapItem::new("k", "Select previous"),
                     KeymapItem::new("J", "Select next directory"),
                     KeymapItem::new("K", "Select parent directory"),
                     KeymapItem::new("G", "Select last"),
-                    KeymapItem::new("g", "Enter gateway mode"),
                     KeymapItem::new("1-9", "Add steps"),
                     KeymapItem::new(">", "Expand width"),
                     KeymapItem::new("<", "Shrink width"),
+                ];
+
+                let mut actions = vec![
+                    KeymapItem::new("l", "Open note"),
+                    KeymapItem::new("h", "Close parent directory"),
+                    KeymapItem::new("g", "Enter gateway mode"),
                     KeymapItem::new("Space", "Move note"),
                     KeymapItem::new("m", "Show more actions"),
                 ];
 
                 if !self.tabs.is_empty() {
-                    keymap.push(KeymapItem::new("Tab", "Focus editor"));
+                    actions.push(KeymapItem::new("Tab", "Focus editor"));
                 }
 
-                keymap.push(KeymapItem::new("Esc", "Quit"));
-                keymap
+                actions.push(KeymapItem::new("Esc", "Quit"));
+
+                vec![
+                    KeymapGroup::new("Navigation", navigation),
+                    KeymapGroup::new("Actions", actions),
+                ]
             }
             NoteTree(NoteTreeState::DirectorySelected) => {
                 let mut keymap = vec![
@@ -306,10 +313,10 @@ impl NotebookState {
                 }
 
                 keymap.push(KeymapItem::new("Esc", "Quit"));
-                keymap
+                vec![KeymapGroup::new("General", keymap)]
             }
             NoteTree(NoteTreeState::Numbering(n)) => {
-                vec![
+                let items = vec![
                     KeymapItem::new("j", format!("Select {n} next")),
                     KeymapItem::new("k", format!("Select {n} previous")),
                     KeymapItem::new("G", "Select last"),
@@ -317,29 +324,36 @@ impl NotebookState {
                     KeymapItem::new(">", format!("Expand width by {n}")),
                     KeymapItem::new("<", format!("Shrink width by {n}")),
                     KeymapItem::new("Esc", "Cancel"),
-                ]
+                ];
+                vec![KeymapGroup::new("General", items)]
             }
             NoteTree(NoteTreeState::GatewayMode) => {
-                vec![
-                    KeymapItem::new("g", "Select first"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("g", "Select first"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             NoteTree(NoteTreeState::MoveMode) => {
-                vec![
-                    KeymapItem::new("j", "Select next"),
-                    KeymapItem::new("k", "Select previous"),
-                    KeymapItem::new("G", "Select last"),
-                    KeymapItem::new("Enter", "Move to selected directory"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("j", "Select next"),
+                        KeymapItem::new("k", "Select previous"),
+                        KeymapItem::new("G", "Select last"),
+                        KeymapItem::new("Enter", "Move to selected directory"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::Idle) => {
                 /*
                     h j k l w e b [1-9] o O 0 $
                     a, A, I, G, g, s, S, x, ^, y, d, u, Ctrl+r
                 */
-                vec![
+                let items = vec![
                     KeymapItem::new("Tab", "Browse notes"),
                     KeymapItem::new("t", "Enter toggle-tabs mode"),
                     KeymapItem::new("i", "Enter insert mode"),
@@ -347,31 +361,45 @@ impl NotebookState {
                     KeymapItem::new("z", "Enter scroll mode"),
                     KeymapItem::new("Ctrl+h", "Show Vim keymap"),
                     KeymapItem::new("Esc", "Quit"),
-                ]
+                ];
+                vec![KeymapGroup::new("General", items)]
             }
             EditingNormalMode(VimNormalState::Toggle) => {
                 vec![
-                    KeymapItem::new("h", "select left tab"),
-                    KeymapItem::new("l", "select right tab"),
-                    KeymapItem::new("H", "Move current tab to left"),
-                    KeymapItem::new("L", "Move current tab to right"),
-                    KeymapItem::new("x", "Close current tab"),
-                    KeymapItem::new("X", "Enter tab close mode"),
-                    KeymapItem::new("b", "Toggle browser"),
-                    KeymapItem::new("n", "Toggle editor line number"),
-                    KeymapItem::new("Esc", "Cancel"),
+                    KeymapGroup::new(
+                        "Tabs",
+                        vec![
+                            KeymapItem::new("h", "select left tab"),
+                            KeymapItem::new("l", "select right tab"),
+                            KeymapItem::new("H", "Move current tab to left"),
+                            KeymapItem::new("L", "Move current tab to right"),
+                            KeymapItem::new("x", "Close current tab"),
+                            KeymapItem::new("X", "Enter tab close mode"),
+                        ],
+                    ),
+                    KeymapGroup::new(
+                        "Options",
+                        vec![
+                            KeymapItem::new("b", "Toggle browser"),
+                            KeymapItem::new("n", "Toggle editor line number"),
+                            KeymapItem::new("Esc", "Cancel"),
+                        ],
+                    ),
                 ]
             }
             EditingNormalMode(VimNormalState::ToggleTabClose) => {
-                vec![
-                    KeymapItem::new("h", "Close left tabs"),
-                    KeymapItem::new("l", "Close right tabs"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("h", "Close left tabs"),
+                        KeymapItem::new("l", "Close right tabs"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::Numbering(n)) => {
                 // h j k l [0-9] s S x y d w e b G
-                vec![
+                let items = vec![
                     KeymapItem::new("j", format!("Move cursor {n} steps down")),
                     KeymapItem::new("k", format!("Move cursor {n} steps up")),
                     KeymapItem::new("h", format!("Move cursor {n} steps left")),
@@ -379,124 +407,155 @@ impl NotebookState {
                     KeymapItem::new("0-9", "Append steps"),
                     KeymapItem::new("Ctrl+h", "Show Vim keymap"),
                     KeymapItem::new("Esc", "Cancel"),
-                ]
+                ];
+                vec![KeymapGroup::new("General", items)]
             }
             EditingNormalMode(VimNormalState::Gateway) => {
-                vec![
-                    KeymapItem::new("g", "Move cursor to top"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("g", "Move cursor to top"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::Yank(n)) => {
-                vec![
-                    KeymapItem::new("y", format!("Yank {n} lines")),
-                    KeymapItem::new("1-9", "Append steps"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("y", format!("Yank {n} lines")),
+                        KeymapItem::new("1-9", "Append steps"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::Yank2(n1, n2)) => {
-                vec![
-                    if *n1 == 1 {
-                        KeymapItem::new("y", format!("Yank {n2} lines"))
-                    } else {
-                        KeymapItem::new("y", format!("Yank {n1}*{n2} lines"))
-                    },
-                    KeymapItem::new("0-9", "Append steps"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        if *n1 == 1 {
+                            KeymapItem::new("y", format!("Yank {n2} lines"))
+                        } else {
+                            KeymapItem::new("y", format!("Yank {n1}*{n2} lines"))
+                        },
+                        KeymapItem::new("0-9", "Append steps"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::Delete(n)) => {
-                vec![
-                    KeymapItem::new("i", "Enter delete inside mode"),
-                    KeymapItem::new("d", format!("Delete {n} lines")),
-                    KeymapItem::new("0", "Delete from start of line"),
-                    KeymapItem::new("b", "Delete previous word"),
-                    KeymapItem::new("e", "Delete to word end"),
-                    KeymapItem::new("h", "Delete previous character"),
-                    KeymapItem::new("l", "Delete next character"),
-                    KeymapItem::new("$", "Delete to line end"),
-                    KeymapItem::new("1-9", "Append steps"),
-                    KeymapItem::new("Ctrl+h", "Show Vim keymap"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("i", "Enter delete inside mode"),
+                        KeymapItem::new("d", format!("Delete {n} lines")),
+                        KeymapItem::new("0", "Delete from start of line"),
+                        KeymapItem::new("b", "Delete previous word"),
+                        KeymapItem::new("e", "Delete to word end"),
+                        KeymapItem::new("h", "Delete previous character"),
+                        KeymapItem::new("l", "Delete next character"),
+                        KeymapItem::new("$", "Delete to line end"),
+                        KeymapItem::new("1-9", "Append steps"),
+                        KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::Delete2(n1, n2)) => {
-                vec![
-                    if *n1 == 1 {
-                        KeymapItem::new("d", format!("Delete {n2} lines"))
-                    } else {
-                        KeymapItem::new("d", format!("Delete {n1}*{n2} lines"))
-                    },
-                    KeymapItem::new("i", "Enter delete inside mode"),
-                    KeymapItem::new("b", "Delete previous word"),
-                    KeymapItem::new("e", "Delete to word end"),
-                    KeymapItem::new("h", "Delete previous character"),
-                    KeymapItem::new("l", "Delete next character"),
-                    KeymapItem::new("$", "Delete to line end"),
-                    KeymapItem::new("0-9", "Append steps"),
-                    KeymapItem::new("Ctrl+h", "Show Vim keymap"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        if *n1 == 1 {
+                            KeymapItem::new("d", format!("Delete {n2} lines"))
+                        } else {
+                            KeymapItem::new("d", format!("Delete {n1}*{n2} lines"))
+                        },
+                        KeymapItem::new("i", "Enter delete inside mode"),
+                        KeymapItem::new("b", "Delete previous word"),
+                        KeymapItem::new("e", "Delete to word end"),
+                        KeymapItem::new("h", "Delete previous character"),
+                        KeymapItem::new("l", "Delete next character"),
+                        KeymapItem::new("$", "Delete to line end"),
+                        KeymapItem::new("0-9", "Append steps"),
+                        KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::DeleteInside(n)) => {
-                vec![
-                    if *n == 1 {
-                        KeymapItem::new("w", "Delete the current word")
-                    } else {
-                        KeymapItem::new("w", format!("Delete {n} words from cursor"))
-                    },
-                    KeymapItem::new("Ctrl+h", "Show Vim keymap"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        if *n == 1 {
+                            KeymapItem::new("w", "Delete the current word")
+                        } else {
+                            KeymapItem::new("w", format!("Delete {n} words from cursor"))
+                        },
+                        KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::Change(n)) => {
-                vec![
-                    KeymapItem::new("i", "Enter change inside mode"),
-                    KeymapItem::new("c", format!("Delete {n} lines and enter insert mode")),
-                    KeymapItem::new("Ctrl+h", "Show Vim keymap"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("i", "Enter change inside mode"),
+                        KeymapItem::new("c", format!("Delete {n} lines and enter insert mode")),
+                        KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::Change2(n1, n2)) => {
-                vec![
-                    if *n1 == 1 {
-                        KeymapItem::new("c", format!("Delete {n2} lines and enter insert mode"))
-                    } else {
-                        KeymapItem::new(
-                            "c",
-                            format!("Delete {n1}*{n2} lines and enter insert mode"),
-                        )
-                    },
-                    KeymapItem::new("i", "Enter change inside mode"),
-                    KeymapItem::new("0-9", "Append steps"),
-                    KeymapItem::new("Ctrl+h", "Show Vim keymap"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        if *n1 == 1 {
+                            KeymapItem::new("c", format!("Delete {n2} lines and enter insert mode"))
+                        } else {
+                            KeymapItem::new(
+                                "c",
+                                format!("Delete {n1}*{n2} lines and enter insert mode"),
+                            )
+                        },
+                        KeymapItem::new("i", "Enter change inside mode"),
+                        KeymapItem::new("0-9", "Append steps"),
+                        KeymapItem::new("Ctrl+h", "Show Vim keymap"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::ChangeInside(n)) => {
-                vec![
-                    if *n == 1 {
-                        KeymapItem::new("w", "Delete the current word and enter insert mode")
-                    } else {
-                        KeymapItem::new(
-                            "w",
-                            format!("Delete {n} words from cursor and enter insert mode"),
-                        )
-                    },
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        if *n == 1 {
+                            KeymapItem::new("w", "Delete the current word and enter insert mode")
+                        } else {
+                            KeymapItem::new(
+                                "w",
+                                format!("Delete {n} words from cursor and enter insert mode"),
+                            )
+                        },
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingNormalMode(VimNormalState::Scroll) => {
-                vec![
-                    KeymapItem::new("z|.", "Scroll to center"),
-                    KeymapItem::new("t|Enter", "Scroll to top"),
-                    KeymapItem::new("b|-", "Scroll to bottom"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("z|.", "Scroll to center"),
+                        KeymapItem::new("t|Enter", "Scroll to top"),
+                        KeymapItem::new("b|-", "Scroll to bottom"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingVisualMode(VimVisualState::Idle) => {
                 // more in the keymap
-                vec![
+                let items = vec![
                     KeymapItem::new("j", "Move cursor down"),
                     KeymapItem::new("k", "Move cursor up"),
                     KeymapItem::new("h", "Move cursor left"),
@@ -504,11 +563,12 @@ impl NotebookState {
                     KeymapItem::new("1-9", "Append steps"),
                     KeymapItem::new("Ctrl+h", "Show Vim keymap"),
                     KeymapItem::new("Esc", "Cancel"),
-                ]
+                ];
+                vec![KeymapGroup::new("General", items)]
             }
             EditingVisualMode(VimVisualState::Numbering(n)) => {
                 // more in the keymap
-                vec![
+                let items = vec![
                     KeymapItem::new("j", format!("Move cursor {n} steps down")),
                     KeymapItem::new("k", format!("Move cursor {n} steps up")),
                     KeymapItem::new("h", format!("Move cursor {n} steps left")),
@@ -516,27 +576,37 @@ impl NotebookState {
                     KeymapItem::new("0-9", "Append steps"),
                     KeymapItem::new("Ctrl+h", "Show Vim keymap"),
                     KeymapItem::new("Esc", "Cancel"),
-                ]
+                ];
+                vec![KeymapGroup::new("General", items)]
             }
             EditingVisualMode(VimVisualState::Gateway) => {
-                vec![
-                    KeymapItem::new("g", "Move cursor to top"),
-                    KeymapItem::new("Esc", "Cancel"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("g", "Move cursor to top"),
+                        KeymapItem::new("Esc", "Cancel"),
+                    ],
+                )]
             }
             EditingInsertMode => {
-                vec![
-                    KeymapItem::new("Esc", "Save note and enter normal mode"),
-                    KeymapItem::new("Ctrl+h", "Show editor keymap"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("Esc", "Save note and enter normal mode"),
+                        KeymapItem::new("Ctrl+h", "Show editor keymap"),
+                    ],
+                )]
             }
             NoteTree(NoteTreeState::DirectoryMoreActions | NoteTreeState::NoteMoreActions) => {
-                vec![
-                    KeymapItem::new("j", "Select next"),
-                    KeymapItem::new("k", "Select Previous"),
-                    KeymapItem::new("Enter", "Run selected item"),
-                    KeymapItem::new("Esc", "Close"),
-                ]
+                vec![KeymapGroup::new(
+                    "General",
+                    vec![
+                        KeymapItem::new("j", "Select next"),
+                        KeymapItem::new("k", "Select Previous"),
+                        KeymapItem::new("Enter", "Run selected item"),
+                        KeymapItem::new("Esc", "Close"),
+                    ],
+                )]
             }
         }
     }
