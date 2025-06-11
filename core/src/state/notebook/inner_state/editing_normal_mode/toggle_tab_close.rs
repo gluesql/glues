@@ -1,0 +1,47 @@
+use super::VimNormalState;
+use {
+    super::VimVisualState,
+    crate::{
+        Error, Event, KeyEvent, NotebookEvent, NumKey, Result,
+        db::CoreBackend,
+        state::notebook::{InnerState, NoteTreeState, NotebookState, directory, note, tabs},
+        transition::{
+            NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition,
+        },
+    },
+};
+
+pub async fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransition> {
+    use Event::*;
+    use NormalModeTransition::*;
+
+    match event {
+        Key(KeyEvent::L) => {
+            let i = state.tab_index.ok_or(Error::Wip(
+                "[ToggleTabClose::L] tab index must exist".to_owned(),
+            ))? + 1;
+
+            state.tabs.splice(i.., []);
+            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+
+            CloseRightTabs(i).into()
+        }
+        Key(KeyEvent::H) => {
+            let i = state.tab_index.ok_or(Error::Wip(
+                "[ToggleTabClose::H] tab index must exist".to_owned(),
+            ))?;
+
+            state.tab_index = Some(0);
+            state.tabs.splice(..i, []);
+            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+
+            CloseLeftTabs(i).into()
+        }
+        event @ Key(_) => {
+            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+
+            super::idle::consume(state, event).await
+        }
+        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+    }
+}
