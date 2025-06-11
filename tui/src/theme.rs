@@ -1,6 +1,8 @@
 use crate::color::*;
 use once_cell::sync::OnceCell;
 use ratatui::style::Color;
+use serde::Deserialize;
+use std::path::Path;
 
 #[derive(Clone, Copy, Debug)]
 #[allow(dead_code)]
@@ -81,6 +83,78 @@ pub const LIGHT_THEME: Theme = Theme {
     crumb_a: GRAY_B,
     crumb_b: GRAY_A,
 };
+
+#[derive(Deserialize)]
+struct ThemeToml {
+    background: String,
+    surface: String,
+    panel: String,
+    text: String,
+    text_secondary: String,
+    hint: String,
+    menu: String,
+    accent: String,
+    accent_text: String,
+    highlight: String,
+    target: String,
+    warning: String,
+    warning_text: String,
+    success: String,
+    success_text: String,
+    error: String,
+    error_text: String,
+    inactive_text: String,
+    inactive_bg: String,
+    crumb_a: String,
+    crumb_b: String,
+}
+
+fn parse_color(value: &str) -> Option<Color> {
+    let hex = value.trim().trim_start_matches('#');
+    if hex.len() != 6 {
+        return None;
+    }
+    let r = u8::from_str_radix(&hex[0..2], 16).ok()?;
+    let g = u8::from_str_radix(&hex[2..4], 16).ok()?;
+    let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
+    Some(Color::Rgb(r, g, b))
+}
+
+pub fn load_theme_from_path(path: &Path) -> Result<Theme, Box<dyn std::error::Error>> {
+    let content = std::fs::read_to_string(path)?;
+    let value: ThemeToml = toml::from_str(&content)?;
+
+    macro_rules! parse {
+        ($field:ident) => {
+            parse_color(&value.$field)
+                .ok_or_else(|| format!("invalid color for {}", stringify!($field)))?
+        };
+    }
+
+    Ok(Theme {
+        background: parse!(background),
+        surface: parse!(surface),
+        panel: parse!(panel),
+        text: parse!(text),
+        text_secondary: parse!(text_secondary),
+        hint: parse!(hint),
+        menu: parse!(menu),
+        accent: parse!(accent),
+        accent_text: parse!(accent_text),
+        highlight: parse!(highlight),
+        target: parse!(target),
+        warning: parse!(warning),
+        warning_text: parse!(warning_text),
+        success: parse!(success),
+        success_text: parse!(success_text),
+        error: parse!(error),
+        error_text: parse!(error_text),
+        inactive_text: parse!(inactive_text),
+        inactive_bg: parse!(inactive_bg),
+        crumb_a: parse!(crumb_a),
+        crumb_b: parse!(crumb_b),
+    })
+}
 
 pub struct ThemeWrapper;
 

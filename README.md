@@ -52,6 +52,26 @@ Glues offers various storage options to suit your needs:
   - These formats store notes as simple log files, ideal for quick data exports or reading logs.
   - CSV saves data in comma-separated format, while JSON uses JSONL (JSON Lines) format.
 
+### Custom Themes
+
+You can load a custom color theme from a TOML file using the `--theme` option:
+
+```bash
+glues --theme /path/to/theme.toml
+```
+
+The file must define all semantic color names with RGB hex values:
+
+```toml
+background = "#000000"
+text = "#ffffff"
+accent = "#ff00ff"
+# ... and so on for each field
+```
+
+You can use the included `sample-theme.toml` file as a starting point and adjust
+the colors to your liking.
+
 ## Roadmap
 
 Here is our plan for Glues and the features we aim to implement. Below is a list of upcoming improvements to make Glues more useful and versatile. If you have suggestions for new features, please feel free to open a GitHub issue.
