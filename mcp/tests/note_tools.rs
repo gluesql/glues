@@ -1,16 +1,16 @@
 use glues_core::{data::Note, db::Db, proxy::ProxyServer};
-use crate::tools::{AddNote, GetNote, ListNotes, RootId};
+use mcp::tools::{AddNote, GetNote, ListNotes, RootId};
 use std::sync::{Arc, mpsc::channel};
 use tokio::sync::Mutex;
 
-#[tokio::test]
+#[tokio::test(flavor = "current_thread")]
 async fn root_and_note_tools_flow() {
     let (tx, _rx) = channel();
     let db = Db::memory(tx).await.unwrap();
     let server = Arc::new(Mutex::new(ProxyServer::new(db)));
 
     // get root id
-    let root_result = RootId.call_tool(server.clone()).await.unwrap();
+    let root_result = RootId {}.call_tool(server.clone()).await.unwrap();
     let root_id = root_result
         .content
         .first()

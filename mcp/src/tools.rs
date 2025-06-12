@@ -36,10 +36,11 @@ impl ListNotes {
         server: Arc<Mutex<ProxyServer<Db>>>,
     ) -> Result<CallToolResult, CallToolError> {
         let dir = self.directory_id.clone();
+        let server = server.clone();
         let result = tokio::task::spawn_blocking(move || {
-            let handle = tokio::runtime::Handle::current();
-            handle.block_on(async {
-                let mut srv = server.blocking_lock();
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                let mut srv = server.lock().await;
                 srv.db.fetch_notes(dir).await
             })
         })
@@ -67,10 +68,11 @@ impl GetNote {
         server: Arc<Mutex<ProxyServer<Db>>>,
     ) -> Result<CallToolResult, CallToolError> {
         let note_id = self.note_id.clone();
+        let server = server.clone();
         let result = tokio::task::spawn_blocking(move || {
-            let handle = tokio::runtime::Handle::current();
-            handle.block_on(async {
-                let mut srv = server.blocking_lock();
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                let mut srv = server.lock().await;
                 srv.db.fetch_note_content(note_id).await
             })
         })
@@ -97,10 +99,11 @@ impl AddNote {
     ) -> Result<CallToolResult, CallToolError> {
         let dir = self.directory_id.clone();
         let name = self.name.clone();
+        let server = server.clone();
         let result = tokio::task::spawn_blocking(move || {
-            let handle = tokio::runtime::Handle::current();
-            handle.block_on(async {
-                let mut srv = server.blocking_lock();
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            rt.block_on(async {
+                let mut srv = server.lock().await;
                 srv.db.add_note(dir, name).await
             })
         })
