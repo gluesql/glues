@@ -8,7 +8,7 @@ use {
         crossterm::event::{Event as Input, KeyCode, KeyEvent},
         style::Style,
         text::Line,
-        widgets::{Block, Borders},
+        widgets::{Block, Borders, ScrollbarState},
     },
     std::time::SystemTime,
     tui_textarea::TextArea,
@@ -59,6 +59,8 @@ pub struct Context {
     pub vim_keymap: Option<VimKeymapKind>,
 
     pub keymap: bool,
+    pub keymap_scroll: usize,
+    pub keymap_scroll_state: ScrollbarState,
 }
 
 impl Default for Context {
@@ -78,6 +80,8 @@ impl Default for Context {
             vim_keymap: None,
 
             keymap: false,
+            keymap_scroll: 0,
+            keymap_scroll_state: ScrollbarState::new(0),
         }
     }
 }
@@ -146,6 +150,22 @@ impl Context {
                         .input(input.clone());
 
                     return Action::None;
+                }
+            }
+        }
+
+        if self.keymap {
+            if let Input::Key(KeyEvent { code, .. }) = input {
+                match code {
+                    KeyCode::Char('j') | KeyCode::Down => {
+                        self.keymap_scroll = self.keymap_scroll.saturating_add(1);
+                        return Action::None;
+                    }
+                    KeyCode::Char('k') | KeyCode::Up => {
+                        self.keymap_scroll = self.keymap_scroll.saturating_sub(1);
+                        return Action::None;
+                    }
+                    _ => {}
                 }
             }
         }

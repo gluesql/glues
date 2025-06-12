@@ -19,7 +19,7 @@ use {
 
 pub fn draw(frame: &mut Frame, state: &State, context: &mut Context) {
     if context.keymap {
-        keymap::draw(frame, state.keymap().as_slice());
+        keymap::draw(frame, context, state.keymap().as_slice());
     }
 
     if let Some(kind) = context.vim_keymap {
