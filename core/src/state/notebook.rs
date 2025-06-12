@@ -42,10 +42,9 @@ pub enum SelectedItem {
 
 impl NotebookState {
     pub async fn new(glues: &mut Glues) -> Result<Self> {
-        let db = glues
-            .db
-            .as_mut()
-            .ok_or(Error::InvalidState("[NotebookState::new] empty db".to_owned()))?;
+        let db = glues.db.as_mut().ok_or(Error::InvalidState(
+            "[NotebookState::new] empty db".to_owned(),
+        ))?;
         let root_id = db.root_id.clone();
         let root_directory = db.fetch_directory(root_id).await?;
         let notes = db.fetch_notes(root_directory.id.clone()).await?;
@@ -273,7 +272,9 @@ impl NotebookState {
     pub fn get_selected_directory(&self) -> Result<&Directory> {
         match &self.selected {
             SelectedItem::Directory(directory) => Ok(directory),
-            _ => Err(Error::InvalidState("selected directory not found".to_owned())),
+            _ => Err(Error::InvalidState(
+                "selected directory not found".to_owned(),
+            )),
         }
     }
 

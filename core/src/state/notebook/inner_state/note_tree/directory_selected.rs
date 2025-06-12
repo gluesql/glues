@@ -49,9 +49,12 @@ pub async fn consume<B: CoreBackend + ?Sized>(
                 return Ok(NotebookTransition::None);
             }
 
-            let parent_item = state.root.find(&directory.parent_id).ok_or(Error::NotFound(
-                "[Key::H] failed to find parent directory".to_owned(),
-            ))?;
+            let parent_item = state
+                .root
+                .find(&directory.parent_id)
+                .ok_or(Error::NotFound(
+                    "[Key::H] failed to find parent directory".to_owned(),
+                ))?;
             let parent = parent_item.directory.clone();
 
             directory::close(state, parent)
