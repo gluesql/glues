@@ -1,4 +1,7 @@
-use glues_core::{db::Db, proxy::ProxyServer};
+use glues_core::{
+    db::{CoreBackend, Db},
+    proxy::ProxyServer,
+};
 use rust_mcp_sdk::{
     macros::{JsonSchema, mcp_tool},
     schema::{CallToolResult, schema_utils::CallToolError},
@@ -6,6 +9,20 @@ use rust_mcp_sdk::{
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::Mutex;
+
+#[mcp_tool(name = "root_id", description = "Get root directory id")]
+#[derive(Debug, Deserialize, Serialize, JsonSchema)]
+pub struct RootId {}
+
+impl RootId {
+    pub async fn call_tool(
+        &self,
+        server: Arc<Mutex<ProxyServer<Db>>>,
+    ) -> Result<CallToolResult, CallToolError> {
+        let srv = server.lock().await;
+        Ok(CallToolResult::text_content(srv.db.root_id(), None))
+    }
+}
 
 #[mcp_tool(name = "list_notes", description = "List notes in a directory")]
 #[derive(Debug, Deserialize, Serialize, JsonSchema)]
@@ -101,4 +118,4 @@ impl AddNote {
 
 use rust_mcp_sdk::tool_box;
 
-tool_box!(NoteTools, [ListNotes, GetNote, AddNote]);
+tool_box!(NoteTools, [RootId, ListNotes, GetNote, AddNote]);

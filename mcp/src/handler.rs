@@ -39,6 +39,7 @@ impl ServerHandler for GluesHandler {
         let tool = NoteTools::try_from(request.params).map_err(CallToolError::new)?;
         let server = self.server.clone();
         match tool {
+            NoteTools::RootId(tool) => tool.call_tool(server).await,
             NoteTools::ListNotes(tool) => tool.call_tool(server).await,
             NoteTools::GetNote(tool) => tool.call_tool(server).await,
             NoteTools::AddNote(tool) => tool.call_tool(server).await,
