@@ -101,5 +101,5 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .get("id")
         .map(Deref::deref)
         .map(Into::into)
-        .ok_or(Error::Wip("empty id".to_owned()))
+        .ok_or(Error::NotFound("empty id".to_owned()))
 }

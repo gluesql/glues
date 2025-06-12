@@ -23,7 +23,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
             let directory = state
                 .root
                 .find(&directory_id)
-                .ok_or(Error::Wip(
+                .ok_or(Error::NotFound(
                     "[CloseDirectory] failed to find target directory".to_owned(),
                 ))?
                 .directory
@@ -33,7 +33,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         }
         Key(KeyEvent::H) | Key(KeyEvent::Left) => {
             let directory_id = &state.get_selected_note()?.directory_id;
-            let directory_item = state.root.find(directory_id).ok_or(Error::Wip(
+            let directory_item = state.root.find(directory_id).ok_or(Error::NotFound(
                 "[Key::H] failed to find parent directory".to_owned(),
             ))?;
             let directory = directory_item.directory.clone();
@@ -92,7 +92,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         )),
         Key(KeyEvent::Tab) if !state.tabs.is_empty() => tabs::focus_editor(db, state).await,
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
-        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+        _ => Err(Error::Todo("Notebook::consume".to_owned())),
     }
 }
 

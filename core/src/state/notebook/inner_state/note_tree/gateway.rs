@@ -26,9 +26,7 @@ pub async fn consume(state: &mut NotebookState, event: Event) -> Result<Notebook
 
             Ok(NotebookTransition::Inedible(event))
         }
-        _ => Err(Error::Wip(
-            "todo: NoteTree::GatewayMode::consume".to_owned(),
-        )),
+        _ => Err(Error::Todo("NoteTree::GatewayMode::consume".to_owned())),
     }
 }
 
@@ -36,7 +34,7 @@ fn leave_gateway_mode(selected: &SelectedItem) -> Result<InnerState> {
     match selected {
         SelectedItem::Directory(_) => Ok(InnerState::NoteTree(NoteTreeState::DirectorySelected)),
         SelectedItem::Note(_) => Ok(InnerState::NoteTree(NoteTreeState::NoteSelected)),
-        SelectedItem::None => Err(Error::Wip("todo: cannot leave gateway mode".to_owned())),
+        SelectedItem::None => Err(Error::Todo("cannot leave gateway mode".to_owned())),
     }
 }
 

@@ -30,7 +30,7 @@ pub async fn consume(state: &mut NotebookState, event: Event) -> Result<Notebook
 
             super::idle::consume(state, event).await
         }
-        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+        _ => Err(Error::Todo("Notebook::consume".to_owned())),
     }
 }
 

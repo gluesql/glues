@@ -23,8 +23,8 @@ impl ProxyClient {
         let resp: ProxyResponse = resp.json().await?;
         let root_id = match resp {
             ProxyResponse::Ok(ResultPayload::Id(id)) => id,
-            ProxyResponse::Err(e) => return Err(Error::Wip(e)),
-            _ => return Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => return Err(Error::Proxy(e)),
+            _ => return Err(Error::InvalidResponse("invalid response".to_owned())),
         };
 
         Ok(Self {
@@ -53,8 +53,8 @@ impl CoreBackend for ProxyClient {
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Directory(dir)) => Ok(dir),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -64,8 +64,8 @@ impl CoreBackend for ProxyClient {
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Directories(dirs)) => Ok(dirs),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -75,8 +75,8 @@ impl CoreBackend for ProxyClient {
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Directory(dir)) => Ok(dir),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -86,8 +86,8 @@ impl CoreBackend for ProxyClient {
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -104,8 +104,8 @@ impl CoreBackend for ProxyClient {
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -115,24 +115,24 @@ impl CoreBackend for ProxyClient {
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
     async fn fetch_notes(&mut self, directory_id: DirectoryId) -> Result<Vec<Note>> {
         match self.rpc(ProxyRequest::FetchNotes { directory_id }).await? {
             ProxyResponse::Ok(ResultPayload::Notes(notes)) => Ok(notes),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
     async fn fetch_note_content(&mut self, note_id: NoteId) -> Result<String> {
         match self.rpc(ProxyRequest::FetchNoteContent { note_id }).await? {
             ProxyResponse::Ok(ResultPayload::Text(text)) => Ok(text),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -142,24 +142,24 @@ impl CoreBackend for ProxyClient {
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Note(note)) => Ok(note),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
     async fn remove_note(&mut self, note_id: NoteId) -> Result<()> {
         match self.rpc(ProxyRequest::RemoveNote { note_id }).await? {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
     async fn rename_note(&mut self, note_id: NoteId, name: String) -> Result<()> {
         match self.rpc(ProxyRequest::RenameNote { note_id, name }).await? {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -169,8 +169,8 @@ impl CoreBackend for ProxyClient {
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -183,16 +183,16 @@ impl CoreBackend for ProxyClient {
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
     async fn log(&mut self, category: String, message: String) -> Result<()> {
         match self.rpc(ProxyRequest::Log { category, message }).await? {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
-            ProxyResponse::Err(e) => Err(Error::Wip(e)),
-            _ => Err(Error::Wip("invalid response".to_owned())),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 }

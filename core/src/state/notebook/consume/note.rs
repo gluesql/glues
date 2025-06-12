@@ -42,7 +42,7 @@ pub async fn rename<B: CoreBackend + ?Sized>(
     .await?;
 
     note.name = new_name;
-    state.root.rename_note(&note).ok_or(Error::Wip(
+    state.root.rename_note(&note).ok_or(Error::NotFound(
         "[note::rename] failed to find parent directory".to_owned(),
     ))?;
 
@@ -67,7 +67,7 @@ pub async fn remove<B: CoreBackend + ?Sized>(
 ) -> Result<NotebookTransition> {
     db.remove_note(note.id.clone()).await?;
 
-    let directory = state.root.remove_note(&note).ok_or(Error::Wip(
+    let directory = state.root.remove_note(&note).ok_or(Error::NotFound(
         "[note::remove] failed to find parent directory".to_owned(),
     ))?;
 
@@ -93,7 +93,7 @@ pub async fn add<B: CoreBackend + ?Sized>(
     let item = state
         .root
         .find_mut(&directory.id)
-        .ok_or(Error::Wip(format!(
+        .ok_or(Error::NotFound(format!(
             "[note::add] directory not found: {}",
             directory.id
         )))?;

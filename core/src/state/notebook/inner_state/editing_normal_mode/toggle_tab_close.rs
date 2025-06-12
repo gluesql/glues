@@ -11,7 +11,7 @@ pub async fn consume(state: &mut NotebookState, event: Event) -> Result<Notebook
 
     match event {
         Key(KeyEvent::L) => {
-            let i = state.tab_index.ok_or(Error::Wip(
+            let i = state.tab_index.ok_or(Error::InvalidState(
                 "[ToggleTabClose::L] tab index must exist".to_owned(),
             ))? + 1;
 
@@ -21,7 +21,7 @@ pub async fn consume(state: &mut NotebookState, event: Event) -> Result<Notebook
             CloseRightTabs(i).into()
         }
         Key(KeyEvent::H) => {
-            let i = state.tab_index.ok_or(Error::Wip(
+            let i = state.tab_index.ok_or(Error::InvalidState(
                 "[ToggleTabClose::H] tab index must exist".to_owned(),
             ))?;
 
@@ -36,7 +36,7 @@ pub async fn consume(state: &mut NotebookState, event: Event) -> Result<Notebook
 
             super::idle::consume(state, event).await
         }
-        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+        _ => Err(Error::Todo("Notebook::consume".to_owned())),
     }
 }
 

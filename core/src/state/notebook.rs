@@ -45,7 +45,7 @@ impl NotebookState {
         let db = glues
             .db
             .as_mut()
-            .ok_or(Error::Wip("[NotebookState::new] empty db".to_owned()))?;
+            .ok_or(Error::InvalidState("[NotebookState::new] empty db".to_owned()))?;
         let root_id = db.root_id.clone();
         let root_directory = db.fetch_directory(root_id).await?;
         let notes = db.fetch_notes(root_directory.id.clone()).await?;
@@ -266,14 +266,14 @@ impl NotebookState {
     pub fn get_selected_note(&self) -> Result<&Note> {
         match &self.selected {
             SelectedItem::Note(note) => Ok(note),
-            _ => Err(Error::Wip("selected note not found".to_owned())),
+            _ => Err(Error::InvalidState("selected note not found".to_owned())),
         }
     }
 
     pub fn get_selected_directory(&self) -> Result<&Directory> {
         match &self.selected {
             SelectedItem::Directory(directory) => Ok(directory),
-            _ => Err(Error::Wip("selected directory not found".to_owned())),
+            _ => Err(Error::InvalidState("selected directory not found".to_owned())),
         }
     }
 
@@ -281,18 +281,18 @@ impl NotebookState {
         match &self.selected {
             SelectedItem::Note(note) => Ok(&note.id),
             SelectedItem::Directory(directory) => Ok(&directory.id),
-            _ => Err(Error::Wip("selected item not found".to_owned())),
+            _ => Err(Error::InvalidState("selected item not found".to_owned())),
         }
     }
 
     pub fn get_editing(&self) -> Result<&Note> {
         let i = self
             .tab_index
-            .ok_or_else(|| Error::Wip("tab index is none".to_owned()))?;
+            .ok_or_else(|| Error::InvalidState("tab index is none".to_owned()))?;
         self.tabs
             .get(i)
             .map(|tab| &tab.note)
-            .ok_or_else(|| Error::Wip("tab not found".to_owned()))
+            .ok_or_else(|| Error::NotFound("tab not found".to_owned()))
     }
 }
 
@@ -300,7 +300,7 @@ pub async fn consume(glues: &mut Glues, event: Event) -> Result<NotebookTransiti
     let db = glues
         .db
         .as_mut()
-        .ok_or(Error::Wip("[consume] empty db".to_owned()))?;
+        .ok_or(Error::InvalidState("[consume] empty db".to_owned()))?;
     let state: &mut NotebookState = glues.state.get_inner_mut()?;
 
     inner_state::consume(db, state, event).await

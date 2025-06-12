@@ -73,7 +73,7 @@ pub async fn consume(
             reset_state(state);
             Ok(NotebookTransition::Inedible(event))
         }
-        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+        _ => Err(Error::Todo("Notebook::consume".to_owned())),
     }
 }
 

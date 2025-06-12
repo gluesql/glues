@@ -67,15 +67,15 @@ macro_rules! impl_state_ext {
             fn get_inner(&self) -> Result<&$State> {
                 match &self.inner {
                     InnerState::$State(state) => Ok(&state),
-                    _ => Err(Error::Wip("State::get_inner for $State failed".to_owned())),
+                    _ => Err(Error::InvalidState("State::get_inner failed".to_owned())),
                 }
             }
 
             fn get_inner_mut(&mut self) -> Result<&mut $State> {
                 match &mut self.inner {
                     InnerState::$State(state) => Ok(state),
-                    _ => Err(Error::Wip(
-                        "State::get_inner_mut for $State failed".to_owned(),
+                    _ => Err(Error::InvalidState(
+                        "State::get_inner_mut failed".to_owned(),
                     )),
                 }
             }

@@ -21,7 +21,7 @@ pub async fn open<B: CoreBackend + ?Sized>(
     let item = state
         .root
         .find_mut(&directory_id)
-        .ok_or(Error::Wip(format!(
+        .ok_or(Error::NotFound(format!(
             "[directory::open] directory not found: {directory_id}"
         )))?;
 
@@ -84,7 +84,7 @@ pub fn close(state: &mut NotebookState, directory: Directory) -> Result<Notebook
     state
         .root
         .find_mut(&directory.id)
-        .ok_or(Error::Wip(format!(
+        .ok_or(Error::NotFound(format!(
             "[directory::close] failed to find directory '{}'",
             directory.name
         )))?
@@ -143,7 +143,7 @@ pub async fn rename<B: CoreBackend + ?Sized>(
     .await?;
 
     directory.name = new_name;
-    state.root.rename_directory(&directory).ok_or(Error::Wip(
+    state.root.rename_directory(&directory).ok_or(Error::NotFound(
         "[directory::rename] failed to find directory".to_owned(),
     ))?;
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
@@ -171,7 +171,7 @@ pub async fn remove<B: CoreBackend + ?Sized>(
     let selected_directory = state
         .root
         .remove_directory(&directory)
-        .ok_or(Error::Wip(
+        .ok_or(Error::NotFound(
             "[directory::remove] failed to find parent directory".to_owned(),
         ))?
         .clone();
@@ -196,7 +196,7 @@ pub async fn add<B: CoreBackend + ?Sized>(
     let parent_id = directory.id.clone();
     let directory = db.add_directory(parent_id.clone(), directory_name).await?;
 
-    let item = state.root.find_mut(&parent_id).ok_or(Error::Wip(format!(
+    let item = state.root.find_mut(&parent_id).ok_or(Error::NotFound(format!(
         "[directory::add] parent directory not found: {}",
         parent_id
     )))?;
