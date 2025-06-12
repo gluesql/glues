@@ -120,7 +120,9 @@ pub async fn consume(state: &mut NotebookState, event: Event) -> Result<Notebook
         }
         Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(VimKeymapKind::NormalIdle)),
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
-        _ => Err(Error::Todo("Notebook::consume".to_owned())),
+        _ => Err(Error::Todo(
+            "Notebook::EditingNormalMode::Idle::consume".to_owned(),
+        )),
     }
 }
 

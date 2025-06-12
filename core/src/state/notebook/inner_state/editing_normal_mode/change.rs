@@ -55,7 +55,9 @@ pub async fn consume(
 
             super::idle::consume(state, event).await
         }
-        _ => Err(Error::Todo("Notebook::consume".to_owned())),
+        _ => Err(Error::Todo(
+            "Notebook::EditingNormalMode::Change::consume".to_owned(),
+        )),
     }
 }
 

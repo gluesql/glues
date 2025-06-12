@@ -41,7 +41,9 @@ pub async fn consume<B: CoreBackend + ?Sized>(
             directory::move_directory(db, state, target_directory_id).await
         }
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
-        _ => Err(Error::Todo("Notebook::consume".to_owned())),
+        _ => Err(Error::Todo(
+            "Notebook::NoteTree::MoveMode::consume".to_owned(),
+        )),
     }
 }
 
