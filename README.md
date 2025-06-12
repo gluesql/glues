@@ -87,6 +87,16 @@ Here is our plan for Glues and the features we aim to implement. Below is a list
 * **More Vim Keybindings:** Integrate Vim keybindings for users who prefer Vim-like shortcuts.
 * **Additional Storage Backends:** Support more storage options like Redis and object storage for greater flexibility.
 
+## MCP Server
+
+An experimental MCP server is bundled in the workspace for integrations that rely on HTTP requests. You can run it with:
+
+```bash
+cargo run -p mcp -- --host 127.0.0.1 --port 8080
+```
+
+The server currently keeps data in memory and will reset once stopped.
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](https://github.com/gluesql/glues/blob/main/LICENSE) file for details.
