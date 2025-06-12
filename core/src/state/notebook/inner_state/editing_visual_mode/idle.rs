@@ -77,7 +77,9 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         }
         Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(VimKeymapKind::VisualIdle)),
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
-        _ => Err(Error::Todo("Notebook::consume".to_owned())),
+        _ => Err(Error::Todo(
+            "Notebook::EditingVisualMode::Idle::consume".to_owned(),
+        )),
     }
 }
 

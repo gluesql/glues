@@ -41,7 +41,9 @@ pub async fn consume<B: CoreBackend + ?Sized>(
 
             super::idle::consume(state, event).await
         }
-        _ => Err(Error::Todo("Notebook::consume".to_owned())),
+        _ => Err(Error::Todo(
+            "Notebook::EditingNormalMode::Toggle::consume".to_owned(),
+        )),
     }
 }
 

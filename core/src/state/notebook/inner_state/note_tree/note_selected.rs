@@ -92,7 +92,9 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         )),
         Key(KeyEvent::Tab) if !state.tabs.is_empty() => tabs::focus_editor(db, state).await,
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
-        _ => Err(Error::Todo("Notebook::consume".to_owned())),
+        _ => Err(Error::Todo(
+            "Notebook::NoteTree::NoteSelected::consume".to_owned(),
+        )),
     }
 }
 

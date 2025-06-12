@@ -73,7 +73,9 @@ pub async fn consume(
             reset_state(state);
             Ok(NotebookTransition::Inedible(event))
         }
-        _ => Err(Error::Todo("Notebook::consume".to_owned())),
+        _ => Err(Error::Todo(
+            "Notebook::NoteTree::Numbering::consume".to_owned(),
+        )),
     }
 }
 

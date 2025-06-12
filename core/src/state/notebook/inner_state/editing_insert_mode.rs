@@ -16,7 +16,9 @@ pub async fn consume<B: CoreBackend + ?Sized>(
     match event {
         Key(KeyEvent::Esc) | Notebook(ViewNote) => note::view(state).await,
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
-        _ => Err(Error::Todo("Notebook::consume".to_owned())),
+        _ => Err(Error::Todo(
+            "Notebook::EditingInsertMode::consume".to_owned(),
+        )),
     }
 }
 
