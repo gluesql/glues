@@ -19,12 +19,12 @@ impl Db {
             .execute(&mut self.storage)
             .await?
             .select()
-            .ok_or(Error::Wip("error case 2".to_owned()))?
+            .ok_or(Error::NotFound("note not found".to_owned()))?
             .next()
-            .ok_or(Error::Wip("error case 3".to_owned()))?
+            .ok_or(Error::NotFound("note not found".to_owned()))?
             .get("content")
             .map(Deref::deref)
-            .ok_or(Error::Wip("error case 4".to_owned()))?
+            .ok_or(Error::NotFound("content not found".to_owned()))?
             .into();
 
         Ok(content)

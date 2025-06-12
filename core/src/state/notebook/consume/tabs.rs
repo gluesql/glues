@@ -18,7 +18,7 @@ pub async fn select_prev<B: CoreBackend + ?Sized>(
 
     let i = state
         .tab_index
-        .ok_or(Error::Wip("opened note must exist".to_owned()))?;
+        .ok_or(Error::InvalidState("opened note must exist".to_owned()))?;
     let i = if i == 0 { state.tabs.len() - 1 } else { i - 1 };
     state.tab_index = Some(i);
 
@@ -42,7 +42,7 @@ pub async fn select_next<B: CoreBackend + ?Sized>(
 
     let i = state
         .tab_index
-        .ok_or(Error::Wip("opened note must exist".to_owned()))?;
+        .ok_or(Error::InvalidState("opened note must exist".to_owned()))?;
     let i = if i + 1 >= state.tabs.len() { 0 } else { i + 1 };
     state.tab_index = Some(i);
 
@@ -61,7 +61,7 @@ pub async fn select_next<B: CoreBackend + ?Sized>(
 pub fn move_prev(state: &mut NotebookState) -> Result<NotebookTransition> {
     let i = state
         .tab_index
-        .ok_or(Error::Wip("opened note must exist".to_owned()))?;
+        .ok_or(Error::InvalidState("opened note must exist".to_owned()))?;
 
     if i == 0 {
         return Ok(NotebookTransition::None);
@@ -79,7 +79,7 @@ pub fn move_prev(state: &mut NotebookState) -> Result<NotebookTransition> {
 pub fn move_next(state: &mut NotebookState) -> Result<NotebookTransition> {
     let i = state
         .tab_index
-        .ok_or(Error::Wip("opened note must exist".to_owned()))?;
+        .ok_or(Error::InvalidState("opened note must exist".to_owned()))?;
 
     if i >= state.tabs.len() - 1 {
         return Ok(NotebookTransition::None);
@@ -101,7 +101,7 @@ pub async fn close<B: CoreBackend + ?Sized>(
     state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
     let i = state
         .tab_index
-        .ok_or(Error::Wip("opened note must exist".to_owned()))?;
+        .ok_or(Error::InvalidState("opened note must exist".to_owned()))?;
 
     let note_id = state.tabs[i].note.id.clone();
     state.tabs.retain(|tab| tab.note.id != note_id);

@@ -8,6 +8,18 @@ pub enum Error {
     #[error("reqwest: {0}")]
     Reqwest(#[from] reqwest::Error),
 
-    #[error("wip: {0}")]
-    Wip(String),
+    #[error("invalid response: {0}")]
+    InvalidResponse(String),
+
+    #[error("invalid state: {0}")]
+    InvalidState(String),
+
+    #[error("not found: {0}")]
+    NotFound(String),
+
+    #[error("todo: {0}")]
+    Todo(String),
+
+    #[error("proxy: {0}")]
+    Proxy(String),
 }

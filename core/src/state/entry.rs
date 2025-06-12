@@ -63,7 +63,7 @@ impl EntryState {
             }
             Key(_) => Ok(EntryTransition::Inedible(event)),
             Cancel => Ok(EntryTransition::None),
-            _ => Err(Error::Wip("todo: EntryState::consume".to_owned())),
+            _ => Err(Error::Todo("EntryState::consume".to_owned())),
         }
     }
 

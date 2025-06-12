@@ -81,7 +81,7 @@ pub async fn consume(
 
             super::idle::consume(state, event).await
         }
-        _ => Err(Error::Wip("todo: Notebook::consume".to_owned())),
+        _ => Err(Error::Todo("Notebook::consume".to_owned())),
     }
 }
 

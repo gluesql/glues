@@ -24,7 +24,7 @@ pub(super) async fn update_breadcrumbs<B: CoreBackend + ?Sized>(
             .iter()
             .enumerate()
             .find_map(|(i, item)| (item.id == &tab.note.id).then_some((i, item.depth)))
-            .ok_or(Error::Wip(format!(
+            .ok_or(Error::NotFound(format!(
                 "[breadcrumb::update_breadcrumbs] note not found: {}",
                 tab.note.name
             )))?;
