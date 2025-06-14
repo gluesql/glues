@@ -60,7 +60,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
                 format!("{name} ")
             };
 
-            breadcrumb.push(Span::raw(name).fg(THEME.warning_text).bg(color_a));
+            breadcrumb.push(Span::raw(name).fg(THEME.text).bg(color_a));
 
             if i < last_index {
                 breadcrumb.push(Span::raw("").fg(color_a).bg(color_b));
