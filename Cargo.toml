@@ -5,13 +5,13 @@ default-members = ["tui", "core"]
 
 [workspace.package]
 authors = ["Taehoon Moon <taehoon.moon@outlook.com>"]
-version = "0.6.3"
+version = "0.7.0"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/gluesql/glues"
 
 [workspace.dependencies]
-glues-core = { path = "./core", version = "0.6.3" }
+glues-core = { path = "./core", version = "0.7.0" }
 async-recursion = "1.1.1"
 
 [workspace.dependencies.gluesql]
