@@ -11,6 +11,7 @@ use {
         transition::{MoveModeTransition, NoteTreeTransition},
         types::{DirectoryId, NoteId},
     },
+    std::cmp::min,
 };
 
 pub fn show_actions_dialog(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
@@ -80,11 +81,10 @@ pub async fn remove<B: CoreBackend + ?Sized>(
 
         match state.tab_index {
             Some(index) if index == i => {
-                if state.tabs.is_empty() {
-                    state.tab_index = None;
+                state.tab_index = if state.tabs.is_empty() {
+                    None
                 } else {
-                    let new_index = std::cmp::min(i, state.tabs.len() - 1);
-                    state.tab_index = Some(new_index);
+                    Some(min(i, state.tabs.len() - 1))
                 }
             }
             Some(index) if index > i => {
@@ -102,7 +102,7 @@ pub async fn remove<B: CoreBackend + ?Sized>(
     Ok(NotebookTransition::NoteTree(
         NoteTreeTransition::RemoveNote {
             note,
-            selected_directory: directory.clone(),
+            selected_directory: directory,
         },
     ))
 }
