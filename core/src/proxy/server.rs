@@ -1,16 +1,13 @@
 use super::request::ProxyRequest;
 use super::response::{ProxyResponse, ResultPayload};
-use crate::db::CoreBackend;
+use crate::{backend::Backend, db::CoreBackend};
 
-pub struct ProxyServer<B> {
-    pub db: B,
+pub struct ProxyServer {
+    pub db: Backend,
 }
 
-impl<B> ProxyServer<B>
-where
-    B: CoreBackend,
-{
-    pub fn new(db: B) -> Self {
+impl ProxyServer {
+    pub fn new(db: Backend) -> Self {
         Self { db }
     }
 
