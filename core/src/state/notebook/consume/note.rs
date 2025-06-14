@@ -67,12 +67,37 @@ pub async fn remove<B: CoreBackend + ?Sized>(
 ) -> Result<NotebookTransition> {
     db.remove_note(note.id.clone()).await?;
 
-    let directory = state.root.remove_note(&note).ok_or(Error::NotFound(
-        "[note::remove] failed to find parent directory".to_owned(),
-    ))?;
+    let directory = state
+        .root
+        .remove_note(&note)
+        .ok_or(Error::NotFound(
+            "[note::remove] failed to find parent directory".to_owned(),
+        ))?
+        .clone();
+
+    if let Some(i) = state.tabs.iter().position(|tab| tab.note.id == note.id) {
+        state.tabs.remove(i);
+
+        match state.tab_index {
+            Some(index) if index == i => {
+                if state.tabs.is_empty() {
+                    state.tab_index = None;
+                } else {
+                    let new_index = std::cmp::min(i, state.tabs.len() - 1);
+                    state.tab_index = Some(new_index);
+                }
+            }
+            Some(index) if index > i => {
+                state.tab_index = Some(index - 1);
+            }
+            _ => {}
+        }
+    }
 
     state.selected = SelectedItem::Directory(directory.clone());
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
+
+    breadcrumb::update_breadcrumbs(db, state).await?;
 
     Ok(NotebookTransition::NoteTree(
         NoteTreeTransition::RemoveNote {
