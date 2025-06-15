@@ -55,7 +55,7 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .execute(storage)
         .await?
         .select()
-        .unwrap()
+        .ok_or(Error::NotFound("schema_version not found".to_owned()))?
         .count()
         == 0;
 
@@ -75,7 +75,7 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .execute(storage)
         .await?
         .select()
-        .unwrap()
+        .ok_or(Error::NotFound("root directory not found".to_owned()))?
         .count()
         == 0;
 
@@ -95,9 +95,9 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .execute(storage)
         .await?
         .select()
-        .unwrap()
+        .ok_or(Error::NotFound("root directory not found".to_owned()))?
         .next()
-        .unwrap()
+        .ok_or(Error::NotFound("root directory not found".to_owned()))?
         .get("id")
         .map(Deref::deref)
         .map(Into::into)

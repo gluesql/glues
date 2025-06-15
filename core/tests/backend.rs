@@ -1,5 +1,7 @@
+use glues_core::Error;
 use glues_core::db::{CoreBackend, Db};
 use std::sync::mpsc::channel;
+use uuid::Uuid;
 
 #[tokio::test]
 async fn memory_backend_operations() {
@@ -69,4 +71,15 @@ async fn memory_backend_operations() {
     db.log("test".to_owned(), "message".to_owned())
         .await
         .unwrap();
+}
+
+#[tokio::test]
+async fn fetch_directory_not_found() {
+    let (tx, _rx) = channel();
+    let mut db = Db::memory(tx).await.unwrap();
+
+    let invalid_id = Uuid::now_v7().to_string();
+    let result = db.fetch_directory(invalid_id).await;
+
+    assert!(matches!(result, Err(Error::NotFound(_))));
 }

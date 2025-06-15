@@ -38,13 +38,23 @@ impl Db {
             .execute(&mut self.storage)
             .await?
             .select()
-            .unwrap()
-            .map(|payload| Note {
-                id: payload.get("id").map(Deref::deref).unwrap().into(),
-                directory_id: directory_id.clone(),
-                name: payload.get("name").map(Deref::deref).unwrap().into(),
+            .ok_or(Error::NotFound("notes not found".to_owned()))?
+            .map(|payload| {
+                Ok(Note {
+                    id: payload
+                        .get("id")
+                        .map(Deref::deref)
+                        .ok_or(Error::NotFound("id not found".to_owned()))?
+                        .into(),
+                    directory_id: directory_id.clone(),
+                    name: payload
+                        .get("name")
+                        .map(Deref::deref)
+                        .ok_or(Error::NotFound("name not found".to_owned()))?
+                        .into(),
+                })
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(notes)
     }
