@@ -2,3 +2,4 @@
 .glues
 .DS_Store
 frame_*.txt
+tui/tests/frames/

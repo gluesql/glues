@@ -37,6 +37,11 @@ impl App {
         &mut self.context
     }
 
+    pub async fn handle_input(&mut self, input: Input) -> bool {
+        let action = self.context.consume(&input).await;
+        self.handle_action(action, input).await
+    }
+
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<()> {
         loop {
             if let Some((_, created_at)) = self.context.last_log {
