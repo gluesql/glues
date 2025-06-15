@@ -1,11 +1,10 @@
 use {
     crate::{
         Error, Result,
-        db::{Execute, Storage},
+        db::{Execute, Storage, get_str},
         types::DirectoryId,
     },
     gluesql::core::ast_builder::{col, table, text},
-    std::ops::Deref,
 };
 
 pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
@@ -88,18 +87,20 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
             .await?;
     }
 
-    table("Directory")
+    let payload = table("Directory")
         .select()
         .filter(col("parent_id").is_null())
         .project("id")
         .execute(storage)
-        .await?
+        .await?;
+
+    let mut rows = payload
         .select()
-        .ok_or(Error::NotFound("root directory not found".to_owned()))?
+        .ok_or(Error::NotFound("root directory not found".to_owned()))?;
+
+    let row = rows
         .next()
-        .ok_or(Error::NotFound("root directory not found".to_owned()))?
-        .get("id")
-        .map(Deref::deref)
-        .map(Into::into)
-        .ok_or(Error::NotFound("empty id".to_owned()))
+        .ok_or(Error::NotFound("root directory not found".to_owned()))?;
+
+    get_str(&row, "id")
 }

@@ -3,6 +3,8 @@ pub use core_backend::CoreBackend;
 mod directory;
 mod log;
 mod note;
+mod util;
+pub(crate) use util::get_str;
 
 use {
     crate::{Result, schema::setup, task::Task, types::DirectoryId},
