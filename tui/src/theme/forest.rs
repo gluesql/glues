@@ -23,4 +23,5 @@ pub const FOREST_THEME: Theme = Theme {
     inactive_bg: Color::Rgb(50, 60, 50),
     crumb_a: Color::Rgb(30, 40, 30),
     crumb_b: Color::Rgb(45, 55, 45),
+    crumb_icon: Color::Rgb(255, 180, 20),
 };

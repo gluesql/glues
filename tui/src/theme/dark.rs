@@ -23,4 +23,5 @@ pub const DARK_THEME: Theme = Theme {
     inactive_bg: GRAY_DIM,
     crumb_a: GRAY_A,
     crumb_b: GRAY_B,
+    crumb_icon: YELLOW,
 };

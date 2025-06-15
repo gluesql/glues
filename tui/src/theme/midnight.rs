@@ -23,4 +23,5 @@ pub const MIDNIGHT_THEME: Theme = Theme {
     inactive_bg: Color::Rgb(30, 30, 50),
     crumb_a: Color::Rgb(35, 35, 55),
     crumb_b: Color::Rgb(55, 55, 75),
+    crumb_icon: Color::Rgb(255, 190, 0),
 };

@@ -23,4 +23,5 @@ pub const PASTEL_THEME: Theme = Theme {
     inactive_bg: Color::Rgb(221, 221, 221),
     crumb_a: Color::Rgb(240, 240, 240),
     crumb_b: Color::Rgb(224, 224, 224),
+    crumb_icon: Color::Rgb(255, 170, 0),
 };
