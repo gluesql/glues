@@ -83,10 +83,8 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             THEME.background,
         ),
         ContextState::EditorInsertMode => (
-            Span::raw(" INSERT ")
-                .fg(THEME.warning_text)
-                .bg(THEME.warning),
-            THEME.warning,
+            Span::raw(" INSERT ").fg(THEME.accent_text).bg(THEME.accent),
+            THEME.accent,
         ),
         ContextState::EditorVisualMode => (
             Span::raw(" VISUAL ").fg(THEME.error_text).bg(THEME.error),
@@ -108,10 +106,10 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     ) {
         (_, true) => block.title_bottom(
             Line::from(vec![
-                Span::raw("").fg(THEME.warning).bg(THEME.background),
+                Span::raw("").fg(THEME.accent).bg(THEME.background),
                 Span::raw(" 󰔚 Saving... ")
-                    .fg(THEME.warning_text)
-                    .bg(THEME.warning),
+                    .fg(THEME.accent_text)
+                    .bg(THEME.accent),
             ])
             .right_aligned(),
         ),

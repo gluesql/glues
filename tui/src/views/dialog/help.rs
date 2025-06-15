@@ -32,19 +32,19 @@ pub fn draw(frame: &mut Frame) {
     let message = vec![
         Line::from("Glues offers various storage options to suit your needs:"),
         Line::raw(""),
-        Line::from("Instant".fg(THEME.warning_text).bg(THEME.warning)),
+        Line::from("Instant".fg(THEME.accent_text).bg(THEME.accent)),
         Line::raw("Data is stored in memory and only persists while the app is running."),
         Line::raw(
             "This option is useful for testing or temporary notes as it is entirely volatile.",
         ),
         Line::raw(""),
-        Line::from("Local".fg(THEME.warning_text).bg(THEME.warning)),
+        Line::from("Local".fg(THEME.accent_text).bg(THEME.accent)),
         Line::raw("Notes are stored locally as separate files."),
         Line::raw(
             "This is the default option for users who prefer a simple, file-based approach without any remote synchronization.",
         ),
         Line::raw(""),
-        Line::from("Git".fg(THEME.warning_text).bg(THEME.warning)),
+        Line::from("Git".fg(THEME.accent_text).bg(THEME.accent)),
         Line::raw("Git storage requires three inputs: `path`, `remote`, and `branch`."),
         Line::raw(
             "The `path` should point to an existing local Git repository, similar to the file storage path.",
@@ -57,7 +57,7 @@ pub fn draw(frame: &mut Frame) {
             "When you modify notes or directories, Glues will automatically sync changes with the specified remote repository.",
         ),
         Line::raw(""),
-        Line::from("MongoDB".fg(THEME.warning_text).bg(THEME.warning)),
+        Line::from("MongoDB".fg(THEME.accent_text).bg(THEME.accent)),
         Line::raw(
             "MongoDB storage allows you to store your notes in a MongoDB database, providing a scalable and centralized solution for managing your notes.",
         ),
@@ -68,9 +68,9 @@ pub fn draw(frame: &mut Frame) {
         ),
         Line::raw(""),
         Line::from(vec![
-            "CSV".fg(THEME.warning_text).bg(THEME.warning),
+            "CSV".fg(THEME.accent_text).bg(THEME.accent),
             " or ".fg(THEME.inactive_text),
-            "JSON".fg(THEME.warning_text).bg(THEME.warning),
+            "JSON".fg(THEME.accent_text).bg(THEME.accent),
         ]),
         Line::raw(
             "These formats store notes as simple log files, ideal for quick data exports or reading logs.",

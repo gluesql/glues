@@ -74,8 +74,8 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapGroup]) {
         match row {
             Row::Title(title) => {
                 let line = Line::from(title.to_string())
-                    .fg(THEME.warning_text)
-                    .bg(THEME.warning);
+                    .fg(THEME.accent_text)
+                    .bg(THEME.accent);
                 let paragraph = Paragraph::new(line).alignment(Alignment::Left);
                 frame.render_widget(paragraph, *row_area);
             }
