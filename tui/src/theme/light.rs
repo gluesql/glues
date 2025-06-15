@@ -23,4 +23,5 @@ pub const LIGHT_THEME: Theme = Theme {
     inactive_bg: GRAY_LIGHT,
     crumb_a: GRAY_B,
     crumb_b: GRAY_A,
+    crumb_icon: YELLOW,
 };

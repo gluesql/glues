@@ -61,7 +61,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
                     let symbol = if *opened { OPEN_SYMBOL } else { CLOSED_SYMBOL };
                     Line::from(vec![
                         format!("{:pad$}", "").into(),
-                        Span::raw(symbol).fg(THEME.warning),
+                        Span::raw(symbol).fg(THEME.crumb_icon),
                         Span::raw(&directory.name),
                     ])
                 }

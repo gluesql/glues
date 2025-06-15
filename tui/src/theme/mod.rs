@@ -43,6 +43,8 @@ pub struct Theme {
     /// alternating breadcrumb background colors
     pub crumb_a: Color,
     pub crumb_b: Color,
+    /// symbol color for breadcrumbs and directory icons
+    pub crumb_icon: Color,
 }
 
 pub struct ThemeWrapper;

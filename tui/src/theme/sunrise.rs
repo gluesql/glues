@@ -23,4 +23,5 @@ pub const SUNRISE_THEME: Theme = Theme {
     inactive_bg: Color::Rgb(240, 220, 200),
     crumb_a: Color::Rgb(250, 240, 230),
     crumb_b: Color::Rgb(240, 220, 210),
+    crumb_icon: Color::Rgb(255, 200, 0),
 };

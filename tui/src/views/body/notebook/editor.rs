@@ -51,12 +51,12 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             };
 
             let name = if i == 0 {
-                breadcrumb.push(Span::raw("  󰝰 ").fg(THEME.warning).bg(color_a));
+                breadcrumb.push(Span::raw("  󰝰 ").fg(THEME.crumb_icon).bg(color_a));
                 format!("{name} ")
             } else if i == last_index {
                 format!(" 󱇗 {name} ")
             } else {
-                breadcrumb.push(Span::raw(" 󰝰 ").fg(THEME.warning).bg(color_a));
+                breadcrumb.push(Span::raw(" 󰝰 ").fg(THEME.crumb_icon).bg(color_a));
                 format!("{name} ")
             };
 
