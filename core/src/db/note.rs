@@ -1,31 +1,32 @@
 use {
-    super::{Db, Execute},
+    super::{Db, Execute, get_str},
     crate::{
         Error, Result,
         data::Note,
         types::{DirectoryId, NoteId},
     },
     gluesql::core::ast_builder::{col, function::now, table, text, uuid},
-    std::ops::Deref,
     uuid::Uuid,
 };
 
 impl Db {
     pub async fn fetch_note_content(&mut self, note_id: NoteId) -> Result<String> {
-        let content = table("Note")
+        let payload = table("Note")
             .select()
             .filter(col("id").eq(uuid(note_id)))
             .project(col("content"))
             .execute(&mut self.storage)
-            .await?
+            .await?;
+
+        let mut rows = payload
             .select()
-            .ok_or(Error::NotFound("note not found".to_owned()))?
+            .ok_or(Error::NotFound("note not found".to_owned()))?;
+
+        let row = rows
             .next()
-            .ok_or(Error::NotFound("note not found".to_owned()))?
-            .get("content")
-            .map(Deref::deref)
-            .ok_or(Error::NotFound("content not found".to_owned()))?
-            .into();
+            .ok_or(Error::NotFound("note not found".to_owned()))?;
+
+        let content = get_str(&row, "content")?;
 
         Ok(content)
     }
@@ -38,13 +39,15 @@ impl Db {
             .execute(&mut self.storage)
             .await?
             .select()
-            .unwrap()
-            .map(|payload| Note {
-                id: payload.get("id").map(Deref::deref).unwrap().into(),
-                directory_id: directory_id.clone(),
-                name: payload.get("name").map(Deref::deref).unwrap().into(),
+            .ok_or(Error::NotFound("notes not found".to_owned()))?
+            .map(|payload| {
+                Ok(Note {
+                    id: get_str(&payload, "id")?,
+                    directory_id: directory_id.clone(),
+                    name: get_str(&payload, "name")?,
+                })
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(notes)
     }

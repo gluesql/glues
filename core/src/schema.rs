@@ -1,11 +1,10 @@
 use {
     crate::{
         Error, Result,
-        db::{Execute, Storage},
+        db::{Execute, Storage, get_str},
         types::DirectoryId,
     },
     gluesql::core::ast_builder::{col, table, text},
-    std::ops::Deref,
 };
 
 pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
@@ -55,7 +54,7 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .execute(storage)
         .await?
         .select()
-        .unwrap()
+        .ok_or(Error::NotFound("schema_version not found".to_owned()))?
         .count()
         == 0;
 
@@ -75,7 +74,7 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .execute(storage)
         .await?
         .select()
-        .unwrap()
+        .ok_or(Error::NotFound("root directory not found".to_owned()))?
         .count()
         == 0;
 
@@ -88,18 +87,20 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
             .await?;
     }
 
-    table("Directory")
+    let payload = table("Directory")
         .select()
         .filter(col("parent_id").is_null())
         .project("id")
         .execute(storage)
-        .await?
+        .await?;
+
+    let mut rows = payload
         .select()
-        .unwrap()
+        .ok_or(Error::NotFound("root directory not found".to_owned()))?;
+
+    let row = rows
         .next()
-        .unwrap()
-        .get("id")
-        .map(Deref::deref)
-        .map(Into::into)
-        .ok_or(Error::NotFound("empty id".to_owned()))
+        .ok_or(Error::NotFound("root directory not found".to_owned()))?;
+
+    get_str(&row, "id")
 }
