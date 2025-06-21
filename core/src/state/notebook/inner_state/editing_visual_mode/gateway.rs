@@ -1,6 +1,6 @@
 use crate::{
     Error, Event, KeyEvent, Result,
-    db::CoreBackend,
+    backend::CoreBackend,
     state::notebook::{InnerState, NotebookState, VimNormalState},
     transition::{NotebookTransition, VisualModeTransition},
     types::{KeymapGroup, KeymapItem},

@@ -1,7 +1,7 @@
 use {
     crate::{
         Error, NotebookTransition, Result,
-        db::CoreBackend,
+        backend::CoreBackend,
         state::notebook::{
             InnerState, NoteTreeState, NotebookState, SelectedItem, VimNormalState, directory,
         },

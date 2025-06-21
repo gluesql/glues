@@ -1,5 +1,6 @@
-use glues_core::{
-    db::{CoreBackend, Db},
+use glues_core::backend::{
+    CoreBackend,
+    local::Db,
     proxy::{ProxyClient, ProxyServer, request::ProxyRequest},
 };
 use std::{

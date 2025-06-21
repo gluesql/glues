@@ -1,5 +1,5 @@
 use crate::{
-    Event, NotebookTransition, Result, db::CoreBackend, state::notebook::NotebookState,
+    Event, NotebookTransition, Result, backend::CoreBackend, state::notebook::NotebookState,
     types::KeymapGroup,
 };
 

@@ -1,4 +1,4 @@
-pub mod db;
+pub mod backend;
 mod error;
 mod event;
 mod glues;
@@ -6,11 +6,11 @@ mod schema;
 mod task;
 
 pub mod data;
-pub mod proxy;
 pub mod state;
 pub mod transition;
 pub mod types;
 
+pub use backend::CoreBackend;
 pub use error::Error;
 pub use event::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey};
 pub use glues::Glues;

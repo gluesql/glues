@@ -1,5 +1,4 @@
 mod core_backend;
-pub use core_backend::CoreBackend;
 mod directory;
 mod log;
 mod note;

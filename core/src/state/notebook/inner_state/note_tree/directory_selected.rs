@@ -2,7 +2,7 @@ use {
     super::NoteTreeState,
     crate::{
         Error, Event, KeyEvent, NotebookEvent, NotebookTransition, Result,
-        db::CoreBackend,
+        backend::CoreBackend,
         state::notebook::{InnerState, NotebookState, directory, note, tabs},
         transition::{MoveModeTransition, NoteTreeTransition},
         types::{KeymapGroup, KeymapItem},

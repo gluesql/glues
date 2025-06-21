@@ -1,7 +1,7 @@
 use {
     crate::{
         Event, Result, Transition,
-        db::Db,
+        backend::local::Db,
         state::{EntryState, State},
         task::{Task, handle_tasks},
     },

@@ -1,6 +1,6 @@
 use super::request::ProxyRequest;
 use super::response::{ProxyResponse, ResultPayload};
-use crate::db::CoreBackend;
+use crate::backend::CoreBackend;
 
 pub struct ProxyServer<B> {
     pub db: B,
