@@ -1,29 +1,33 @@
 use {
-    super::{Db, Execute},
-    crate::{Result, data::Directory, types::DirectoryId},
+    super::{Db, Execute, get_str},
+    crate::{Error, Result, data::Directory, types::DirectoryId},
     async_recursion::async_recursion,
     gluesql::core::ast_builder::{col, function::now, table, text, uuid},
-    std::ops::Deref,
     uuid::Uuid,
 };
 
 impl Db {
     pub async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Result<Directory> {
-        let directory = table("Directory")
+        let payload = table("Directory")
             .select()
             .filter(col("id").eq(uuid(directory_id)))
             .project(vec!["id", "parent_id", "name"])
             .execute(&mut self.storage)
-            .await?
+            .await?;
+
+        let mut rows = payload
             .select()
-            .unwrap()
+            .ok_or(Error::NotFound("directory not found".to_owned()))?;
+
+        let payload = rows
             .next()
-            .map(|payload| Directory {
-                id: payload.get("id").map(Deref::deref).unwrap().into(),
-                parent_id: payload.get("parent_id").map(Deref::deref).unwrap().into(),
-                name: payload.get("name").map(Deref::deref).unwrap().into(),
-            })
-            .unwrap();
+            .ok_or(Error::NotFound("directory not found".to_owned()))?;
+
+        let directory = Directory {
+            id: get_str(&payload, "id")?,
+            parent_id: get_str(&payload, "parent_id")?,
+            name: get_str(&payload, "name")?,
+        };
 
         Ok(directory)
     }
@@ -36,13 +40,15 @@ impl Db {
             .execute(&mut self.storage)
             .await?
             .select()
-            .unwrap()
-            .map(|payload| Directory {
-                id: payload.get("id").map(Deref::deref).unwrap().into(),
-                parent_id: parent_id.clone(),
-                name: payload.get("name").map(Deref::deref).unwrap().into(),
+            .ok_or(Error::NotFound("directories not found".to_owned()))?
+            .map(|payload| {
+                Ok(Directory {
+                    id: get_str(&payload, "id")?,
+                    parent_id: parent_id.clone(),
+                    name: get_str(&payload, "name")?,
+                })
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(directories)
     }
