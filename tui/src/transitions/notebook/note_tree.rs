@@ -52,8 +52,22 @@ impl App {
                 id,
                 directory_id: parent_id,
                 ..
-            })
-            | NoteTreeTransition::AddDirectory(Directory { id, parent_id, .. }) => {
+            }) => {
+                self.glues
+                    .dispatch(NotebookEvent::OpenDirectory(parent_id.clone()).into())
+                    .await
+                    .log_unwrap();
+                let NotebookState { root, .. } = self.glues.state.get_inner().log_unwrap();
+
+                self.context.notebook.update_items(root);
+                self.context.notebook.select_item(&id);
+
+                self.glues
+                    .dispatch(NotebookEvent::OpenNote.into())
+                    .await
+                    .log_unwrap();
+            }
+            NoteTreeTransition::AddDirectory(Directory { id, parent_id, .. }) => {
                 self.glues
                     .dispatch(NotebookEvent::OpenDirectory(parent_id.clone()).into())
                     .await
