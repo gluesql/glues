@@ -1,4 +1,4 @@
-use glues_core::db::{CoreBackend, Db};
+use glues_core::backend::{CoreBackend, local::Db};
 use std::sync::mpsc::channel;
 
 #[tokio::test]

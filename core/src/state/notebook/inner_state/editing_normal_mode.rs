@@ -1,6 +1,6 @@
 use crate::{
     Event, Result,
-    db::CoreBackend,
+    backend::CoreBackend,
     state::notebook::NotebookState,
     transition::{NormalModeTransition, NotebookTransition},
     types::KeymapGroup,

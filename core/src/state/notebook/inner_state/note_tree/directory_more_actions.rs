@@ -1,6 +1,6 @@
 use crate::{
     Error, Event, NotebookEvent, NotebookTransition, Result,
-    db::CoreBackend,
+    backend::CoreBackend,
     state::notebook::{NotebookState, directory, note},
     types::{KeymapGroup, KeymapItem},
 };

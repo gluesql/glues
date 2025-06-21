@@ -2,8 +2,8 @@ use {
     super::{breadcrumb, directory},
     crate::{
         Error, NotebookTransition, Result,
+        backend::CoreBackend,
         data::{Directory, Note},
-        db::CoreBackend,
         state::notebook::{
             DirectoryItem, InnerState, NoteTreeState, NotebookState, SelectedItem, Tab,
             VimNormalState,

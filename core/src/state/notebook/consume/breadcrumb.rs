@@ -1,6 +1,6 @@
 use {
     super::directory,
-    crate::{Error, Result, db::CoreBackend, state::notebook::NotebookState},
+    crate::{Error, Result, backend::CoreBackend, state::notebook::NotebookState},
 };
 
 pub(super) async fn update_breadcrumbs<B: CoreBackend + ?Sized>(

@@ -2,8 +2,8 @@ use {
     super::breadcrumb,
     crate::{
         Error, NotebookTransition, Result,
+        backend::CoreBackend,
         data::Directory,
-        db::CoreBackend,
         state::notebook::{
             DirectoryItem, DirectoryItemChildren, InnerState, NoteTreeState, NotebookState,
             SelectedItem,

@@ -2,8 +2,8 @@ use super::request::ProxyRequest;
 use super::response::{ProxyResponse, ResultPayload};
 use crate::{
     Error, Result,
+    backend::CoreBackend,
     data::{Directory, Note},
-    db::CoreBackend,
     types::{DirectoryId, NoteId},
 };
 use async_trait::async_trait;
