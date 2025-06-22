@@ -1214,7 +1214,6 @@ dependencies = [
  "async-trait",
  "axum",
  "gluesql",
- "gluesql-mongo-storage",
  "reqwest",
  "serde",
  "serde_json",
@@ -1227,23 +1226,24 @@ dependencies = [
 
 [[package]]
 name = "gluesql"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "948111f461eb5099a13e8d9f202ad2809fef19ad7bf45fb2b1fda4084f299fc0"
+checksum = "e8b13fa6610a91e4c033745dd544c2f149a8647ee20b14382610307d79d18ee3"
 dependencies = [
  "gluesql-core",
  "gluesql-csv-storage",
  "gluesql-file-storage",
  "gluesql-git-storage",
  "gluesql-json-storage",
+ "gluesql-mongo-storage",
  "gluesql_memory_storage",
 ]
 
 [[package]]
 name = "gluesql-core"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81facfa9f7b0ab9e7d8b43c5a7805a0724c9cbf1ffc1c65053dd0c8532d5bf27"
+checksum = "3d35f781c62f44216834af3049726b2b21b07988d72aba91f27a8a862e86ac53"
 dependencies = [
  "async-recursion",
  "async-trait",
@@ -1272,9 +1272,9 @@ dependencies = [
 
 [[package]]
 name = "gluesql-csv-storage"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a66af054b5dde0dd9b02054fdc438cb1e44591063248005502455aaacb77b46"
+checksum = "5e1f8d047623515f18c5623addd3b1cac3554e4a2ad8f399275b67dda16231c3"
 dependencies = [
  "async-trait",
  "csv",
@@ -1288,9 +1288,9 @@ dependencies = [
 
 [[package]]
 name = "gluesql-file-storage"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e051cb0858be355480cfdae34a96be29b2c8f50321093223f02049803d856fc"
+checksum = "2383ca16be2bf4ac826830d21871dc433ae7cea966bdd2dd32e618f59301f434"
 dependencies = [
  "async-trait",
  "futures",
@@ -1303,9 +1303,9 @@ dependencies = [
 
 [[package]]
 name = "gluesql-git-storage"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4789312f36cd105d7310e32017297b67bb99ca34433d5cfce73a7e04c5a0b4aa"
+checksum = "a485c4407641ae1f3614f16c2384eeecd00db7d2f331431892c5f976b90381b5"
 dependencies = [
  "async-trait",
  "gluesql-core",
@@ -1317,9 +1317,9 @@ dependencies = [
 
 [[package]]
 name = "gluesql-json-storage"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eff06334b70400aa206bfe54221437506a2bc1672c0f0bbe305831e868f48a95"
+checksum = "2e07a0197417c00f63276704ccf2ae03b6a47174df36ecb6eee442510c5a5603"
 dependencies = [
  "async-trait",
  "futures",
@@ -1335,9 +1335,9 @@ dependencies = [
 
 [[package]]
 name = "gluesql-mongo-storage"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7ab303c3fc5b51b2efda03bcc61f05a4db8566518d285e5604f549fdbbe488c"
+checksum = "f5daf1c94a04c19d35eb448a2dfdc4e475219f6a2cf1609b4147f127d513f599"
 dependencies = [
  "async-trait",
  "bson",
@@ -1355,9 +1355,9 @@ dependencies = [
 
 [[package]]
 name = "gluesql-utils"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1cde784a3e810ba470f11e4da90b26691aefd67a504779c2b7826f91a3ca6d7b"
+checksum = "222241734eff7b0d8866407df1977b80f6b4b79f0c0973d604774bcde1d66f5e"
 dependencies = [
  "futures",
  "indexmap 1.9.3",
@@ -1366,9 +1366,9 @@ dependencies = [
 
 [[package]]
 name = "gluesql_memory_storage"
-version = "0.16.3"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2389e95c8ff1417722ad42696a0abffb9456e4d4fdb7c08255f218ad7e21bd47"
+checksum = "1cdd739ff61a7f071b68973552d736efa38a6793111cf2b114877a63a120d6f0"
 dependencies = [
  "async-trait",
  "futures",
@@ -3105,9 +3105,9 @@ checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
 
 [[package]]
 name = "sqlparser"
-version = "0.50.0"
+version = "0.52.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b2e5b515a2bd5168426033e9efbfd05500114833916f1d5c268f938b4ee130ac"
+checksum = "9a875d8cd437cc8a97e9aeaeea352ec9a19aea99c23e9effb17757291de80b08"
 dependencies = [
  "bigdecimal",
  "log",

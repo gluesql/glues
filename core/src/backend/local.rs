@@ -9,9 +9,9 @@ use {
     gluesql::{
         core::ast_builder::Build,
         gluesql_git_storage::{GitStorage, StorageType},
+        gluesql_mongo_storage::MongoStorage,
         prelude::{CsvStorage, FileStorage, Glue, JsonStorage, MemoryStorage, Payload},
     },
-    gluesql_mongo_storage::MongoStorage,
     std::sync::mpsc::Sender,
 };
 

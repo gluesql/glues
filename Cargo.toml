@@ -15,7 +15,7 @@ glues-core = { path = "./core", version = "0.7.0" }
 async-recursion = "1.1.1"
 
 [workspace.dependencies.gluesql]
-version = "0.16.3"
+version = "0.17.0"
 default-features = false
 features = [
     "gluesql_memory_storage",
@@ -23,6 +23,7 @@ features = [
     "gluesql-json-storage",
     "gluesql-file-storage",
     "gluesql-git-storage",
+    "gluesql-mongo-storage",
 ]
 
 [profile.release]
