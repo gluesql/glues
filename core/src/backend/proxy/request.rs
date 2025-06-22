@@ -22,6 +22,10 @@ pub enum ProxyRequest {
         directory_id: DirectoryId,
         parent_id: DirectoryId,
     },
+    ReorderDirectory {
+        directory_id: DirectoryId,
+        order: i64,
+    },
     RenameDirectory {
         directory_id: DirectoryId,
         name: String,
@@ -50,6 +54,10 @@ pub enum ProxyRequest {
     MoveNote {
         note_id: NoteId,
         directory_id: DirectoryId,
+    },
+    ReorderNote {
+        note_id: NoteId,
+        order: i64,
     },
     Log {
         category: String,

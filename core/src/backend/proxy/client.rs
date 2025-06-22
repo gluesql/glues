@@ -109,6 +109,20 @@ impl CoreBackend for ProxyClient {
         }
     }
 
+    async fn reorder_directory(&mut self, directory_id: DirectoryId, order: i64) -> Result<()> {
+        match self
+            .rpc(ProxyRequest::ReorderDirectory {
+                directory_id,
+                order,
+            })
+            .await?
+        {
+            ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+        }
+    }
+
     async fn rename_directory(&mut self, directory_id: DirectoryId, name: String) -> Result<()> {
         match self
             .rpc(ProxyRequest::RenameDirectory { directory_id, name })
@@ -180,6 +194,17 @@ impl CoreBackend for ProxyClient {
                 note_id,
                 directory_id,
             })
+            .await?
+        {
+            ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
+            ProxyResponse::Err(e) => Err(Error::Proxy(e)),
+            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+        }
+    }
+
+    async fn reorder_note(&mut self, note_id: NoteId, order: i64) -> Result<()> {
+        match self
+            .rpc(ProxyRequest::ReorderNote { note_id, order })
             .await?
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),

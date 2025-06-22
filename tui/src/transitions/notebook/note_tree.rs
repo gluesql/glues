@@ -48,6 +48,14 @@ impl App {
                 self.context.notebook.update_items(root);
                 self.context.notebook.tabs = tabs.clone();
             }
+            NoteTreeTransition::ReorderDirectory(directory) => {
+                self.context.notebook.update_items(root);
+                self.context.notebook.select_item(&directory.id);
+            }
+            NoteTreeTransition::ReorderNote(note) => {
+                self.context.notebook.update_items(root);
+                self.context.notebook.select_item(&note.id);
+            }
             NoteTreeTransition::AddNote(Note {
                 id,
                 directory_id: parent_id,

@@ -4,7 +4,7 @@ use {
         backend::local::{Execute, Storage},
         types::DirectoryId,
     },
-    gluesql::core::ast_builder::{col, table, text},
+    gluesql::core::ast_builder::{col, num, table, text},
     std::ops::Deref,
 };
 
@@ -32,6 +32,7 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .add_column("id UUID PRIMARY KEY DEFAULT GENERATE_UUID()")
         .add_column("parent_id UUID NULL")
         .add_column("name TEXT NOT NULL")
+        .add_column("order INTEGER NOT NULL")
         .add_column("created_at TIMESTAMP NOT NULL DEFAULT NOW()")
         .add_column("updated_at TIMESTAMP NOT NULL DEFAULT NOW()")
         .execute(storage)
@@ -42,6 +43,7 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .add_column("id UUID PRIMARY KEY")
         .add_column("name TEXT NOT NULL")
         .add_column("directory_id UUID NOT NULL")
+        .add_column("order INTEGER NOT NULL")
         .add_column("created_at TIMESTAMP NOT NULL DEFAULT NOW()")
         .add_column("updated_at TIMESTAMP NOT NULL DEFAULT NOW()")
         .add_column("content TEXT NOT NULL DEFAULT ''")
@@ -82,8 +84,8 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
     if root_not_exists {
         table("Directory")
             .insert()
-            .columns("name")
-            .values(vec![vec![text("Notes")]])
+            .columns(vec!["name", "order"])
+            .values(vec![vec![text("Notes"), num(0)]])
             .execute(storage)
             .await?;
     }

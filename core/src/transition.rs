@@ -82,6 +82,9 @@ pub enum NoteTreeTransition {
     AddNote(Note),
     AddDirectory(Directory),
 
+    ReorderNote(Note),
+    ReorderDirectory(Directory),
+
     ShowNoteActionsDialog(Note),
     ShowDirectoryActionsDialog(Directory),
 

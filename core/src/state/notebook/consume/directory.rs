@@ -261,3 +261,54 @@ pub async fn move_directory<B: CoreBackend + ?Sized>(
         MoveModeTransition::Commit,
     )))
 }
+
+pub async fn reorder<B: CoreBackend + ?Sized>(
+    db: &mut B,
+    state: &mut NotebookState,
+    up: bool,
+) -> Result<NotebookTransition> {
+    let directory = state.get_selected_directory()?.clone();
+    if state.root.directory.id == directory.id {
+        return Ok(NotebookTransition::Alert(
+            "Cannot reorder the root directory".to_owned(),
+        ));
+    }
+
+    let parent_id = directory.parent_id.clone();
+    let mut dirs = db.fetch_directories(parent_id.clone()).await?;
+    let i = dirs
+        .iter()
+        .position(|d| d.id == directory.id)
+        .ok_or(Error::NotFound("[directory::reorder] not found".to_owned()))?;
+
+    if up && i == 0 || !up && i + 1 >= dirs.len() {
+        return Ok(NotebookTransition::None);
+    }
+
+    let j = if up { i - 1 } else { i + 1 };
+    let other = dirs[j].clone();
+
+    db.reorder_directory(directory.id.clone(), other.order)
+        .await?;
+    db.reorder_directory(other.id.clone(), directory.order)
+        .await?;
+    dirs.swap(i, j);
+
+    if let Some(item) = state.root.find_mut(&parent_id) {
+        if let Some(children) = &mut item.children {
+            children.directories = dirs
+                .into_iter()
+                .map(|d| DirectoryItem {
+                    directory: d,
+                    children: None,
+                })
+                .collect();
+        }
+    }
+
+    state.selected = SelectedItem::Directory(directory.clone());
+
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::ReorderDirectory(directory),
+    ))
+}

@@ -71,6 +71,8 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         Key(KeyEvent::CapK) => Ok(NotebookTransition::NoteTree(
             NoteTreeTransition::SelectPrevDirectory,
         )),
+        Key(KeyEvent::CapH) => directory::reorder(db, state, true).await,
+        Key(KeyEvent::CapL) => directory::reorder(db, state, false).await,
         Key(KeyEvent::M) => {
             let directory = state.get_selected_directory()?.clone();
 
@@ -125,6 +127,8 @@ pub fn keymap(state: &NotebookState) -> Vec<KeymapGroup> {
         KeymapItem::new(">", "Expand width"),
         KeymapItem::new("<", "Shrink width"),
         KeymapItem::new("Space", "Move directory"),
+        KeymapItem::new("H", "Move up"),
+        KeymapItem::new("L", "Move down"),
         KeymapItem::new("m", "Show more actions"),
     ];
 

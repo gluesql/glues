@@ -226,3 +226,40 @@ pub async fn move_note<B: CoreBackend + ?Sized>(
         MoveModeTransition::Commit,
     )))
 }
+
+pub async fn reorder<B: CoreBackend + ?Sized>(
+    db: &mut B,
+    state: &mut NotebookState,
+    up: bool,
+) -> Result<NotebookTransition> {
+    let note = state.get_selected_note()?.clone();
+    let directory_id = note.directory_id.clone();
+    let mut notes = db.fetch_notes(directory_id.clone()).await?;
+    let i = notes
+        .iter()
+        .position(|n| n.id == note.id)
+        .ok_or(Error::NotFound("[note::reorder] note not found".to_owned()))?;
+
+    if up && i == 0 || !up && i + 1 >= notes.len() {
+        return Ok(NotebookTransition::None);
+    }
+
+    let j = if up { i - 1 } else { i + 1 };
+    let other = notes[j].clone();
+
+    db.reorder_note(note.id.clone(), other.order).await?;
+    db.reorder_note(other.id.clone(), note.order).await?;
+    notes.swap(i, j);
+
+    if let Some(item) = state.root.find_mut(&directory_id) {
+        if let Some(children) = &mut item.children {
+            children.notes = notes.clone();
+        }
+    }
+
+    state.selected = SelectedItem::Note(note.clone());
+
+    Ok(NotebookTransition::NoteTree(
+        NoteTreeTransition::ReorderNote(note),
+    ))
+}

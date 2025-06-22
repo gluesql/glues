@@ -18,6 +18,7 @@ pub trait CoreBackend {
         directory_id: DirectoryId,
         parent_id: DirectoryId,
     ) -> Result<()>;
+    async fn reorder_directory(&mut self, directory_id: DirectoryId, order: i64) -> Result<()>;
     async fn rename_directory(&mut self, directory_id: DirectoryId, name: String) -> Result<()>;
 
     async fn fetch_notes(&mut self, directory_id: DirectoryId) -> Result<Vec<Note>>;
@@ -27,6 +28,7 @@ pub trait CoreBackend {
     async fn rename_note(&mut self, note_id: NoteId, name: String) -> Result<()>;
     async fn update_note_content(&mut self, note_id: NoteId, content: String) -> Result<()>;
     async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) -> Result<()>;
+    async fn reorder_note(&mut self, note_id: NoteId, order: i64) -> Result<()>;
 
     async fn log(&mut self, category: String, message: String) -> Result<()>;
 }
