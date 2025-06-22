@@ -3,11 +3,11 @@ use {
         App,
         config::{
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
-            LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME,
+            LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME, LAST_THEME,
         },
         context::ContextPrompt,
         logger::*,
-        theme::THEME,
+        theme,
     },
     glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey},
     ratatui::{
@@ -46,6 +46,9 @@ pub enum TuiAction {
     ShowEditorKeymap,
     SaveAndPassThrough,
     Quit,
+
+    ShowThemeDialog,
+    ChangeTheme(&'static str, theme::Theme),
 
     OpenCsv,
     OpenJson,
@@ -98,6 +101,9 @@ impl App {
             Action::Tui(TuiAction::ShowEditorKeymap) => {
                 self.context.editor_keymap = true;
             }
+            Action::Tui(TuiAction::ShowThemeDialog) => {
+                self.context.theme_dialog = true;
+            }
             Action::Tui(TuiAction::Alert(message)) => {
                 self.context.alert = Some(message);
             }
@@ -120,8 +126,9 @@ impl App {
                     .context
                     .take_prompt_input()
                     .log_expect("prompt must not be none");
+                let t = theme::current_theme();
                 let message = vec![
-                    Line::from(format!("path: {path}").fg(THEME.hint)),
+                    Line::from(format!("path: {path}").fg(t.hint)),
                     Line::raw(""),
                     Line::raw("Enter the git remote:"),
                 ];
@@ -136,9 +143,10 @@ impl App {
                     .context
                     .take_prompt_input()
                     .log_expect("prompt must not be none");
+                let t = theme::current_theme();
                 let message = vec![
-                    Line::from(format!("path: {path}").fg(THEME.hint)),
-                    Line::from(format!("remote: {remote}").fg(THEME.hint)),
+                    Line::from(format!("path: {path}").fg(t.hint)),
+                    Line::from(format!("remote: {remote}").fg(t.hint)),
                     Line::raw(""),
                     Line::raw("Enter the git branch:"),
                 ];
@@ -172,8 +180,9 @@ impl App {
                     .context
                     .take_prompt_input()
                     .log_expect("conn str must not be none");
+                let t = theme::current_theme();
                 let message = vec![
-                    Line::from(format!("conn_str: {conn_str}").fg(THEME.hint)),
+                    Line::from(format!("conn_str: {conn_str}").fg(t.hint)),
                     Line::raw(""),
                     Line::raw("Enter the database name:"),
                 ];
@@ -339,6 +348,10 @@ impl App {
                     .await
                     .log_unwrap();
                 self.handle_transition(transition).await;
+            }
+            Action::Tui(TuiAction::ChangeTheme(name, theme)) => {
+                theme::set_theme(theme);
+                config::update(LAST_THEME, name).await;
             }
             Action::Dispatch(event) => {
                 let transition = self.glues.dispatch(event).await.log_unwrap();

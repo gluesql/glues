@@ -1,8 +1,5 @@
 use {
-    crate::{
-        context::{NotebookContext, notebook::DIRECTORY_ACTIONS},
-        theme,
-    },
+    crate::{context::EntryContext, context::entry::THEMES, theme},
     ratatui::{
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
@@ -11,7 +8,7 @@ use {
     },
 };
 
-pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
+pub fn draw(frame: &mut Frame, context: &mut EntryContext) {
     let t = theme::current_theme();
     let [area] = Layout::horizontal([Length(28)])
         .flex(Flex::Center)
@@ -22,9 +19,9 @@ pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
         .bg(t.surface)
         .fg(t.text)
         .padding(Padding::new(2, 2, 1, 1))
-        .title("Directory Actions")
+        .title("Theme")
         .title_alignment(Alignment::Center);
-    let list = List::new(DIRECTORY_ACTIONS)
+    let list = List::new(THEMES)
         .block(block)
         .highlight_style(Style::new().fg(t.accent_text).bg(t.accent))
         .highlight_symbol(" ")
@@ -32,5 +29,5 @@ pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
         .direction(ListDirection::TopToBottom);
 
     frame.render_widget(Clear, area);
-    frame.render_stateful_widget(list, area, &mut context.directory_actions_state);
+    frame.render_stateful_widget(list, area, &mut context.theme_state);
 }

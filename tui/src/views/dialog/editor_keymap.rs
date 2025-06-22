@@ -1,5 +1,5 @@
 use {
-    crate::theme::THEME,
+    crate::theme,
     ratatui::{
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
@@ -10,6 +10,7 @@ use {
 };
 
 pub fn draw(frame: &mut Frame) {
+    let t = theme::current_theme();
     let [area] = Layout::horizontal([Length(100)])
         .flex(Flex::Center)
         .areas(frame.area());
@@ -18,8 +19,8 @@ pub fn draw(frame: &mut Frame) {
         .areas(area);
 
     let block = Block::bordered()
-        .fg(THEME.text)
-        .bg(THEME.surface)
+        .fg(t.text)
+        .bg(t.surface)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Editor Keymap")
         .title_alignment(Alignment::Center);
@@ -69,7 +70,7 @@ Thanks to tui-textarea
         .wrap(Wrap { trim: true })
         .style(Style::default())
         .alignment(Alignment::Left);
-    let control = Line::from("Press any key to close".fg(THEME.hint)).centered();
+    let control = Line::from("Press any key to close".fg(t.hint)).centered();
 
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);

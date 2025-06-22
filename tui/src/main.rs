@@ -50,16 +50,47 @@ enum ThemeArg {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
 
-    match cli.theme {
-        ThemeArg::Dark => theme::set_theme(theme::DARK_THEME),
-        ThemeArg::Light => theme::set_theme(theme::LIGHT_THEME),
-        ThemeArg::Pastel => theme::set_theme(theme::PASTEL_THEME),
-        ThemeArg::Sunrise => theme::set_theme(theme::SUNRISE_THEME),
-        ThemeArg::Midnight => theme::set_theme(theme::MIDNIGHT_THEME),
-        ThemeArg::Forest => theme::set_theme(theme::FOREST_THEME),
+    config::init().await;
+
+    if let Some(name) = config::get(config::LAST_THEME).await {
+        match name.as_str() {
+            "Dark" => theme::set_theme(theme::DARK_THEME),
+            "Light" => theme::set_theme(theme::LIGHT_THEME),
+            "Pastel" => theme::set_theme(theme::PASTEL_THEME),
+            "Sunrise" => theme::set_theme(theme::SUNRISE_THEME),
+            "Midnight" => theme::set_theme(theme::MIDNIGHT_THEME),
+            "Forest" => theme::set_theme(theme::FOREST_THEME),
+            _ => {}
+        }
     }
 
-    config::init().await;
+    match cli.theme {
+        ThemeArg::Dark => {
+            theme::set_theme(theme::DARK_THEME);
+            config::update(config::LAST_THEME, "Dark").await;
+        }
+        ThemeArg::Light => {
+            theme::set_theme(theme::LIGHT_THEME);
+            config::update(config::LAST_THEME, "Light").await;
+        }
+        ThemeArg::Pastel => {
+            theme::set_theme(theme::PASTEL_THEME);
+            config::update(config::LAST_THEME, "Pastel").await;
+        }
+        ThemeArg::Sunrise => {
+            theme::set_theme(theme::SUNRISE_THEME);
+            config::update(config::LAST_THEME, "Sunrise").await;
+        }
+        ThemeArg::Midnight => {
+            theme::set_theme(theme::MIDNIGHT_THEME);
+            config::update(config::LAST_THEME, "Midnight").await;
+        }
+        ThemeArg::Forest => {
+            theme::set_theme(theme::FOREST_THEME);
+            config::update(config::LAST_THEME, "Forest").await;
+        }
+    }
+
     logger::init().await;
     color_eyre::install()?;
 

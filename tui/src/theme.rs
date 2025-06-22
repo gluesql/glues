@@ -1,5 +1,6 @@
-use once_cell::sync::OnceCell;
+use once_cell::sync::Lazy;
 use ratatui::style::Color;
+use std::sync::RwLock;
 
 pub mod dark;
 pub mod forest;
@@ -47,20 +48,12 @@ pub struct Theme {
     pub crumb_icon: Color,
 }
 
-pub struct ThemeWrapper;
+static THEME_CELL: Lazy<RwLock<Theme>> = Lazy::new(|| RwLock::new(DARK_THEME));
 
-static THEME_CELL: OnceCell<Theme> = OnceCell::new();
-
-impl std::ops::Deref for ThemeWrapper {
-    type Target = Theme;
-
-    fn deref(&self) -> &Self::Target {
-        THEME_CELL.get_or_init(|| DARK_THEME)
-    }
+pub fn current_theme() -> Theme {
+    *THEME_CELL.read().expect("theme read lock poisoned")
 }
 
-pub static THEME: ThemeWrapper = ThemeWrapper;
-
 pub fn set_theme(theme: Theme) {
-    let _ = THEME_CELL.set(theme);
+    *THEME_CELL.write().expect("theme write lock poisoned") = theme;
 }

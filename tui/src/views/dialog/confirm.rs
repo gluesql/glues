@@ -1,5 +1,5 @@
 use {
-    crate::{context::Context, logger::*, theme::THEME},
+    crate::{context::Context, logger::*, theme},
     ratatui::{
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
@@ -9,14 +9,15 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, context: &mut Context) {
+    let t = theme::current_theme();
     let [area] = Layout::horizontal([Length(40)])
         .flex(Flex::Center)
         .areas(frame.area());
     let [area] = Layout::vertical([Length(9)]).flex(Flex::Center).areas(area);
 
     let block = Block::bordered()
-        .bg(THEME.surface)
-        .fg(THEME.text)
+        .bg(t.surface)
+        .fg(t.text)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Confirm")
         .title_alignment(Alignment::Center);
@@ -35,8 +36,8 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .alignment(Alignment::Left);
 
     let lines = vec![
-        "[y] Confirm".fg(THEME.text_secondary).into(),
-        "[n] Cancel".fg(THEME.text_secondary).into(),
+        "[y] Confirm".fg(t.text_secondary).into(),
+        "[n] Cancel".fg(t.text_secondary).into(),
     ];
     let control = Paragraph::new(lines)
         .wrap(Wrap { trim: true })

@@ -1,7 +1,7 @@
 use {
     crate::{
         context::{Context, notebook::ContextState},
-        theme::THEME,
+        theme,
     },
     ratatui::{
         Frame,
@@ -16,6 +16,7 @@ use {
 const NOTE_SYMBOL: &str = "󱇗 ";
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
+    let t = theme::current_theme();
     context.notebook.editor_height = area.height - 2;
 
     let (title, mut bottom_left) = if let Some(tab_index) = context.notebook.tab_index {
@@ -24,12 +25,12 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             let name = format!(" {NOTE_SYMBOL}{} ", tab.note.name.clone());
             let name = if i == tab_index {
                 if context.notebook.state.is_editor() {
-                    name.fg(THEME.accent_text).bg(THEME.accent)
+                    name.fg(t.accent_text).bg(t.accent)
                 } else {
-                    name.fg(THEME.accent_text).bg(THEME.inactive_bg)
+                    name.fg(t.accent_text).bg(t.inactive_bg)
                 }
             } else {
-                name.fg(THEME.hint)
+                name.fg(t.hint)
             };
 
             title.push(name);
@@ -45,57 +46,56 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             .enumerate()
         {
             let (color_a, color_b) = if i % 2 == 0 {
-                (THEME.crumb_a, THEME.crumb_b)
+                (t.crumb_a, t.crumb_b)
             } else {
-                (THEME.crumb_b, THEME.crumb_a)
+                (t.crumb_b, t.crumb_a)
             };
 
             let name = if i == 0 {
-                breadcrumb.push(Span::raw("  󰝰 ").fg(THEME.crumb_icon).bg(color_a));
+                breadcrumb.push(Span::raw("  󰝰 ").fg(t.crumb_icon).bg(color_a));
                 format!("{name} ")
             } else if i == last_index {
                 format!(" 󱇗 {name} ")
             } else {
-                breadcrumb.push(Span::raw(" 󰝰 ").fg(THEME.crumb_icon).bg(color_a));
+                breadcrumb.push(Span::raw(" 󰝰 ").fg(t.crumb_icon).bg(color_a));
                 format!("{name} ")
             };
 
-            breadcrumb.push(Span::raw(name).fg(THEME.text).bg(color_a));
+            breadcrumb.push(Span::raw(name).fg(t.text).bg(color_a));
 
             if i < last_index {
                 breadcrumb.push(Span::raw("").fg(color_a).bg(color_b));
             } else {
-                breadcrumb.push(Span::raw("").fg(color_a).bg(THEME.background));
+                breadcrumb.push(Span::raw("").fg(color_a).bg(t.background));
             }
         }
 
         (title, breadcrumb)
     } else {
         (
-            Line::from("[Editor]".fg(THEME.inactive_text)),
+            Line::from("[Editor]".fg(t.inactive_text)),
             vec![Span::default()],
         )
     };
 
     let (mode, bg) = match context.notebook.state {
         ContextState::EditorNormalMode { .. } => (
-            Span::raw(" NORMAL ").fg(THEME.text).bg(THEME.background),
-            THEME.background,
+            Span::raw(" NORMAL ").fg(t.text).bg(t.background),
+            t.background,
         ),
         ContextState::EditorInsertMode => (
-            Span::raw(" INSERT ").fg(THEME.accent_text).bg(THEME.accent),
-            THEME.accent,
+            Span::raw(" INSERT ").fg(t.accent_text).bg(t.accent),
+            t.accent,
         ),
-        ContextState::EditorVisualMode => (
-            Span::raw(" VISUAL ").fg(THEME.error_text).bg(THEME.error),
-            THEME.error,
-        ),
-        _ => (Span::raw("        ").bg(THEME.surface), THEME.surface),
+        ContextState::EditorVisualMode => {
+            (Span::raw(" VISUAL ").fg(t.error_text).bg(t.error), t.error)
+        }
+        _ => (Span::raw("        ").bg(t.surface), t.surface),
     };
 
     if context.notebook.tab_index.is_some() {
         bottom_left.insert(0, mode);
-        bottom_left.insert(1, Span::raw("").fg(bg).bg(THEME.crumb_a));
+        bottom_left.insert(1, Span::raw("").fg(bg).bg(t.crumb_a));
     }
 
     let bottom_left = Line::from(bottom_left);
@@ -106,25 +106,18 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     ) {
         (_, true) => block.title_bottom(
             Line::from(vec![
-                Span::raw("").fg(THEME.accent).bg(THEME.background),
-                Span::raw(" 󰔚 Saving... ")
-                    .fg(THEME.accent_text)
-                    .bg(THEME.accent),
+                Span::raw("").fg(t.accent).bg(t.background),
+                Span::raw(" 󰔚 Saving... ").fg(t.accent_text).bg(t.accent),
             ])
             .right_aligned(),
         ),
         (Some((log, _)), false) => block.title_bottom(
-            Line::from(
-                format!(" {} ", log)
-                    .fg(THEME.success_text)
-                    .bg(THEME.success),
-            )
-            .right_aligned(),
+            Line::from(format!(" {} ", log).fg(t.success_text).bg(t.success)).right_aligned(),
         ),
         (None, false) => block,
     }
-    .fg(THEME.text)
-    .bg(THEME.background)
+    .fg(t.text)
+    .bg(t.background)
     .padding(if context.notebook.show_line_number {
         Padding::ZERO
     } else {
@@ -146,7 +139,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         ContextState::EditorNormalMode { .. }
         | ContextState::EditorInsertMode
         | ContextState::EditorVisualMode => (
-            Style::default().fg(THEME.accent_text).bg(THEME.accent),
+            Style::default().fg(t.accent_text).bg(t.accent),
             Style::default().underlined(),
         ),
         _ => (Style::default(), Style::default()),
@@ -155,7 +148,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     editor.set_cursor_style(cursor_style);
     editor.set_cursor_line_style(cursor_line_style);
     if show_line_number {
-        editor.set_line_number_style(Style::default().fg(THEME.inactive_text));
+        editor.set_line_number_style(Style::default().fg(t.inactive_text));
     } else {
         editor.remove_line_number();
     }
