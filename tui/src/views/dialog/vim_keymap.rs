@@ -1,5 +1,5 @@
 use {
-    crate::theme::THEME,
+    crate::theme,
     glues_core::transition::VimKeymapKind,
     ratatui::{
         Frame,
@@ -11,11 +11,12 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
+    let t = theme::current_theme();
     let (title, message) = match keymap_kind {
         VimKeymapKind::NormalIdle => (
             "VIM NORMAL MODE KEYMAP",
             vec![
-                Line::from("TO INSERT MODE".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("TO INSERT MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[i] Go to insert mode"),
                 Line::raw("[I] Go to insert mode at the beginning of the line"),
                 Line::raw("[o] Insert a new line below and go to insert mode"),
@@ -25,7 +26,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[s] Delete character and go to insert mode"),
                 Line::raw("[S] Delete line and go to insert mode"),
                 Line::raw(""),
-                Line::from("TO OTHER MODES".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("TO OTHER MODES".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[c] Go to change mode (prepare to edit text)"),
                 Line::raw("[v] Go to visual mode (select text to edit or copy)"),
                 Line::raw("[g] Go to gateway mode (access extended commands)"),
@@ -34,7 +35,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[z] Go to scroll mode (adjust viewport)"),
                 Line::raw("[1-9] Go to numbering mode (repeat or extend actions with numbers)"),
                 Line::raw(""),
-                Line::from("MOVE CURSOR".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("MOVE CURSOR".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[h] Move cursor left"),
                 Line::raw("[j] Move cursor down"),
                 Line::raw("[k] Move cursor up"),
@@ -47,7 +48,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[^] Move cursor to the first non-blank character of the line"),
                 Line::raw("[G] Move cursor to the end of the file"),
                 Line::raw(""),
-                Line::from("EDIT TEXT".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("EDIT TEXT".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[~] Toggle the case of the current character"),
                 Line::raw("[x] Delete character under the cursor"),
                 Line::raw("[u] Undo the last change"),
@@ -57,26 +58,22 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         VimKeymapKind::NormalNumbering => (
             "VIM NORMAL MODE KEYMAP - NUMBERING",
             vec![
-                Line::from(
-                    "EXTENDING NUMBERING MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
-                ),
+                Line::from("EXTENDING NUMBERING MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[0-9] Append additional digits to extend the current command"),
                 Line::raw(""),
-                Line::from("TO INSERT MODE".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("TO INSERT MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[s] Delete specified number of characters and go to insert mode"),
                 Line::raw("[S] Delete the entire line and go to insert mode"),
                 Line::raw(""),
-                Line::from("TO OTHER MODES".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("TO OTHER MODES".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[c] Go to change mode with repeat count (prepare to edit text)"),
                 Line::raw("[y] Go to yank mode with repeat count (prepare to copy text)"),
                 Line::raw("[d] Go to delete mode with repeat count (prepare to delete text)"),
                 Line::raw(""),
                 Line::from(
                     "MOVE CURSOR AND RETURN TO NORMAL MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
+                        .fg(t.accent_text)
+                        .bg(t.accent),
                 ),
                 Line::raw("[h] Move cursor left by the specified number of times"),
                 Line::raw("[j] Move cursor down by the specified number of times"),
@@ -95,8 +92,8 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw(""),
                 Line::from(
                     "EDIT TEXT AND RETURN TO NORMAL MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
+                        .fg(t.accent_text)
+                        .bg(t.accent),
                 ),
                 Line::raw("[x] Delete specified number of characters and return to normal mode"),
             ],
@@ -104,17 +101,13 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         VimKeymapKind::NormalDelete => (
             "VIM NORMAL MODE KEYMAP - DELETE",
             vec![
-                Line::from("TO NUMBERING MODE".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("TO NUMBERING MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[1-9] Go to delete numbering mode"),
                 Line::raw(""),
-                Line::from(
-                    "TO DELETE INSIDE MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
-                ),
+                Line::from("TO DELETE INSIDE MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[i] Go to delete inside mode"),
                 Line::raw(""),
-                Line::from("DELETE TEXT".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("DELETE TEXT".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[d] Delete the specified number of lines"),
                 Line::raw("[j] Delete the current and following lines"),
                 Line::raw("[k] Delete the current and previous lines"),
@@ -129,21 +122,13 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         VimKeymapKind::NormalDelete2 => (
             "VIM NORMAL MODE KEYMAP - DELETE NUMBERING",
             vec![
-                Line::from(
-                    "EXTENDING NUMBERING MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
-                ),
+                Line::from("EXTENDING NUMBERING MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[0-9] Append additional digits to extend the current command"),
                 Line::raw(""),
-                Line::from(
-                    "TO DELETE INSIDE MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
-                ),
+                Line::from("TO DELETE INSIDE MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[i] Go to delete inside mode"),
                 Line::raw(""),
-                Line::from("DELETE TEXT".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("DELETE TEXT".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[d] Delete the specified number of lines"),
                 Line::raw("[j] Delete the current and following lines"),
                 Line::raw("[k] Delete the current and previous lines"),
@@ -157,22 +142,18 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         VimKeymapKind::NormalChange => (
             "VIM NORMAL MODE KEYMAP - CHANGE",
             vec![
-                Line::from(
-                    "TO CHANGE INSIDE MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
-                ),
+                Line::from("TO CHANGE INSIDE MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[i] Go to change inside mode"),
                 Line::raw(""),
                 Line::from(
                     "CHANGE TEXT AND GO TO INSERT MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
+                        .fg(t.accent_text)
+                        .bg(t.accent),
                 ),
                 Line::raw("[c] Delete the specified number of lines"),
                 Line::from(vec![
                     "[e] ".into(),
-                    "or ".fg(THEME.inactive_text),
+                    "or ".fg(t.inactive_text),
                     "[w] Delete to the end of the word by the specified number of times".into(),
                 ]),
                 Line::raw(
@@ -185,29 +166,21 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         VimKeymapKind::NormalChange2 => (
             "VIM NORMAL MODE KEYMAP - CHANGE NUMBERING",
             vec![
-                Line::from(
-                    "EXTENDING NUMBERING MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
-                ),
+                Line::from("EXTENDING NUMBERING MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[0-9] Append additional digits to extend the current command"),
                 Line::raw(""),
-                Line::from(
-                    "TO CHANGE INSIDE MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
-                ),
+                Line::from("TO CHANGE INSIDE MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[i] Go to change inside mode"),
                 Line::raw(""),
                 Line::from(
                     "CHANGE TEXT AND GO TO INSERT MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
+                        .fg(t.accent_text)
+                        .bg(t.accent),
                 ),
                 Line::raw("[c] Delete the specified number of lines"),
                 Line::from(vec![
                     "[e] ".into(),
-                    "or ".fg(THEME.inactive_text),
+                    "or ".fg(t.inactive_text),
                     "[w] Delete to the end of the word by the specified number of times".into(),
                 ]),
                 Line::raw(
@@ -219,7 +192,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         VimKeymapKind::VisualIdle => (
             "VIM VISUAL MODE KEYMAP",
             vec![
-                Line::from("MOVE CURSOR".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("MOVE CURSOR".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[h] Move cursor left"),
                 Line::raw("[j] Move cursor down"),
                 Line::raw("[k] Move cursor up"),
@@ -232,25 +205,25 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
                 Line::raw("[^] Move cursor to the first non-blank character of the line"),
                 Line::raw("[G] Move cursor to the end of the file"),
                 Line::raw(""),
-                Line::from("TO INSERT MODE".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("TO INSERT MODE".fg(t.accent_text).bg(t.accent)),
                 Line::from(vec![
                     "[s] ".into(),
-                    "or ".fg(THEME.inactive_text),
+                    "or ".fg(t.inactive_text),
                     "[S] Substitute selected text and go to insert mode".into(),
                 ]),
                 Line::raw(""),
-                Line::from("TO EXTENDED MODES".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("TO EXTENDED MODES".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[g] Go to gateway mode for additional commands"),
                 Line::raw("[1-9] Specify repeat count for subsequent actions"),
                 Line::raw(""),
                 Line::from(
                     "EDIT TEXT AND RETURN TO NORMAL MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
+                        .fg(t.accent_text)
+                        .bg(t.accent),
                 ),
                 Line::from(vec![
                     "[d] ".into(),
-                    "or ".fg(THEME.inactive_text),
+                    "or ".fg(t.inactive_text),
                     "[x] Delete selected text".into(),
                 ]),
                 Line::raw("[y] Yank (copy) selected text"),
@@ -260,14 +233,10 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         VimKeymapKind::VisualNumbering => (
             "VIM VISUAL MODE KEYMAP - NUMBERING",
             vec![
-                Line::from(
-                    "EXTENDING NUMBERING MODE"
-                        .fg(THEME.accent_text)
-                        .bg(THEME.accent),
-                ),
+                Line::from("EXTENDING NUMBERING MODE".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[0-9] Append additional digits to extend the current command"),
                 Line::raw(""),
-                Line::from("MOVE CURSOR".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::from("MOVE CURSOR".fg(t.accent_text).bg(t.accent)),
                 Line::raw("[h] Move cursor left by the specified number of times"),
                 Line::raw("[j] Move cursor down by the specified number of times"),
                 Line::raw("[k] Move cursor up by the specified number of times"),
@@ -295,10 +264,10 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         .areas(area);
 
     let block = Block::bordered()
-        .fg(THEME.text)
-        .bg(THEME.surface)
+        .fg(t.text)
+        .bg(t.surface)
         .padding(Padding::new(2, 2, 1, 1))
-        .title(title.fg(THEME.success_text).bg(THEME.success))
+        .title(title.fg(t.success_text).bg(t.success))
         .title_alignment(Alignment::Center);
 
     let inner_area = block.inner(area);
@@ -309,7 +278,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         .wrap(Wrap { trim: true })
         .style(Style::default())
         .alignment(Alignment::Left);
-    let control = Line::from("Press any key to close".fg(THEME.hint)).centered();
+    let control = Line::from("Press any key to close".fg(t.hint)).centered();
 
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);

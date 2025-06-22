@@ -1,5 +1,5 @@
 use {
-    crate::theme::THEME,
+    crate::theme,
     ratatui::{
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
@@ -10,6 +10,7 @@ use {
 };
 
 pub fn draw(frame: &mut Frame) {
+    let t = theme::current_theme();
     let [area] = Layout::horizontal([Length(120)])
         .flex(Flex::Center)
         .areas(frame.area());
@@ -18,8 +19,8 @@ pub fn draw(frame: &mut Frame) {
         .areas(area);
 
     let block = Block::bordered()
-        .bg(THEME.surface)
-        .fg(THEME.text)
+        .bg(t.surface)
+        .fg(t.text)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Help")
         .title_alignment(Alignment::Center);
@@ -32,19 +33,19 @@ pub fn draw(frame: &mut Frame) {
     let message = vec![
         Line::from("Glues offers various storage options to suit your needs:"),
         Line::raw(""),
-        Line::from("Instant".fg(THEME.accent_text).bg(THEME.accent)),
+        Line::from("Instant".fg(t.accent_text).bg(t.accent)),
         Line::raw("Data is stored in memory and only persists while the app is running."),
         Line::raw(
             "This option is useful for testing or temporary notes as it is entirely volatile.",
         ),
         Line::raw(""),
-        Line::from("Local".fg(THEME.accent_text).bg(THEME.accent)),
+        Line::from("Local".fg(t.accent_text).bg(t.accent)),
         Line::raw("Notes are stored locally as separate files."),
         Line::raw(
             "This is the default option for users who prefer a simple, file-based approach without any remote synchronization.",
         ),
         Line::raw(""),
-        Line::from("Git".fg(THEME.accent_text).bg(THEME.accent)),
+        Line::from("Git".fg(t.accent_text).bg(t.accent)),
         Line::raw("Git storage requires three inputs: `path`, `remote`, and `branch`."),
         Line::raw(
             "The `path` should point to an existing local Git repository, similar to the file storage path.",
@@ -57,7 +58,7 @@ pub fn draw(frame: &mut Frame) {
             "When you modify notes or directories, Glues will automatically sync changes with the specified remote repository.",
         ),
         Line::raw(""),
-        Line::from("MongoDB".fg(THEME.accent_text).bg(THEME.accent)),
+        Line::from("MongoDB".fg(t.accent_text).bg(t.accent)),
         Line::raw(
             "MongoDB storage allows you to store your notes in a MongoDB database, providing a scalable and centralized solution for managing your notes.",
         ),
@@ -68,9 +69,9 @@ pub fn draw(frame: &mut Frame) {
         ),
         Line::raw(""),
         Line::from(vec![
-            "CSV".fg(THEME.accent_text).bg(THEME.accent),
-            " or ".fg(THEME.inactive_text),
-            "JSON".fg(THEME.accent_text).bg(THEME.accent),
+            "CSV".fg(t.accent_text).bg(t.accent),
+            " or ".fg(t.inactive_text),
+            "JSON".fg(t.accent_text).bg(t.accent),
         ]),
         Line::raw(
             "These formats store notes as simple log files, ideal for quick data exports or reading logs.",
@@ -84,7 +85,7 @@ pub fn draw(frame: &mut Frame) {
         .wrap(Wrap { trim: true })
         .style(Style::default())
         .alignment(Alignment::Left);
-    let control = Line::from("Press any key to close".fg(THEME.text_secondary)).centered();
+    let control = Line::from("Press any key to close".fg(t.text_secondary)).centered();
 
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);

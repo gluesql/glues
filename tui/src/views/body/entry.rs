@@ -1,7 +1,7 @@
 use {
     crate::{
         context::{EntryContext, entry::MENU_ITEMS},
-        theme::THEME,
+        theme,
     },
     ratatui::{
         Frame,
@@ -13,7 +13,8 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
-    let background = Block::default().bg(THEME.background);
+    let t = theme::current_theme();
+    let background = Block::default().bg(t.background);
     frame.render_widget(background, area);
 
     let [area] = Layout::horizontal([Length(38)])
@@ -24,24 +25,24 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
         .areas(area);
 
     let title = BigText::builder()
-        .lines(vec!["Glues".fg(THEME.accent).into()])
+        .lines(vec!["Glues".fg(t.accent).into()])
         .build();
     let block = Block::bordered()
-        .fg(THEME.text)
+        .fg(t.text)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Open Notes")
         .title_alignment(Alignment::Center);
 
     let items = MENU_ITEMS.into_iter().map(|name| {
         if name.ends_with("CSV") || name.ends_with("JSON") {
-            name.fg(THEME.inactive_text)
+            name.fg(t.inactive_text)
         } else {
-            name.fg(THEME.menu)
+            name.fg(t.menu)
         }
     });
     let list = List::new(items)
         .block(block)
-        .highlight_style(Style::new().fg(THEME.accent_text).bg(THEME.accent))
+        .highlight_style(Style::new().fg(t.accent_text).bg(t.accent))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);

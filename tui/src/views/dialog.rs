@@ -6,6 +6,7 @@ mod help;
 mod keymap;
 mod note_actions;
 mod prompt;
+mod theme;
 mod vim_keymap;
 
 use {
@@ -39,6 +40,9 @@ pub fn draw(frame: &mut Frame, state: &State, context: &mut Context) {
         return;
     } else if context.prompt.is_some() {
         prompt::draw(frame, context);
+        return;
+    } else if context.theme_dialog {
+        theme::draw(frame, &mut context.entry);
         return;
     }
 

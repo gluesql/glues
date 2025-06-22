@@ -5,7 +5,7 @@ use {
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_PATH, LAST_JSON_PATH, LAST_MONGO_CONN_STR,
         },
         logger::*,
-        theme::THEME,
+        theme,
     },
     glues_core::EntryEvent,
     ratatui::{crossterm::event::KeyCode, style::Stylize, text::Line, widgets::ListState},
@@ -17,30 +17,64 @@ pub const GIT: &str = "[3] Git";
 pub const MONGO: &str = "[4] MongoDB";
 pub const CSV: &str = "[5] CSV";
 pub const JSON: &str = "[6] JSON";
+pub const THEME: &str = "[t] Theme";
 pub const HELP: &str = "[h] Help";
 pub const QUIT: &str = "[q] Quit";
 
-pub const MENU_ITEMS: [&str; 8] = [INSTANT, FILE, GIT, MONGO, CSV, JSON, HELP, QUIT];
+pub const MENU_ITEMS: [&str; 9] = [INSTANT, FILE, GIT, MONGO, CSV, JSON, THEME, HELP, QUIT];
+
+pub const THEMES: [&str; 6] = ["Dark", "Light", "Pastel", "Sunrise", "Midnight", "Forest"];
 
 pub struct EntryContext {
     pub list_state: ListState,
+    pub theme_state: ListState,
 }
 
 impl Default for EntryContext {
     fn default() -> Self {
         Self {
             list_state: ListState::default().with_selected(Some(0)),
+            theme_state: ListState::default().with_selected(Some(0)),
         }
     }
 }
 
 impl EntryContext {
+    pub fn consume_theme(&mut self, code: KeyCode) -> Action {
+        match code {
+            KeyCode::Char('j') | KeyCode::Down => {
+                self.theme_state.select_next();
+                Action::None
+            }
+            KeyCode::Char('k') | KeyCode::Up => {
+                self.theme_state.select_previous();
+                Action::None
+            }
+            KeyCode::Enter => {
+                let i = self.theme_state.selected().unwrap_or(0);
+                let (name, theme) = match THEMES[i] {
+                    "Dark" => ("Dark", theme::DARK_THEME),
+                    "Light" => ("Light", theme::LIGHT_THEME),
+                    "Pastel" => ("Pastel", theme::PASTEL_THEME),
+                    "Sunrise" => ("Sunrise", theme::SUNRISE_THEME),
+                    "Midnight" => ("Midnight", theme::MIDNIGHT_THEME),
+                    "Forest" => ("Forest", theme::FOREST_THEME),
+                    _ => ("Dark", theme::DARK_THEME),
+                };
+                TuiAction::ChangeTheme(name, theme).into()
+            }
+            KeyCode::Esc => Action::None,
+            _ => Action::PassThrough,
+        }
+    }
+
     pub async fn consume(&mut self, code: KeyCode) -> Action {
+        let theme = theme::current_theme();
         let open = |key, action: TuiAction| async move {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the path:"),
-                    Line::from("If the path does not exist, it will be created.".fg(THEME.hint)),
+                    Line::from("If the path does not exist, it will be created.".fg(theme.hint)),
                 ],
                 action: Box::new(action.into()),
                 default: config::get(key).await,
@@ -52,8 +86,8 @@ impl EntryContext {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the git repository path:"),
-                    Line::from("The path must contain an existing .git repository.".fg(THEME.hint)),
-                    Line::from("otherwise, an error will occur.".fg(THEME.hint)),
+                    Line::from("The path must contain an existing .git repository.".fg(theme.hint)),
+                    Line::from("otherwise, an error will occur.".fg(theme.hint)),
                 ],
                 action: Box::new(TuiAction::OpenGit(OpenGitStep::Path).into()),
                 default: config::get(LAST_GIT_PATH).await,
@@ -65,7 +99,7 @@ impl EntryContext {
             TuiAction::Prompt {
                 message: vec![
                     Line::raw("Enter the MongoDB connection string:"),
-                    Line::from("e.g. mongodb://localhost:27017".fg(THEME.hint)),
+                    Line::from("e.g. mongodb://localhost:27017".fg(theme.hint)),
                 ],
                 action: Box::new(TuiAction::OpenMongo(OpenMongoStep::ConnStr).into()),
                 default: config::get(LAST_MONGO_CONN_STR).await,
@@ -89,6 +123,7 @@ impl EntryContext {
             KeyCode::Char('4') => open_mongo().await,
             KeyCode::Char('5') => open(LAST_CSV_PATH, TuiAction::OpenCsv).await,
             KeyCode::Char('6') => open(LAST_JSON_PATH, TuiAction::OpenJson).await,
+            KeyCode::Char('t') => TuiAction::ShowThemeDialog.into(),
             KeyCode::Char('a') => TuiAction::Help.into(),
 
             KeyCode::Enter => {
@@ -103,6 +138,7 @@ impl EntryContext {
                     MONGO => open_mongo().await,
                     CSV => open(LAST_CSV_PATH, TuiAction::OpenCsv).await,
                     JSON => open(LAST_JSON_PATH, TuiAction::OpenJson).await,
+                    THEME => TuiAction::ShowThemeDialog.into(),
                     HELP => TuiAction::Help.into(),
                     QUIT => TuiAction::Quit.into(),
                     _ => Action::None,

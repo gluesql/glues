@@ -4,7 +4,7 @@ use {
             NotebookContext,
             notebook::{ContextState, TreeItem, TreeItemKind},
         },
-        theme::THEME,
+        theme,
     },
     ratatui::{
         Frame,
@@ -20,6 +20,7 @@ const OPEN_SYMBOL: &str = "󰝰 ";
 const NOTE_SYMBOL: &str = "󱇗 ";
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
+    let t = theme::current_theme();
     let note_tree_focused = matches!(
         context.state,
         ContextState::NoteTreeBrowsing
@@ -29,14 +30,14 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
     );
     let title = "[Browser]";
     let title = if note_tree_focused {
-        title.fg(THEME.highlight)
+        title.fg(t.highlight)
     } else {
-        title.fg(THEME.inactive_text)
+        title.fg(t.inactive_text)
     };
     let block = Block::new()
         .borders(Borders::RIGHT)
         .border_type(BorderType::QuadrantOutside)
-        .fg(THEME.hint)
+        .fg(t.hint)
         .title(title);
     let inner_area = block.inner(area);
 
@@ -61,15 +62,15 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
                     let symbol = if *opened { OPEN_SYMBOL } else { CLOSED_SYMBOL };
                     Line::from(vec![
                         format!("{:pad$}", "").into(),
-                        Span::raw(symbol).fg(THEME.crumb_icon),
+                        Span::raw(symbol).fg(t.crumb_icon),
                         Span::raw(&directory.name),
                     ])
                 }
             };
 
             match (selectable, target) {
-                (true, _) => line.fg(THEME.text),
-                (false, true) => line.fg(THEME.target),
+                (true, _) => line.fg(t.text),
+                (false, true) => line.fg(t.target),
                 (false, false) => line.dim(),
             }
         },
@@ -77,14 +78,14 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
 
     let highlight_style = Style::default()
         .bg(if note_tree_focused {
-            THEME.accent
+            t.accent
         } else {
-            THEME.surface
+            t.surface
         })
         .fg(if note_tree_focused {
-            THEME.accent_text
+            t.accent_text
         } else {
-            THEME.text
+            t.text
         });
 
     let list = List::new(tree_items)
@@ -93,6 +94,6 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);
 
-    frame.render_widget(block.bg(THEME.background), area);
+    frame.render_widget(block.bg(t.background), area);
     frame.render_stateful_widget(list, inner_area, &mut context.tree_state);
 }

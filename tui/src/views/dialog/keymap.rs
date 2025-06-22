@@ -1,5 +1,5 @@
 use {
-    crate::theme::THEME,
+    crate::theme,
     glues_core::types::{KeymapGroup, KeymapItem},
     ratatui::{
         Frame,
@@ -19,6 +19,7 @@ const KEYMAP_WIDTH: u16 = 46;
 const KEY_WIDTH: u16 = 10;
 
 pub fn draw(frame: &mut Frame, keymap: &[KeymapGroup]) {
+    let t = theme::current_theme();
     let [area] = Layout::horizontal([Length(KEYMAP_WIDTH)])
         .flex(Flex::End)
         .areas(frame.area());
@@ -27,15 +28,15 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapGroup]) {
         .areas(area);
 
     let block = Block::default()
-        .fg(THEME.inactive_text)
-        .bg(THEME.panel)
+        .fg(t.inactive_text)
+        .bg(t.panel)
         .padding(Padding::new(2, 2, 1, 1))
         .title(
             Line::from(vec![
-                Span::raw("").fg(THEME.success).bg(THEME.panel),
+                Span::raw("").fg(t.success).bg(t.panel),
                 Span::raw(" [?] Hide keymap ")
-                    .fg(THEME.success_text)
-                    .bg(THEME.success),
+                    .fg(t.success_text)
+                    .bg(t.success),
             ])
             .right_aligned(),
         );
@@ -73,9 +74,7 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapGroup]) {
     for (row_area, row) in row_areas.iter().zip(rows) {
         match row {
             Row::Title(title) => {
-                let line = Line::from(title.to_string())
-                    .fg(THEME.accent_text)
-                    .bg(THEME.accent);
+                let line = Line::from(title.to_string()).fg(t.accent_text).bg(t.accent);
                 let paragraph = Paragraph::new(line).alignment(Alignment::Left);
                 frame.render_widget(paragraph, *row_area);
             }

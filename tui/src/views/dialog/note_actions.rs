@@ -1,7 +1,7 @@
 use {
     crate::{
         context::{NotebookContext, notebook::NOTE_ACTIONS},
-        theme::THEME,
+        theme,
     },
     ratatui::{
         Frame,
@@ -12,20 +12,21 @@ use {
 };
 
 pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
+    let t = theme::current_theme();
     let [area] = Layout::horizontal([Length(28)])
         .flex(Flex::Center)
         .areas(frame.area());
     let [area] = Layout::vertical([Length(7)]).flex(Flex::Center).areas(area);
 
     let block = Block::bordered()
-        .bg(THEME.surface)
-        .fg(THEME.text)
+        .bg(t.surface)
+        .fg(t.text)
         .padding(Padding::new(2, 2, 1, 1))
         .title("Note Actions")
         .title_alignment(Alignment::Center);
     let list = List::new(NOTE_ACTIONS)
         .block(block)
-        .highlight_style(Style::new().fg(THEME.accent_text).bg(THEME.accent))
+        .highlight_style(Style::new().fg(t.accent_text).bg(t.accent))
         .highlight_symbol(" ")
         .highlight_spacing(HighlightSpacing::Always)
         .direction(ListDirection::TopToBottom);

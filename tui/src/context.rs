@@ -2,7 +2,7 @@ pub mod entry;
 pub mod notebook;
 
 use {
-    crate::{Action, log, logger::*, theme::THEME},
+    crate::{Action, action::TuiAction, log, logger::*, theme},
     glues_core::transition::VimKeymapKind,
     ratatui::{
         crossterm::event::{Event as Input, KeyCode, KeyEvent},
@@ -28,8 +28,9 @@ pub struct ContextPrompt {
 
 impl ContextPrompt {
     pub fn new(message: Vec<Line<'static>>, action: Action, default: Option<String>) -> Self {
+        let theme = theme::current_theme();
         let mut widget = TextArea::new(vec![default.unwrap_or_default()]);
-        widget.set_cursor_style(Style::default().fg(THEME.accent_text).bg(THEME.accent));
+        widget.set_cursor_style(Style::default().fg(theme.accent_text).bg(theme.accent));
         widget.set_block(
             Block::default()
                 .border_style(Style::default())
@@ -58,6 +59,8 @@ pub struct Context {
     pub editor_keymap: bool,
     pub vim_keymap: Option<VimKeymapKind>,
 
+    pub theme_dialog: bool,
+
     pub keymap: bool,
 }
 
@@ -76,6 +79,8 @@ impl Default for Context {
             help: false,
             editor_keymap: false,
             vim_keymap: None,
+
+            theme_dialog: false,
 
             keymap: false,
         }
@@ -148,6 +153,22 @@ impl Context {
                     return Action::None;
                 }
             }
+        } else if self.theme_dialog {
+            let code = match input {
+                Input::Key(key) => key.code,
+                _ => return Action::None,
+            };
+
+            if code == KeyCode::Esc {
+                self.theme_dialog = false;
+                return Action::None;
+            }
+
+            let action = self.entry.consume_theme(code);
+            if matches!(action, Action::Tui(TuiAction::ChangeTheme(..))) {
+                self.theme_dialog = false;
+            }
+            return action;
         }
 
         match self.state {
