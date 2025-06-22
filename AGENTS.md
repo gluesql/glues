@@ -4,3 +4,4 @@
 - Run `cargo test` to verify all tests pass.
 - After clippy and tests succeed, run `cargo fmt` on the entire workspace before committing changes.
 - Use file-based module declarations; do **not** create `mod.rs` files.
+- Branch names may contain only lowercase `a`-`z`, dashes (`-`), and slashes (`/`).
