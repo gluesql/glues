@@ -5,7 +5,7 @@ use {
         data::Note,
         types::{DirectoryId, NoteId},
     },
-    gluesql::core::ast_builder::{col, function::now, table, text, uuid},
+    gluesql::core::ast_builder::{col, function::now, num, table, text, uuid},
     std::ops::Deref,
     uuid::Uuid,
 };
@@ -34,7 +34,8 @@ impl Db {
         let notes = table("Note")
             .select()
             .filter(col("directory_id").eq(uuid(directory_id.clone())))
-            .project(vec!["id", "name"])
+            .project(vec!["id", "name", "order"])
+            .order_by("order")
             .execute(&mut self.storage)
             .await?
             .select()
@@ -43,6 +44,7 @@ impl Db {
                 id: payload.get("id").map(Deref::deref).unwrap().into(),
                 directory_id: directory_id.clone(),
                 name: payload.get("name").map(Deref::deref).unwrap().into(),
+                order: payload.get("order").cloned().unwrap().try_into().unwrap(),
             })
             .collect();
 
@@ -51,16 +53,31 @@ impl Db {
 
     pub async fn add_note(&mut self, directory_id: DirectoryId, name: String) -> Result<Note> {
         let id = Uuid::now_v7().to_string();
+        let order = self
+            .fetch_notes(directory_id.clone())
+            .await?
+            .into_iter()
+            .map(|n| n.order)
+            .max()
+            .unwrap_or(-1)
+            + 1;
+
         let note = Note {
             id: id.clone(),
             directory_id: directory_id.clone(),
             name: name.clone(),
+            order,
         };
 
         table("Note")
             .insert()
-            .columns(vec!["id", "directory_id", "name"])
-            .values(vec![vec![uuid(id), uuid(directory_id), text(name)]])
+            .columns(vec!["id", "directory_id", "name", "order"])
+            .values(vec![vec![
+                uuid(id),
+                uuid(directory_id),
+                text(name),
+                num(order),
+            ]])
             .execute(&mut self.storage)
             .await?;
 
@@ -106,6 +123,18 @@ impl Db {
             .update()
             .filter(col("id").eq(uuid(note_id)))
             .set("directory_id", uuid(directory_id))
+            .set("updated_at", now())
+            .execute(&mut self.storage)
+            .await?;
+
+        self.sync()
+    }
+
+    pub async fn reorder_note(&mut self, note_id: NoteId, order: i64) -> Result<()> {
+        table("Note")
+            .update()
+            .filter(col("id").eq(uuid(note_id)))
+            .set("order", num(order))
             .set("updated_at", now())
             .execute(&mut self.storage)
             .await?;

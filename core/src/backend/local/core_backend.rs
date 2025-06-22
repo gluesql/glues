@@ -38,6 +38,10 @@ impl CoreBackend for Db {
         Db::move_directory(self, directory_id, parent_id).await
     }
 
+    async fn reorder_directory(&mut self, directory_id: DirectoryId, order: i64) -> Result<()> {
+        Db::reorder_directory(self, directory_id, order).await
+    }
+
     async fn rename_directory(&mut self, directory_id: DirectoryId, name: String) -> Result<()> {
         Db::rename_directory(self, directory_id, name).await
     }
@@ -68,6 +72,10 @@ impl CoreBackend for Db {
 
     async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) -> Result<()> {
         Db::move_note(self, note_id, directory_id).await
+    }
+
+    async fn reorder_note(&mut self, note_id: NoteId, order: i64) -> Result<()> {
+        Db::reorder_note(self, note_id, order).await
     }
 
     async fn log(&mut self, category: String, message: String) -> Result<()> {

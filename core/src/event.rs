@@ -60,6 +60,11 @@ pub enum NotebookEvent {
     AddNote(String),
     AddDirectory(String),
 
+    ReorderNoteUp,
+    ReorderNoteDown,
+    ReorderDirectoryUp,
+    ReorderDirectoryDown,
+
     MoveNote(DirectoryId),
     MoveDirectory(DirectoryId),
 

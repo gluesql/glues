@@ -45,6 +45,13 @@ where
                 Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
                 Err(e) => ProxyResponse::Err(e.to_string()),
             },
+            ReorderDirectory {
+                directory_id,
+                order,
+            } => match self.db.reorder_directory(directory_id, order).await {
+                Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
+                Err(e) => ProxyResponse::Err(e.to_string()),
+            },
             RenameDirectory { directory_id, name } => {
                 match self.db.rename_directory(directory_id, name).await {
                     Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
@@ -81,6 +88,10 @@ where
                 note_id,
                 directory_id,
             } => match self.db.move_note(note_id, directory_id).await {
+                Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
+                Err(e) => ProxyResponse::Err(e.to_string()),
+            },
+            ReorderNote { note_id, order } => match self.db.reorder_note(note_id, order).await {
                 Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
                 Err(e) => ProxyResponse::Err(e.to_string()),
             },

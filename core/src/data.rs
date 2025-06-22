@@ -6,6 +6,7 @@ pub struct Note {
     pub id: NoteId,
     pub directory_id: DirectoryId,
     pub name: String,
+    pub order: i64,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -13,4 +14,5 @@ pub struct Directory {
     pub id: DirectoryId,
     pub parent_id: DirectoryId,
     pub name: String,
+    pub order: i64,
 }
