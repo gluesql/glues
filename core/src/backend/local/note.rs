@@ -31,20 +31,34 @@ impl Db {
     }
 
     pub async fn fetch_notes(&mut self, directory_id: DirectoryId) -> Result<Vec<Note>> {
-        let notes = table("Note")
+        let result = table("Note")
             .select()
             .filter(col("directory_id").eq(uuid(directory_id.clone())))
             .project(vec!["id", "name"])
             .execute(&mut self.storage)
-            .await?
+            .await?;
+
+        let rows = result
             .select()
-            .unwrap()
-            .map(|payload| Note {
-                id: payload.get("id").map(Deref::deref).unwrap().into(),
-                directory_id: directory_id.clone(),
-                name: payload.get("name").map(Deref::deref).unwrap().into(),
+            .ok_or_else(|| Error::BackendError("expected select payload".into()))?;
+
+        let notes = rows
+            .map(|payload| {
+                Ok(Note {
+                    id: payload
+                        .get("id")
+                        .map(Deref::deref)
+                        .ok_or_else(|| Error::BackendError("id missing".into()))?
+                        .into(),
+                    directory_id: directory_id.clone(),
+                    name: payload
+                        .get("name")
+                        .map(Deref::deref)
+                        .ok_or_else(|| Error::BackendError("name missing".into()))?
+                        .into(),
+                })
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(notes)
     }

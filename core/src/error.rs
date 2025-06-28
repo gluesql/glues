@@ -22,4 +22,7 @@ pub enum Error {
 
     #[error("proxy: {0}")]
     Proxy(String),
+
+    #[error("backend: {0}")]
+    BackendError(String),
 }

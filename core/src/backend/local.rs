@@ -4,7 +4,7 @@ mod log;
 mod note;
 
 use {
-    crate::{Result, schema::setup, task::Task, types::DirectoryId},
+    crate::{Error, Result, schema::setup, task::Task, types::DirectoryId},
     async_trait::async_trait,
     gluesql::{
         core::ast_builder::Build,
@@ -135,7 +135,10 @@ impl Db {
                 branch,
             };
 
-            self.task_tx.clone().send(task).unwrap();
+            self.task_tx
+                .clone()
+                .send(task)
+                .map_err(|e| Error::BackendError(e.to_string()))?;
         }
 
         Ok(())

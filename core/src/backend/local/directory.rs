@@ -1,6 +1,6 @@
 use {
     super::{Db, Execute},
-    crate::{Result, data::Directory, types::DirectoryId},
+    crate::{Error, Result, data::Directory, types::DirectoryId},
     async_recursion::async_recursion,
     gluesql::core::ast_builder::{col, function::now, table, text, uuid},
     std::ops::Deref,
@@ -9,40 +9,69 @@ use {
 
 impl Db {
     pub async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Result<Directory> {
-        let directory = table("Directory")
+        let result = table("Directory")
             .select()
             .filter(col("id").eq(uuid(directory_id)))
             .project(vec!["id", "parent_id", "name"])
             .execute(&mut self.storage)
-            .await?
+            .await?;
+
+        let payload = result
             .select()
-            .unwrap()
+            .ok_or_else(|| Error::BackendError("expected select payload".into()))?
             .next()
-            .map(|payload| Directory {
-                id: payload.get("id").map(Deref::deref).unwrap().into(),
-                parent_id: payload.get("parent_id").map(Deref::deref).unwrap().into(),
-                name: payload.get("name").map(Deref::deref).unwrap().into(),
-            })
-            .unwrap();
+            .ok_or_else(|| Error::BackendError("directory not found".into()))?;
+
+        let directory = Directory {
+            id: payload
+                .get("id")
+                .map(Deref::deref)
+                .ok_or_else(|| Error::BackendError("id missing".into()))?
+                .into(),
+            parent_id: payload
+                .get("parent_id")
+                .map(Deref::deref)
+                .ok_or_else(|| Error::BackendError("parent_id missing".into()))?
+                .into(),
+            name: payload
+                .get("name")
+                .map(Deref::deref)
+                .ok_or_else(|| Error::BackendError("name missing".into()))?
+                .into(),
+        };
 
         Ok(directory)
     }
 
     pub async fn fetch_directories(&mut self, parent_id: DirectoryId) -> Result<Vec<Directory>> {
-        let directories = table("Directory")
+        let result = table("Directory")
             .select()
             .filter(col("parent_id").eq(uuid(parent_id.clone())))
             .project(vec!["id", "name"])
             .execute(&mut self.storage)
-            .await?
+            .await?;
+
+        let rows = result
             .select()
-            .unwrap()
-            .map(|payload| Directory {
-                id: payload.get("id").map(Deref::deref).unwrap().into(),
-                parent_id: parent_id.clone(),
-                name: payload.get("name").map(Deref::deref).unwrap().into(),
+            .ok_or_else(|| Error::BackendError("expected select payload".into()))?;
+
+        let directories = rows
+            .map(|payload| {
+                Ok(Directory {
+                    id: payload
+                        .get("id")
+                        .map(Deref::deref)
+                        .ok_or_else(|| Error::BackendError("id missing".into()))?
+                        .into(),
+                    parent_id: parent_id.clone(),
+                    name: payload
+                        .get("name")
+                        .map(Deref::deref)
+                        .ok_or_else(|| Error::BackendError("name missing".into()))?
+                        .into(),
+                })
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(directories)
     }
