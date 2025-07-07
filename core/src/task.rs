@@ -1,9 +1,9 @@
 use {
     crate::{Result, Transition},
-    gluesql::gluesql_git_storage::{GitStorage, StorageType},
+    /*gluesql::gluesql_git_storage::{GitStorage, StorageType},*/
     std::{
         collections::VecDeque,
-        path::PathBuf,
+        /*path::PathBuf,*/
         sync::{Arc, Mutex, mpsc::Receiver},
         thread::{JoinHandle, spawn},
     },
@@ -11,52 +11,25 @@ use {
 
 #[derive(Clone, Debug)]
 pub enum Task {
-    GitSync {
-        path: PathBuf,
-        remote: String,
-        branch: String,
-    },
+    // GitSync {
+    //     path: PathBuf,
+    //     remote: String,
+    //     branch: String,
+    // },
 }
 
 pub fn handle_tasks(
     task_rx: Receiver<Task>,
-    transition_queue: &Arc<Mutex<VecDeque<Transition>>>,
+    _transition_queue: &Arc<Mutex<VecDeque<Transition>>>,
 ) -> JoinHandle<()> {
-    spawn({
-        let transition_queue = Arc::clone(transition_queue);
-
-        move || {
-            while let Ok(task) = task_rx.recv() {
-                let transition = match handle_task(task) {
-                    Ok(transition) => transition,
-                    Err(error) => Transition::Error(error.to_string()),
-                };
-
-                transition_queue
-                    .lock()
-                    .expect("failed to acquire transition queue")
-                    .push_back(transition);
-            }
+    spawn(move || {
+        while task_rx.recv().is_ok() {
+            // background tasks are disabled
         }
     })
 }
 
-fn handle_task(task: Task) -> Result<Transition> {
-    match task {
-        Task::GitSync {
-            path,
-            remote,
-            branch,
-        } => {
-            let mut storage = GitStorage::open(path, StorageType::File)?;
-            storage.set_remote(remote);
-            storage.set_branch(branch);
-            storage.pull()?;
-            storage.push()?;
-
-            Ok(Transition::Log(
-                "Sync complete. Your notes are up to date.".to_owned(),
-            ))
-        }
-    }
+#[allow(dead_code)]
+fn handle_task(_task: Task) -> Result<Transition> {
+    Ok(Transition::Log("background tasks disabled".to_owned()))
 }

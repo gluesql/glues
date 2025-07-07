@@ -2,7 +2,7 @@ use {
     crate::logger::*,
     gluesql::{
         core::ast_builder::{Execute, col, table, text},
-        prelude::{CsvStorage, Glue},
+        prelude::{Glue, MemoryStorage /*CsvStorage*/},
     },
     home::home_dir,
     std::ops::Deref,
@@ -19,11 +19,12 @@ pub const LAST_MONGO_DB_NAME: &str = "last_mongo_db_name";
 
 const PATH: &str = ".glues/";
 
-pub fn get_glue() -> Glue<CsvStorage> {
+pub fn get_glue() -> Glue<MemoryStorage> {
     let path = home_dir()
         .unwrap_or(std::env::current_dir().expect("failed to get current directory"))
         .join(PATH);
-    let storage = CsvStorage::new(path).unwrap();
+    let _storage_path = path; // path kept for future use
+    let storage = MemoryStorage::default();
 
     Glue::new(storage)
 }

@@ -52,6 +52,26 @@ Glues offers various storage options to suit your needs:
   - These formats store notes as simple log files, ideal for quick data exports or reading logs.
   - CSV saves data in comma-separated format, while JSON uses JSONL (JSON Lines) format.
 
+### Browser Demo
+
+Glues ships with a small example that runs in the browser using [Ratzilla](https://github.com/orhun/ratzilla).
+An `index.html` file is included under `tui/` which loads the `glues-web` binary via [trunk](https://trunkrs.dev).
+To try it out install trunk and add the WebAssembly target:
+
+```bash
+cargo install --locked trunk
+rustup target add wasm32-unknown-unknown
+```
+
+From the `tui` directory run:
+
+```bash
+cd tui
+trunk serve --open
+```
+
+This builds the WASM bundle and serves `tui/index.html` at `http://localhost:8080` so you can see Glues running in your browser.
+
 ### Theme Presets
 
 Glues includes several built-in color schemes. The application starts with the
