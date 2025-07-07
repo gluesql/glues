@@ -67,7 +67,7 @@ From the `tui` directory run:
 
 ```bash
 cd tui
-trunk serve --open
+trunk serve --open --no-default-features --features web
 ```
 
 This builds the WASM bundle and serves `tui/index.html` at `http://localhost:8080` so you can see Glues running in your browser.
