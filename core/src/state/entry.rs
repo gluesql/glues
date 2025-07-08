@@ -23,44 +23,11 @@ impl EntryState {
                 glues.state = NotebookState::new(glues).await?.into();
                 Ok(EntryTransition::OpenNotebook)
             }
-            Entry(OpenCsv(path)) => {
-                glues.db = Db::csv(glues.task_tx.clone(), &path).await.map(Some)?;
-                glues.state = NotebookState::new(glues).await?.into();
-
-                Ok(EntryTransition::OpenNotebook)
-            }
-            Entry(OpenJson(path)) => {
-                glues.db = Db::json(glues.task_tx.clone(), &path).await.map(Some)?;
-                glues.state = NotebookState::new(glues).await?.into();
-
-                Ok(EntryTransition::OpenNotebook)
-            }
-            Entry(OpenFile(path)) => {
-                glues.db = Db::file(glues.task_tx.clone(), &path).await.map(Some)?;
-                glues.state = NotebookState::new(glues).await?.into();
-
-                Ok(EntryTransition::OpenNotebook)
-            }
-            Entry(OpenGit {
-                path,
-                remote,
-                branch,
-            }) => {
-                glues.db = Db::git(glues.task_tx.clone(), &path, remote, branch)
-                    .await
-                    .map(Some)?;
-                glues.state = NotebookState::new(glues).await?.into();
-
-                Ok(EntryTransition::OpenNotebook)
-            }
-            Entry(OpenMongo { conn_str, db_name }) => {
-                glues.db = Db::mongo(glues.task_tx.clone(), &conn_str, &db_name)
-                    .await
-                    .map(Some)?;
-                glues.state = NotebookState::new(glues).await?.into();
-
-                Ok(EntryTransition::OpenNotebook)
-            }
+            Entry(OpenCsv(_))
+            | Entry(OpenJson(_))
+            | Entry(OpenFile(_))
+            | Entry(OpenGit { .. })
+            | Entry(OpenMongo { .. }) => Err(Error::Todo("storage disabled".to_owned())),
             Key(_) => Ok(EntryTransition::Inedible(event)),
             Cancel => Ok(EntryTransition::None),
             _ => Err(Error::Todo("EntryState::consume".to_owned())),

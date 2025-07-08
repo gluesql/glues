@@ -13,17 +13,18 @@ repository = "https://github.com/gluesql/glues"
 [workspace.dependencies]
 glues-core = { path = "./core", version = "0.7.0" }
 async-recursion = "1.1.1"
+ratzilla = "0.1.0"
 
 [workspace.dependencies.gluesql]
 version = "0.17.0"
 default-features = false
 features = [
     "gluesql_memory_storage",
-    "gluesql-csv-storage",
-    "gluesql-json-storage",
-    "gluesql-file-storage",
-    "gluesql-git-storage",
-    "gluesql-mongo-storage",
+    # "gluesql-csv-storage",
+    # "gluesql-json-storage",
+    # "gluesql-file-storage",
+    # "gluesql-git-storage",
+    # "gluesql-mongo-storage",
 ]
 
 [profile.release]
