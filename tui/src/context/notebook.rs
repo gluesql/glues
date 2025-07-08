@@ -189,7 +189,7 @@ impl NotebookContext {
             .selected()
             .and_then(|i| self.tree_items.get(i))
             .map(|item| item.id());
-        let is_move_mode = matches!(self.state, ContextState::MoveMode { .. });
+        let is_move_mode = matches!(self.state, ContextState::MoveMode);
         let selectable = !is_move_mode || (selectable && Some(&directory_item.directory.id) != id);
 
         let mut items = vec![TreeItem {

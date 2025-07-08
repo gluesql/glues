@@ -40,7 +40,7 @@ async fn proxy_backend_operations() {
         }
     });
 
-    let mut client = ProxyClient::connect(format!("http://{}", addr))
+    let mut client = ProxyClient::connect(format!("http://{addr}"))
         .await
         .unwrap();
 

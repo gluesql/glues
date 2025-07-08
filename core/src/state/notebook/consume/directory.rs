@@ -203,8 +203,7 @@ pub async fn add<B: CoreBackend + ?Sized>(
         .root
         .find_mut(&parent_id)
         .ok_or(Error::NotFound(format!(
-            "[directory::add] parent directory not found: {}",
-            parent_id
+            "[directory::add] parent directory not found: {parent_id}"
         )))?;
 
     if let DirectoryItem {

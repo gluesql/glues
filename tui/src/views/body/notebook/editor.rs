@@ -114,12 +114,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
             .right_aligned(),
         ),
         (Some((log, _)), false) => block.title_bottom(
-            Line::from(
-                format!(" {} ", log)
-                    .fg(THEME.success_text)
-                    .bg(THEME.success),
-            )
-            .right_aligned(),
+            Line::from(format!(" {log} ").fg(THEME.success_text).bg(THEME.success)).right_aligned(),
         ),
         (None, false) => block,
     }
