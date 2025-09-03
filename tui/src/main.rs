@@ -86,10 +86,13 @@ impl App {
 
     async fn run(mut self, mut terminal: DefaultTerminal) -> Result<()> {
         loop {
-            if let Some((_, created_at)) = self.context.last_log {
-                if created_at.elapsed().log_unwrap().as_secs() > 5 {
-                    self.context.last_log = None;
-                }
+            if self
+                .context
+                .last_log
+                .as_ref()
+                .is_some_and(|(_, created_at)| created_at.elapsed().log_unwrap().as_secs() > 5)
+            {
+                self.context.last_log = None;
             }
 
             terminal.draw(|frame| self.draw(frame))?;

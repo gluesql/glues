@@ -83,7 +83,7 @@ impl DirectoryItem {
         Some(&directory_item.directory)
     }
 
-    pub(crate) fn tree_items(&self, depth: usize) -> Vec<TreeItem> {
+    pub(crate) fn tree_items(&self, depth: usize) -> Vec<TreeItem<'_>> {
         let mut items = vec![TreeItem {
             id: &self.directory.id,
             name: &self.directory.name,
