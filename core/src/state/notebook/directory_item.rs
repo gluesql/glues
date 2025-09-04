@@ -25,8 +25,7 @@ impl DirectoryItem {
             .as_ref()?
             .directories
             .iter()
-            .filter_map(|item| item.find(id))
-            .next()
+            .find_map(|item| item.find(id))
     }
 
     pub fn find_mut(&mut self, id: &DirectoryId) -> Option<&mut DirectoryItem> {
@@ -38,8 +37,7 @@ impl DirectoryItem {
             .as_mut()?
             .directories
             .iter_mut()
-            .filter_map(|item| item.find_mut(id))
-            .next()
+            .find_map(|item| item.find_mut(id))
     }
 
     pub fn rename_directory(&mut self, target: &Directory) -> Option<()> {
