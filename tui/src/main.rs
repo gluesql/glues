@@ -66,7 +66,7 @@ async fn main() -> Result<()> {
     log!("Hello");
 
     let terminal = ratatui::init();
-    let app_result = App::new().await.run(terminal).await;
+    let app_result = App::new().run(terminal).await;
     ratatui::restore();
     app_result
 }
@@ -77,8 +77,8 @@ struct App {
 }
 
 impl App {
-    async fn new() -> Self {
-        let glues = Glues::new().await;
+    fn new() -> Self {
+        let glues = Glues::new();
         let context = Context::default();
 
         Self { glues, context }

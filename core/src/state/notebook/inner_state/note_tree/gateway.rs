@@ -5,7 +5,7 @@ use crate::{
     types::{KeymapGroup, KeymapItem},
 };
 
-pub async fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransition> {
+pub fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransition> {
     use Event::*;
 
     match event {

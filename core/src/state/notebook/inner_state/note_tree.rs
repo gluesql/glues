@@ -35,8 +35,8 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         DirectorySelected => directory_selected::consume(db, state, event).await,
         NoteMoreActions => note_more_actions::consume(db, state, event).await,
         DirectoryMoreActions => directory_more_actions::consume(db, state, event).await,
-        Numbering(n) => numbering::consume(state, n, event).await,
-        GatewayMode => gateway::consume(state, event).await,
+        Numbering(n) => numbering::consume(state, n, event),
+        GatewayMode => gateway::consume(state, event),
         MoveMode => move_mode::consume(db, state, event).await,
     }
 }

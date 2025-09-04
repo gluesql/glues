@@ -6,7 +6,7 @@ use crate::{
     types::{KeymapGroup, KeymapItem},
 };
 
-pub async fn consume<B: CoreBackend + ?Sized>(
+pub fn consume<B: CoreBackend + ?Sized>(
     _db: &mut B,
     state: &mut NotebookState,
     event: Event,

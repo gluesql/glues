@@ -6,7 +6,7 @@ use crate::{
     types::{KeymapGroup, KeymapItem},
 };
 
-pub async fn consume<B: CoreBackend + ?Sized>(
+pub fn consume<B: CoreBackend + ?Sized>(
     db: &mut B,
     state: &mut NotebookState,
     n: usize,
@@ -76,7 +76,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
-            super::idle::consume(db, state, event).await
+            super::idle::consume(db, state, event)
         }
         _ => Err(Error::Todo(
             "Notebook::EditingVisualMode::Numbering::consume".to_owned(),

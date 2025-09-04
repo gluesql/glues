@@ -115,7 +115,7 @@ impl Db {
         })
     }
 
-    pub async fn pull(&mut self) -> Result<()> {
+    pub fn pull(&mut self) -> Result<()> {
         if let Storage::Git(glue) = &mut self.storage {
             glue.storage.pull()?;
         }
