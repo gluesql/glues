@@ -176,7 +176,7 @@ pub async fn open<B: CoreBackend + ?Sized>(
     }))
 }
 
-pub async fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
+pub fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
     let note = state.get_editing()?.clone();
 
     state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);

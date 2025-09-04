@@ -38,10 +38,8 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         EditingNormalMode(vim_state) => {
             editing_normal_mode::consume(db, state, *vim_state, event).await
         }
-        EditingVisualMode(vim_state) => {
-            editing_visual_mode::consume(db, state, *vim_state, event).await
-        }
-        EditingInsertMode => editing_insert_mode::consume(db, state, event).await,
+        EditingVisualMode(vim_state) => editing_visual_mode::consume(db, state, *vim_state, event),
+        EditingInsertMode => editing_insert_mode::consume(db, state, event),
     }
 }
 

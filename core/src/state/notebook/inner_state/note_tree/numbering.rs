@@ -8,11 +8,7 @@ use {
     },
 };
 
-pub async fn consume(
-    state: &mut NotebookState,
-    n: usize,
-    event: Event,
-) -> Result<NotebookTransition> {
+pub fn consume(state: &mut NotebookState, n: usize, event: Event) -> Result<NotebookTransition> {
     use Event::*;
     use NotebookEvent::*;
 

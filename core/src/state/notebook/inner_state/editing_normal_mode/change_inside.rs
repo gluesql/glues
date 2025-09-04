@@ -5,11 +5,7 @@ use crate::{
     types::{KeymapGroup, KeymapItem},
 };
 
-pub async fn consume(
-    state: &mut NotebookState,
-    n: usize,
-    event: Event,
-) -> Result<NotebookTransition> {
+pub fn consume(state: &mut NotebookState, n: usize, event: Event) -> Result<NotebookTransition> {
     use Event::*;
     use NormalModeTransition::*;
 
@@ -22,7 +18,7 @@ pub async fn consume(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
 
-            super::idle::consume(state, event).await
+            super::idle::consume(state, event)
         }
         _ => Err(Error::Todo(
             "Notebook::EditingNormalMode::ChangeInside::consume".to_owned(),

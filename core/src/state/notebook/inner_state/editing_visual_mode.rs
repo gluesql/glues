@@ -17,16 +17,16 @@ pub enum VimVisualState {
     Numbering(usize),
 }
 
-pub async fn consume<B: CoreBackend + ?Sized>(
+pub fn consume<B: CoreBackend + ?Sized>(
     db: &mut B,
     state: &mut NotebookState,
     vim_state: VimVisualState,
     event: Event,
 ) -> Result<NotebookTransition> {
     match vim_state {
-        VimVisualState::Idle => idle::consume(db, state, event).await,
-        VimVisualState::Gateway => gateway::consume(db, state, event).await,
-        VimVisualState::Numbering(n) => numbering::consume(db, state, n, event).await,
+        VimVisualState::Idle => idle::consume(db, state, event),
+        VimVisualState::Gateway => gateway::consume(db, state, event),
+        VimVisualState::Numbering(n) => numbering::consume(db, state, n, event),
     }
 }
 

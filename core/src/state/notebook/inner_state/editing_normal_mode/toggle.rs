@@ -39,7 +39,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         event @ Key(_) => {
             state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
 
-            super::idle::consume(state, event).await
+            super::idle::consume(state, event)
         }
         _ => Err(Error::Todo(
             "Notebook::EditingNormalMode::Toggle::consume".to_owned(),

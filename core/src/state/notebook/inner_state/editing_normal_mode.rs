@@ -46,20 +46,20 @@ pub async fn consume<B: CoreBackend + ?Sized>(
     event: Event,
 ) -> Result<NotebookTransition> {
     match vim_state {
-        VimNormalState::Idle => idle::consume(state, event).await,
+        VimNormalState::Idle => idle::consume(state, event),
         VimNormalState::Toggle => toggle::consume(db, state, event).await,
-        VimNormalState::ToggleTabClose => toggle_tab_close::consume(state, event).await,
-        VimNormalState::Numbering(n) => numbering::consume(state, n, event).await,
-        VimNormalState::Gateway => gateway::consume(state, event).await,
-        VimNormalState::Yank(n) => yank::consume(state, n, event).await,
-        VimNormalState::Yank2(n1, n2) => yank2::consume(state, n1, n2, event).await,
-        VimNormalState::Delete(n) => delete::consume(state, n, event).await,
-        VimNormalState::Delete2(n1, n2) => delete2::consume(state, n1, n2, event).await,
-        VimNormalState::DeleteInside(n) => delete_inside::consume(state, n, event).await,
-        VimNormalState::Change(n) => change::consume(state, n, event).await,
-        VimNormalState::Change2(n1, n2) => change2::consume(state, n1, n2, event).await,
-        VimNormalState::ChangeInside(n) => change_inside::consume(state, n, event).await,
-        VimNormalState::Scroll => scroll::consume(state, event).await,
+        VimNormalState::ToggleTabClose => toggle_tab_close::consume(state, event),
+        VimNormalState::Numbering(n) => numbering::consume(state, n, event),
+        VimNormalState::Gateway => gateway::consume(state, event),
+        VimNormalState::Yank(n) => yank::consume(state, n, event),
+        VimNormalState::Yank2(n1, n2) => yank2::consume(state, n1, n2, event),
+        VimNormalState::Delete(n) => delete::consume(state, n, event),
+        VimNormalState::Delete2(n1, n2) => delete2::consume(state, n1, n2, event),
+        VimNormalState::DeleteInside(n) => delete_inside::consume(state, n, event),
+        VimNormalState::Change(n) => change::consume(state, n, event),
+        VimNormalState::Change2(n1, n2) => change2::consume(state, n1, n2, event),
+        VimNormalState::ChangeInside(n) => change_inside::consume(state, n, event),
+        VimNormalState::Scroll => scroll::consume(state, event),
     }
 }
 

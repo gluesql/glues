@@ -24,8 +24,14 @@ pub struct Glues {
     pub transition_queue: Arc<Mutex<VecDeque<Transition>>>,
 }
 
+impl Default for Glues {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Glues {
-    pub async fn new() -> Self {
+    pub fn new() -> Self {
         let transition_queue = Arc::new(Mutex::new(VecDeque::new()));
         let (task_tx, task_rx) = channel();
         let task_handle = handle_tasks(task_rx, &transition_queue);

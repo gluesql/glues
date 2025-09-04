@@ -5,7 +5,7 @@ use crate::{
     types::{KeymapGroup, KeymapItem},
 };
 
-pub async fn consume<B: CoreBackend + ?Sized>(
+pub fn consume<B: CoreBackend + ?Sized>(
     _db: &mut B,
     state: &mut NotebookState,
     event: Event,
@@ -14,7 +14,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
     use NotebookEvent::*;
 
     match event {
-        Key(KeyEvent::Esc) | Notebook(ViewNote) => note::view(state).await,
+        Key(KeyEvent::Esc) | Notebook(ViewNote) => note::view(state),
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Todo(
             "Notebook::EditingInsertMode::consume".to_owned(),
