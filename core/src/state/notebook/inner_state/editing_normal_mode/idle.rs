@@ -13,8 +13,8 @@ pub fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransi
     use NotebookEvent as NE;
 
     match event {
-        Notebook(NE::SelectNote(note)) => note::select(state, note),
-        Notebook(NE::SelectDirectory(directory)) => directory::select(state, directory),
+        Notebook(NE::SelectNote(note)) => Ok(note::select(state, note)),
+        Notebook(NE::SelectDirectory(directory)) => Ok(directory::select(state, directory)),
         Key(KeyEvent::Tab) => {
             state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 

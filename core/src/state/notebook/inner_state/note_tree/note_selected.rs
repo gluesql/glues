@@ -55,7 +55,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         Key(KeyEvent::M) => {
             let note = state.get_selected_note()?.clone();
 
-            note::show_actions_dialog(state, note)
+            Ok(note::show_actions_dialog(state, note))
         }
         Key(KeyEvent::Space) => {
             state.inner_state = InnerState::NoteTree(NoteTreeState::MoveMode);
@@ -64,8 +64,8 @@ pub async fn consume<B: CoreBackend + ?Sized>(
                 MoveModeTransition::Enter,
             )))
         }
-        Notebook(SelectNote(note)) => note::select(state, note),
-        Notebook(SelectDirectory(directory)) => directory::select(state, directory),
+        Notebook(SelectNote(note)) => Ok(note::select(state, note)),
+        Notebook(SelectDirectory(directory)) => Ok(directory::select(state, directory)),
         Key(KeyEvent::L | KeyEvent::Enter) | Notebook(OpenNote) => {
             let note = state.get_selected_note()?.clone();
 

@@ -100,23 +100,18 @@ pub fn close(state: &mut NotebookState, directory: Directory) -> Result<Notebook
     ))
 }
 
-pub fn show_actions_dialog(
-    state: &mut NotebookState,
-    directory: Directory,
-) -> Result<NotebookTransition> {
+pub fn show_actions_dialog(state: &mut NotebookState, directory: Directory) -> NotebookTransition {
     state.selected = SelectedItem::Directory(directory.clone());
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectoryMoreActions);
 
-    Ok(NotebookTransition::NoteTree(
-        NoteTreeTransition::ShowDirectoryActionsDialog(directory),
-    ))
+    NotebookTransition::NoteTree(NoteTreeTransition::ShowDirectoryActionsDialog(directory))
 }
 
-pub fn select(state: &mut NotebookState, directory: Directory) -> Result<NotebookTransition> {
+pub fn select(state: &mut NotebookState, directory: Directory) -> NotebookTransition {
     state.selected = SelectedItem::Directory(directory);
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
-    Ok(NotebookTransition::None)
+    NotebookTransition::None
 }
 
 pub async fn rename<B: CoreBackend + ?Sized>(

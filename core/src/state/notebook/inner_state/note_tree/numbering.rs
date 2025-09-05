@@ -25,8 +25,8 @@ pub fn consume(state: &mut NotebookState, n: usize, event: Event) -> Result<Note
     };
 
     match event {
-        Notebook(SelectNote(note)) => note::select(state, note),
-        Notebook(SelectDirectory(directory)) => directory::select(state, directory),
+        Notebook(SelectNote(note)) => Ok(note::select(state, note)),
+        Notebook(SelectDirectory(directory)) => Ok(directory::select(state, directory)),
         Key(KeyEvent::Num(n2)) => {
             let step = n2 + n.saturating_mul(10);
             state.inner_state = InnerState::NoteTree(NoteTreeState::Numbering(step));
