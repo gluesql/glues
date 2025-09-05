@@ -19,7 +19,7 @@ pub(super) async fn update_breadcrumbs<B: CoreBackend + ?Sized>(
 
     let tree_items = state.root.tree_items(0);
 
-    for tab in state.tabs.iter_mut() {
+    for tab in &mut state.tabs {
         let (i, mut depth) = tree_items
             .iter()
             .enumerate()
