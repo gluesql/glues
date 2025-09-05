@@ -24,7 +24,9 @@ impl ProxyClient {
         let root_id = match resp {
             ProxyResponse::Ok(ResultPayload::Id(id)) => id,
             ProxyResponse::Err(e) => return Err(Error::Proxy(e)),
-            _ => return Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => {
+                return Err(Error::InvalidResponse("invalid response".to_owned()));
+            }
         };
 
         Ok(Self {
@@ -54,7 +56,7 @@ impl CoreBackend for ProxyClient {
         {
             ProxyResponse::Ok(ResultPayload::Directory(dir)) => Ok(dir),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -65,7 +67,7 @@ impl CoreBackend for ProxyClient {
         {
             ProxyResponse::Ok(ResultPayload::Directories(dirs)) => Ok(dirs),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -76,7 +78,7 @@ impl CoreBackend for ProxyClient {
         {
             ProxyResponse::Ok(ResultPayload::Directory(dir)) => Ok(dir),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -87,7 +89,7 @@ impl CoreBackend for ProxyClient {
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -105,7 +107,7 @@ impl CoreBackend for ProxyClient {
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -116,7 +118,7 @@ impl CoreBackend for ProxyClient {
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -124,7 +126,7 @@ impl CoreBackend for ProxyClient {
         match self.rpc(ProxyRequest::FetchNotes { directory_id }).await? {
             ProxyResponse::Ok(ResultPayload::Notes(notes)) => Ok(notes),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -132,7 +134,7 @@ impl CoreBackend for ProxyClient {
         match self.rpc(ProxyRequest::FetchNoteContent { note_id }).await? {
             ProxyResponse::Ok(ResultPayload::Text(text)) => Ok(text),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -143,7 +145,7 @@ impl CoreBackend for ProxyClient {
         {
             ProxyResponse::Ok(ResultPayload::Note(note)) => Ok(note),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -151,7 +153,7 @@ impl CoreBackend for ProxyClient {
         match self.rpc(ProxyRequest::RemoveNote { note_id }).await? {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -159,7 +161,7 @@ impl CoreBackend for ProxyClient {
         match self.rpc(ProxyRequest::RenameNote { note_id, name }).await? {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -170,7 +172,7 @@ impl CoreBackend for ProxyClient {
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -184,7 +186,7 @@ impl CoreBackend for ProxyClient {
         {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 
@@ -192,7 +194,7 @@ impl CoreBackend for ProxyClient {
         match self.rpc(ProxyRequest::Log { category, message }).await? {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
-            _ => Err(Error::InvalidResponse("invalid response".to_owned())),
+            ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
         }
     }
 }
