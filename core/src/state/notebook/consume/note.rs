@@ -46,7 +46,7 @@ pub async fn rename<B: CoreBackend + ?Sized>(
     ))?;
 
     for tab in state.tabs.iter_mut().filter(|tab| tab.note.id == note.id) {
-        tab.note.name = note.name.clone();
+        tab.note.name.clone_from(&note.name);
     }
 
     state.selected = SelectedItem::Note(note.clone());
@@ -162,7 +162,7 @@ pub async fn open<B: CoreBackend + ?Sized>(
         };
         state.tabs.push(tab.clone());
         state.tab_index = Some(state.tabs.len() - 1);
-    };
+    }
 
     state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
 
@@ -203,11 +203,11 @@ pub async fn move_note<B: CoreBackend + ?Sized>(
     directory_id: DirectoryId,
 ) -> Result<NotebookTransition> {
     let mut note = state.get_selected_note()?.clone();
-    note.directory_id = directory_id.clone();
+    note.directory_id.clone_from(&directory_id);
 
     state.tabs.iter_mut().for_each(|tab| {
         if tab.note.id == note.id {
-            tab.note.directory_id = directory_id.clone();
+            tab.note.directory_id.clone_from(&directory_id);
         }
     });
 
