@@ -17,7 +17,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         Notebook(CloseNoteActionsDialog) => {
             let note = state.get_selected_note()?.clone();
 
-            note::select(state, note)
+            Ok(note::select(state, note))
         }
         Notebook(RenameNote(new_name)) => {
             let note = state.get_selected_note()?.clone();
@@ -32,7 +32,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         Cancel => {
             let note = state.get_selected_note()?.clone();
 
-            note::select(state, note.clone())
+            Ok(note::select(state, note.clone()))
         }
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Todo(

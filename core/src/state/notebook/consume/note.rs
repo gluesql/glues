@@ -14,19 +14,17 @@ use {
     std::cmp::min,
 };
 
-pub fn show_actions_dialog(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
+pub fn show_actions_dialog(state: &mut NotebookState, note: Note) -> NotebookTransition {
     state.inner_state = InnerState::NoteTree(NoteTreeState::NoteMoreActions);
 
-    Ok(NotebookTransition::NoteTree(
-        NoteTreeTransition::ShowNoteActionsDialog(note),
-    ))
+    NotebookTransition::NoteTree(NoteTreeTransition::ShowNoteActionsDialog(note))
 }
 
-pub fn select(state: &mut NotebookState, note: Note) -> Result<NotebookTransition> {
+pub fn select(state: &mut NotebookState, note: Note) -> NotebookTransition {
     state.selected = SelectedItem::Note(note);
     state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 
-    Ok(NotebookTransition::None)
+    NotebookTransition::None
 }
 
 pub async fn rename<B: CoreBackend + ?Sized>(

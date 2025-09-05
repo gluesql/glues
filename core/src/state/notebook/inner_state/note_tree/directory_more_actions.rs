@@ -17,7 +17,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         Notebook(CloseDirectoryActionsDialog) => {
             let directory = state.get_selected_directory()?.clone();
 
-            directory::select(state, directory)
+            Ok(directory::select(state, directory))
         }
         Notebook(RenameDirectory(new_name)) => {
             let directory = state.get_selected_directory()?.clone();
@@ -42,7 +42,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         Cancel => {
             let directory = state.get_selected_directory()?.clone();
 
-            directory::select(state, directory)
+            Ok(directory::select(state, directory))
         }
         event @ Key(_) => Ok(NotebookTransition::Inedible(event)),
         _ => Err(Error::Todo(
