@@ -43,7 +43,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
 
             directory::close(state, directory)
         }
-        Key(KeyEvent::H) | Key(KeyEvent::Left) => {
+        Key(KeyEvent::H | KeyEvent::Left) => {
             let directory = state.get_selected_directory()?;
             if state.root.directory.id == directory.id {
                 return Ok(NotebookTransition::None);

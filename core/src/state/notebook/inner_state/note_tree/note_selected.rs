@@ -31,7 +31,7 @@ pub async fn consume<B: CoreBackend + ?Sized>(
 
             directory::close(state, directory)
         }
-        Key(KeyEvent::H) | Key(KeyEvent::Left) => {
+        Key(KeyEvent::H | KeyEvent::Left) => {
             let directory_id = &state.get_selected_note()?.directory_id;
             let directory_item = state.root.find(directory_id).ok_or(Error::NotFound(
                 "[Key::H] failed to find parent directory".to_owned(),
