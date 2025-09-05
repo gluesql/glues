@@ -68,7 +68,7 @@ pub fn draw(frame: &mut Frame, keymap: &[KeymapGroup]) {
     let row_areas = Layout::vertical(row_constraints).split(inner_area);
 
     frame.render_widget(Clear, area);
-    frame.render_widget(block.clone(), area);
+    frame.render_widget(block, area);
 
     for (row_area, row) in row_areas.iter().zip(rows) {
         match row {
