@@ -21,7 +21,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     let (title, mut bottom_left) = if let Some(tab_index) = context.notebook.tab_index {
         let mut title = vec![];
         for (i, tab) in context.notebook.tabs.iter().enumerate() {
-            let name = format!(" {NOTE_SYMBOL}{} ", tab.note.name.clone());
+            let name = format!(" {NOTE_SYMBOL}{} ", tab.note.name);
             let name = if i == tab_index {
                 if context.notebook.state.is_editor() {
                     name.fg(THEME.accent_text).bg(THEME.accent)
