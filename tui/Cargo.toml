@@ -24,3 +24,8 @@ arboard = "3.4.1"
 textwrap = "0.16"
 clap = { version = "4.5.4", features = ["derive"] }
 once_cell = "1.19"
+
+[dev-dependencies]
+assert_cmd = "2"
+expectrl = "0.7"
+insta = { version = "1", features = ["glob"] }
