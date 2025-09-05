@@ -360,7 +360,7 @@ impl NotebookContext {
             return;
         }
 
-        if let Some(yank) = self.yank.clone() {
+        if let Some(yank) = self.yank.as_ref().cloned() {
             self.get_editor_mut().set_yank_text(yank);
         }
     }
