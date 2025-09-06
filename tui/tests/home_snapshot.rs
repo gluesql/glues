@@ -2,6 +2,7 @@ use assert_cmd::cargo::cargo_bin;
 use color_eyre::Result;
 use expectrl::{Eof, Regex, session::Session};
 use insta::assert_debug_snapshot;
+use nix::sys::signal::Signal;
 use std::{process::Command, thread::sleep, time::Duration};
 use vt100::Parser;
 
@@ -12,6 +13,8 @@ fn home_screen_snapshot() -> Result<()> {
     let mut pty = Session::spawn(cmd)?;
     // ensure terminal has 120×40 size for predictable snapshots
     pty.get_process_mut().set_window_size(120, 40)?;
+    // redraw after resizing so the initial frame uses the new dimensions
+    pty.get_process_mut().signal(Signal::SIGWINCH)?;
 
     let first = pty.expect(Regex("Show keymap"))?;
     let mut output = first.as_bytes().to_vec();
@@ -50,6 +53,8 @@ fn instant_screen_snapshot() -> Result<()> {
     let mut pty = Session::spawn(cmd)?;
     // ensure terminal has 120×40 size for predictable snapshots
     pty.get_process_mut().set_window_size(120, 40)?;
+    // redraw after resizing so the notebook view fits the configured size
+    pty.get_process_mut().signal(Signal::SIGWINCH)?;
 
     // capture the initial home screen
     let menu = pty.expect(Regex("\\[q\\] Quit"))?;

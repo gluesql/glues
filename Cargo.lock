@@ -1292,6 +1292,7 @@ dependencies = [
  "gluesql",
  "home",
  "insta",
+ "nix",
  "once_cell",
  "ratatui",
  "textwrap",
