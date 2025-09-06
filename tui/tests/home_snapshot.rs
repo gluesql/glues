@@ -16,7 +16,15 @@ fn home_screen_snapshot() -> Result<()> {
     // redraw after resizing so the initial frame uses the new dimensions
     pty.get_process_mut().signal(Signal::SIGWINCH)?;
 
-    let first = pty.expect(Regex("Show keymap"))?;
+    let first = loop {
+        match pty.expect(Regex("Show keymap")) {
+            Ok(m) => break m,
+            Err(Error::Eof) => {
+                sleep(Duration::from_millis(10));
+            }
+            Err(e) => return Err(e.into()),
+        }
+    };
     let mut output = first.as_bytes().to_vec();
 
     // wait for the quit hint and capture the rest of the screen
