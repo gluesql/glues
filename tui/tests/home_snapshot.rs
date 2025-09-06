@@ -9,9 +9,10 @@ fn home_screen_snapshot() -> Result<()> {
     let bin = cargo_bin("glues");
     let cmd = Command::new(bin);
     let mut pty = Session::spawn(cmd)?;
+    pty.get_process_mut().set_window_size(80, 24)?;
 
     let found = pty.expect(Regex("Show keymap"))?;
-    let screen = String::from_utf8_lossy(found.before()).to_string();
+    let screen = String::from_utf8_lossy(found.as_bytes()).to_string();
     assert_snapshot!("home_screen", screen);
 
     pty.send("q")?;
