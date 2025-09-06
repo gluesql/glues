@@ -2,7 +2,7 @@ use assert_cmd::cargo::cargo_bin;
 use color_eyre::Result;
 use expectrl::{Eof, Regex, session::Session};
 use insta::assert_debug_snapshot;
-use std::{io::Read, process::Command};
+use std::process::Command;
 use vt100::Parser;
 
 #[test]
@@ -19,15 +19,23 @@ fn home_screen_snapshot() -> Result<()> {
     // wait for the quit hint and capture the rest of the screen
     let menu = pty.expect(Regex("\\[q\\] Quit"))?;
     output.extend_from_slice(menu.as_bytes());
-    let mut tail = [0u8; 1024];
-    let n = pty.read(&mut tail)?;
-    output.extend_from_slice(&tail[..n]);
+    // read any remaining bytes in the PTY buffer without blocking
+    let mut buf = [0u8; 8192];
+    while let Ok(n) = pty.try_read(&mut buf) {
+        if n == 0 {
+            break;
+        }
+        output.extend_from_slice(&buf[..n]);
+    }
 
-    let mut parser = Parser::new(40, 120, 0);
+    let mut parser = Parser::new(40, 120, 40);
     parser.process(&output);
     let screen = parser.screen();
-    let width = screen.size().1;
-    let snapshot = screen.rows(0, width).collect::<Vec<String>>();
+    let (height, width) = screen.size();
+    let snapshot = screen
+        .rows(0, width)
+        .take(height as usize)
+        .collect::<Vec<String>>();
     assert_debug_snapshot!("home_screen", snapshot);
 
     pty.send("q")?;
