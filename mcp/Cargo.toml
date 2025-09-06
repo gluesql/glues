@@ -1,0 +1,18 @@
+[package]
+name = "mcp"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Minimal MCP server for Glues"
+
+[dependencies]
+glues-core.workspace = true
+tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread", "signal"] }
+serde_json = "1.0"
+clap = { version = "4.5.4", features = ["derive"] }
+color-eyre = "0.6.3"
+serde = { version = "1.0", features = ["derive"] }
+rust-mcp-sdk = { version = "0.4.2", default-features = false, features = ["server", "macros", "hyper-server", "2025_03_26"] }
+async-trait = "0.1"
