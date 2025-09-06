@@ -22,6 +22,8 @@ fn home_screen_snapshot() -> Result<()> {
     // wait for the quit hint and capture the rest of the screen
     let menu = pty.expect(Regex("\\[q\\] Quit"))?;
     output.extend_from_slice(menu.as_bytes());
+    // allow remaining bytes to arrive before draining
+    sleep(Duration::from_millis(50));
     // read any remaining bytes in the PTY buffer without blocking
     let mut buf = [0u8; 8192];
     while let Ok(n) = pty.try_read(&mut buf) {
