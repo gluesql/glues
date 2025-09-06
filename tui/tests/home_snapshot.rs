@@ -10,7 +10,7 @@ fn home_screen_snapshot() -> Result<()> {
     let bin = cargo_bin("glues");
     let cmd = Command::new(bin);
     let mut pty = Session::spawn(cmd)?;
-    // ensure terminal has 120x40 size for predictable snapshots
+    // ensure terminal has 120×40 size for predictable snapshots
     pty.get_process_mut().set_window_size(120, 40)?;
 
     let first = pty.expect(Regex("Show keymap"))?;
@@ -25,8 +25,10 @@ fn home_screen_snapshot() -> Result<()> {
 
     let mut parser = Parser::new(40, 120, 0);
     parser.process(&output);
-    let screen = parser.screen().rows(0, 40).collect::<Vec<String>>();
-    assert_debug_snapshot!("home_screen", screen);
+    let screen = parser.screen();
+    let width = screen.size().1;
+    let snapshot = screen.rows(0, width).collect::<Vec<String>>();
+    assert_debug_snapshot!("home_screen", snapshot);
 
     pty.send("q")?;
     pty.expect(Eof)?;
