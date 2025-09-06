@@ -3,4 +3,29 @@ source: tui/tests/home_snapshot.rs
 expression: screen
 snapshot_kind: text
 ---
-[?1049h[1;1H[38;5;240;48;5;253m Glues - TUI note-taking app offering complete data control an[38;5;77;48;5;253m[38;5;0;48;5;77m [?] Show keymap
+[
+    " Glues - TUI note-taking app offering complete data control an\u{e0be} [?] Show keymap",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+]
