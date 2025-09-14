@@ -1,6 +1,7 @@
 ---
-source: tui/tests/home_snapshot.rs
-expression: snapshot
+source: tui/tests/flow_inproc.rs
+assertion_line: 29
+expression: buffer_to_lines(&term)
 snapshot_kind: text
 ---
 [
