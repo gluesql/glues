@@ -1,3 +1,5 @@
+#![cfg(feature = "test-utils")]
+
 use color_eyre::Result;
 use insta::assert_debug_snapshot;
 use ratatui::{

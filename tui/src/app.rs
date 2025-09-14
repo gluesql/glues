@@ -1,7 +1,7 @@
 use {
     crate::{context::Context, logger::*, views},
     glues_core::Glues,
-    ratatui::{DefaultTerminal, Frame, Terminal, backend::Backend},
+    ratatui::{DefaultTerminal, Frame},
     std::time::Duration,
 };
 
@@ -108,15 +108,17 @@ impl App {
     }
 
     // Test helper: render one frame on any ratatui Terminal
-    pub fn draw_once_on<B: Backend>(
+    #[cfg(feature = "test-utils")]
+    pub fn draw_once_on<B: ratatui::backend::Backend>(
         &mut self,
-        terminal: &mut Terminal<B>,
+        terminal: &mut ratatui::Terminal<B>,
     ) -> color_eyre::Result<()> {
         terminal.draw(|f| self.draw(f))?;
         Ok(())
     }
 
     // Test helper: inject a single input event and return whether it requested quit
+    #[cfg(feature = "test-utils")]
     pub async fn handle_input(&mut self, input: ratatui::crossterm::event::Event) -> bool {
         use ratatui::crossterm::event::{
             Event as Input, KeyCode, KeyEvent as CKeyEvent, KeyEventKind, KeyModifiers,
@@ -149,6 +151,7 @@ impl App {
     }
 
     // Test helper: drain queued transitions (e.g., from background tasks)
+    #[cfg(feature = "test-utils")]
     pub async fn drain_pending_transitions(&mut self) {
         let mut transitions = Vec::new();
         {
@@ -162,6 +165,7 @@ impl App {
         }
     }
 
+    #[cfg(feature = "test-utils")]
     async fn save_immediate(&mut self) {
         self.save().await;
     }
