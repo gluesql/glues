@@ -1,0 +1,48 @@
+---
+source: tui/tests/flow_inproc.rs
+assertion_line: 40
+expression: buffer_to_lines(&term)
+snapshot_kind: text
+---
+[
+    " Directory 'Notes' selected                                                                           \u{e0be} [?] Show keymap ",
+    "[Browser]                                   ▐[Editor]                                                                   ",
+    " \u{f0770} Notes                                    ▐ 1 Welcome to Glues :D                                                     ",
+    "   \u{f11d7} Sample Note                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+    "                                            ▐                                                                           ",
+]

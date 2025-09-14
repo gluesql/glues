@@ -1,0 +1,48 @@
+---
+source: tui/tests/flow_inproc.rs
+assertion_line: 29
+expression: buffer_to_lines(&term)
+snapshot_kind: text
+---
+[
+    " Glues - TUI note-taking app offering complete data control and flexible storage options              \u{e0be} [?] Show keymap ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                           ████   ███                                                                   ",
+    "                                          ██  ██   ██                                                                   ",
+    "                                         ██        ██    ██  ██   ████    █████                                         ",
+    "                                         ██        ██    ██  ██  ██  ██  ██                                             ",
+    "                                         ██  ███   ██    ██  ██  ██████   ████                                          ",
+    "                                          ██  ██   ██    ██  ██  ██          ██                                         ",
+    "                                           █████  ████    ███ ██  ████   █████                                          ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                         ┌─────────────Open Notes─────────────┐                                         ",
+    "                                         │                                    │                                         ",
+    "                                         │   [1] Instant                      │                                         ",
+    "                                         │   [2] Local                        │                                         ",
+    "                                         │   [3] Git                          │                                         ",
+    "                                         │   [4] MongoDB                      │                                         ",
+    "                                         │   [5] CSV                          │                                         ",
+    "                                         │   [6] JSON                         │                                         ",
+    "                                         │   [h] Help                         │                                         ",
+    "                                         │   [q] Quit                         │                                         ",
+    "                                         │                                    │                                         ",
+    "                                         └────────────────────────────────────┘                                         ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+    "                                                                                                                        ",
+]
