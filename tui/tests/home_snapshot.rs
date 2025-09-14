@@ -3,8 +3,36 @@ use color_eyre::Result;
 use expectrl::{Eof, Error, Regex, session::Session};
 use insta::assert_debug_snapshot;
 use nix::sys::signal::Signal;
-use std::{process::Command, thread::sleep, time::Duration};
+use std::{
+    process::Command,
+    thread::sleep,
+    time::{Duration, Instant},
+};
 use vt100::Parser;
+
+fn drain_until_quiet(pty: &mut Session, parser: &mut Parser, quiet_ms: u64, timeout_ms: u64) {
+    let mut buf = [0u8; 8192];
+    let mut last_update = Instant::now();
+    let start = Instant::now();
+    loop {
+        match pty.try_read(&mut buf) {
+            Ok(n) if n > 0 => {
+                parser.process(&buf[..n]);
+                last_update = Instant::now();
+            }
+            _ => {
+                // no bytes right now
+                if last_update.elapsed() >= Duration::from_millis(quiet_ms) {
+                    break;
+                }
+                if start.elapsed() >= Duration::from_millis(timeout_ms) {
+                    break;
+                }
+                sleep(Duration::from_millis(10));
+            }
+        }
+    }
+}
 
 #[test]
 fn home_screen_snapshot() -> Result<()> {
@@ -16,6 +44,8 @@ fn home_screen_snapshot() -> Result<()> {
     // redraw after resizing so the initial frame uses the new dimensions
     pty.get_process_mut().signal(Signal::SIGWINCH)?;
 
+    let mut parser = Parser::new(40, 120, 40);
+
     let first = loop {
         match pty.expect(Regex("Show keymap")) {
             Ok(m) => break m,
@@ -25,24 +55,13 @@ fn home_screen_snapshot() -> Result<()> {
             Err(e) => return Err(e.into()),
         }
     };
-    let mut output = first.as_bytes().to_vec();
+    parser.process(first.as_bytes());
 
     // wait for the quit hint and capture the rest of the screen
     let menu = pty.expect(Regex("\\[q\\] Quit"))?;
-    output.extend_from_slice(menu.as_bytes());
-    // allow remaining bytes to arrive before draining
-    sleep(Duration::from_millis(50));
-    // read any remaining bytes in the PTY buffer without blocking
-    let mut buf = [0u8; 8192];
-    while let Ok(n) = pty.try_read(&mut buf) {
-        if n == 0 {
-            break;
-        }
-        output.extend_from_slice(&buf[..n]);
-    }
-
-    let mut parser = Parser::new(40, 120, 40);
-    parser.process(&output);
+    parser.process(menu.as_bytes());
+    // drain updates until the UI is quiet so we snapshot the final frame
+    drain_until_quiet(&mut pty, &mut parser, 150, 2000);
     let screen = parser.screen();
     let (height, width) = screen.size();
     let snapshot = screen
@@ -68,7 +87,8 @@ fn instant_screen_snapshot() -> Result<()> {
 
     // capture the initial home screen
     let menu = pty.expect(Regex("\\[q\\] Quit"))?;
-    let mut output = menu.as_bytes().to_vec();
+    let mut parser = Parser::new(40, 120, 40);
+    parser.process(menu.as_bytes());
 
     // open the in-memory (Instant) storage and wait for notebook content
     pty.send("1")?;
@@ -83,19 +103,9 @@ fn instant_screen_snapshot() -> Result<()> {
             Err(e) => return Err(e.into()),
         }
     };
-    output.extend_from_slice(notebook.as_bytes());
-    // allow remaining bytes to arrive
-    sleep(Duration::from_millis(50));
-    let mut buf = [0u8; 8192];
-    while let Ok(n) = pty.try_read(&mut buf) {
-        if n == 0 {
-            break;
-        }
-        output.extend_from_slice(&buf[..n]);
-    }
-
-    let mut parser = Parser::new(40, 120, 40);
-    parser.process(&output);
+    parser.process(notebook.as_bytes());
+    // drain updates until the UI is quiet so we snapshot the final frame
+    drain_until_quiet(&mut pty, &mut parser, 150, 2000);
     let screen = parser.screen();
     let (height, width) = screen.size();
     let snapshot = screen
