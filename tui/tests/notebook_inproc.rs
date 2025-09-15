@@ -1,3 +1,4 @@
+#[macro_use]
 mod tester;
 use tester::Tester;
 
@@ -15,7 +16,7 @@ async fn notebook_open_note_with_l_inproc() -> Result<()> {
     t.draw()?;
 
     // editor shows sample content
-    t.assert_snapshot("note_open_inproc");
+    snap!(t, "note_open_inproc");
 
     Ok(())
 }
@@ -31,12 +32,12 @@ async fn notebook_note_actions_dialog_open_close_inproc() -> Result<()> {
     // open note actions dialog
     t.press('m').await;
     t.draw()?;
-    t.assert_snapshot("note_actions_open_inproc");
+    snap!(t, "note_actions_open_inproc");
 
     // close dialog with Esc
     t.key(KeyCode::Esc).await;
     t.draw()?;
-    t.assert_snapshot("note_actions_closed_inproc");
+    snap!(t, "note_actions_closed_inproc");
 
     Ok(())
 }
@@ -49,12 +50,12 @@ async fn notebook_directory_actions_dialog_open_close_inproc() -> Result<()> {
     // on root directory selection, open directory actions dialog
     t.press('m').await;
     t.draw()?;
-    t.assert_snapshot("dir_actions_open_inproc");
+    snap!(t, "dir_actions_open_inproc");
 
     // close dialog with Esc
     t.key(KeyCode::Esc).await;
     t.draw()?;
-    t.assert_snapshot("dir_actions_closed_inproc");
+    snap!(t, "dir_actions_closed_inproc");
 
     Ok(())
 }
@@ -67,12 +68,12 @@ async fn notebook_keymap_toggle_inproc() -> Result<()> {
     // show keymap
     t.press('?').await;
     t.draw()?;
-    t.assert_snapshot("keymap_shown_inproc");
+    snap!(t, "keymap_shown_inproc");
 
     // hide keymap
     t.press('?').await;
     t.draw()?;
-    t.assert_snapshot("keymap_hidden_inproc");
+    snap!(t, "keymap_hidden_inproc");
 
     Ok(())
 }

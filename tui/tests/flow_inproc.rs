@@ -1,3 +1,4 @@
+#[macro_use]
 mod tester;
 use tester::Tester;
 
@@ -9,11 +10,11 @@ async fn home_to_instant_quit_inproc() -> Result<()> {
 
     // initial home screen
     t.draw()?;
-    t.assert_snapshot("home_inproc");
+    snap!(t, "home_inproc");
 
     // open Instant (in-memory) notebook
     t.open_instant().await?;
-    t.assert_snapshot("instant_inproc");
+    snap!(t, "instant_inproc");
 
     // quit with Ctrl+C
     let quit = t.ctrl('c').await;
