@@ -13,6 +13,16 @@ pub struct Tester {
     pub term: Terminal<TestBackend>,
 }
 
+// Bring a concise snapshot macro into test files.
+// Usage: snap!(t, "name");
+#[allow(unused_macros)]
+macro_rules! snap {
+    ($t:expr, $name:expr) => {{
+        let text = $t.snapshot_text();
+        insta::assert_snapshot!($name, text);
+    }};
+}
+
 impl Tester {
     pub async fn new() -> Result<Self> {
         let cwd = std::env::current_dir()?;
@@ -66,9 +76,8 @@ impl Tester {
     }
 
     #[allow(dead_code)]
-    pub fn assert_snapshot(&self, name: &str) {
-        let text = buffer_lines(&self.term).join("\n");
-        insta::assert_snapshot!(name, text);
+    pub fn snapshot_text(&self) -> String {
+        buffer_lines(&self.term).join("\n")
     }
 
     async fn handle_input(&mut self, input: Input) -> bool {

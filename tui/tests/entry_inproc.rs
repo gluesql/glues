@@ -1,3 +1,4 @@
+#[macro_use]
 mod tester;
 use tester::Tester;
 
@@ -18,7 +19,7 @@ async fn entry_nav_enter_opens_instant_inproc() -> Result<()> {
 
     // draw and snapshot notebook view (e.g., sample note visible)
     t.draw()?;
-    t.assert_snapshot("instant_inproc");
+    snap!(t, "instant_inproc");
 
     Ok(())
 }
@@ -42,12 +43,12 @@ async fn entry_help_overlay_open_close_inproc() -> Result<()> {
     // open help (currently bound to 'a')
     t.press('a').await;
     t.draw()?;
-    t.assert_snapshot("help_open_inproc");
+    snap!(t, "help_open_inproc");
 
     // any key closes help
     t.press('x').await;
     t.draw()?;
-    t.assert_snapshot("help_closed_inproc");
+    snap!(t, "help_closed_inproc");
 
     Ok(())
 }

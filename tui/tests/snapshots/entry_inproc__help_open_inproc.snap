@@ -1,5 +1,5 @@
 ---
-source: tui/tests/tester.rs
+source: tui/tests/entry_inproc.rs
 expression: text
 snapshot_kind: text
 ---

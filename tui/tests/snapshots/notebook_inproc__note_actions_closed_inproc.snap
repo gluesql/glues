@@ -1,9 +1,9 @@
 ---
-source: tui/tests/tester.rs
+source: tui/tests/notebook_inproc.rs
 expression: text
 snapshot_kind: text
 ---
- Directory 'Notes' selected                                                                            [?] Show keymap 
+ Note 'Sample Note' selected                                                                           [?] Show keymap 
 [Browser]                                   ▐[Editor]                                                                   
  󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
    󱇗 Sample Note                            ▐                                                                           
