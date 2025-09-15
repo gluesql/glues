@@ -1,9 +1,10 @@
 #![cfg(feature = "test-utils")]
 
 mod common;
+use common::AppTestExt as _;
 
 use color_eyre::Result;
-use ratatui::crossterm::event::{Event as Input, KeyCode, KeyEvent, KeyModifiers};
+use ratatui::crossterm::event::KeyCode;
 
 #[tokio::test]
 async fn notebook_open_note_with_l_inproc() -> Result<()> {
@@ -11,17 +12,9 @@ async fn notebook_open_note_with_l_inproc() -> Result<()> {
     common::open_instant(&mut app, &mut term).await?;
 
     // select first note and open
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('j'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('l'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.draw_once_on(&mut term)?;
+    common::send_char(&mut app, 'j').await;
+    common::send_char(&mut app, 'l').await;
+    app.draw_frame(&mut term)?;
 
     // editor shows sample content
     let buf = common::buffer_to_lines(&term).join("\n");
@@ -36,26 +29,17 @@ async fn notebook_note_actions_dialog_open_close_inproc() -> Result<()> {
     common::open_instant(&mut app, &mut term).await?;
 
     // select note to enable note actions
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('j'),
-        KeyModifiers::NONE,
-    )))
-    .await;
+    common::send_char(&mut app, 'j').await;
 
     // open note actions dialog
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('m'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.draw_once_on(&mut term)?;
+    common::send_char(&mut app, 'm').await;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(buf.contains("Note Actions"));
 
     // close dialog with Esc
-    app.handle_input(Input::Key(KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE)))
-        .await;
-    app.draw_once_on(&mut term)?;
+    common::send_code(&mut app, KeyCode::Esc).await;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(!buf.contains("Note Actions"));
 
@@ -68,19 +52,14 @@ async fn notebook_directory_actions_dialog_open_close_inproc() -> Result<()> {
     common::open_instant(&mut app, &mut term).await?;
 
     // on root directory selection, open directory actions dialog
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('m'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.draw_once_on(&mut term)?;
+    common::send_char(&mut app, 'm').await;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(buf.contains("Directory Actions"));
 
     // close dialog with Esc
-    app.handle_input(Input::Key(KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE)))
-        .await;
-    app.draw_once_on(&mut term)?;
+    common::send_code(&mut app, KeyCode::Esc).await;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(!buf.contains("Directory Actions"));
 
@@ -93,22 +72,14 @@ async fn notebook_keymap_toggle_inproc() -> Result<()> {
     common::open_instant(&mut app, &mut term).await?;
 
     // show keymap
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('?'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.draw_once_on(&mut term)?;
+    common::send_char(&mut app, '?').await;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(buf.contains(" [?] Hide keymap "));
 
     // hide keymap
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('?'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.draw_once_on(&mut term)?;
+    common::send_char(&mut app, '?').await;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(!buf.contains(" [?] Hide keymap "));
 
@@ -121,39 +92,19 @@ async fn notebook_editor_keymap_in_insert_mode_inproc() -> Result<()> {
     common::open_instant(&mut app, &mut term).await?;
 
     // open note and enter insert mode
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('j'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('l'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('i'),
-        KeyModifiers::NONE,
-    )))
-    .await;
+    common::send_char(&mut app, 'j').await;
+    common::send_char(&mut app, 'l').await;
+    common::send_char(&mut app, 'i').await;
 
     // show editor keymap with Ctrl+h
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('h'),
-        KeyModifiers::CONTROL,
-    )))
-    .await;
-    app.draw_once_on(&mut term)?;
+    common::send_ctrl(&mut app, 'h').await;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(buf.contains("Editor Keymap"));
 
     // any key closes
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('x'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.draw_once_on(&mut term)?;
+    common::send_char(&mut app, 'x').await;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(!buf.contains("Editor Keymap"));
 
@@ -166,34 +117,20 @@ async fn notebook_quit_confirm_then_cancel_inproc() -> Result<()> {
     common::open_instant(&mut app, &mut term).await?;
 
     // open note in normal mode (idle)
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('j'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('l'),
-        KeyModifiers::NONE,
-    )))
-    .await;
+    common::send_char(&mut app, 'j').await;
+    common::send_char(&mut app, 'l').await;
 
     // Esc opens quit confirmation
-    app.handle_input(Input::Key(KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE)))
-        .await;
-    app.draw_once_on(&mut term)?;
+    common::send_code(&mut app, KeyCode::Esc).await;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(buf.contains("Do you want to quit?"));
 
     // cancel with 'n' (should not quit)
-    let quit = app
-        .handle_input(Input::Key(KeyEvent::new(
-            KeyCode::Char('n'),
-            KeyModifiers::NONE,
-        )))
-        .await;
+    let quit = common::send_char(&mut app, 'n').await;
     assert!(!quit);
 
-    app.draw_once_on(&mut term)?;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(!buf.contains("Do you want to quit?"));
 
@@ -206,26 +143,12 @@ async fn notebook_quit_confirm_then_accept_inproc() -> Result<()> {
     common::open_instant(&mut app, &mut term).await?;
 
     // open note in normal mode (idle)
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('j'),
-        KeyModifiers::NONE,
-    )))
-    .await;
-    app.handle_input(Input::Key(KeyEvent::new(
-        KeyCode::Char('l'),
-        KeyModifiers::NONE,
-    )))
-    .await;
+    common::send_char(&mut app, 'j').await;
+    common::send_char(&mut app, 'l').await;
 
     // Esc then 'y' should quit
-    app.handle_input(Input::Key(KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE)))
-        .await;
-    let quit = app
-        .handle_input(Input::Key(KeyEvent::new(
-            KeyCode::Char('y'),
-            KeyModifiers::NONE,
-        )))
-        .await;
+    common::send_code(&mut app, KeyCode::Esc).await;
+    let quit = common::send_char(&mut app, 'y').await;
     assert!(quit);
 
     Ok(())

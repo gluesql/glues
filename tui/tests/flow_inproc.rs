@@ -1,17 +1,17 @@
 #![cfg(feature = "test-utils")]
 
 mod common;
+use common::AppTestExt as _;
 
 use color_eyre::Result;
 use insta::assert_debug_snapshot;
-use ratatui::crossterm::event::{Event as Input, KeyCode, KeyEvent, KeyModifiers};
 
 #[tokio::test]
 async fn home_to_instant_quit_inproc() -> Result<()> {
     let (mut app, mut term) = common::setup_app_and_term().await?;
 
     // initial home screen
-    app.draw_once_on(&mut term)?;
+    app.draw_frame(&mut term)?;
     assert_debug_snapshot!("home_inproc", common::buffer_to_lines(&term));
 
     // open Instant (in-memory) notebook
@@ -19,12 +19,7 @@ async fn home_to_instant_quit_inproc() -> Result<()> {
     assert_debug_snapshot!("instant_inproc", common::buffer_to_lines(&term));
 
     // quit with Ctrl+C
-    let quit = app
-        .handle_input(Input::Key(KeyEvent::new(
-            KeyCode::Char('c'),
-            KeyModifiers::CONTROL,
-        )))
-        .await;
+    let quit = common::send_ctrl(&mut app, 'c').await;
     assert!(quit);
 
     Ok(())
