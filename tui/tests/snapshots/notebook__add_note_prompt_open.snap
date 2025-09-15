@@ -1,0 +1,45 @@
+---
+source: tui/tests/notebook.rs
+expression: text
+snapshot_kind: text
+---
+ Directory actions dialog                                                                              [?] Show keymap 
+[Browser]                                   ▐[Editor]                                                                   
+ 󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
+   󱇗 Sample Note                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                              ┌──────────────────────────Prompt───────────────────────────┐                             
+                              │                                                           │                             
+                              │  Enter note name:                                         │                             
+                              │  ┌─────────────────────────────────────────────────────┐  │                             
+                              │  │                                                     │  │                             
+                              │  └─────────────────────────────────────────────────────┘  │                             
+                              │                                                           │                             
+                              │  [Enter] Submit                                           │                             
+                              │  [Esc] Cancel                                             │                             
+                              │                                                           │                             
+                              └───────────────────────────────────────────────────────────┘                             
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐
