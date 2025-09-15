@@ -1,5 +1,5 @@
 mod common;
-use common::AppTestExt as _;
+use common::{AppTestExt as _, TerminalTestExt as _};
 
 use color_eyre::Result;
 use insta::assert_debug_snapshot;
@@ -10,11 +10,11 @@ async fn home_to_instant_quit_inproc() -> Result<()> {
 
     // initial home screen
     app.draw_frame(&mut term)?;
-    assert_debug_snapshot!("home_inproc", common::buffer_to_lines(&term));
+    assert_debug_snapshot!("home_inproc", term.buffer_to_lines());
 
     // open Instant (in-memory) notebook
     app.open_instant(&mut term).await?;
-    assert_debug_snapshot!("instant_inproc", common::buffer_to_lines(&term));
+    assert_debug_snapshot!("instant_inproc", term.buffer_to_lines());
 
     // quit with Ctrl+C
     let quit = app.ctrl('c').await;

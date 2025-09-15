@@ -1,5 +1,5 @@
 mod common;
-use common::AppTestExt as _;
+use common::{AppTestExt as _, TerminalTestExt as _};
 
 use color_eyre::Result;
 use ratatui::crossterm::event::KeyCode;
@@ -15,7 +15,7 @@ async fn notebook_open_note_with_l_inproc() -> Result<()> {
     app.draw_frame(&mut term)?;
 
     // editor shows sample content
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(buf.contains("Hi :D"));
 
     Ok(())
@@ -32,13 +32,13 @@ async fn notebook_note_actions_dialog_open_close_inproc() -> Result<()> {
     // open note actions dialog
     app.press('m').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(buf.contains("Note Actions"));
 
     // close dialog with Esc
     app.key(KeyCode::Esc).await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(!buf.contains("Note Actions"));
 
     Ok(())
@@ -52,13 +52,13 @@ async fn notebook_directory_actions_dialog_open_close_inproc() -> Result<()> {
     // on root directory selection, open directory actions dialog
     app.press('m').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(buf.contains("Directory Actions"));
 
     // close dialog with Esc
     app.key(KeyCode::Esc).await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(!buf.contains("Directory Actions"));
 
     Ok(())
@@ -72,13 +72,13 @@ async fn notebook_keymap_toggle_inproc() -> Result<()> {
     // show keymap
     app.press('?').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(buf.contains(" [?] Hide keymap "));
 
     // hide keymap
     app.press('?').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(!buf.contains(" [?] Hide keymap "));
 
     Ok(())
@@ -97,13 +97,13 @@ async fn notebook_editor_keymap_in_insert_mode_inproc() -> Result<()> {
     // show editor keymap with Ctrl+h
     app.ctrl('h').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(buf.contains("Editor Keymap"));
 
     // any key closes
     app.press('x').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(!buf.contains("Editor Keymap"));
 
     Ok(())
@@ -121,7 +121,7 @@ async fn notebook_quit_confirm_then_cancel_inproc() -> Result<()> {
     // Esc opens quit confirmation
     app.key(KeyCode::Esc).await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(buf.contains("Do you want to quit?"));
 
     // cancel with 'n' (should not quit)
@@ -129,7 +129,7 @@ async fn notebook_quit_confirm_then_cancel_inproc() -> Result<()> {
     assert!(!quit);
 
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(!buf.contains("Do you want to quit?"));
 
     Ok(())

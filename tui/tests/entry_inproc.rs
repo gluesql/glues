@@ -1,5 +1,5 @@
 mod common;
-use common::AppTestExt as _;
+use common::{AppTestExt as _, TerminalTestExt as _};
 
 use color_eyre::Result;
 use ratatui::crossterm::event::KeyCode;
@@ -18,7 +18,7 @@ async fn entry_nav_enter_opens_instant_inproc() -> Result<()> {
 
     // draw and assert notebook content is visible (e.g., sample note)
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(buf.contains("Sample Note"));
 
     Ok(())
@@ -43,13 +43,13 @@ async fn entry_keymap_toggle_inproc() -> Result<()> {
     // show keymap
     app.press('?').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(buf.contains(" [?] Hide keymap "));
 
     // hide keymap
     app.press('?').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(!buf.contains(" [?] Hide keymap "));
 
     Ok(())
@@ -63,13 +63,13 @@ async fn entry_help_overlay_open_close_inproc() -> Result<()> {
     // open help (currently bound to 'a')
     app.press('a').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(buf.contains("Press any key to close"));
 
     // any key closes help
     app.press('x').await;
     app.draw_frame(&mut term)?;
-    let buf = common::buffer_to_lines(&term).join("\n");
+    let buf = term.buffer_to_lines().join("\n");
     assert!(!buf.contains("Press any key to close"));
 
     Ok(())
