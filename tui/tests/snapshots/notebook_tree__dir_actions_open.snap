@@ -1,0 +1,45 @@
+---
+source: tui/tests/notebook_tree.rs
+expression: text
+snapshot_kind: text
+---
+ Directory actions dialog                                                                              [?] Show keymap 
+[Browser]                                   ▐[Editor]                                                                   
+ 󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
+   󱇗 Sample Note                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ ┌────Directory Actions─────┐                                              
+                                            ▐ │                          │                                              
+                                            ▐ │   Add note               │                                              
+                                            ▐ │   Add directory          │                                              
+                                            ▐ │   Rename directory       │                                              
+                                            ▐ │   Remove directory       │                                              
+                                            ▐ │   Close                  │                                              
+                                            ▐ │                          │                                              
+                                            ▐ └──────────────────────────┘                                              
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐

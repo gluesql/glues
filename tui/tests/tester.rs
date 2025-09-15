@@ -76,6 +76,28 @@ impl Tester {
     }
 
     #[allow(dead_code)]
+    pub async fn type_str(&mut self, s: &str) {
+        for ch in s.chars() {
+            let _ = self.press(ch).await;
+        }
+    }
+
+    #[allow(dead_code)]
+    pub async fn backspace(&mut self, n: usize) {
+        for _ in 0..n {
+            let _ = self.key(KeyCode::Backspace).await;
+        }
+    }
+
+    #[allow(dead_code)]
+    pub async fn open_first_note(&mut self) -> Result<()> {
+        self.press('j').await;
+        self.press('l').await;
+        self.draw()?;
+        Ok(())
+    }
+
+    #[allow(dead_code)]
     pub fn snapshot_text(&self) -> String {
         buffer_lines(&self.term).join("\n")
     }
