@@ -12,7 +12,6 @@ pub use terminal_ext::TerminalTestExt;
 use color_eyre::Result;
 use glues::{App, config, logger};
 use ratatui::{Terminal, backend::TestBackend};
-use std::string::String;
 
 pub fn assert_snapshot(name: &str, lines: &[String]) {
     insta::assert_debug_snapshot!(name, lines);
