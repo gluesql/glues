@@ -6,7 +6,7 @@ use color_eyre::Result;
 use ratatui::crossterm::event::KeyCode;
 
 #[tokio::test]
-async fn entry_nav_enter_opens_instant_inproc() -> Result<()> {
+async fn opens_instant_on_enter() -> Result<()> {
     let mut t = Tester::new().await?;
 
     // initial draw (home)
@@ -19,13 +19,13 @@ async fn entry_nav_enter_opens_instant_inproc() -> Result<()> {
 
     // draw and snapshot notebook view (e.g., sample note visible)
     t.draw()?;
-    snap!(t, "instant_inproc");
+    snap!(t, "instant");
 
     Ok(())
 }
 
 #[tokio::test]
-async fn entry_quit_with_q_inproc() -> Result<()> {
+async fn quits_on_q() -> Result<()> {
     let mut t = Tester::new().await?;
     t.draw()?;
 
@@ -36,19 +36,19 @@ async fn entry_quit_with_q_inproc() -> Result<()> {
 }
 
 #[tokio::test]
-async fn entry_help_overlay_open_close_inproc() -> Result<()> {
+async fn help_overlay_toggles() -> Result<()> {
     let mut t = Tester::new().await?;
     t.draw()?;
 
     // open help (currently bound to 'a')
     t.press('a').await;
     t.draw()?;
-    snap!(t, "help_open_inproc");
+    snap!(t, "help_open");
 
     // any key closes help
     t.press('x').await;
     t.draw()?;
-    snap!(t, "help_closed_inproc");
+    snap!(t, "help_closed");
 
     Ok(())
 }

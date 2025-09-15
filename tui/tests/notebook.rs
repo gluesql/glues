@@ -6,7 +6,7 @@ use color_eyre::Result;
 use ratatui::crossterm::event::KeyCode;
 
 #[tokio::test]
-async fn notebook_open_note_with_l_inproc() -> Result<()> {
+async fn opens_note_on_l() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
 
@@ -16,13 +16,13 @@ async fn notebook_open_note_with_l_inproc() -> Result<()> {
     t.draw()?;
 
     // editor shows sample content
-    snap!(t, "note_open_inproc");
+    snap!(t, "note_open");
 
     Ok(())
 }
 
 #[tokio::test]
-async fn notebook_note_actions_dialog_open_close_inproc() -> Result<()> {
+async fn note_actions_dialog_toggles() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
 
@@ -32,54 +32,54 @@ async fn notebook_note_actions_dialog_open_close_inproc() -> Result<()> {
     // open note actions dialog
     t.press('m').await;
     t.draw()?;
-    snap!(t, "note_actions_open_inproc");
+    snap!(t, "note_actions_open");
 
     // close dialog with Esc
     t.key(KeyCode::Esc).await;
     t.draw()?;
-    snap!(t, "note_actions_closed_inproc");
+    snap!(t, "note_actions_closed");
 
     Ok(())
 }
 
 #[tokio::test]
-async fn notebook_directory_actions_dialog_open_close_inproc() -> Result<()> {
+async fn dir_actions_dialog_toggles() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
 
     // on root directory selection, open directory actions dialog
     t.press('m').await;
     t.draw()?;
-    snap!(t, "dir_actions_open_inproc");
+    snap!(t, "dir_actions_open");
 
     // close dialog with Esc
     t.key(KeyCode::Esc).await;
     t.draw()?;
-    snap!(t, "dir_actions_closed_inproc");
+    snap!(t, "dir_actions_closed");
 
     Ok(())
 }
 
 #[tokio::test]
-async fn notebook_keymap_toggle_inproc() -> Result<()> {
+async fn keymap_toggles() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
 
     // show keymap
     t.press('?').await;
     t.draw()?;
-    snap!(t, "keymap_shown_inproc");
+    snap!(t, "keymap_shown");
 
     // hide keymap
     t.press('?').await;
     t.draw()?;
-    snap!(t, "keymap_hidden_inproc");
+    snap!(t, "keymap_hidden");
 
     Ok(())
 }
 
 #[tokio::test]
-async fn notebook_quit_confirm_then_accept_inproc() -> Result<()> {
+async fn quits_on_esc_then_y() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
 
