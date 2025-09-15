@@ -205,5 +205,3 @@ async fn dir_actions_dialog_toggles() -> Result<()> {
 
     Ok(())
 }
-
- 

@@ -21,4 +21,3 @@ async fn keymap_toggles() -> Result<()> {
 
     Ok(())
 }
-
