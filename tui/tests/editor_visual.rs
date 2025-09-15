@@ -75,4 +75,3 @@ async fn editor_keymap_overlay_in_visual_mode() -> Result<()> {
 
     Ok(())
 }
-
