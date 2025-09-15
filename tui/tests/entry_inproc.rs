@@ -16,9 +16,9 @@ async fn entry_nav_enter_opens_instant_inproc() -> Result<()> {
     t.press('k').await;
     t.key(KeyCode::Enter).await;
 
-    // draw and assert notebook content is visible (e.g., sample note)
+    // draw and snapshot notebook view (e.g., sample note visible)
     t.draw()?;
-    t.assert_contains("Sample Note");
+    t.assert_snapshot("instant_inproc");
 
     Ok(())
 }
@@ -42,12 +42,12 @@ async fn entry_help_overlay_open_close_inproc() -> Result<()> {
     // open help (currently bound to 'a')
     t.press('a').await;
     t.draw()?;
-    t.assert_contains("Press any key to close");
+    t.assert_snapshot("help_open_inproc");
 
     // any key closes help
     t.press('x').await;
     t.draw()?;
-    t.assert_not_contains("Press any key to close");
+    t.assert_snapshot("help_closed_inproc");
 
     Ok(())
 }
