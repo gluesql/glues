@@ -1,11 +1,11 @@
 ---
-source: tui/tests/notebook_inproc.rs
+source: tui/tests/notebook.rs
 expression: text
 snapshot_kind: text
 ---
- Note actions dialog                                                                                   [?] Show keymap 
-[Browser]                                   ▐[Editor]                                                                   
- 󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
+ Note 'Sample Note' normal mode                                                                        [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 Hi :D                                                                   
    󱇗 Sample Note                            ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -20,13 +20,6 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐ ┌───────Note Actions───────┐                                              
-                                            ▐ │                          │                                              
-                                            ▐ │   Rename note            │                                              
-                                            ▐ │   Remove note            │                                              
-                                            ▐ │   Close                  │                                              
-                                            ▐ │                          │                                              
-                                            ▐ └──────────────────────────┘                                              
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -42,4 +35,11 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󱇗 Sample Note 
