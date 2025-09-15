@@ -1,5 +1,5 @@
-mod common;
-use common::Tester;
+mod tester;
+use tester::Tester;
 
 use color_eyre::Result;
 

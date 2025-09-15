@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use color_eyre::Result;
 use glues::{App, config, logger};
 use ratatui::{
@@ -44,6 +42,7 @@ impl Tester {
         .await
     }
 
+    #[allow(dead_code)]
     pub async fn ctrl(&mut self, c: char) -> bool {
         self.handle_input(Input::Key(CKeyEvent::new(
             KeyCode::Char(c),
@@ -52,11 +51,13 @@ impl Tester {
         .await
     }
 
+    #[allow(dead_code)]
     pub async fn key(&mut self, code: KeyCode) -> bool {
         self.handle_input(Input::Key(CKeyEvent::new(code, KeyModifiers::NONE)))
             .await
     }
 
+    #[allow(dead_code)]
     pub async fn open_instant(&mut self) -> Result<()> {
         self.draw()?;
         let _ = self.press('1').await;
@@ -64,16 +65,19 @@ impl Tester {
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn assert_contains(&self, needle: &str) {
         let text = buffer_lines(&self.term).join("\n");
         assert!(text.contains(needle));
     }
 
+    #[allow(dead_code)]
     pub fn assert_not_contains(&self, needle: &str) {
         let text = buffer_lines(&self.term).join("\n");
         assert!(!text.contains(needle));
     }
 
+    #[allow(dead_code)]
     pub fn assert_snapshot(&self, name: &str) {
         let lines = buffer_lines(&self.term);
         insta::assert_debug_snapshot!(name, lines);

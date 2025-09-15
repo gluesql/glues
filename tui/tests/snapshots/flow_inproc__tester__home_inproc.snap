@@ -1,5 +1,5 @@
 ---
-source: tui/tests/common.rs
+source: tui/tests/tester.rs
 assertion_line: 999
 expression: lines
 snapshot_kind: text
