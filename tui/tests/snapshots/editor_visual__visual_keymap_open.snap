@@ -1,0 +1,45 @@
+---
+source: tui/tests/editor_visual.rs
+expression: text
+snapshot_kind: text
+---
+ Note 'Sample Note' visual mode                                                                        [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 Hi :D                                                                   
+   󱇗 Sample Note                            ▐                                                                           
+                                            ▐                                                                           
+               ┌─────────────────────────────────VIM VISUAL MODE KEYMAP─────────────────────────────────┐               
+               │                                                                                        │               
+               │  MOVE CURSOR                                                                           │               
+               │  [h] Move cursor left                                                                  │               
+               │  [j] Move cursor down                                                                  │               
+               │  [k] Move cursor up                                                                    │               
+               │  [l] Move cursor right                                                                 │               
+               │  [w] Move cursor to the start of the next word                                         │               
+               │  [e] Move cursor to the end of the next word                                           │               
+               │  [b] Move cursor to the start of the previous word                                     │               
+               │  [0] Move cursor to the start of the line                                              │               
+               │  [$] Move cursor to the end of the line                                                │               
+               │  [^] Move cursor to the first non-blank character of the line                          │               
+               │  [G] Move cursor to the end of the file                                                │               
+               │                                                                                        │               
+               │  TO INSERT MODE                                                                        │               
+               │  [s] or [S] Substitute selected text and go to insert mode                             │               
+               │                                                                                        │               
+               │  TO EXTENDED MODES                                                                     │               
+               │  [g] Go to gateway mode for additional commands                                        │               
+               │  [1-9] Specify repeat count for subsequent actions                                     │               
+               │                                                                                        │               
+               │  EDIT TEXT AND RETURN TO NORMAL MODE                                                   │               
+               │  [d] or [x] Delete selected text                                                       │               
+               │  [y] Yank (copy) selected text                                                         │               
+               │  [~] Toggle the case of the select text                                                │               
+               │                                                                                        │               
+               │                                                                                        │               
+               │                                 Press any key to close                                 │               
+               │                                                                                        │               
+               └────────────────────────────────────────────────────────────────────────────────────────┘               
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ VISUAL   󰝰 Notes  󱇗 Sample Note 
