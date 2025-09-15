@@ -22,6 +22,85 @@ async fn opens_note_on_l() -> Result<()> {
 }
 
 #[tokio::test]
+async fn numbering_steps_move_next_prev() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+
+    // enter numbering with '2'
+    t.press('2').await;
+    t.draw()?;
+    snap!(t, "numbering_open");
+
+    // move down by 2
+    t.press('j').await;
+    t.draw()?;
+    snap!(t, "numbering_move_down_2");
+
+    // enter numbering again and move up by 2
+    t.press('2').await;
+    t.press('k').await;
+    t.draw()?;
+    snap!(t, "numbering_move_up_2");
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn gateway_mode_enter_and_first_select() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+
+    // enter gateway mode from directory selection
+    t.press('g').await;
+    t.draw()?;
+    snap!(t, "gateway_mode");
+
+    // pressing 'g' selects first
+    t.press('g').await;
+    t.draw()?;
+    snap!(t, "gateway_mode_select_first");
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn move_mode_enter_and_cancel_on_directory() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+
+    // enter move mode on directory (Space)
+    t.key(KeyCode::Char(' ')).await;
+    t.draw()?;
+    snap!(t, "move_mode_directory");
+
+    // cancel with Esc
+    t.key(KeyCode::Esc).await;
+    t.draw()?;
+    snap!(t, "move_mode_cancelled_directory");
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn move_mode_enter_and_cancel_on_note() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+
+    // select a note and enter move mode
+    t.press('j').await;
+    t.key(KeyCode::Char(' ')).await;
+    t.draw()?;
+    snap!(t, "move_mode_note");
+
+    // cancel with Esc
+    t.key(KeyCode::Esc).await;
+    t.draw()?;
+    snap!(t, "move_mode_cancelled_note");
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn add_note_via_directory_actions() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
