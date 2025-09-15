@@ -1,11 +1,12 @@
 ---
-source: tui/tests/notebook.rs
+source: tui/tests/notebook_tree.rs
 expression: text
 snapshot_kind: text
 ---
- Note actions dialog                                                                                   [?] Show keymap 
+ Note 'Sample Note' selected                                                                           [?] Show keymap 
 [Browser]                                   ▐[Editor]                                                                   
  󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
+   󰉋 Tmp                                    ▐                                                                           
    󱇗 Sample Note                            ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -18,17 +19,16 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                              ┌──────────────────────────Prompt───────────────────────────┐                             
-                              │                                                           │                             
-                              │  Enter new note name:                                     │                             
-                              │  ┌─────────────────────────────────────────────────────┐  │                             
-                              │  │Sample Note                                          │  │                             
-                              │  └─────────────────────────────────────────────────────┘  │                             
-                              │                                                           │                             
-                              │  [Enter] Submit                                           │                             
-                              │  [Esc] Cancel                                             │                             
-                              │                                                           │                             
-                              └───────────────────────────────────────────────────────────┘                             
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           

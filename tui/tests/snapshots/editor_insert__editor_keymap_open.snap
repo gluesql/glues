@@ -1,5 +1,5 @@
 ---
-source: tui/tests/notebook.rs
+source: tui/tests/editor_insert.rs
 expression: text
 snapshot_kind: text
 ---

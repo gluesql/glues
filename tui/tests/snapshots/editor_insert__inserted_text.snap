@@ -1,13 +1,12 @@
 ---
-source: tui/tests/notebook.rs
+source: tui/tests/editor_insert.rs
 expression: text
 snapshot_kind: text
 ---
- Note 'New Note' normal mode                                                                           [?] Show keymap 
-[Browser]                                   ▐ 󱇗 New Note                                                                
- 󰝰 Notes                                    ▐ 1                                                                         
+ Note 'Sample Note' insert mode                                                                   [Ctrl+h] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 HelloHi :D                                                              
    󱇗 Sample Note                            ▐                                                                           
-   󱇗 New Note                               ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -42,4 +41,5 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐ NORMAL   󰝰 Notes  󱇗 New Note 
+                                            ▐                                                                           
+                                            ▐ INSERT   󰝰 Notes  󱇗 Sample Note 

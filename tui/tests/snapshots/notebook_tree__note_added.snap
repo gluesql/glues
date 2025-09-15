@@ -1,12 +1,13 @@
 ---
-source: tui/tests/notebook.rs
+source: tui/tests/notebook_tree.rs
 expression: text
 snapshot_kind: text
 ---
- Note 'Sample Note' selected                                                                           [?] Show keymap 
-[Browser]                                   ▐[Editor]                                                                   
- 󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
+ Note 'New Note' normal mode                                                                           [?] Show keymap 
+[Browser]                                   ▐ 󱇗 New Note                                                                
+ 󰝰 Notes                                    ▐ 1                                                                         
    󱇗 Sample Note                            ▐                                                                           
+   󱇗 New Note                               ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -41,5 +42,4 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐                                                                           
-                                            ▐
+                                            ▐ NORMAL   󰝰 Notes  󱇗 New Note 

@@ -168,29 +168,6 @@ async fn remove_directory_confirm_cancel_then_accept() -> Result<()> {
 }
 
 #[tokio::test]
-async fn editor_keymap_overlay_in_insert_mode() -> Result<()> {
-    let mut t = Tester::new().await?;
-    t.open_instant().await?;
-
-    // open first note and enter insert mode
-    t.press('j').await;
-    t.press('l').await;
-    t.press('i').await;
-
-    // show editor keymap (Ctrl+h)
-    t.ctrl('h').await;
-    t.draw()?;
-    snap!(t, "editor_keymap_open");
-
-    // any key closes overlay
-    t.press('x').await;
-    t.draw()?;
-    snap!(t, "editor_keymap_closed");
-
-    Ok(())
-}
-
-#[tokio::test]
 async fn note_actions_dialog_toggles() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
@@ -229,37 +206,4 @@ async fn dir_actions_dialog_toggles() -> Result<()> {
     Ok(())
 }
 
-#[tokio::test]
-async fn keymap_toggles() -> Result<()> {
-    let mut t = Tester::new().await?;
-    t.open_instant().await?;
-
-    // show keymap
-    t.press('?').await;
-    t.draw()?;
-    snap!(t, "keymap_shown");
-
-    // hide keymap
-    t.press('?').await;
-    t.draw()?;
-    snap!(t, "keymap_hidden");
-
-    Ok(())
-}
-
-#[tokio::test]
-async fn quits_on_esc_then_y() -> Result<()> {
-    let mut t = Tester::new().await?;
-    t.open_instant().await?;
-
-    // open note in normal mode (idle)
-    t.press('j').await;
-    t.press('l').await;
-
-    // Esc then 'y' should quit
-    t.key(KeyCode::Esc).await;
-    let quit = t.press('y').await;
-    assert!(quit);
-
-    Ok(())
-}
+ 

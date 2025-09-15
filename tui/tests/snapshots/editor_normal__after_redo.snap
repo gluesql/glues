@@ -1,11 +1,11 @@
 ---
-source: tui/tests/notebook.rs
+source: tui/tests/editor_normal.rs
 expression: text
 snapshot_kind: text
 ---
- Directory actions dialog                                                                              [?] Show keymap 
-[Browser]                                   ▐[Editor]                                                                   
- 󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
+ Note 'Sample Note' normal mode                                                                        [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 HelloHi :D                                                              
    󱇗 Sample Note                            ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -18,17 +18,6 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                              ┌──────────────────────────Prompt───────────────────────────┐                             
-                              │                                                           │                             
-                              │  Enter directory name:                                    │                             
-                              │  ┌─────────────────────────────────────────────────────┐  │                             
-                              │  │                                                     │  │                             
-                              │  └─────────────────────────────────────────────────────┘  │                             
-                              │                                                           │                             
-                              │  [Enter] Submit                                           │                             
-                              │  [Esc] Cancel                                             │                             
-                              │                                                           │                             
-                              └───────────────────────────────────────────────────────────┘                             
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -42,4 +31,15 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󱇗 Sample Note                           󰔚 Saving...

@@ -1,12 +1,11 @@
 ---
-source: tui/tests/notebook.rs
+source: tui/tests/notebook_tree.rs
 expression: text
 snapshot_kind: text
 ---
- Note 'Sample Note' selected                                                                           [?] Show keymap 
+ Directory actions dialog                                                                              [?] Show keymap 
 [Browser]                                   ▐[Editor]                                                                   
  󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
-   󰉋 Tmp                                    ▐                                                                           
    󱇗 Sample Note                            ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -20,14 +19,15 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
+                                            ▐ ┌────Directory Actions─────┐                                              
+                                            ▐ │                          │                                              
+                                            ▐ │   Add note               │                                              
+                                            ▐ │   Add directory          │                                              
+                                            ▐ │   Rename directory       │                                              
+                                            ▐ │   Remove directory       │                                              
+                                            ▐ │   Close                  │                                              
+                                            ▐ │                          │                                              
+                                            ▐ └──────────────────────────┘                                              
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           

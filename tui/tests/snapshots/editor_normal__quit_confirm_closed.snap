@@ -1,12 +1,11 @@
 ---
-source: tui/tests/notebook.rs
+source: tui/tests/editor_normal.rs
 expression: text
 snapshot_kind: text
 ---
- Directory 'Tmp' selected                                                                              [?] Show keymap 
-[Browser]                                   ▐[Editor]                                                                   
- 󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
-   󰉋 Tmp                                    ▐                                                                           
+ Note 'Sample Note' normal mode                                                                        [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 Hi :D                                                                   
    󱇗 Sample Note                            ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -42,4 +41,5 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󱇗 Sample Note 
