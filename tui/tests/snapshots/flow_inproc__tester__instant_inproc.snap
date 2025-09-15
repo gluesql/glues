@@ -1,48 +1,45 @@
 ---
 source: tui/tests/tester.rs
-assertion_line: 999
-expression: lines
+expression: text
 snapshot_kind: text
 ---
-[
-    " Directory 'Notes' selected                                                                           \u{e0be} [?] Show keymap ",
-    "[Browser]                                   ▐[Editor]                                                                   ",
-    " \u{f0770} Notes                                    ▐ 1 Welcome to Glues :D                                                     ",
-    "   \u{f11d7} Sample Note                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-    "                                            ▐                                                                           ",
-]
+ Directory 'Notes' selected                                                                            [?] Show keymap 
+[Browser]                                   ▐[Editor]                                                                   
+ 󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
+   󱇗 Sample Note                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐

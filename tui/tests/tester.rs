@@ -79,8 +79,8 @@ impl Tester {
 
     #[allow(dead_code)]
     pub fn assert_snapshot(&self, name: &str) {
-        let lines = buffer_lines(&self.term);
-        insta::assert_debug_snapshot!(name, lines);
+        let text = buffer_lines(&self.term).join("\n");
+        insta::assert_snapshot!(name, text);
     }
 
     async fn handle_input(&mut self, input: Input) -> bool {

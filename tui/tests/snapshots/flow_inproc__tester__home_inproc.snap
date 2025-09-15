@@ -1,48 +1,36 @@
 ---
 source: tui/tests/tester.rs
-assertion_line: 999
-expression: lines
+expression: text
 snapshot_kind: text
 ---
-[
-    " Glues - TUI note-taking app offering complete data control and flexible storage options              \u{e0be} [?] Show keymap ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                           ████   ███                                                                   ",
-    "                                          ██  ██   ██                                                                   ",
-    "                                         ██        ██    ██  ██   ████    █████                                         ",
-    "                                         ██        ██    ██  ██  ██  ██  ██                                             ",
-    "                                         ██  ███   ██    ██  ██  ██████   ████                                          ",
-    "                                          ██  ██   ██    ██  ██  ██          ██                                         ",
-    "                                           █████  ████    ███ ██  ████   █████                                          ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                         ┌─────────────Open Notes─────────────┐                                         ",
-    "                                         │                                    │                                         ",
-    "                                         │   [1] Instant                      │                                         ",
-    "                                         │   [2] Local                        │                                         ",
-    "                                         │   [3] Git                          │                                         ",
-    "                                         │   [4] MongoDB                      │                                         ",
-    "                                         │   [5] CSV                          │                                         ",
-    "                                         │   [6] JSON                         │                                         ",
-    "                                         │   [h] Help                         │                                         ",
-    "                                         │   [q] Quit                         │                                         ",
-    "                                         │                                    │                                         ",
-    "                                         └────────────────────────────────────┘                                         ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-    "                                                                                                                        ",
-]
+ Glues - TUI note-taking app offering complete data control and flexible storage options               [?] Show keymap 
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                           ████   ███                                                                   
+                                          ██  ██   ██                                                                   
+                                         ██        ██    ██  ██   ████    █████                                         
+                                         ██        ██    ██  ██  ██  ██  ██                                             
+                                         ██  ███   ██    ██  ██  ██████   ████                                          
+                                          ██  ██   ██    ██  ██  ██          ██                                         
+                                           █████  ████    ███ ██  ████   █████                                          
+                                                                                                                        
+                                                                                                                        
+                                         ┌─────────────Open Notes─────────────┐                                         
+                                         │                                    │                                         
+                                         │   [1] Instant                      │                                         
+                                         │   [2] Local                        │                                         
+                                         │   [3] Git                          │                                         
+                                         │   [4] MongoDB                      │                                         
+                                         │   [5] CSV                          │                                         
+                                         │   [6] JSON                         │                                         
+                                         │   [h] Help                         │                                         
+                                         │   [q] Quit                         │                                         
+                                         │                                    │                                         
+                                         └────────────────────────────────────┘
