@@ -66,18 +66,6 @@ impl Tester {
     }
 
     #[allow(dead_code)]
-    pub fn assert_contains(&self, needle: &str) {
-        let text = buffer_lines(&self.term).join("\n");
-        assert!(text.contains(needle));
-    }
-
-    #[allow(dead_code)]
-    pub fn assert_not_contains(&self, needle: &str) {
-        let text = buffer_lines(&self.term).join("\n");
-        assert!(!text.contains(needle));
-    }
-
-    #[allow(dead_code)]
     pub fn assert_snapshot(&self, name: &str) {
         let text = buffer_lines(&self.term).join("\n");
         insta::assert_snapshot!(name, text);
