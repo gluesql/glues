@@ -48,3 +48,47 @@ pub fn snapshot_lines(term: &Terminal<TestBackend>) -> Vec<String> {
     }
     lines
 }
+
+pub struct Tester {
+    pub app: App,
+    pub term: Terminal<TestBackend>,
+}
+
+impl Tester {
+    pub async fn new() -> Result<Self> {
+        let (app, term) = setup_app_and_term().await?;
+        Ok(Self { app, term })
+    }
+
+    pub fn draw(&mut self) -> color_eyre::Result<()> {
+        self.app.draw_frame(&mut self.term)
+    }
+
+    pub async fn press(&mut self, c: char) -> bool {
+        self.app.press(c).await
+    }
+
+    pub async fn ctrl(&mut self, c: char) -> bool {
+        self.app.ctrl(c).await
+    }
+
+    pub async fn key(&mut self, code: ratatui::crossterm::event::KeyCode) -> bool {
+        self.app.key(code).await
+    }
+
+    pub async fn open_instant(&mut self) -> Result<()> {
+        self.app.open_instant(&mut self.term).await
+    }
+
+    pub fn assert_contains(&self, needle: &str) {
+        self.term.assert_contains(needle);
+    }
+
+    pub fn assert_not_contains(&self, needle: &str) {
+        self.term.assert_not_contains(needle);
+    }
+
+    pub fn assert_snapshot(&self, name: &str) {
+        self.term.assert_snapshot(name);
+    }
+}
