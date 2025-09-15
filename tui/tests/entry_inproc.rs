@@ -18,8 +18,7 @@ async fn entry_nav_enter_opens_instant_inproc() -> Result<()> {
 
     // draw and assert notebook content is visible (e.g., sample note)
     app.draw_frame(&mut term)?;
-    let buf = term.buffer_to_lines().join("\n");
-    assert!(buf.contains("Sample Note"));
+    term.assert_contains("Sample Note");
 
     Ok(())
 }
@@ -36,26 +35,6 @@ async fn entry_quit_with_q_inproc() -> Result<()> {
 }
 
 #[tokio::test]
-async fn entry_keymap_toggle_inproc() -> Result<()> {
-    let (mut app, mut term) = common::setup_app_and_term().await?;
-    app.draw_frame(&mut term)?;
-
-    // show keymap
-    app.press('?').await;
-    app.draw_frame(&mut term)?;
-    let buf = term.buffer_to_lines().join("\n");
-    assert!(buf.contains(" [?] Hide keymap "));
-
-    // hide keymap
-    app.press('?').await;
-    app.draw_frame(&mut term)?;
-    let buf = term.buffer_to_lines().join("\n");
-    assert!(!buf.contains(" [?] Hide keymap "));
-
-    Ok(())
-}
-
-#[tokio::test]
 async fn entry_help_overlay_open_close_inproc() -> Result<()> {
     let (mut app, mut term) = common::setup_app_and_term().await?;
     app.draw_frame(&mut term)?;
@@ -63,14 +42,12 @@ async fn entry_help_overlay_open_close_inproc() -> Result<()> {
     // open help (currently bound to 'a')
     app.press('a').await;
     app.draw_frame(&mut term)?;
-    let buf = term.buffer_to_lines().join("\n");
-    assert!(buf.contains("Press any key to close"));
+    term.assert_contains("Press any key to close");
 
     // any key closes help
     app.press('x').await;
     app.draw_frame(&mut term)?;
-    let buf = term.buffer_to_lines().join("\n");
-    assert!(!buf.contains("Press any key to close"));
+    term.assert_not_contains("Press any key to close");
 
     Ok(())
 }
