@@ -8,12 +8,6 @@ pub async fn init() {
     let mut glue = get_glue();
 
     table("logs")
-        .drop_table_if_exists()
-        .execute(&mut glue)
-        .await
-        .unwrap();
-
-    table("logs")
         .create_table_if_not_exists()
         .add_column("timestamp TIMESTAMP DEFAULT NOW()")
         .add_column("message TEXT")

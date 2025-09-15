@@ -1,7 +1,7 @@
 ---
-source: tui/tests/flow_inproc.rs
-assertion_line: 40
-expression: buffer_to_lines(&term)
+source: tui/tests/tester.rs
+assertion_line: 999
+expression: lines
 snapshot_kind: text
 ---
 [

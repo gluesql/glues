@@ -87,7 +87,7 @@ impl From<EntryEvent> for Action {
 }
 
 impl App {
-    pub(super) async fn handle_action(&mut self, action: Action, input: Input) -> bool {
+    pub async fn handle_action(&mut self, action: Action, input: Input) -> bool {
         match action {
             Action::Tui(TuiAction::Quit) => {
                 return true;
