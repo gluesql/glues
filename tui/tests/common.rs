@@ -1,41 +1,110 @@
-#![allow(dead_code, async_fn_in_trait)]
-
-#[path = "common/app_ext.rs"]
-pub mod app_ext;
-#[path = "common/terminal_ext.rs"]
-pub mod terminal_ext;
-
-pub use app_ext::AppTestExt;
-#[allow(unused_imports)]
-pub use terminal_ext::TerminalTestExt;
+#![allow(dead_code)]
 
 use color_eyre::Result;
 use glues::{App, config, logger};
-use ratatui::{Terminal, backend::TestBackend};
+use ratatui::{
+    Terminal,
+    backend::TestBackend,
+    crossterm::event::{
+        Event as Input, KeyCode, KeyEvent as CKeyEvent, KeyEventKind, KeyModifiers,
+    },
+};
 
-pub fn assert_snapshot(name: &str, lines: &[String]) {
-    insta::assert_debug_snapshot!(name, lines);
+pub struct Tester {
+    pub app: App,
+    pub term: Terminal<TestBackend>,
 }
 
-pub async fn setup_app_and_term() -> Result<(App, Terminal<TestBackend>)> {
-    // Use repo cwd as HOME and ensure `.glues` exists; logger init is idempotent now
-    let cwd = std::env::current_dir()?;
-    std::fs::create_dir_all(cwd.join(".glues"))?;
-    unsafe {
-        std::env::set_var("HOME", &cwd);
+impl Tester {
+    pub async fn new() -> Result<Self> {
+        let cwd = std::env::current_dir()?;
+        std::fs::create_dir_all(cwd.join(".glues"))?;
+        unsafe {
+            std::env::set_var("HOME", &cwd);
+        }
+        config::init().await;
+        logger::init().await;
+
+        let backend = TestBackend::new(120, 40);
+        let term = Terminal::new(backend)?;
+        let app = App::new();
+        Ok(Self { app, term })
     }
-    config::init().await;
-    logger::init().await;
 
-    let backend = TestBackend::new(120, 40);
-    let term = Terminal::new(backend)?;
-    let app = App::new();
+    pub fn draw(&mut self) -> color_eyre::Result<()> {
+        self.term.draw(|f| self.app.draw(f))?;
+        Ok(())
+    }
 
-    Ok((app, term))
+    pub async fn press(&mut self, c: char) -> bool {
+        self.handle_input(Input::Key(CKeyEvent::new(
+            KeyCode::Char(c),
+            KeyModifiers::NONE,
+        )))
+        .await
+    }
+
+    pub async fn ctrl(&mut self, c: char) -> bool {
+        self.handle_input(Input::Key(CKeyEvent::new(
+            KeyCode::Char(c),
+            KeyModifiers::CONTROL,
+        )))
+        .await
+    }
+
+    pub async fn key(&mut self, code: KeyCode) -> bool {
+        self.handle_input(Input::Key(CKeyEvent::new(code, KeyModifiers::NONE)))
+            .await
+    }
+
+    pub async fn open_instant(&mut self) -> Result<()> {
+        self.draw()?;
+        let _ = self.press('1').await;
+        self.draw()?;
+        Ok(())
+    }
+
+    pub fn assert_contains(&self, needle: &str) {
+        let text = buffer_lines(&self.term).join("\n");
+        assert!(text.contains(needle));
+    }
+
+    pub fn assert_not_contains(&self, needle: &str) {
+        let text = buffer_lines(&self.term).join("\n");
+        assert!(!text.contains(needle));
+    }
+
+    pub fn assert_snapshot(&self, name: &str) {
+        let lines = buffer_lines(&self.term);
+        insta::assert_debug_snapshot!(name, lines);
+    }
+
+    async fn handle_input(&mut self, input: Input) -> bool {
+        if !matches!(
+            input,
+            Input::Key(CKeyEvent {
+                kind: KeyEventKind::Press,
+                ..
+            })
+        ) {
+            return false;
+        }
+
+        match input {
+            Input::Key(CKeyEvent {
+                code: KeyCode::Char('c'),
+                modifiers: KeyModifiers::CONTROL,
+                ..
+            }) => true,
+            _ => {
+                let action = self.app.context_mut().consume(&input).await;
+                self.app.handle_action(action, input).await
+            }
+        }
+    }
 }
 
-// Build snapshot lines from the current terminal buffer.
-pub fn snapshot_lines(term: &Terminal<TestBackend>) -> Vec<String> {
+fn buffer_lines(term: &Terminal<TestBackend>) -> Vec<String> {
     let buf = term.backend().buffer().clone();
     let area = buf.area();
     let mut lines = Vec::with_capacity(area.height as usize);
@@ -47,48 +116,4 @@ pub fn snapshot_lines(term: &Terminal<TestBackend>) -> Vec<String> {
         lines.push(line);
     }
     lines
-}
-
-pub struct Tester {
-    pub app: App,
-    pub term: Terminal<TestBackend>,
-}
-
-impl Tester {
-    pub async fn new() -> Result<Self> {
-        let (app, term) = setup_app_and_term().await?;
-        Ok(Self { app, term })
-    }
-
-    pub fn draw(&mut self) -> color_eyre::Result<()> {
-        self.app.draw_frame(&mut self.term)
-    }
-
-    pub async fn press(&mut self, c: char) -> bool {
-        self.app.press(c).await
-    }
-
-    pub async fn ctrl(&mut self, c: char) -> bool {
-        self.app.ctrl(c).await
-    }
-
-    pub async fn key(&mut self, code: ratatui::crossterm::event::KeyCode) -> bool {
-        self.app.key(code).await
-    }
-
-    pub async fn open_instant(&mut self) -> Result<()> {
-        self.app.open_instant(&mut self.term).await
-    }
-
-    pub fn assert_contains(&self, needle: &str) {
-        self.term.assert_contains(needle);
-    }
-
-    pub fn assert_not_contains(&self, needle: &str) {
-        self.term.assert_not_contains(needle);
-    }
-
-    pub fn assert_snapshot(&self, name: &str) {
-        self.term.assert_snapshot(name);
-    }
 }
