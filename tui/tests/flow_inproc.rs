@@ -19,7 +19,7 @@ async fn home_to_instant_quit_inproc() -> Result<()> {
     assert_debug_snapshot!("instant_inproc", common::buffer_to_lines(&term));
 
     // quit with Ctrl+C
-    let quit = common::send_ctrl(&mut app, 'c').await;
+    let quit = app.ctrl('c').await;
     assert!(quit);
 
     Ok(())
