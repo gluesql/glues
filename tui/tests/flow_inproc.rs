@@ -1,5 +1,3 @@
-#![cfg(feature = "test-utils")]
-
 mod common;
 use common::AppTestExt as _;
 
@@ -15,7 +13,7 @@ async fn home_to_instant_quit_inproc() -> Result<()> {
     assert_debug_snapshot!("home_inproc", common::buffer_to_lines(&term));
 
     // open Instant (in-memory) notebook
-    common::open_instant(&mut app, &mut term).await?;
+    app.open_instant(&mut term).await?;
     assert_debug_snapshot!("instant_inproc", common::buffer_to_lines(&term));
 
     // quit with Ctrl+C

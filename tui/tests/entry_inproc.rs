@@ -1,5 +1,3 @@
-#![cfg(feature = "test-utils")]
-
 mod common;
 use common::AppTestExt as _;
 
@@ -70,7 +68,7 @@ async fn entry_help_overlay_open_close_inproc() -> Result<()> {
 
     // any key closes help
     app.press('x').await;
-    app.draw_once_on(&mut term)?;
+    app.draw_frame(&mut term)?;
     let buf = common::buffer_to_lines(&term).join("\n");
     assert!(!buf.contains("Press any key to close"));
 
