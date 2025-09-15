@@ -9,6 +9,36 @@ use ratatui::{
 
 use glues::{App, config, logger};
 
+// --- Internal helpers ------------------------------------------------------
+
+async fn process_input(app: &mut App, input: Input) -> bool {
+    use ratatui::crossterm::event::{
+        Event as Input, KeyCode, KeyEvent as CKeyEvent, KeyEventKind, KeyModifiers,
+    };
+
+    if !matches!(
+        input,
+        Input::Key(CKeyEvent {
+            kind: KeyEventKind::Press,
+            ..
+        })
+    ) {
+        return false;
+    }
+
+    match input {
+        Input::Key(CKeyEvent {
+            code: KeyCode::Char('c'),
+            modifiers: KeyModifiers::CONTROL,
+            ..
+        }) => true,
+        _ => {
+            let action = app.context_mut().consume(&input).await;
+            app.handle_action(action, input).await
+        }
+    }
+}
+
 pub fn buffer_to_lines(term: &Terminal<TestBackend>) -> Vec<String> {
     let buf = term.backend().buffer().clone();
     let area = buf.area();
@@ -40,18 +70,6 @@ pub async fn setup_app_and_term() -> Result<(App, Terminal<TestBackend>)> {
     let app = App::new();
 
     Ok((app, term))
-}
-
-// free helper kept for convenience in some tests, but AppTestExt::open_instant is preferred
-async fn open_instant(app: &mut App, term: &mut Terminal<TestBackend>) -> Result<()> {
-    term.draw(|f| app.draw(f))?;
-    process_input(
-        app,
-        Input::Key(CKeyEvent::new(KeyCode::Char('1'), KeyModifiers::NONE)),
-    )
-    .await;
-    term.draw(|f| app.draw(f))?;
-    Ok(())
 }
 
 // --- Extension trait: ergonomic helpers on App ----------------------------
@@ -89,34 +107,13 @@ impl AppTestExt for App {
         process_input(self, Input::Key(CKeyEvent::new(code, KeyModifiers::NONE))).await
     }
     async fn open_instant(&mut self, term: &mut Terminal<TestBackend>) -> Result<()> {
-        open_instant(self, term).await
-    }
-}
-
-async fn process_input(app: &mut App, input: Input) -> bool {
-    use ratatui::crossterm::event::{
-        Event as Input, KeyCode, KeyEvent as CKeyEvent, KeyEventKind, KeyModifiers,
-    };
-
-    if !matches!(
-        input,
-        Input::Key(CKeyEvent {
-            kind: KeyEventKind::Press,
-            ..
-        })
-    ) {
-        return false;
-    }
-
-    match input {
-        Input::Key(CKeyEvent {
-            code: KeyCode::Char('c'),
-            modifiers: KeyModifiers::CONTROL,
-            ..
-        }) => true,
-        _ => {
-            let action = app.context_mut().consume(&input).await;
-            app.handle_action(action, input).await
-        }
+        term.draw(|f| self.draw(f))?;
+        process_input(
+            self,
+            Input::Key(CKeyEvent::new(KeyCode::Char('1'), KeyModifiers::NONE)),
+        )
+        .await;
+        term.draw(|f| self.draw(f))?;
+        Ok(())
     }
 }
