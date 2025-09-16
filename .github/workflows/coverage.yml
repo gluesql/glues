@@ -1,0 +1,70 @@
+name: Coverage
+
+on:
+  push:
+    branches: [main, release-*]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    env:
+      COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git user
+        run: |
+          git config --global user.email "glues.ci@example.com"
+          git config --global user.name "Glues CI"
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+
+      - name: Generate coverage report
+        run: |
+          mkdir -p coverage
+          cargo llvm-cov --workspace --lcov --output-path coverage/lcov.info
+
+      - name: Compress coverage report
+        run: |
+          xz -T0 -9e -c coverage/lcov.info > coverage/lcov.info.xz
+          rm -f coverage/lcov.info
+
+      - name: Set timestamp
+        run: echo "TIMESTAMP=$(date -u +'%Y-%m-%dT%H%M%SZ')" >> $GITHUB_ENV
+
+      - name: Create GitHub App token
+        if: github.repository == 'gluesql/glues' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.COVERAGE_APP_ID }}
+          installation-id: ${{ secrets.COVERAGE_APP_INSTALLATION_ID }}
+          private-key: ${{ secrets.COVERAGE_APP_PRIVATE_KEY }}
+          owner: gluesql
+          repositories: glues, gluesql.github.io
+
+      - name: Publish coverage to gluesql.github.io
+        if: github.repository == 'gluesql/glues' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git clone https://github.com/gluesql/gluesql.github.io.git
+          cd gluesql.github.io
+          git checkout gh-pages
+          mkdir -p coverage/glues/main
+          cp ../coverage/lcov.info.xz coverage/glues/main/${TIMESTAMP}.${COMMIT_SHA}.lcov.info.xz
+          git add coverage/glues/main/${TIMESTAMP}.${COMMIT_SHA}.lcov.info.xz
+          git commit -m "Coverage: main@${COMMIT_SHA}"
+          git push https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/gluesql/gluesql.github.io.git
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info.xz
