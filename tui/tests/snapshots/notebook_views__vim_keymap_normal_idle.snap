@@ -1,0 +1,46 @@
+---
+source: tui/tests/notebook_views.rs
+assertion_line: 160
+expression: text
+snapshot_kind: text
+---
+ Note 'Sample N┌─────────────────────────────────VIM NORMAL MODE KEYMAP─────────────────────────────────┐?] Show keymap 
+[Browser]      │                                                                                        │               
+ 󰝰 Notes       │  TO INSERT MODE                                                                        │               
+   󱇗 Sample Not│  [i] Go to insert mode                                                                 │               
+               │  [I] Go to insert mode at the beginning of the line                                    │               
+               │  [o] Insert a new line below and go to insert mode                                     │               
+               │  [O] Insert a new line above and go to insert mode                                     │               
+               │  [a] Move cursor forward and go to insert mode                                         │               
+               │  [A] Move cursor to the end of the line and go to insert mode                          │               
+               │  [s] Delete character and go to insert mode                                            │               
+               │  [S] Delete line and go to insert mode                                                 │               
+               │                                                                                        │               
+               │  TO OTHER MODES                                                                        │               
+               │  [c] Go to change mode (prepare to edit text)                                          │               
+               │  [v] Go to visual mode (select text to edit or copy)                                   │               
+               │  [g] Go to gateway mode (access extended commands)                                     │               
+               │  [y] Go to yank mode (prepare to copy text)                                            │               
+               │  [d] Go to delete mode (prepare to delete text)                                        │               
+               │  [z] Go to scroll mode (adjust viewport)                                               │               
+               │  [1-9] Go to numbering mode (repeat or extend actions with numbers)                    │               
+               │                                                                                        │               
+               │  MOVE CURSOR                                                                           │               
+               │  [h] Move cursor left                                                                  │               
+               │  [j] Move cursor down                                                                  │               
+               │  [k] Move cursor up                                                                    │               
+               │  [l] Move cursor right                                                                 │               
+               │  [w] Move cursor to the start of the next word                                         │               
+               │  [e] Move cursor to the end of the current word                                        │               
+               │  [b] Move cursor to the start of the previous word                                     │               
+               │  [0] Move cursor to the start of the line                                              │               
+               │  [$] Move cursor to the end of the line                                                │               
+               │  [^] Move cursor to the first non-blank character of the line                          │               
+               │  [G] Move cursor to the end of the file                                                │               
+               │                                                                                        │               
+               │  EDIT TEXT                                                                             │               
+               │  [~] Toggle the case of the current character                                          │               
+               │  [x] Delete character under the cursor                                                 │               
+               │                                 Press any key to close                                 │               
+               │                                                                                        │               
+               └────────────────────────────────────────────────────────────────────────────────────────┘

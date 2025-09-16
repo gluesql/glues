@@ -1,0 +1,46 @@
+---
+source: tui/tests/notebook_views.rs
+assertion_line: 160
+expression: text
+snapshot_kind: text
+---
+ Note 'Sample Note' normal mode                                                                        [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 Hi :D                                                                   
+   󱇗 Sample Note                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+               ┌────────────────────────────VIM NORMAL MODE KEYMAP - DELETE─────────────────────────────┐               
+               │                                                                                        │               
+               │  TO NUMBERING MODE                                                                     │               
+               │  [1-9] Go to delete numbering mode                                                     │               
+               │                                                                                        │               
+               │  TO DELETE INSIDE MODE                                                                 │               
+               │  [i] Go to delete inside mode                                                          │               
+               │                                                                                        │               
+               │  DELETE TEXT                                                                           │               
+               │  [d] Delete the specified number of lines                                              │               
+               │  [j] Delete the current and following lines                                            │               
+               │  [k] Delete the current and previous lines                                             │               
+               │  [e] Delete the word from the cursor to the end of the current word.                   │               
+               │  [b] Delete the word before the cursor.                                                │               
+               │  [0] Delete to the beginning of the line                                               │               
+               │  [$] Delete to the end of the line, repeated by the specified number                   │               
+               │  [h] Delete the specified number of characters to the left                             │               
+               │  [l] Delete the specified number of characters to the right                            │               
+               │                                                                                        │               
+               │                                                                                        │               
+               │                                 Press any key to close                                 │               
+               │                                                                                        │               
+               └────────────────────────────────────────────────────────────────────────────────────────┘               
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󱇗 Sample Note 

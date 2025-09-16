@@ -1,0 +1,46 @@
+---
+source: tui/tests/notebook_views.rs
+assertion_line: 160
+expression: text
+snapshot_kind: text
+---
+ Note 'Sample Note' normal mode                                                                        [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 Hi :D                                                                   
+   󱇗 Sample Note                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+               ┌────────────────────────────VIM NORMAL MODE KEYMAP - CHANGE─────────────────────────────┐               
+               │                                                                                        │               
+               │  TO CHANGE INSIDE MODE                                                                 │               
+               │  [i] Go to change inside mode                                                          │               
+               │                                                                                        │               
+               │  CHANGE TEXT AND GO TO INSERT MODE                                                     │               
+               │  [c] Delete the specified number of lines                                              │               
+               │  [e] or [w] Delete to the end of the word by the specified number of times             │               
+               │  [b] Delete to the start of the previous word, repeated by the specified number        │               
+               │  [0] Delete to the beginning of the line                                               │               
+               │  [$] Delete to the end of the line, repeated by the specified number                   │               
+               │                                                                                        │               
+               │                                                                                        │               
+               │                                 Press any key to close                                 │               
+               │                                                                                        │               
+               └────────────────────────────────────────────────────────────────────────────────────────┘               
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󱇗 Sample Note 
