@@ -1,0 +1,46 @@
+---
+source: tui/tests/notebook_views.rs
+assertion_line: 100
+expression: text
+snapshot_kind: text
+---
+ Note 'Sample Note' normal mode                                                                        [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 Hi :D                                                                   
+   󱇗 Sample Note                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                        ┌───────────────Confirm────────────────┐                                        
+                                        │                                      │                                        
+                                        │  Do you want to quit?                │                                        
+                                        │                                      │                                        
+                                        │                                      │                                        
+                                        │  [y] Confirm                         │                                        
+                                        │  [n] Cancel                          │                                        
+                                        │                                      │                                        
+                                        └──────────────────────────────────────┘                                        
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󱇗 Sample Note 

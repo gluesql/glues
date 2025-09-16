@@ -1,0 +1,46 @@
+---
+source: tui/tests/notebook_views.rs
+assertion_line: 24
+expression: text
+snapshot_kind: text
+---
+ Note 'Sample Note' normal mode                                                                        [?] Show keymap 
+ 󱇗 Sample Note                                                                                                          
+ 1 Hi :D                                                                                                                
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+ NORMAL   󰝰 Notes  󱇗 Sample Note 
