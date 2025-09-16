@@ -3,10 +3,8 @@ mod tester;
 use tester::Tester;
 
 use {
-    color_eyre::Result,
-    glues::context::notebook::ContextState,
-    glues_core::transition::VimKeymapKind,
-    ratatui::crossterm::event::KeyCode,
+    color_eyre::Result, glues::context::notebook::ContextState,
+    glues_core::transition::VimKeymapKind, ratatui::crossterm::event::KeyCode,
     std::time::SystemTime,
 };
 
@@ -140,14 +138,46 @@ async fn vim_keymap_variants() -> Result<()> {
     t.open_first_note().await?;
 
     let cases = [
-        (EditorNormalMode { idle: true }, VimKeymapKind::NormalIdle, "vim_keymap_normal_idle"),
-        (EditorNormalMode { idle: false }, VimKeymapKind::NormalNumbering, "vim_keymap_normal_numbering"),
-        (EditorNormalMode { idle: false }, VimKeymapKind::NormalDelete, "vim_keymap_normal_delete"),
-        (EditorNormalMode { idle: false }, VimKeymapKind::NormalDelete2, "vim_keymap_normal_delete2"),
-        (EditorNormalMode { idle: false }, VimKeymapKind::NormalChange, "vim_keymap_normal_change"),
-        (EditorNormalMode { idle: false }, VimKeymapKind::NormalChange2, "vim_keymap_normal_change2"),
-        (EditorVisualMode, VimKeymapKind::VisualIdle, "vim_keymap_visual_idle"),
-        (EditorVisualMode, VimKeymapKind::VisualNumbering, "vim_keymap_visual_numbering"),
+        (
+            EditorNormalMode { idle: true },
+            VimKeymapKind::NormalIdle,
+            "vim_keymap_normal_idle",
+        ),
+        (
+            EditorNormalMode { idle: false },
+            VimKeymapKind::NormalNumbering,
+            "vim_keymap_normal_numbering",
+        ),
+        (
+            EditorNormalMode { idle: false },
+            VimKeymapKind::NormalDelete,
+            "vim_keymap_normal_delete",
+        ),
+        (
+            EditorNormalMode { idle: false },
+            VimKeymapKind::NormalDelete2,
+            "vim_keymap_normal_delete2",
+        ),
+        (
+            EditorNormalMode { idle: false },
+            VimKeymapKind::NormalChange,
+            "vim_keymap_normal_change",
+        ),
+        (
+            EditorNormalMode { idle: false },
+            VimKeymapKind::NormalChange2,
+            "vim_keymap_normal_change2",
+        ),
+        (
+            EditorVisualMode,
+            VimKeymapKind::VisualIdle,
+            "vim_keymap_visual_idle",
+        ),
+        (
+            EditorVisualMode,
+            VimKeymapKind::VisualNumbering,
+            "vim_keymap_visual_numbering",
+        ),
     ];
 
     for (state, kind, name) in cases {
