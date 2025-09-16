@@ -1,0 +1,37 @@
+---
+source: tui/tests/entry.rs
+assertion_line: 65
+expression: text
+snapshot_kind: text
+---
+ Glues - TUI note-taking app offering complete data control and flexible storage options               [?] Show keymap 
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                           ████   ███                                                                   
+                                          ██  ██   ██                                                                   
+                                         ██        ██    ██  ██   ████    █████                                         
+                                         ██        ██    ██  ██  ██  ██  ██                                             
+                              ┌──────────────────────────Prompt───────────────────────────┐                             
+                              │                                                           │                             
+                              │  Enter the path:                                          │                             
+                              │  If the path does not exist, it will be created.          │                             
+                              │  ┌─────────────────────────────────────────────────────┐  │                             
+                              │  │                                                     │  │                             
+                              │  └─────────────────────────────────────────────────────┘  │                             
+                              │                                                           │                             
+                              │  [Enter] Submit                                           │                             
+                              │  [Esc] Cancel                                             │                             
+                              │                                                           │                             
+                              └───────────────────────────────────────────────────────────┘                             
+                                         │   [6] JSON                         │                                         
+                                         │   [h] Help                         │                                         
+                                         │   [q] Quit                         │                                         
+                                         │                                    │                                         
+                                         └────────────────────────────────────┘
