@@ -87,6 +87,23 @@ Here is our plan for Glues and the features we aim to implement. Below is a list
 * **More Vim Keybindings:** Integrate Vim keybindings for users who prefer Vim-like shortcuts.
 * **Additional Storage Backends:** Support more storage options like Redis and object storage for greater flexibility.
 
+## Development
+
+### Coverage
+
+Install [cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov) once with:
+
+```bash
+cargo install cargo-llvm-cov
+```
+
+Key commands exposed via project aliases:
+
+- `cargo coverage` - run the workspace under coverage and emit an HTML report at `target/llvm-cov/html/index.html`
+- `cargo coverage-report` - print a text summary (run after `cargo coverage --no-report`; append `--fail-under-lines <N>` to guard CI)
+- `cargo coverage-lcov` - export `target/llvm-cov/lcov.info` for external services
+- `cargo coverage-clean` - remove coverage artifacts
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](https://github.com/gluesql/glues/blob/main/LICENSE) file for details.
