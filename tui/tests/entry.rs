@@ -52,3 +52,16 @@ async fn help_overlay_toggles() -> Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn open_local_prompt() -> Result<()> {
+    let mut t = Tester::new().await?;
+
+    t.draw()?;
+    // open Local storage prompt via hotkey 2
+    t.press('2').await;
+    t.draw()?;
+    snap!(t, "local_prompt");
+
+    Ok(())
+}
