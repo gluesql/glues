@@ -30,7 +30,7 @@ jobs:
       - name: Generate coverage report
         run: |
           mkdir -p coverage
-          cargo llvm-cov --workspace --lcov --output-path coverage/lcov.info
+          cargo llvm-cov --workspace --lcov --output-path coverage/lcov.info --remap-path-prefix
 
       - name: Compress coverage report
         run: |
