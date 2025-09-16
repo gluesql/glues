@@ -1,6 +1,6 @@
 ---
 source: tui/tests/notebook_views.rs
-assertion_line: 107
+assertion_line: 118
 expression: text
 snapshot_kind: text
 ---
@@ -43,4 +43,4 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐ NORMAL   󰝰 Notes  󱇗 SecondSample Note 
+                                            ▐ NORMAL   󰝰 Notes  󰝰 Dir  󱇗 Nested 

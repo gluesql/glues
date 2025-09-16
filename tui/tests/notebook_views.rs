@@ -75,6 +75,14 @@ async fn notebook_editor_states() -> Result<()> {
 
     // Highlight tabs while browsing the tree
     t.key(KeyCode::Tab).await;
+    {
+        let context = t.app.context_mut();
+        if context.notebook.tabs.len() == 1 {
+            let mut tab = context.notebook.tabs[0].clone();
+            tab.note.name = "Other".into();
+            context.notebook.tabs.push(tab);
+        }
+    }
     t.draw()?;
     snap!(t, "editor_tab_tree");
     t.press('l').await;
@@ -101,6 +109,9 @@ async fn notebook_editor_states() -> Result<()> {
         let context = t.app.context_mut();
         for (_, item) in context.notebook.editors.iter_mut() {
             item.dirty = false;
+        }
+        if let Some(tab) = context.notebook.tabs.get_mut(0) {
+            tab.breadcrumb = vec!["Notes".into(), "Dir".into(), "Nested".into()];
         }
     }
     t.draw()?;

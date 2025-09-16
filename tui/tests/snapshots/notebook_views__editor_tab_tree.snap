@@ -1,11 +1,11 @@
 ---
 source: tui/tests/notebook_views.rs
-assertion_line: 79
+assertion_line: 87
 expression: text
 snapshot_kind: text
 ---
  Note 'SecondSample Note' selected                                                                     [?] Show keymap 
-[Browser]                                   ▐ 󱇗 SecondSample Note                                                       
+[Browser]                                   ▐ 󱇗 SecondSample Note  󱇗 Other                                              
  󰝰 Notes                                    ▐ 1 XHi :D                                                                  
    󱇗 SecondSample Note                      ▐                                                                           
                                             ▐                                                                           
