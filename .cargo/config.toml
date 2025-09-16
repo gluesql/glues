@@ -1,0 +1,22 @@
+[alias]
+coverage = [
+    "llvm-cov",
+    "--workspace",
+    "--html"
+]
+coverage-report = [
+    "llvm-cov",
+    "report",
+    "--text"
+]
+coverage-lcov = [
+    "llvm-cov",
+    "--workspace",
+    "--lcov",
+    "--output-path",
+    "target/llvm-cov/lcov.info"
+]
+coverage-clean = [
+    "llvm-cov",
+    "clean"
+]
