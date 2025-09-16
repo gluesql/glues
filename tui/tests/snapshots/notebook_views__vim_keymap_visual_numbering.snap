@@ -1,6 +1,6 @@
 ---
 source: tui/tests/notebook_views.rs
-assertion_line: 138
+assertion_line: 160
 expression: text
 snapshot_kind: text
 ---
@@ -15,32 +15,32 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
+               ┌───────────────────────────VIM VISUAL MODE KEYMAP - NUMBERING───────────────────────────┐               
+               │                                                                                        │               
+               │  EXTENDING NUMBERING MODE                                                              │               
+               │  [0-9] Append additional digits to extend the current command                          │               
+               │                                                                                        │               
+               │  MOVE CURSOR                                                                           │               
+               │  [h] Move cursor left by the specified number of times                                 │               
+               │  [j] Move cursor down by the specified number of times                                 │               
+               │  [k] Move cursor up by the specified number of times                                   │               
+               │  [l] Move cursor right by the specified number of times                                │               
+               │  [w] Move cursor to the start of the next word, repeated by the specified number       │               
+               │  [e] Move cursor to the end of the next word, repeated by the specified number         │               
+               │  [b] Move cursor to the start of the previous word, repeated by the specified number   │               
+               │  [G] Move cursor to the specified line number                                          │               
+               │                                                                                        │               
+               │                                                                                        │               
+               │                                 Press any key to close                                 │               
+               │                                                                                        │               
+               └────────────────────────────────────────────────────────────────────────────────────────┘               
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                        ┌───────────────Confirm────────────────┐                                        
-                                        │                                      │                                        
-                                        │  Do you want to quit?                │                                        
-                                        │                                      │                                        
-                                        │                                      │                                        
-                                        │  [y] Confirm                         │                                        
-                                        │  [n] Cancel                          │                                        
-                                        │                                      │                                        
-                                        └──────────────────────────────────────┘                                        
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐ NORMAL   󰝰 Notes  󱇗 Sample Note 
+                                            ▐ VISUAL   󰝰 Notes  󱇗 Sample Note 

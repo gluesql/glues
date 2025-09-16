@@ -2,7 +2,13 @@
 mod tester;
 use tester::Tester;
 
-use {color_eyre::Result, ratatui::crossterm::event::KeyCode, std::time::SystemTime};
+use {
+    color_eyre::Result,
+    glues::context::notebook::ContextState,
+    glues_core::transition::VimKeymapKind,
+    ratatui::crossterm::event::KeyCode,
+    std::time::SystemTime,
+};
 
 #[tokio::test]
 async fn notebook_browser_toggle() -> Result<()> {
@@ -127,66 +133,34 @@ async fn notebook_editor_states() -> Result<()> {
 
 #[tokio::test]
 async fn vim_keymap_variants() -> Result<()> {
+    use ContextState::*;
+
     let mut t = Tester::new().await?;
     t.open_instant().await?;
     t.open_first_note().await?;
 
-    t.key(KeyCode::Esc).await;
-    t.ctrl('h').await;
-    t.draw()?;
-    snap!(t, "vim_keymap_normal_idle");
-    t.press('x').await;
+    let cases = [
+        (EditorNormalMode { idle: true }, VimKeymapKind::NormalIdle, "vim_keymap_normal_idle"),
+        (EditorNormalMode { idle: false }, VimKeymapKind::NormalNumbering, "vim_keymap_normal_numbering"),
+        (EditorNormalMode { idle: false }, VimKeymapKind::NormalDelete, "vim_keymap_normal_delete"),
+        (EditorNormalMode { idle: false }, VimKeymapKind::NormalDelete2, "vim_keymap_normal_delete2"),
+        (EditorNormalMode { idle: false }, VimKeymapKind::NormalChange, "vim_keymap_normal_change"),
+        (EditorNormalMode { idle: false }, VimKeymapKind::NormalChange2, "vim_keymap_normal_change2"),
+        (EditorVisualMode, VimKeymapKind::VisualIdle, "vim_keymap_visual_idle"),
+        (EditorVisualMode, VimKeymapKind::VisualNumbering, "vim_keymap_visual_numbering"),
+    ];
 
-    t.press('2').await;
-    t.ctrl('h').await;
-    t.draw()?;
-    snap!(t, "vim_keymap_normal_numbering");
-    t.press('x').await;
-    t.key(KeyCode::Esc).await;
+    for (state, kind, name) in cases {
+        {
+            let context = t.app.context_mut();
+            context.notebook.state = state;
+            context.vim_keymap = Some(kind);
+        }
+        t.draw()?;
+        snap!(t, name);
+        t.app.context_mut().vim_keymap = None;
+    }
 
-    t.press('d').await;
-    t.ctrl('h').await;
-    t.draw()?;
-    snap!(t, "vim_keymap_normal_delete");
-    t.press('x').await;
-    t.key(KeyCode::Esc).await;
-
-    t.press('d').await;
-    t.press('2').await;
-    t.ctrl('h').await;
-    t.draw()?;
-    snap!(t, "vim_keymap_normal_delete2");
-    t.press('x').await;
-    t.key(KeyCode::Esc).await;
-
-    t.press('c').await;
-    t.ctrl('h').await;
-    t.draw()?;
-    snap!(t, "vim_keymap_normal_change");
-    t.press('x').await;
-    t.key(KeyCode::Esc).await;
-
-    t.press('c').await;
-    t.press('2').await;
-    t.ctrl('h').await;
-    t.draw()?;
-    snap!(t, "vim_keymap_normal_change2");
-    t.press('x').await;
-    t.key(KeyCode::Esc).await;
-
-    t.press('v').await;
-    t.ctrl('h').await;
-    t.draw()?;
-    snap!(t, "vim_keymap_visual_idle");
-    t.press('x').await;
-    t.key(KeyCode::Esc).await;
-
-    t.press('v').await;
-    t.press('2').await;
-    t.ctrl('h').await;
-    t.draw()?;
-    snap!(t, "vim_keymap_visual_numbering");
-    t.press('x').await;
     t.key(KeyCode::Esc).await;
 
     Ok(())
