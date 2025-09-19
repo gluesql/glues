@@ -1,0 +1,16 @@
+[package]
+name = "glues-proxy-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+glues-core.workspace = true
+tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread", "signal"] }
+axum = "0.7"
+clap = { version = "4.5.4", features = ["derive"] }
+color-eyre = "0.6.3"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }

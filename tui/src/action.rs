@@ -3,7 +3,7 @@ use {
         App,
         config::{
             self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
-            LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME,
+            LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME, LAST_PROXY_URL,
         },
         context::ContextPrompt,
         logger::*,
@@ -52,6 +52,7 @@ pub enum TuiAction {
     OpenFile,
     OpenGit(OpenGitStep),
     OpenMongo(OpenMongoStep),
+    OpenProxy,
 
     RenameNote,
     RemoveNote,
@@ -195,6 +196,21 @@ impl App {
                 let transition = self
                     .glues
                     .dispatch(EntryEvent::OpenMongo { conn_str, db_name }.into())
+                    .await
+                    .log_unwrap();
+                self.handle_transition(transition).await;
+            }
+            Action::Tui(TuiAction::OpenProxy) => {
+                let url = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("proxy url must not be none");
+
+                config::update(LAST_PROXY_URL, &url).await;
+
+                let transition = self
+                    .glues
+                    .dispatch(EntryEvent::OpenProxy { url }.into())
                     .await
                     .log_unwrap();
                 self.handle_transition(transition).await;

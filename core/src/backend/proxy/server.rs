@@ -2,15 +2,12 @@ use super::request::ProxyRequest;
 use super::response::{ProxyResponse, ResultPayload};
 use crate::backend::CoreBackend;
 
-pub struct ProxyServer<B> {
-    pub db: B,
+pub struct ProxyServer {
+    pub db: Box<dyn CoreBackend + Send>,
 }
 
-impl<B> ProxyServer<B>
-where
-    B: CoreBackend,
-{
-    pub fn new(db: B) -> Self {
+impl ProxyServer {
+    pub fn new(db: Box<dyn CoreBackend + Send>) -> Self {
         Self { db }
     }
 
