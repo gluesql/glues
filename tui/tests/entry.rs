@@ -67,19 +67,14 @@ async fn open_local_prompt() -> Result<()> {
 }
 
 #[tokio::test]
-async fn csv_prompt_empty_shows_alert() -> Result<()> {
+async fn proxy_prompt_open() -> Result<()> {
     let mut t = Tester::new().await?;
     t.draw()?;
 
-    // open CSV prompt via hotkey 5
+    // open Proxy prompt via hotkey 5
     t.press('5').await;
     t.draw()?;
-    snap!(t, "csv_prompt_open");
-
-    // submit empty path to trigger alert
-    t.key(KeyCode::Enter).await;
-    t.draw()?;
-    snap!(t, "csv_alert");
+    snap!(t, "proxy_prompt_open");
 
     Ok(())
 }

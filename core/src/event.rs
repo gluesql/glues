@@ -23,8 +23,6 @@ pub enum Event {
 #[derive(Clone, Debug, Display)]
 pub enum EntryEvent {
     OpenMemory,
-    OpenCsv(String),
-    OpenJson(String),
     OpenFile(String),
     OpenGit {
         path: String,

@@ -1288,7 +1288,6 @@ dependencies = [
  "gluesql-csv-storage",
  "gluesql-file-storage",
  "gluesql-git-storage",
- "gluesql-json-storage",
  "gluesql-macros",
  "gluesql-mongo-storage",
  "gluesql_memory_storage",

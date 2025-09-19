@@ -7,7 +7,7 @@
 
 ## Vim-inspired, privacy-first TUI note-taking app with multiple storage options
 
-Glues is a Vim-inspired, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can store your notes locally, choose Git for distributed version control, or opt for MongoDB for centralized data management. This flexibility allows you to manage your notes in the way that best suits your workflow, whether you prefer the simplicity of local files, the collaboration capabilities of Git, or the scalability of MongoDB. For additional support, log file formats such as CSV and JSON are also available.
+Glues is a Vim-inspired, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can store your notes locally, choose Git for distributed version control, or opt for MongoDB for centralized data management.
 
 Glues is designed with a core architecture that operates independently of the TUI, providing robust state management and action handling. Although the current frontend is TUI-based, the architecture allows for easy integration with other frontends such as GUI, iOS, Android, or even running headlessly without a UI. The TUI interface clearly displays the current state and available actions, making it intuitive and easy to use.
 
@@ -48,13 +48,10 @@ Glues offers various storage options to suit your needs:
   - MongoDB storage allows you to store your notes in a MongoDB database, providing a scalable and centralized solution for managing your notes.
   - You need to provide the MongoDB connection string and the database name. Glues will handle storing and retrieving notes from the specified database.
   - This option is ideal for users who need centralized data management or work in team environments where notes are shared.
-* **CSV or JSON**:
-  - These formats store notes as simple log files, ideal for quick data exports or reading logs.
-  - CSV saves data in comma-separated format, while JSON uses JSONL (JSON Lines) format.
 * **Proxy**:
   - Point Glues at an HTTP proxy that exposes the same set of operations as the local backend.
-  - Run the bundled proxy server with `cargo run -p glues-proxy-server -- memory` (replace `memory` with `file`, `csv`, `json`, `git`, or `mongo` as needed). The server listens on `127.0.0.1:4000` by default; use `--listen` to change the address.
-  - In the TUI entry menu choose `[7] Proxy`, enter the proxy URL (e.g. `http://127.0.0.1:4000`), and Glues will talk to the remote backend just like it does locally.
+  - Run the bundled proxy server with `cargo run -p glues-proxy-server -- memory` (replace `memory` with `file`, `git`, or `mongo` as needed). The server listens on `127.0.0.1:4000` by default; use `--listen` to change the address.
+  - In the TUI entry menu choose `[5] Proxy`, enter the proxy URL (e.g. `http://127.0.0.1:4000`), and Glues will talk to the remote backend just like it does locally.
 
 ### Theme Presets
 
@@ -87,7 +84,7 @@ Here is our plan for Glues and the features we aim to implement. Below is a list
 * **Search and Tagging Improvements:** Improve search with tag support and advanced filtering to make it easier to find specific notes.
 * **Customizable Themes:** Allow users to personalize the TUI interface with customizable themes.
 * **Additional Package Manager Support:** Expand distribution beyond Cargo, making Glues available through more package managers like Homebrew, Snap, and APT for easier installation.
-* **Storage Migration:** Add a feature to migrate data between different storage options, such as from CSV to Git.
+* **Storage Migration:** Add a feature to migrate data between different storage options, such as from local files to Git.
 * **More Vim Keybindings:** Integrate Vim keybindings for users who prefer Vim-like shortcuts.
 * **Additional Storage Backends:** Support more storage options like Redis and object storage for greater flexibility.
 

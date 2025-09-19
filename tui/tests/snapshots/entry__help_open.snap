@@ -1,5 +1,6 @@
 ---
 source: tui/tests/entry.rs
+assertion_line: 46
 expression: text
 snapshot_kind: text
 ---
@@ -32,9 +33,9 @@ snapshot_kind: text
 │  Glues will handle storing and retrieving notes from the specified database.                                         │
 │  This option is ideal for users who prefer a centralized storage solution or need robust, reliable data storage.     │
 │                                                                                                                      │
-│  CSV or JSON                                                                                                         │
-│  These formats store notes as simple log files, ideal for quick data exports or reading logs.                        │
-│  CSV saves data in comma-separated format, while JSON uses JSONL (JSON Lines) format.                                │
+│  Proxy                                                                                                               │
+│  Connects Glues to a remote backend exposed over HTTP.                                                               │
+│  Run `cargo run -p glues-proxy-server -- memory` (or file/git/mongo) to start a local proxy.                         │
 │                                                                                                                      │
 │                                                                                                                      │
 │                                                Press any key to close                                                │
