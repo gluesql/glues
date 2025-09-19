@@ -8,7 +8,7 @@ use async_trait::async_trait;
 
 use super::Db;
 
-#[async_trait(?Send)]
+#[async_trait]
 impl CoreBackend for Db {
     fn root_id(&self) -> DirectoryId {
         self.root_id.clone()
