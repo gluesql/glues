@@ -51,6 +51,10 @@ Glues offers various storage options to suit your needs:
 * **CSV or JSON**:
   - These formats store notes as simple log files, ideal for quick data exports or reading logs.
   - CSV saves data in comma-separated format, while JSON uses JSONL (JSON Lines) format.
+* **Proxy**:
+  - Point Glues at an HTTP proxy that exposes the same set of operations as the local backend.
+  - Run the bundled proxy server with `cargo run -p glues-proxy-server -- memory` (replace `memory` with `file`, `csv`, `json`, `git`, or `mongo` as needed). The server listens on `127.0.0.1:4000` by default; use `--listen` to change the address.
+  - In the TUI entry menu choose `[7] Proxy`, enter the proxy URL (e.g. `http://127.0.0.1:4000`), and Glues will talk to the remote backend just like it does locally.
 
 ### Theme Presets
 
