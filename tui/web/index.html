@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/fira_code.min.css"
+    />
+    <link
+      data-trunk
+      rel="rust"
+      href="../Cargo.toml"
+      data-cargo-manifest="../Cargo.toml"
+      data-target-name="glues"
+      data-target-kind="cdylib"
+      data-cargo-args="--lib --no-default-features --features web"
+    />
+    <title>Glues Web</title>
+    <style>
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        background-color: #121212;
+      }
+      pre {
+        font-family: "Fira Code", monospace;
+        font-size: 16px;
+        margin: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      window.addEventListener("TrunkApplicationStarted", () => {
+        console.log("Glues web client initialised");
+      });
+    </script>
+  </body>
+</html>

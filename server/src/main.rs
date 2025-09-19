@@ -26,6 +26,7 @@ use {
         time::Duration,
     },
     tokio::{net::TcpListener, signal, sync::Mutex as AsyncMutex, time::sleep},
+    tower_http::cors::{Any, CorsLayer},
     tracing::{error, info},
     tracing_subscriber::EnvFilter,
 };
@@ -46,10 +47,6 @@ enum StorageCommand {
     Memory,
     /// File storage backend rooted at the given path
     File { path: String },
-    /// CSV storage backend rooted at the given path
-    Csv { path: String },
-    /// JSON storage backend rooted at the given path
-    Json { path: String },
     /// Git storage backend
     Git {
         path: String,
@@ -78,10 +75,16 @@ async fn main() -> Result<()> {
     let backend = build_backend(cli.storage, task_tx).await?;
     let server = Arc::new(AsyncMutex::new(ProxyServer::new(backend)));
 
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
+
     let app = Router::new()
         .route("/", post(handle_proxy))
         .route("/health", get(health))
-        .with_state(server.clone());
+        .with_state(server.clone())
+        .layer(cors);
 
     let listener = TcpListener::bind(cli.listen).await?;
     info!("listening on {}", cli.listen);
@@ -100,8 +103,6 @@ async fn build_backend(
     let backend: Box<dyn CoreBackend + Send> = match storage {
         StorageCommand::Memory => Box::new(Db::memory(task_tx.clone()).await?),
         StorageCommand::File { path } => Box::new(Db::file(task_tx.clone(), &path).await?),
-        StorageCommand::Csv { path } => Box::new(Db::csv(task_tx.clone(), &path).await?),
-        StorageCommand::Json { path } => Box::new(Db::json(task_tx.clone(), &path).await?),
         StorageCommand::Git {
             path,
             remote,

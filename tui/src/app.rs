@@ -1,9 +1,22 @@
 use {
-    crate::{context::Context, logger::*, views},
+    crate::{context::Context, views},
     glues_core::Glues,
-    ratatui::{DefaultTerminal, Frame},
+    ratatui::Frame,
+};
+
+#[cfg(not(target_arch = "wasm32"))]
+use {
+    crate::{
+        input::{Input, KeyCode, KeyEvent, KeyEventKind},
+        logger::*,
+    },
+    ratatui::DefaultTerminal,
     std::time::Duration,
 };
+
+#[cfg(target_arch = "wasm32")]
+#[cfg(not(target_arch = "wasm32"))]
+use crate::logger::*;
 
 pub struct App {
     pub(crate) glues: Glues,
@@ -24,10 +37,8 @@ impl App {
         Self { glues, context }
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> color_eyre::Result<()> {
-        use ct::event::{
-            Event as Input, KeyCode, KeyEvent as CKeyEvent, KeyEventKind, KeyModifiers,
-        };
         use ratatui::crossterm as ct;
 
         loop {
@@ -60,10 +71,12 @@ impl App {
                 continue;
             }
 
-            let input = ct::event::read()?;
+            let raw_input = ct::event::read()?;
+            let input: Input = raw_input.into();
+
             if !matches!(
                 input,
-                Input::Key(CKeyEvent {
+                Input::Key(KeyEvent {
                     kind: KeyEventKind::Press,
                     ..
                 })
@@ -72,11 +85,11 @@ impl App {
             }
 
             match input {
-                Input::Key(CKeyEvent {
+                Input::Key(KeyEvent {
                     code: KeyCode::Char('c'),
-                    modifiers: KeyModifiers::CONTROL,
+                    modifiers,
                     ..
-                }) => {
+                }) if modifiers.ctrl => {
                     self.save().await;
                     return Ok(());
                 }

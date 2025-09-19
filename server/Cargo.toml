@@ -12,5 +12,7 @@ tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread", "signal"]
 axum = "0.7"
 clap = { version = "4.5.4", features = ["derive"] }
 color-eyre = "0.6.3"
+tower = "0.5.2"
+tower-http = { version = "0.5", features = ["cors"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }

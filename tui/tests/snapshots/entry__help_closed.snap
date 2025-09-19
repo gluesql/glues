@@ -29,9 +29,9 @@ snapshot_kind: text
                                          │   [2] Local                        │                                         
                                          │   [3] Git                          │                                         
                                          │   [4] MongoDB                      │                                         
-                                         │   [5] CSV                          │                                         
-                                         │   [6] JSON                         │                                         
-                                         │   [7] Proxy                        │                                         
+                                         │   [5] Proxy                        │                                         
                                          │   [h] Help                         │                                         
+                                         │   [q] Quit                         │                                         
+                                         │                                    │                                         
                                          │                                    │                                         
                                          └────────────────────────────────────┘

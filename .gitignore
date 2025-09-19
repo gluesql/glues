@@ -1,3 +1,4 @@
-/target
-.glues
 .DS_Store
+.glues
+/target
+tui/web/dist/

@@ -1,0 +1,9 @@
+[build]
+release = true
+manifest = "../Cargo.toml"
+dist = "dist"
+
+[serve]
+addresses = ["127.0.0.1"]
+port = 8080
+open = false

@@ -3,7 +3,7 @@ mod tester;
 use tester::Tester;
 
 use color_eyre::Result;
-use ratatui::crossterm::event::KeyCode;
+use glues::input::KeyCode;
 
 #[tokio::test]
 async fn enter_visual_mode_and_escape() -> Result<()> {

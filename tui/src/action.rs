@@ -1,20 +1,25 @@
 use {
     super::{
         App,
-        config::{
-            self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
-            LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME, LAST_PROXY_URL,
-        },
+        config::{self, LAST_PROXY_URL},
         context::ContextPrompt,
         logger::*,
-        theme::THEME,
     },
+    crate::input::{Input, KeyCode},
     glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey},
-    ratatui::{
-        crossterm::event::{Event as Input, KeyCode, KeyModifiers},
-        style::Stylize,
-        text::Line,
-    },
+    ratatui::text::Line,
+};
+
+#[cfg_attr(target_arch = "wasm32", allow(unused_imports))]
+use ratatui::style::Stylize;
+
+#[cfg_attr(target_arch = "wasm32", allow(unused_imports))]
+use super::theme::THEME;
+
+#[cfg(not(target_arch = "wasm32"))]
+use super::config::{
+    LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE, LAST_MONGO_CONN_STR,
+    LAST_MONGO_DB_NAME,
 };
 
 #[derive(Clone)]
@@ -47,8 +52,6 @@ pub enum TuiAction {
     SaveAndPassThrough,
     Quit,
 
-    OpenCsv,
-    OpenJson,
     OpenFile,
     OpenGit(OpenGitStep),
     OpenMongo(OpenMongoStep),
@@ -116,6 +119,7 @@ impl App {
             }) => {
                 self.context.prompt = Some(ContextPrompt::new(message, *action, default));
             }
+            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenGit(OpenGitStep::Path)) => {
                 let path = self
                     .context
@@ -132,6 +136,7 @@ impl App {
                 let action = TuiAction::OpenGit(OpenGitStep::Remote { path }).into();
                 self.context.prompt = Some(ContextPrompt::new(message, action, default));
             }
+            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenGit(OpenGitStep::Remote { path })) => {
                 let remote = self
                     .context
@@ -149,6 +154,7 @@ impl App {
                 let action = TuiAction::OpenGit(OpenGitStep::Branch { path, remote }).into();
                 self.context.prompt = Some(ContextPrompt::new(message, action, default));
             }
+            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenGit(OpenGitStep::Branch { path, remote })) => {
                 let branch = self
                     .context
@@ -168,6 +174,7 @@ impl App {
                     .log_unwrap();
                 self.handle_transition(transition).await;
             }
+            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenMongo(OpenMongoStep::ConnStr)) => {
                 let conn_str = self
                     .context
@@ -185,6 +192,7 @@ impl App {
                 let action = TuiAction::OpenMongo(OpenMongoStep::Database { conn_str }).into();
                 self.context.prompt = Some(ContextPrompt::new(message, action, default));
             }
+            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenMongo(OpenMongoStep::Database { conn_str })) => {
                 let db_name = self
                     .context
@@ -215,44 +223,11 @@ impl App {
                     .log_unwrap();
                 self.handle_transition(transition).await;
             }
-            Action::Tui(TuiAction::OpenCsv) => {
-                let path = self
-                    .context
-                    .take_prompt_input()
-                    .log_expect("prompt must not be none");
-                if path.is_empty() {
-                    self.context.alert = Some("Path cannot be empty".to_string());
-                    return false;
-                }
-
-                config::update(LAST_CSV_PATH, &path).await;
-
-                let transition = self
-                    .glues
-                    .dispatch(EntryEvent::OpenCsv(path).into())
-                    .await
-                    .log_unwrap();
-                self.handle_transition(transition).await;
-            }
-            Action::Tui(TuiAction::OpenJson) => {
-                let path = self
-                    .context
-                    .take_prompt_input()
-                    .log_expect("prompt must not be none");
-                if path.is_empty() {
-                    self.context.alert = Some("Path cannot be empty".to_string());
-                    return false;
-                }
-
-                config::update(LAST_JSON_PATH, &path).await;
-
-                let transition = self
-                    .glues
-                    .dispatch(EntryEvent::OpenJson(path).into())
-                    .await
-                    .log_unwrap();
-                self.handle_transition(transition).await;
-            }
+            #[cfg(target_arch = "wasm32")]
+            Action::Tui(TuiAction::OpenFile)
+            | Action::Tui(TuiAction::OpenGit(_))
+            | Action::Tui(TuiAction::OpenMongo(_)) => {}
+            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenFile) => {
                 let path = self
                     .context
@@ -398,7 +373,7 @@ fn to_event(input: Input) -> Option<KeyEvent> {
         _ => return None,
     };
     let code = key.code;
-    let ctrl = key.modifiers == KeyModifiers::CONTROL;
+    let ctrl = key.modifiers.ctrl;
 
     let event = match code {
         KeyCode::Char('h') if ctrl => KeyEvent::CtrlH,

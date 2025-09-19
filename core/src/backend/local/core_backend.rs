@@ -8,7 +8,8 @@ use async_trait::async_trait;
 
 use super::Db;
 
-#[async_trait]
+#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
+#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
 impl CoreBackend for Db {
     fn root_id(&self) -> DirectoryId {
         self.root_id.clone()

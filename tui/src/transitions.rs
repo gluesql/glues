@@ -3,9 +3,7 @@ mod keymap;
 mod notebook;
 
 use {
-    super::{App, logger::*},
-    async_recursion::async_recursion,
-    glues_core::transition::Transition,
+    super::App, async_recursion::async_recursion, glues_core::transition::Transition,
     std::time::SystemTime,
 };
 

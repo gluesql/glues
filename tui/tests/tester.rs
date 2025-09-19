@@ -1,16 +1,24 @@
-use color_eyre::Result;
-use glues::{App, config, logger};
-use ratatui::{
-    Terminal,
-    backend::TestBackend,
-    crossterm::event::{
-        Event as Input, KeyCode, KeyEvent as CKeyEvent, KeyEventKind, KeyModifiers,
+use {
+    color_eyre::Result,
+    glues::{
+        App, config,
+        input::{Input, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
+        logger,
     },
+    ratatui::{Terminal, backend::TestBackend},
 };
 
 pub struct Tester {
     pub app: App,
     pub term: Terminal<TestBackend>,
+}
+
+fn key_press(code: KeyCode, modifiers: KeyModifiers) -> Input {
+    Input::Key(KeyEvent {
+        code,
+        modifiers,
+        kind: KeyEventKind::Press,
+    })
 }
 
 // Bring a concise snapshot macro into test files.
@@ -45,26 +53,19 @@ impl Tester {
     }
 
     pub async fn press(&mut self, c: char) -> bool {
-        self.handle_input(Input::Key(CKeyEvent::new(
-            KeyCode::Char(c),
-            KeyModifiers::NONE,
-        )))
-        .await
+        self.handle_input(key_press(KeyCode::Char(c), KeyModifiers::NONE))
+            .await
     }
 
     #[allow(dead_code)]
     pub async fn ctrl(&mut self, c: char) -> bool {
-        self.handle_input(Input::Key(CKeyEvent::new(
-            KeyCode::Char(c),
-            KeyModifiers::CONTROL,
-        )))
-        .await
+        self.handle_input(key_press(KeyCode::Char(c), KeyModifiers::CONTROL))
+            .await
     }
 
     #[allow(dead_code)]
     pub async fn key(&mut self, code: KeyCode) -> bool {
-        self.handle_input(Input::Key(CKeyEvent::new(code, KeyModifiers::NONE)))
-            .await
+        self.handle_input(key_press(code, KeyModifiers::NONE)).await
     }
 
     #[allow(dead_code)]
@@ -105,7 +106,7 @@ impl Tester {
     async fn handle_input(&mut self, input: Input) -> bool {
         if !matches!(
             input,
-            Input::Key(CKeyEvent {
+            Input::Key(KeyEvent {
                 kind: KeyEventKind::Press,
                 ..
             })
@@ -114,11 +115,11 @@ impl Tester {
         }
 
         match input {
-            Input::Key(CKeyEvent {
+            Input::Key(KeyEvent {
                 code: KeyCode::Char('c'),
-                modifiers: KeyModifiers::CONTROL,
+                modifiers,
                 ..
-            }) => true,
+            }) if modifiers.ctrl => true,
             _ => {
                 let action = self.app.context_mut().consume(&input).await;
                 self.app.handle_action(action, input).await

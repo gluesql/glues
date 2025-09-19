@@ -1,13 +1,3 @@
-use {
-    crate::logger::*,
-    gluesql::{
-        core::ast_builder::{Execute, col, table, text},
-        prelude::{CsvStorage, Glue},
-    },
-    home::home_dir,
-    std::ops::Deref,
-};
-
 pub const LAST_CSV_PATH: &str = "last_csv_path";
 pub const LAST_JSON_PATH: &str = "last_json_path";
 pub const LAST_FILE_PATH: &str = "last_file_path";
@@ -18,77 +8,167 @@ pub const LAST_MONGO_CONN_STR: &str = "last_mongo_conn_str";
 pub const LAST_MONGO_DB_NAME: &str = "last_mongo_db_name";
 pub const LAST_PROXY_URL: &str = "last_proxy_url";
 
-const PATH: &str = ".glues/";
+const DEFAULTS: &[(&str, &str)] = &[
+    (LAST_CSV_PATH, ""),
+    (LAST_JSON_PATH, ""),
+    (LAST_FILE_PATH, ""),
+    (LAST_GIT_PATH, ""),
+    (LAST_GIT_REMOTE, "origin"),
+    (LAST_GIT_BRANCH, "main"),
+    (LAST_MONGO_CONN_STR, ""),
+    (LAST_MONGO_DB_NAME, ""),
+    (LAST_PROXY_URL, ""),
+];
 
-pub fn get_glue() -> Glue<CsvStorage> {
-    let path = home_dir()
-        .unwrap_or(std::env::current_dir().expect("failed to get current directory"))
-        .join(PATH);
-    let storage = CsvStorage::new(path).unwrap();
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) mod platform {
+    use {
+        super::DEFAULTS,
+        crate::logger::*,
+        gluesql::{
+            core::ast_builder::{Execute, col, table, text},
+            prelude::{CsvStorage, Glue},
+        },
+        home::home_dir,
+        std::ops::Deref,
+    };
 
-    Glue::new(storage)
-}
+    const PATH: &str = ".glues/";
 
-pub async fn init() {
-    let mut glue = get_glue();
+    pub(crate) fn get_glue() -> Glue<CsvStorage> {
+        let path = home_dir()
+            .unwrap_or(std::env::current_dir().expect("failed to get current directory"))
+            .join(PATH);
+        let storage = CsvStorage::new(path).unwrap();
 
-    table("config")
-        .create_table_if_not_exists()
-        .add_column("key TEXT PRIMARY KEY")
-        .add_column("value TEXT NOT NULL")
-        .execute(&mut glue)
-        .await
-        .unwrap();
+        Glue::new(storage)
+    }
 
-    for (key, value) in [
-        (LAST_CSV_PATH, ""),
-        (LAST_JSON_PATH, ""),
-        (LAST_FILE_PATH, ""),
-        (LAST_GIT_PATH, ""),
-        (LAST_GIT_REMOTE, "origin"),
-        (LAST_GIT_BRANCH, "main"),
-        (LAST_MONGO_CONN_STR, ""),
-        (LAST_MONGO_DB_NAME, ""),
-        (LAST_PROXY_URL, ""),
-    ] {
-        let _ = table("config")
-            .insert()
-            .columns(vec!["key", "value"])
-            .values(vec![vec![text(key), text(value)]])
+    pub async fn init() {
+        let mut glue = get_glue();
+
+        table("config")
+            .create_table_if_not_exists()
+            .add_column("key TEXT PRIMARY KEY")
+            .add_column("value TEXT NOT NULL")
             .execute(&mut glue)
-            .await;
+            .await
+            .unwrap();
+
+        for (key, value) in DEFAULTS {
+            let _ = table("config")
+                .insert()
+                .columns(vec!["key", "value"])
+                .values(vec![vec![text(*key), text(*value)]])
+                .execute(&mut glue)
+                .await;
+        }
+    }
+
+    pub async fn update(key: &str, value: &str) {
+        let mut glue = get_glue();
+
+        table("config")
+            .update()
+            .filter(col("key").eq(text(key)))
+            .set("value", text(value))
+            .execute(&mut glue)
+            .await
+            .unwrap();
+    }
+
+    pub async fn get(key: &str) -> Option<String> {
+        let mut glue = get_glue();
+
+        let value = table("config")
+            .select()
+            .filter(col("key").eq(text(key)))
+            .project(col("value"))
+            .execute(&mut glue)
+            .await
+            .log_unwrap()
+            .select()
+            .log_expect("payload is not from select query")
+            .next()?
+            .get("value")
+            .map(Deref::deref)
+            .log_expect("value does not exist in row")
+            .into();
+
+        Some(value)
     }
 }
 
-pub async fn update(key: &str, value: &str) {
-    let mut glue = get_glue();
+#[cfg(target_arch = "wasm32")]
+pub(crate) mod platform {
+    use {
+        super::DEFAULTS,
+        crate::logger::*,
+        gluesql::{
+            core::ast_builder::{Execute, col, table, text},
+            gluesql_web_storage::{WebStorage, WebStorageType},
+            prelude::Glue,
+        },
+        std::ops::Deref,
+    };
 
-    table("config")
-        .update()
-        .filter(col("key").eq(text(key)))
-        .set("value", text(value))
-        .execute(&mut glue)
-        .await
-        .unwrap();
+    pub(crate) fn get_glue() -> Glue<WebStorage> {
+        Glue::new(WebStorage::new(WebStorageType::Local))
+    }
+
+    pub async fn init() {
+        let mut glue = get_glue();
+
+        table("config")
+            .create_table_if_not_exists()
+            .add_column("key TEXT PRIMARY KEY")
+            .add_column("value TEXT NOT NULL")
+            .execute(&mut glue)
+            .await
+            .unwrap();
+
+        for (key, value) in DEFAULTS {
+            let _ = table("config")
+                .insert()
+                .columns(vec!["key", "value"])
+                .values(vec![vec![text(*key), text(*value)]])
+                .execute(&mut glue)
+                .await;
+        }
+    }
+
+    pub async fn update(key: &str, value: &str) {
+        let mut glue = get_glue();
+
+        table("config")
+            .update()
+            .filter(col("key").eq(text(key)))
+            .set("value", text(value))
+            .execute(&mut glue)
+            .await
+            .unwrap();
+    }
+
+    pub async fn get(key: &str) -> Option<String> {
+        let mut glue = get_glue();
+
+        let value = table("config")
+            .select()
+            .filter(col("key").eq(text(key)))
+            .project(col("value"))
+            .execute(&mut glue)
+            .await
+            .log_unwrap()
+            .select()
+            .log_expect("payload is not from select query")
+            .next()?
+            .get("value")
+            .map(Deref::deref)
+            .log_expect("value does not exist in row")
+            .into();
+
+        Some(value)
+    }
 }
 
-pub async fn get(key: &str) -> Option<String> {
-    let mut glue = get_glue();
-
-    let value = table("config")
-        .select()
-        .filter(col("key").eq(text(key)))
-        .project(col("value"))
-        .execute(&mut glue)
-        .await
-        .log_unwrap()
-        .select()
-        .log_expect("payload is not from select query")
-        .next()?
-        .get("value")
-        .map(Deref::deref)
-        .log_expect("value does not exist in row")
-        .into();
-
-    Some(value)
-}
+pub use platform::{get, init, update};

@@ -18,14 +18,6 @@ async-recursion = "1.1.1"
 git = "https://github.com/gluesql/gluesql"
 rev = "7960be640defc8083be6751d3324cf2dd809a645"
 default-features = false
-features = [
-    "gluesql_memory_storage",
-    "gluesql-csv-storage",
-    "gluesql-json-storage",
-    "gluesql-file-storage",
-    "gluesql-git-storage",
-    "gluesql-mongo-storage",
-]
 
 [profile.release]
 lto = true

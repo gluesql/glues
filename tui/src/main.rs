@@ -1,10 +1,13 @@
+#[cfg(not(target_arch = "wasm32"))]
 use glues::{App, config, logger, theme};
 
+#[cfg(not(target_arch = "wasm32"))]
 use {
     clap::{Parser, ValueEnum},
     color_eyre::Result,
 };
 
+#[cfg(not(target_arch = "wasm32"))]
 #[derive(Parser)]
 #[command(author, version, about)]
 struct Cli {
@@ -12,6 +15,7 @@ struct Cli {
     theme: ThemeArg,
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 #[derive(Clone, Copy, ValueEnum)]
 enum ThemeArg {
     Dark,
@@ -22,6 +26,7 @@ enum ThemeArg {
     Forest,
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::main]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
@@ -44,3 +49,6 @@ async fn main() -> Result<()> {
     ratatui::restore();
     app_result
 }
+
+#[cfg(target_arch = "wasm32")]
+fn main() {}

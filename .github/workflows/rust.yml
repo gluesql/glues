@@ -47,3 +47,21 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo test --workspace --all-features --verbose
 
+  wasm_build:
+    name: Wasm Build
+    runs-on: ubuntu-latest
+    needs: [rust_test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+      - name: Check wasm32 target
+        run: cargo check --target wasm32-unknown-unknown -p glues
+      - name: Install trunk
+        run: cargo install trunk --locked --force
+      - name: Build web bundle
+        run: |
+          cd tui/web
+          trunk build --release

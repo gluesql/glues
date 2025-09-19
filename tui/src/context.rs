@@ -2,10 +2,15 @@ pub mod entry;
 pub mod notebook;
 
 use {
-    crate::{Action, log, logger::*, theme::THEME},
+    crate::{
+        Action,
+        input::{Input, KeyCode, KeyEvent, to_textarea_input},
+        log,
+        logger::*,
+        theme::THEME,
+    },
     glues_core::transition::VimKeymapKind,
     ratatui::{
-        crossterm::event::{Event as Input, KeyCode, KeyEvent},
         style::Style,
         text::Line,
         widgets::{Block, Borders},
@@ -139,11 +144,13 @@ impl Context {
                     return Action::None;
                 }
                 _ => {
-                    self.prompt
-                        .as_mut()
-                        .log_expect("prompt must be some")
-                        .widget
-                        .input(input.clone());
+                    if let Some(text_input) = to_textarea_input(input) {
+                        self.prompt
+                            .as_mut()
+                            .log_expect("prompt must be some")
+                            .widget
+                            .input(text_input);
+                    }
 
                     return Action::None;
                 }
