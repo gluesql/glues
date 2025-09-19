@@ -23,20 +23,6 @@ impl EntryState {
                 glues.state = NotebookState::new(glues).await?.into();
                 Ok(EntryTransition::OpenNotebook)
             }
-            Entry(OpenCsv(path)) => {
-                let db = Db::csv(glues.task_tx.clone(), &path).await?;
-                glues.db = Some(Box::new(db));
-                glues.state = NotebookState::new(glues).await?.into();
-
-                Ok(EntryTransition::OpenNotebook)
-            }
-            Entry(OpenJson(path)) => {
-                let db = Db::json(glues.task_tx.clone(), &path).await?;
-                glues.db = Some(Box::new(db));
-                glues.state = NotebookState::new(glues).await?.into();
-
-                Ok(EntryTransition::OpenNotebook)
-            }
             Entry(OpenFile(path)) => {
                 let db = Db::file(glues.task_tx.clone(), &path).await?;
                 glues.db = Some(Box::new(db));

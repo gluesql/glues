@@ -46,10 +46,6 @@ enum StorageCommand {
     Memory,
     /// File storage backend rooted at the given path
     File { path: String },
-    /// CSV storage backend rooted at the given path
-    Csv { path: String },
-    /// JSON storage backend rooted at the given path
-    Json { path: String },
     /// Git storage backend
     Git {
         path: String,
@@ -100,8 +96,6 @@ async fn build_backend(
     let backend: Box<dyn CoreBackend + Send> = match storage {
         StorageCommand::Memory => Box::new(Db::memory(task_tx.clone()).await?),
         StorageCommand::File { path } => Box::new(Db::file(task_tx.clone(), &path).await?),
-        StorageCommand::Csv { path } => Box::new(Db::csv(task_tx.clone(), &path).await?),
-        StorageCommand::Json { path } => Box::new(Db::json(task_tx.clone(), &path).await?),
         StorageCommand::Git {
             path,
             remote,

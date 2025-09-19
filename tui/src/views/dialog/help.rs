@@ -67,16 +67,10 @@ pub fn draw(frame: &mut Frame) {
             "This option is ideal for users who prefer a centralized storage solution or need robust, reliable data storage.",
         ),
         Line::raw(""),
-        Line::from(vec![
-            "CSV".fg(THEME.accent_text).bg(THEME.accent),
-            " or ".fg(THEME.inactive_text),
-            "JSON".fg(THEME.accent_text).bg(THEME.accent),
-        ]),
+        Line::from("Proxy".fg(THEME.accent_text).bg(THEME.accent)),
+        Line::raw("Connects Glues to a remote backend exposed over HTTP."),
         Line::raw(
-            "These formats store notes as simple log files, ideal for quick data exports or reading logs.",
-        ),
-        Line::raw(
-            "CSV saves data in comma-separated format, while JSON uses JSONL (JSON Lines) format.",
+            "Run `cargo run -p glues-proxy-server -- memory` (or file/git/mongo) to start a local proxy.",
         ),
         Line::raw(""),
     ];

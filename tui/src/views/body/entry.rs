@@ -32,13 +32,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
         .title("Open Notes")
         .title_alignment(Alignment::Center);
 
-    let items = MENU_ITEMS.into_iter().map(|name| {
-        if name.ends_with("CSV") || name.ends_with("JSON") {
-            name.fg(THEME.inactive_text)
-        } else {
-            name.fg(THEME.menu)
-        }
-    });
+    let items = MENU_ITEMS.into_iter().map(|name| name.fg(THEME.menu));
     let list = List::new(items)
         .block(block)
         .highlight_style(Style::new().fg(THEME.accent_text).bg(THEME.accent))

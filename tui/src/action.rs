@@ -2,8 +2,8 @@ use {
     super::{
         App,
         config::{
-            self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
-            LAST_JSON_PATH, LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME, LAST_PROXY_URL,
+            self, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
+            LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME, LAST_PROXY_URL,
         },
         context::ContextPrompt,
         logger::*,
@@ -47,8 +47,6 @@ pub enum TuiAction {
     SaveAndPassThrough,
     Quit,
 
-    OpenCsv,
-    OpenJson,
     OpenFile,
     OpenGit(OpenGitStep),
     OpenMongo(OpenMongoStep),
@@ -211,44 +209,6 @@ impl App {
                 let transition = self
                     .glues
                     .dispatch(EntryEvent::OpenProxy { url }.into())
-                    .await
-                    .log_unwrap();
-                self.handle_transition(transition).await;
-            }
-            Action::Tui(TuiAction::OpenCsv) => {
-                let path = self
-                    .context
-                    .take_prompt_input()
-                    .log_expect("prompt must not be none");
-                if path.is_empty() {
-                    self.context.alert = Some("Path cannot be empty".to_string());
-                    return false;
-                }
-
-                config::update(LAST_CSV_PATH, &path).await;
-
-                let transition = self
-                    .glues
-                    .dispatch(EntryEvent::OpenCsv(path).into())
-                    .await
-                    .log_unwrap();
-                self.handle_transition(transition).await;
-            }
-            Action::Tui(TuiAction::OpenJson) => {
-                let path = self
-                    .context
-                    .take_prompt_input()
-                    .log_expect("prompt must not be none");
-                if path.is_empty() {
-                    self.context.alert = Some("Path cannot be empty".to_string());
-                    return false;
-                }
-
-                config::update(LAST_JSON_PATH, &path).await;
-
-                let transition = self
-                    .glues
-                    .dispatch(EntryEvent::OpenJson(path).into())
                     .await
                     .log_unwrap();
                 self.handle_transition(transition).await;

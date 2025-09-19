@@ -21,7 +21,6 @@ default-features = false
 features = [
     "gluesql_memory_storage",
     "gluesql-csv-storage",
-    "gluesql-json-storage",
     "gluesql-file-storage",
     "gluesql-git-storage",
     "gluesql-mongo-storage",
