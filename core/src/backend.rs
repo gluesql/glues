@@ -5,8 +5,8 @@ use crate::{
 };
 use async_trait::async_trait;
 
-#[async_trait(?Send)]
-pub trait CoreBackend {
+#[async_trait]
+pub trait CoreBackend: Send {
     fn root_id(&self) -> DirectoryId;
 
     async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Result<Directory>;

@@ -15,7 +15,8 @@ glues-core = { path = "./core", version = "0.7.0" }
 async-recursion = "1.1.1"
 
 [workspace.dependencies.gluesql]
-version = "0.17.0"
+git = "https://github.com/gluesql/gluesql"
+rev = "7960be640defc8083be6751d3324cf2dd809a645"
 default-features = false
 features = [
     "gluesql_memory_storage",

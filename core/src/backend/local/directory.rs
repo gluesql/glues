@@ -98,7 +98,7 @@ impl Db {
         self.sync().map(|()| directory)
     }
 
-    #[async_recursion(?Send)]
+    #[async_recursion]
     pub async fn remove_directory(&mut self, directory_id: DirectoryId) -> Result<()> {
         table("Note")
             .delete()

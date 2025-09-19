@@ -43,7 +43,7 @@ impl ProxyClient {
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 impl CoreBackend for ProxyClient {
     fn root_id(&self) -> DirectoryId {
         self.root_id.clone()

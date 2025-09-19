@@ -145,7 +145,7 @@ impl Db {
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait]
 pub trait Execute
 where
     Self: Sized,
@@ -153,8 +153,8 @@ where
     async fn execute(self, storage: &mut Storage) -> Result<Payload>;
 }
 
-#[async_trait(?Send)]
-impl<T: Build> Execute for T
+#[async_trait]
+impl<T: Build + Send> Execute for T
 where
     Self: Sized,
 {
