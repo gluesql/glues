@@ -14,6 +14,7 @@ pub use backend::CoreBackend;
 pub use error::Error;
 pub use event::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey};
 pub use glues::Glues;
+pub use task::{Task, handle_tasks};
 pub use transition::{EntryTransition, NotebookTransition, Transition};
 
 type Result<T> = std::result::Result<T, Error>;

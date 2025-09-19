@@ -2,7 +2,8 @@ use {
     crate::{
         action::{Action, OpenGitStep, OpenMongoStep, TuiAction},
         config::{
-            self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_PATH, LAST_JSON_PATH, LAST_MONGO_CONN_STR,
+            self, LAST_CSV_PATH, LAST_FILE_PATH, LAST_GIT_PATH, LAST_JSON_PATH,
+            LAST_MONGO_CONN_STR, LAST_PROXY_URL,
         },
         logger::*,
         theme::THEME,
@@ -17,10 +18,11 @@ pub const GIT: &str = "[3] Git";
 pub const MONGO: &str = "[4] MongoDB";
 pub const CSV: &str = "[5] CSV";
 pub const JSON: &str = "[6] JSON";
+pub const PROXY: &str = "[7] Proxy";
 pub const HELP: &str = "[h] Help";
 pub const QUIT: &str = "[q] Quit";
 
-pub const MENU_ITEMS: [&str; 8] = [INSTANT, FILE, GIT, MONGO, CSV, JSON, HELP, QUIT];
+pub const MENU_ITEMS: [&str; 9] = [INSTANT, FILE, GIT, MONGO, CSV, JSON, PROXY, HELP, QUIT];
 
 pub struct EntryContext {
     pub list_state: ListState,
@@ -73,6 +75,18 @@ impl EntryContext {
             .into()
         };
 
+        let open_proxy = || async move {
+            TuiAction::Prompt {
+                message: vec![
+                    Line::raw("Enter the proxy server URL:"),
+                    Line::from("e.g. http://127.0.0.1:4000".fg(THEME.hint)),
+                ],
+                action: Box::new(TuiAction::OpenProxy.into()),
+                default: config::get(LAST_PROXY_URL).await,
+            }
+            .into()
+        };
+
         match code {
             KeyCode::Char('q') => TuiAction::Quit.into(),
             KeyCode::Char('j') | KeyCode::Down => {
@@ -89,6 +103,7 @@ impl EntryContext {
             KeyCode::Char('4') => open_mongo().await,
             KeyCode::Char('5') => open(LAST_CSV_PATH, TuiAction::OpenCsv).await,
             KeyCode::Char('6') => open(LAST_JSON_PATH, TuiAction::OpenJson).await,
+            KeyCode::Char('7') => open_proxy().await,
             KeyCode::Char('a') => TuiAction::Help.into(),
 
             KeyCode::Enter => {
@@ -103,6 +118,7 @@ impl EntryContext {
                     MONGO => open_mongo().await,
                     CSV => open(LAST_CSV_PATH, TuiAction::OpenCsv).await,
                     JSON => open(LAST_JSON_PATH, TuiAction::OpenJson).await,
+                    PROXY => open_proxy().await,
                     HELP => TuiAction::Help.into(),
                     QUIT => TuiAction::Quit.into(),
                     _ => Action::None,

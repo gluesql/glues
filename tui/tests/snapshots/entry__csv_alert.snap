@@ -1,6 +1,6 @@
 ---
 source: tui/tests/entry.rs
-assertion_line: 83
+assertion_line: 82
 expression: text
 snapshot_kind: text
 ---
@@ -31,7 +31,7 @@ snapshot_kind: text
                                          │   [4] MongoDB                      │                                         
                                          │   [5] CSV                          │                                         
                                          │   [6] JSON                         │                                         
+                                         │   [7] Proxy                        │                                         
                                          │   [h] Help                         │                                         
-                                         │   [q] Quit                         │                                         
                                          │                                    │                                         
                                          └────────────────────────────────────┘

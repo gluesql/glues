@@ -14,7 +14,7 @@ use tokio::sync::Mutex;
 async fn proxy_backend_operations() {
     let (tx, _rx) = channel();
     let db = Db::memory(tx).await.unwrap();
-    let server = ProxyServer::new(db);
+    let server = ProxyServer::new(Box::new(db));
     let server = Arc::new(Mutex::new(server));
 
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();

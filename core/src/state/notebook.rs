@@ -45,8 +45,8 @@ impl NotebookState {
         let db = glues.db.as_mut().ok_or(Error::InvalidState(
             "[NotebookState::new] empty db".to_owned(),
         ))?;
-        let root_id = db.root_id.clone();
-        let root_directory = db.fetch_directory(root_id).await?;
+        let root_id = db.root_id();
+        let root_directory = db.fetch_directory(root_id.clone()).await?;
         let notes = db.fetch_notes(root_directory.id.clone()).await?;
         let directories = db
             .fetch_directories(root_directory.id.clone())

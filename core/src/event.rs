@@ -35,6 +35,9 @@ pub enum EntryEvent {
         conn_str: String,
         db_name: String,
     },
+    OpenProxy {
+        url: String,
+    },
 }
 
 #[derive(Clone, Debug, Display)]
