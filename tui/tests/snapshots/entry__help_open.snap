@@ -1,6 +1,5 @@
 ---
 source: tui/tests/entry.rs
-assertion_line: 46
 expression: text
 snapshot_kind: text
 ---
@@ -35,7 +34,7 @@ snapshot_kind: text
 │                                                                                                                      │
 │  Proxy                                                                                                               │
 │  Connects Glues to a remote backend exposed over HTTP.                                                               │
-│  Run `cargo run -p glues-proxy-server -- memory` (or file/git/mongo) to start a local proxy.                         │
+│  Run `cargo run -p glues-server -- memory` (or file/git/mongo) to start a local proxy.                               │
 │                                                                                                                      │
 │                                                                                                                      │
 │                                                Press any key to close                                                │

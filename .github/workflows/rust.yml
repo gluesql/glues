@@ -60,7 +60,7 @@ jobs:
         run: rustup target add wasm32-unknown-unknown
       - uses: Swatinem/rust-cache@v2
       - name: Check wasm32 target
-        run: cargo check --target wasm32-unknown-unknown -p glues
+        run: cargo check --target wasm32-unknown-unknown -p glues-tui
       - name: Install trunk
         run: cargo install trunk --locked --force
       - name: Build web bundle

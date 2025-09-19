@@ -1308,24 +1308,11 @@ dependencies = [
 name = "glues"
 version = "0.7.0"
 dependencies = [
- "arboard",
- "async-recursion",
  "clap",
  "color-eyre",
- "console_error_panic_hook",
- "glues-core",
- "gluesql",
- "home",
- "insta",
- "once_cell",
- "ratatui",
- "ratzilla",
- "textwrap",
+ "glues-server",
+ "glues-tui",
  "tokio",
- "tui-big-text",
- "tui-textarea",
- "wasm-bindgen",
- "wasm-bindgen-futures",
 ]
 
 [[package]]
@@ -1347,7 +1334,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "glues-proxy-server"
+name = "glues-server"
 version = "0.7.0"
 dependencies = [
  "axum",
@@ -1359,6 +1346,30 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "glues-tui"
+version = "0.7.0"
+dependencies = [
+ "arboard",
+ "async-recursion",
+ "clap",
+ "color-eyre",
+ "console_error_panic_hook",
+ "glues-core",
+ "gluesql",
+ "home",
+ "insta",
+ "once_cell",
+ "ratatui",
+ "ratzilla",
+ "textwrap",
+ "tokio",
+ "tui-big-text",
+ "tui-textarea",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
 ]
 
 [[package]]

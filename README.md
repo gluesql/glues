@@ -50,8 +50,9 @@ Glues offers various storage options to suit your needs:
   - This option is ideal for users who need centralized data management or work in team environments where notes are shared.
 * **Proxy**:
   - Point Glues at an HTTP proxy that exposes the same set of operations as the local backend.
-  - Run the bundled proxy server with `cargo run -p glues-proxy-server -- memory` (replace `memory` with `file`, `git`, or `mongo` as needed). The server listens on `127.0.0.1:4000` by default; use `--listen` to change the address.
+  - Run the bundled proxy server with `cargo run -p glues-server -- memory` (replace `memory` with `file`, `git`, or `mongo` as needed). The server listens on `127.0.0.1:4000` by default; use `--listen` to change the address.
   - In the TUI entry menu choose `Proxy` (option `[5]` on the native build), enter the proxy URL (e.g. `http://127.0.0.1:4000`), and Glues will talk to the remote backend just like it does locally.
+  - After installing via `cargo install glues`, start the proxy with `glues server memory` (or `file`, `git`, `mongo`) to use the same executable for both client and server flows.
 
 > **Web build:** The browser version of Glues persists configuration through GlueSQL WebStorage (LocalStorage) and currently exposes the **Instant** and **Proxy** backends. Point the Proxy option at a running Glues proxy server to keep data outside the browser sandbox.
 

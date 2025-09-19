@@ -1,6 +1,6 @@
 use {
     color_eyre::Result,
-    glues::{
+    glues_tui::{
         App, config,
         input::{Input, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
         logger,

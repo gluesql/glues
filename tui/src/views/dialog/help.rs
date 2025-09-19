@@ -42,7 +42,7 @@ pub fn draw(frame: &mut Frame) {
                 Line::from("Proxy".fg(THEME.accent_text).bg(THEME.accent)),
                 Line::raw("Bridge to a Glues proxy server for persistence."),
                 Line::raw(
-                    "Start it with `cargo run -p glues-proxy-server` (use `--listen` to change the address).",
+                    "Start it with `cargo run -p glues-server` (use `--listen` to change the address).",
                 ),
                 Line::raw("Both the web and TUI clients can connect to the same proxy."),
                 Line::raw(""),
@@ -95,7 +95,7 @@ pub fn draw(frame: &mut Frame) {
                 Line::from("Proxy".fg(THEME.accent_text).bg(THEME.accent)),
                 Line::raw("Connects Glues to a remote backend exposed over HTTP."),
                 Line::raw(
-                    "Run `cargo run -p glues-proxy-server -- memory` (or file/git/mongo) to start a local proxy.",
+                    "Run `cargo run -p glues-server -- memory` (or file/git/mongo) to start a local proxy.",
                 ),
                 Line::raw(""),
             ]

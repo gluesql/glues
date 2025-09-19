@@ -2,7 +2,7 @@
 mod tester;
 use tester::Tester;
 
-use {color_eyre::Result, glues::input::KeyCode};
+use {color_eyre::Result, glues_tui::input::KeyCode};
 
 #[tokio::test]
 async fn opens_instant_on_enter() -> Result<()> {

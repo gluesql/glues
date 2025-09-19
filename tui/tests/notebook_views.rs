@@ -4,8 +4,8 @@ use tester::Tester;
 
 use {
     color_eyre::Result,
-    glues::{context::notebook::ContextState, input::KeyCode},
     glues_core::transition::VimKeymapKind,
+    glues_tui::{context::notebook::ContextState, input::KeyCode},
     std::time::SystemTime,
 };
 

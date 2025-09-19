@@ -1,16 +1,17 @@
 [package]
-name = "glues"
+name = "glues-tui"
 authors.workspace = true
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Vim-inspired note-taking app for TUI & web with Instant, Proxy, Git, and Mongo backends"
+description = "TUI and WASM frontends for the Glues note-taking experience"
 readme = "../README.md"
 keywords = ["tui", "note-taking", "vim", "ratatui", "data-privacy"]
-default-run = "glues-cli"
+default-run = "glues-tui"
 
 [lib]
+name = "glues_tui"
 crate-type = ["rlib", "cdylib"]
 
 [dependencies]
@@ -29,7 +30,7 @@ cli = []
 web = []
 
 [[bin]]
-name = "glues-cli"
+name = "glues-tui"
 path = "src/main.rs"
 required-features = ["cli"]
 

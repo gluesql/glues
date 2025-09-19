@@ -1,10 +1,20 @@
 [package]
-name = "glues-proxy-server"
+name = "glues-server"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
+description = "Glues HTTP proxy server"
+default-run = "glues-server"
+
+[lib]
+name = "glues_server"
+path = "src/lib.rs"
+
+[[bin]]
+name = "glues-server"
+path = "src/main.rs"
 
 [dependencies]
 glues-core.workspace = true

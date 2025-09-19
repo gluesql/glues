@@ -1,5 +1,7 @@
 pub mod action;
 pub mod app;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod cli;
 pub mod color;
 pub mod config;
 pub mod context;

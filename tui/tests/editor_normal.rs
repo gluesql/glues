@@ -3,7 +3,7 @@ mod tester;
 use tester::Tester;
 
 use color_eyre::Result;
-use glues::input::KeyCode;
+use glues_tui::input::KeyCode;
 
 #[tokio::test]
 async fn quits_on_esc_then_y() -> Result<()> {
