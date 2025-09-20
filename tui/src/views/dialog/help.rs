@@ -65,6 +65,10 @@ pub fn draw(frame: &mut Frame) {
                     "This is the default option for users who prefer a simple, file-based approach without any remote synchronization.",
                 ),
                 Line::raw(""),
+                Line::from("redb".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::raw("Persist everything inside a single redb database file."),
+                Line::raw("Provide a path and Glues will create or reuse the file for portable storage."),
+                Line::raw(""),
                 Line::from("Git".fg(THEME.accent_text).bg(THEME.accent)),
                 Line::raw("Git storage requires three inputs: `path`, `remote`, and `branch`."),
                 Line::raw(
@@ -87,9 +91,6 @@ pub fn draw(frame: &mut Frame) {
                 ),
                 Line::raw(
                     "Glues will handle storing and retrieving notes from the specified database.",
-                ),
-                Line::raw(
-                    "This option is ideal for users who prefer a centralized storage solution or need robust, reliable data storage.",
                 ),
                 Line::raw(""),
                 Line::from("Proxy".fg(THEME.accent_text).bg(THEME.accent)),
