@@ -7,6 +7,7 @@ pub const LAST_GIT_BRANCH: &str = "last_git_branch";
 pub const LAST_MONGO_CONN_STR: &str = "last_mongo_conn_str";
 pub const LAST_MONGO_DB_NAME: &str = "last_mongo_db_name";
 pub const LAST_PROXY_URL: &str = "last_proxy_url";
+pub const LAST_IDB_NAMESPACE: &str = "last_idb_namespace";
 pub const LAST_THEME: &str = "last_theme";
 
 const DEFAULTS: &[(&str, &str)] = &[
@@ -19,6 +20,7 @@ const DEFAULTS: &[(&str, &str)] = &[
     (LAST_MONGO_CONN_STR, ""),
     (LAST_MONGO_DB_NAME, ""),
     (LAST_PROXY_URL, ""),
+    (LAST_IDB_NAMESPACE, "glues"),
     (LAST_THEME, "dark"),
 ];
 

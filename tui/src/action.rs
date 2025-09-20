@@ -10,6 +10,9 @@ use {
     ratatui::text::Line,
 };
 
+#[cfg(target_arch = "wasm32")]
+use super::config::LAST_IDB_NAMESPACE;
+
 #[cfg_attr(target_arch = "wasm32", allow(unused_imports))]
 use ratatui::style::Stylize;
 
@@ -61,6 +64,8 @@ pub enum TuiAction {
     OpenGit(OpenGitStep),
     OpenMongo(OpenMongoStep),
     OpenProxy,
+    #[cfg(target_arch = "wasm32")]
+    OpenIndexedDb,
 
     RenameNote,
     RemoveNote,
@@ -247,6 +252,31 @@ impl App {
                 let transition = self
                     .glues
                     .dispatch(EntryEvent::OpenProxy { url }.into())
+                    .await
+                    .log_unwrap();
+                self.handle_transition(transition).await;
+            }
+            #[cfg(target_arch = "wasm32")]
+            Action::Tui(TuiAction::OpenIndexedDb) => {
+                let namespace_input = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("IndexedDB namespace must not be none");
+
+                let namespace = {
+                    let trimmed = namespace_input.trim();
+                    if trimmed.is_empty() {
+                        "glues".to_owned()
+                    } else {
+                        trimmed.to_owned()
+                    }
+                };
+
+                config::update(LAST_IDB_NAMESPACE, &namespace).await;
+
+                let transition = self
+                    .glues
+                    .dispatch(EntryEvent::OpenIndexedDb { namespace }.into())
                     .await
                     .log_unwrap();
                 self.handle_transition(transition).await;
