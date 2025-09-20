@@ -141,6 +141,7 @@ impl Context {
             };
 
             match code {
+                #[cfg(not(target_arch = "wasm32"))]
                 KeyCode::Char('q') => {
                     let menu = self.quit_menu.take().log_expect("quit menu must be some");
                     return menu.quit_action;

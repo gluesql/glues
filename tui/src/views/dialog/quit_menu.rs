@@ -41,26 +41,31 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
     let key_style = Style::default().fg(THEME.text);
     let hint_style = Style::default().fg(THEME.text_secondary);
 
-    let options = Paragraph::new(vec![
-        Line::from(vec![
-            Span::styled("[m]", key_style),
-            Span::raw(" "),
-            Span::styled("Back to menu", hint_style),
-        ]),
-        Line::from(vec![
+    let mut lines = vec![Line::from(vec![
+        Span::styled("[m]", key_style),
+        Span::raw(" "),
+        Span::styled("Back to menu", hint_style),
+    ])];
+
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        lines.push(Line::from(vec![
             Span::styled("[q]", key_style),
             Span::raw(" "),
             Span::styled("Quit", hint_style),
-        ]),
-        Line::from(vec![
-            Span::styled("[Esc]", key_style),
-            Span::raw(" "),
-            Span::styled("Cancel", hint_style),
-        ]),
-    ])
-    .wrap(Wrap { trim: true })
-    .style(Style::default())
-    .alignment(Alignment::Left);
+        ]));
+    }
+
+    lines.push(Line::from(vec![
+        Span::styled("[Esc]", key_style),
+        Span::raw(" "),
+        Span::styled("Cancel", hint_style),
+    ]));
+
+    let options = Paragraph::new(lines)
+        .wrap(Wrap { trim: true })
+        .style(Style::default())
+        .alignment(Alignment::Left);
 
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);

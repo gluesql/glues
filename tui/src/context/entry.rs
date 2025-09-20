@@ -34,7 +34,7 @@ pub const QUIT: &str = "[q] Quit";
 #[cfg(not(target_arch = "wasm32"))]
 pub const MENU_ITEMS: [&str; 8] = [INSTANT, FILE, GIT, MONGO, PROXY, HELP, THEME_MENU, QUIT];
 #[cfg(target_arch = "wasm32")]
-pub const MENU_ITEMS: [&str; 5] = [INSTANT, PROXY, HELP, THEME_MENU, QUIT];
+pub const MENU_ITEMS: [&str; 4] = [INSTANT, PROXY, HELP, THEME_MENU];
 
 pub struct EntryContext {
     pub list_state: ListState,
@@ -103,6 +103,7 @@ impl EntryContext {
         };
 
         match code {
+            #[cfg(not(target_arch = "wasm32"))]
             KeyCode::Char('q') => TuiAction::Quit.into(),
             KeyCode::Char('j') | KeyCode::Down => {
                 self.list_state.select_next();
@@ -139,6 +140,7 @@ impl EntryContext {
                     PROXY => open_proxy().await,
                     HELP => TuiAction::Help.into(),
                     THEME_MENU => TuiAction::OpenThemeMenu.into(),
+                    #[cfg(not(target_arch = "wasm32"))]
                     QUIT => TuiAction::Quit.into(),
                     _ => Action::None,
                 }
