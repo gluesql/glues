@@ -33,5 +33,6 @@ snapshot_kind: text
                                          │   [p] Proxy                        │                                         
                                          │   [h] Help                         │                                         
                                          │   [t] Theme                        │                                         
+                                         │   [q] Quit                         │                                         
                                          │                                    │                                         
                                          └────────────────────────────────────┘

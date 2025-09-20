@@ -1,6 +1,6 @@
 ---
 source: tui/tests/entry.rs
-assertion_line: 91
+assertion_line: 90
 expression: text
 snapshot_kind: text
 ---
@@ -33,5 +33,6 @@ snapshot_kind: text
                                          │   [p] Proxy                        │                                         
                                          │   [h] Help                         │                                         
                                          │   [t] Theme                        │                                         
+                                         │   [q] Quit                         │                                         
                                          │                                    │                                         
                                          └────────────────────────────────────┘
