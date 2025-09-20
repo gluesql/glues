@@ -16,17 +16,17 @@ use crate::{
     config::{LAST_FILE_PATH, LAST_GIT_PATH, LAST_MONGO_CONN_STR},
 };
 
-pub const INSTANT: &str = "[1] Instant";
+pub const INSTANT: &str = "[i] Instant";
 #[cfg(not(target_arch = "wasm32"))]
-pub const FILE: &str = "[2] Local";
+pub const FILE: &str = "[l] Local";
 #[cfg(not(target_arch = "wasm32"))]
-pub const GIT: &str = "[3] Git";
+pub const GIT: &str = "[g] Git";
 #[cfg(not(target_arch = "wasm32"))]
-pub const MONGO: &str = "[4] MongoDB";
+pub const MONGO: &str = "[m] MongoDB";
 #[cfg(target_arch = "wasm32")]
-pub const PROXY: &str = "[2] Proxy";
+pub const PROXY: &str = "[p] Proxy";
 #[cfg(not(target_arch = "wasm32"))]
-pub const PROXY: &str = "[5] Proxy";
+pub const PROXY: &str = "[p] Proxy";
 pub const HELP: &str = "[h] Help";
 pub const QUIT: &str = "[q] Quit";
 
@@ -111,18 +111,15 @@ impl EntryContext {
                 self.list_state.select_previous();
                 Action::None
             }
-            KeyCode::Char('1') => EntryEvent::OpenMemory.into(),
+            KeyCode::Char('i') => EntryEvent::OpenMemory.into(),
             #[cfg(not(target_arch = "wasm32"))]
-            KeyCode::Char('2') => open(LAST_FILE_PATH, TuiAction::OpenFile).await,
+            KeyCode::Char('l') => open(LAST_FILE_PATH, TuiAction::OpenFile).await,
             #[cfg(not(target_arch = "wasm32"))]
-            KeyCode::Char('3') => open_git().await,
+            KeyCode::Char('g') => open_git().await,
             #[cfg(not(target_arch = "wasm32"))]
-            KeyCode::Char('4') => open_mongo().await,
-            #[cfg(not(target_arch = "wasm32"))]
-            KeyCode::Char('5') => open_proxy().await,
-            #[cfg(target_arch = "wasm32")]
-            KeyCode::Char('2') => open_proxy().await,
-            KeyCode::Char('a') => TuiAction::Help.into(),
+            KeyCode::Char('m') => open_mongo().await,
+            KeyCode::Char('p') => open_proxy().await,
+            KeyCode::Char('h') => TuiAction::Help.into(),
 
             KeyCode::Enter => {
                 let i = self
