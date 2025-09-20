@@ -61,3 +61,15 @@ wasm-bindgen-futures = "0.4"
 console_error_panic_hook = "0.1"
 tokio = { version = "1.41.0", features = ["macros", "rt", "sync", "time"] }
 ratatui = { version = "0.29.0", default-features = false }
+web-sys = { version = "0.3", features = [
+    "CssStyleDeclaration",
+    "Document",
+    "EventTarget",
+    "HtmlElement",
+    "HtmlTextAreaElement",
+    "Event",
+    "InputEvent",
+    "KeyboardEvent",
+    "Window",
+    "CompositionEvent",
+] }
