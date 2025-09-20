@@ -34,7 +34,7 @@ jobs:
       - name: Build web bundle
         run: |
           cd tui/web
-          trunk build --release
+          trunk build --release --public-url /glues/
 
       - name: Clone gluesql.org
         run: git clone https://github.com/gluesql/gluesql.github.io.git
