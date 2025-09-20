@@ -203,7 +203,6 @@ fn attach_ime_listeners(app: Rc<Mutex<App>>, ime: Rc<HtmlTextAreaElement>) {
             if event.key() == "Tab" && !event.ctrl_key() && !event.alt_key() && !event.shift_key() {
                 let _ = ime_focus.focus();
                 event.prevent_default();
-                event.stop_propagation();
             }
         });
 
