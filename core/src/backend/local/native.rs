@@ -5,6 +5,7 @@ use {
         core::ast_builder::Build,
         gluesql_git_storage::{GitStorage, StorageType},
         gluesql_mongo_storage::MongoStorage,
+        gluesql_redb_storage::RedbStorage,
         prelude::{FileStorage, Glue, MemoryStorage, Payload},
     },
     std::sync::mpsc::Sender,
@@ -19,6 +20,7 @@ pub struct Db {
 pub enum Storage {
     Memory(Glue<MemoryStorage>),
     File(Glue<FileStorage>),
+    Redb(Glue<RedbStorage>),
     Git(Glue<GitStorage>),
     Mongo(Glue<MongoStorage>),
 }
@@ -39,6 +41,25 @@ impl Db {
 
     pub async fn file(task_tx: Sender<Task>, path: &str) -> Result<Self> {
         let mut storage = FileStorage::new(path).map(Glue::new).map(Storage::File)?;
+
+        let root_id = setup(&mut storage).await?;
+
+        Ok(Self {
+            storage,
+            root_id,
+            task_tx,
+        })
+    }
+
+    pub async fn redb(task_tx: Sender<Task>, path: &str) -> Result<Self> {
+        if let Some(parent) = std::path::Path::new(path).parent()
+            && !parent.as_os_str().is_empty()
+        {
+            std::fs::create_dir_all(parent)
+                .map_err(|e| Error::BackendError(format!("failed to create directory: {e}")))?;
+        }
+
+        let mut storage = RedbStorage::new(path).map(Glue::new).map(Storage::Redb)?;
 
         let root_id = setup(&mut storage).await?;
 
@@ -133,6 +154,7 @@ where
         match storage {
             Storage::Memory(glue) => glue.execute_stmt(&statement).await,
             Storage::File(glue) => glue.execute_stmt(&statement).await,
+            Storage::Redb(glue) => glue.execute_stmt(&statement).await,
             Storage::Git(glue) => glue.execute_stmt(&statement).await,
             Storage::Mongo(glue) => glue.execute_stmt(&statement).await,
         }

@@ -40,6 +40,14 @@ impl EntryState {
                 Ok(EntryTransition::OpenNotebook)
             }
             #[cfg(not(target_arch = "wasm32"))]
+            Entry(OpenRedb(path)) => {
+                let db = Db::redb(glues.task_tx.clone(), &path).await?;
+                glues.db = Some(Box::new(db));
+                glues.state = NotebookState::new(glues).await?.into();
+
+                Ok(EntryTransition::OpenNotebook)
+            }
+            #[cfg(not(target_arch = "wasm32"))]
             Entry(OpenGit {
                 path,
                 remote,

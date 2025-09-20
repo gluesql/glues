@@ -1,6 +1,7 @@
 pub const LAST_CSV_PATH: &str = "last_csv_path";
 pub const LAST_JSON_PATH: &str = "last_json_path";
 pub const LAST_FILE_PATH: &str = "last_file_path";
+pub const LAST_REDB_PATH: &str = "last_redb_path";
 pub const LAST_GIT_PATH: &str = "last_git_path";
 pub const LAST_GIT_REMOTE: &str = "last_git_remote";
 pub const LAST_GIT_BRANCH: &str = "last_git_branch";
@@ -14,6 +15,7 @@ const DEFAULTS: &[(&str, &str)] = &[
     (LAST_CSV_PATH, ""),
     (LAST_JSON_PATH, ""),
     (LAST_FILE_PATH, ""),
+    (LAST_REDB_PATH, ""),
     (LAST_GIT_PATH, ""),
     (LAST_GIT_REMOTE, "origin"),
     (LAST_GIT_BRANCH, "main"),

@@ -16,7 +16,7 @@ use crate::config::LAST_IDB_NAMESPACE;
 #[cfg(not(target_arch = "wasm32"))]
 use crate::{
     action::{OpenGitStep, OpenMongoStep},
-    config::{LAST_FILE_PATH, LAST_GIT_PATH, LAST_MONGO_CONN_STR},
+    config::{LAST_FILE_PATH, LAST_GIT_PATH, LAST_MONGO_CONN_STR, LAST_REDB_PATH},
 };
 
 pub const INSTANT: &str = "[i] Instant";
@@ -24,6 +24,8 @@ pub const INSTANT: &str = "[i] Instant";
 pub const INDEXED_DB: &str = "[d] IndexedDB";
 #[cfg(not(target_arch = "wasm32"))]
 pub const FILE: &str = "[l] Local";
+#[cfg(not(target_arch = "wasm32"))]
+pub const REDB: &str = "[r] redb";
 #[cfg(not(target_arch = "wasm32"))]
 pub const GIT: &str = "[g] Git";
 #[cfg(not(target_arch = "wasm32"))]
@@ -37,7 +39,9 @@ pub const THEME_MENU: &str = "[t] Theme";
 pub const QUIT: &str = "[q] Quit";
 
 #[cfg(not(target_arch = "wasm32"))]
-pub const MENU_ITEMS: [&str; 8] = [INSTANT, FILE, GIT, MONGO, PROXY, HELP, THEME_MENU, QUIT];
+pub const MENU_ITEMS: [&str; 9] = [
+    INSTANT, FILE, REDB, GIT, MONGO, PROXY, HELP, THEME_MENU, QUIT,
+];
 #[cfg(target_arch = "wasm32")]
 pub const MENU_ITEMS: [&str; 5] = [INSTANT, INDEXED_DB, PROXY, HELP, THEME_MENU];
 
@@ -64,6 +68,21 @@ impl EntryContext {
                 ],
                 action: Box::new(action.into()),
                 default: config::get(key).await,
+            }
+            .into()
+        };
+
+        #[cfg(not(target_arch = "wasm32"))]
+        let open_redb = || async move {
+            TuiAction::Prompt {
+                message: vec![
+                    Line::raw("Provide the redb database path:"),
+                    Line::from(
+                        "Glues will create or reuse the single-file redb database.".fg(THEME.hint),
+                    ),
+                ],
+                action: Box::new(TuiAction::OpenRedb.into()),
+                default: config::get(LAST_REDB_PATH).await,
             }
             .into()
         };
@@ -137,6 +156,8 @@ impl EntryContext {
             #[cfg(not(target_arch = "wasm32"))]
             KeyCode::Char('l') => open(LAST_FILE_PATH, TuiAction::OpenFile).await,
             #[cfg(not(target_arch = "wasm32"))]
+            KeyCode::Char('r') => open_redb().await,
+            #[cfg(not(target_arch = "wasm32"))]
             KeyCode::Char('g') => open_git().await,
             #[cfg(not(target_arch = "wasm32"))]
             KeyCode::Char('m') => open_mongo().await,
@@ -155,6 +176,8 @@ impl EntryContext {
                     INDEXED_DB => open_indexed_db().await,
                     #[cfg(not(target_arch = "wasm32"))]
                     FILE => open(LAST_FILE_PATH, TuiAction::OpenFile).await,
+                    #[cfg(not(target_arch = "wasm32"))]
+                    REDB => open_redb().await,
                     #[cfg(not(target_arch = "wasm32"))]
                     GIT => open_git().await,
                     #[cfg(not(target_arch = "wasm32"))]

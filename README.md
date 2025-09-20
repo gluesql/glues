@@ -7,11 +7,11 @@
 
 ## Vim-inspired, privacy-first TUI note-taking app with multiple storage options
 
-Glues is a Vim-inspired, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can store your notes locally, choose Git for distributed version control, or opt for MongoDB for centralized data management.
+Glues is a Vim-inspired, terminal-based (TUI) note-taking application that offers flexible and secure storage options. You can keep notes purely in memory, store them as individual files, write them into a portable redb database, choose Git for distributed version control, or opt for MongoDB for centralized data management.
 
 Glues is designed with a core architecture that operates independently of the TUI, providing robust state management and action handling. Although the current frontend is TUI-based, the architecture allows for easy integration with other frontends such as GUI, iOS, Android, or even running headlessly without a UI. The TUI interface clearly displays the current state and available actions, making it intuitive and easy to use.
 
-With no reliance on third-party services, Glues ensures that your data remains private and fully under your control. Currently, it supports Git and MongoDB for storage, and we plan to integrate additional storage options through [GlueSQL](https://github.com/gluesql/gluesql), giving you even more flexibility in managing your data. The core concept behind Glues is to empower users to choose how their data is handled—whether through local files, Git, MongoDB, or future storage options—without any dependence on a central authority. This makes Glues a sync-enabled application that prioritizes user autonomy and privacy.
+With no reliance on third-party services, Glues ensures that your data remains private and fully under your control. Currently, it ships with Instant (in-memory), Local (file-per-note), redb (single-file), Git, and MongoDB storage options, and we plan to integrate additional backends through [GlueSQL](https://github.com/gluesql/gluesql) for even more flexibility. The core concept behind Glues is to empower users to choose how their data is handled—whether through local files, a redb database file, Git, MongoDB, or future storage options—without any dependence on a central authority. This makes Glues a sync-enabled application that prioritizes user autonomy and privacy.
 
 <img width="1497" alt="image" src="https://github.com/user-attachments/assets/581c0586-67d9-4e13-9200-454b6ae8c50c" />
 
@@ -37,6 +37,7 @@ Glues offers various storage options to suit your needs:
 
 * **Instant**: Data is stored in memory and only persists while the app is running. This option is useful for testing or temporary notes as it is entirely volatile.
 * **Local**: Notes are stored locally as separate files. This is the default option for users who prefer a simple, file-based approach without any remote synchronization.
+* **redb**: Persist everything inside a single [redb](https://github.com/cberner/redb) database file. Provide a path and Glues will create or reuse the file, giving you a portable, self-contained notebook that is easy to back up or sync with other tools.
 * **Git**:
   - Git storage requires three inputs: `path`, `remote`, and `branch`.
   - The `path` should point to an existing local Git repository. For example, you can clone a GitHub repository and use that path.
@@ -50,9 +51,8 @@ Glues offers various storage options to suit your needs:
   - This option is ideal for users who need centralized data management or work in team environments where notes are shared.
 * **Proxy**:
   - Point Glues at an HTTP proxy that exposes the same set of operations as the local backend.
-  - Run the bundled proxy server with `cargo run -p glues-server -- memory` (replace `memory` with `file`, `git`, or `mongo` as needed). The server listens on `127.0.0.1:4000` by default; use `--listen` to change the address.
+  - Run the bundled proxy server with `glues server memory` (replace `memory` with `file`, `redb`, `git`, or `mongo` as needed). The server listens on `127.0.0.1:4000` by default; use `--listen` to change the address.
   - In the TUI entry menu choose `Proxy` (shortcut `[p]`), enter the proxy URL (e.g. `http://127.0.0.1:4000`), and Glues will talk to the remote backend just like it does locally.
-  - After installing via `cargo install glues`, start the proxy with `glues server memory` (or `file`, `git`, `mongo`) to use the same executable for both client and server flows.
 
 > **Web build:** The browser version of Glues persists configuration through GlueSQL WebStorage (LocalStorage) and currently exposes the **Instant**, **IndexedDB**, and **Proxy** backends. Use IndexedDB to keep notes in-browser across sessions, or point the Proxy option at a running Glues proxy server to keep data outside the browser sandbox.
 

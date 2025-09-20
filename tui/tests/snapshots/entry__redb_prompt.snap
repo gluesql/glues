@@ -1,6 +1,6 @@
 ---
 source: tui/tests/entry.rs
-assertion_line: 64
+assertion_line: 77
 expression: text
 snapshot_kind: text
 ---
@@ -20,8 +20,8 @@ snapshot_kind: text
                                          ██        ██    ██  ██  ██  ██  ██                                             
                               ┌──────────────────────────Prompt───────────────────────────┐                             
                               │                                                           │                             
-                              │  Enter the path:                                          │                             
-                              │  If the path does not exist, it will be created.          │                             
+                              │  Provide the redb database path:                          │                             
+                              │  Glues will create or reuse the single-file redb          │                             
                               │  ┌─────────────────────────────────────────────────────┐  │                             
                               │  │                                                     │  │                             
                               │  └─────────────────────────────────────────────────────┘  │                             

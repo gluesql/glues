@@ -1,6 +1,6 @@
 ---
 source: tui/tests/entry.rs
-assertion_line: 77
+assertion_line: 90
 expression: text
 snapshot_kind: text
 ---
@@ -30,6 +30,7 @@ snapshot_kind: text
                               │  [Esc] Cancel                                             │                             
                               │                                                           │                             
                               └───────────────────────────────────────────────────────────┘                             
+                                         │   [p] Proxy                        │                                         
                                          │   [h] Help                         │                                         
                                          │   [t] Theme                        │                                         
                                          │   [q] Quit                         │                                         

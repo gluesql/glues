@@ -67,6 +67,19 @@ async fn open_local_prompt() -> Result<()> {
 }
 
 #[tokio::test]
+async fn open_redb_prompt() -> Result<()> {
+    let mut t = Tester::new().await?;
+
+    t.draw()?;
+    // open redb storage prompt via hotkey 'r'
+    t.press('r').await;
+    t.draw()?;
+    snap!(t, "redb_prompt");
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn proxy_prompt_open() -> Result<()> {
     let mut t = Tester::new().await?;
     t.draw()?;

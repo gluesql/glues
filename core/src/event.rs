@@ -27,6 +27,8 @@ pub enum EntryEvent {
     OpenIndexedDb {
         namespace: String,
     },
+    #[cfg(not(target_arch = "wasm32"))]
+    OpenRedb(String),
     OpenFile(String),
     OpenGit {
         path: String,

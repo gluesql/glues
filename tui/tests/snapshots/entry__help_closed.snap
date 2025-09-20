@@ -27,6 +27,7 @@ snapshot_kind: text
                                          │                                    │                                         
                                          │   [i] Instant                      │                                         
                                          │   [l] Local                        │                                         
+                                         │   [r] redb                         │                                         
                                          │   [g] Git                          │                                         
                                          │   [m] MongoDB                      │                                         
                                          │   [p] Proxy                        │                                         

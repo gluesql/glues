@@ -11,7 +11,7 @@ description = "Headless state management module for Glues Notes"
 async-recursion.workspace = true
 thiserror = "1.0.61"
 async-trait = "0.1"
-uuid = { version = "1.10", features = ["v7"] }
+uuid = { version = "1.18.1", features = ["v7", "js"] }
 strum_macros = "0.26.4"
 serde = { version = "1.0", features = ["derive"] }
 
@@ -25,6 +25,7 @@ gluesql = { workspace = true, features = [
     "gluesql_memory_storage",
     "gluesql-csv-storage",
     "gluesql-file-storage",
+    "gluesql-redb-storage",
     "gluesql-git-storage",
     "gluesql-mongo-storage",
 ] }

@@ -1,10 +1,10 @@
 ---
 source: tui/tests/entry.rs
+assertion_line: 45
 expression: text
 snapshot_kind: text
 ---
  Glues - TUI note-taking app offering complete data control and flexible storage options               [?] Show keymap 
-                                                                                                                        
                                                                                                                         
 ┌─────────────────────────────────────────────────────────Help─────────────────────────────────────────────────────────┐
 │                                                                                                                      │
@@ -18,6 +18,10 @@ snapshot_kind: text
 │  Notes are stored locally as separate files.                                                                         │
 │  This is the default option for users who prefer a simple, file-based approach without any remote synchronization.   │
 │                                                                                                                      │
+│  redb                                                                                                                │
+│  Persist everything inside a single redb database file.                                                              │
+│  Provide a path and Glues will create or reuse the file for portable storage.                                        │
+│                                                                                                                      │
 │  Git                                                                                                                 │
 │  Git storage requires three inputs: `path`, `remote`, and `branch`.                                                  │
 │  The `path` should point to an existing local Git repository, similar to the file storage path.                      │
@@ -30,11 +34,10 @@ snapshot_kind: text
 │  solution for managing your notes.                                                                                   │
 │  You need to provide the MongoDB connection string and the database name.                                            │
 │  Glues will handle storing and retrieving notes from the specified database.                                         │
-│  This option is ideal for users who prefer a centralized storage solution or need robust, reliable data storage.     │
 │                                                                                                                      │
 │  Proxy                                                                                                               │
 │  Connects Glues to a remote backend exposed over HTTP.                                                               │
-│  Run `cargo run -p glues-server -- memory` (or file/git/mongo) to start a local proxy.                               │
+│  Run `glues server memory` (or file/redb/git/mongo) to start a local proxy.                                          │
 │                                                                                                                      │
 │                                                                                                                      │
 │                                                Press any key to close                                                │
