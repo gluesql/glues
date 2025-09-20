@@ -1397,6 +1397,7 @@ dependencies = [
  "async-recursion",
  "color-eyre",
  "console_error_panic_hook",
+ "getrandom 0.2.12",
  "glues-core",
  "gluesql",
  "home",
