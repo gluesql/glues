@@ -54,9 +54,11 @@ Glues offers various storage options to suit your needs:
   - In the TUI entry menu choose `Proxy` (shortcut `[p]`), enter the proxy URL (e.g. `http://127.0.0.1:4000`), and Glues will talk to the remote backend just like it does locally.
   - After installing via `cargo install glues`, start the proxy with `glues server memory` (or `file`, `git`, `mongo`) to use the same executable for both client and server flows.
 
-> **Web build:** The browser version of Glues persists configuration through GlueSQL WebStorage (LocalStorage) and currently exposes the **Instant** and **Proxy** backends. Point the Proxy option at a running Glues proxy server to keep data outside the browser sandbox.
+> **Web build:** The browser version of Glues persists configuration through GlueSQL WebStorage (LocalStorage) and currently exposes the **Instant**, **IndexedDB**, and **Proxy** backends. Use IndexedDB to keep notes in-browser across sessions, or point the Proxy option at a running Glues proxy server to keep data outside the browser sandbox.
 
 ### Web Build
+
+Try the hosted demo at https://gluesql.org/glues (Instant, IndexedDB, or Proxy storage).
 
 Glues ships with a [Ratzilla](https://github.com/orhun/ratzilla)-powered web frontend that reuses the TUI logic.
 
@@ -70,7 +72,7 @@ Glues ships with a [Ratzilla](https://github.com/orhun/ratzilla)-powered web fro
    cd tui/web
    trunk serve --release
    ```
-3. Open [http://localhost:8080](http://localhost:8080) in your browser. Use **Instant** for ephemeral notes, or connect to a running proxy server via the **Proxy** option for persistence.
+3. Open [http://localhost:8080](http://localhost:8080) in your browser. Use **Instant** for ephemeral notes, **IndexedDB** for browser-local persistence, or connect to a running proxy server via the **Proxy** option.
 
 To produce a static bundle instead, run `trunk build --release` from the same directory; the optimized artifacts will be emitted under `dist/`.
 
