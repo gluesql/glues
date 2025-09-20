@@ -78,3 +78,15 @@ async fn proxy_prompt_open() -> Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn theme_dialog_open() -> Result<()> {
+    let mut t = Tester::new().await?;
+
+    t.draw()?;
+    t.press('t').await;
+    t.draw()?;
+    snap!(t, "theme_dialog_open");
+
+    Ok(())
+}

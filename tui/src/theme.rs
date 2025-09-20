@@ -1,5 +1,7 @@
-use once_cell::sync::OnceCell;
-use ratatui::style::Color;
+use {
+    ratatui::style::Color,
+    std::sync::atomic::{AtomicPtr, AtomicU8, Ordering},
+};
 
 pub mod dark;
 pub mod forest;
@@ -47,20 +49,138 @@ pub struct Theme {
     pub crumb_icon: Color,
 }
 
-pub struct ThemeWrapper;
+const fn theme_ptr(theme: &'static Theme) -> *mut Theme {
+    theme as *const Theme as *mut Theme
+}
 
-static THEME_CELL: OnceCell<Theme> = OnceCell::new();
+static CURRENT_THEME_PTR: AtomicPtr<Theme> = AtomicPtr::new(theme_ptr(&DARK_THEME));
+static CURRENT_THEME_ID: AtomicU8 = AtomicU8::new(ThemeId::Dark as u8);
+
+pub struct ThemeWrapper;
 
 impl std::ops::Deref for ThemeWrapper {
     type Target = Theme;
 
     fn deref(&self) -> &Self::Target {
-        THEME_CELL.get_or_init(|| DARK_THEME)
+        // SAFETY: the pointer always refers to one of the &'static Theme presets.
+        unsafe { &*CURRENT_THEME_PTR.load(Ordering::Relaxed) }
     }
 }
 
 pub static THEME: ThemeWrapper = ThemeWrapper;
 
-pub fn set_theme(theme: Theme) {
-    let _ = THEME_CELL.set(theme);
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u8)]
+pub enum ThemeId {
+    Dark = 0,
+    Light = 1,
+    Pastel = 2,
+    Sunrise = 3,
+    Midnight = 4,
+    Forest = 5,
+}
+
+impl ThemeId {
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            ThemeId::Dark => "dark",
+            ThemeId::Light => "light",
+            ThemeId::Pastel => "pastel",
+            ThemeId::Sunrise => "sunrise",
+            ThemeId::Midnight => "midnight",
+            ThemeId::Forest => "forest",
+        }
+    }
+}
+
+impl std::str::FromStr for ThemeId {
+    type Err = ();
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        match value {
+            "dark" => Ok(ThemeId::Dark),
+            "light" => Ok(ThemeId::Light),
+            "pastel" => Ok(ThemeId::Pastel),
+            "sunrise" => Ok(ThemeId::Sunrise),
+            "midnight" => Ok(ThemeId::Midnight),
+            "forest" => Ok(ThemeId::Forest),
+            _ => Err(()),
+        }
+    }
+}
+
+pub struct ThemePreset {
+    pub id: ThemeId,
+    pub key: char,
+    pub label: &'static str,
+    pub theme: &'static Theme,
+}
+
+pub const PRESETS: [ThemePreset; 6] = [
+    ThemePreset {
+        id: ThemeId::Dark,
+        key: 'd',
+        label: "Dark",
+        theme: &DARK_THEME,
+    },
+    ThemePreset {
+        id: ThemeId::Light,
+        key: 'l',
+        label: "Light",
+        theme: &LIGHT_THEME,
+    },
+    ThemePreset {
+        id: ThemeId::Pastel,
+        key: 'p',
+        label: "Pastel",
+        theme: &PASTEL_THEME,
+    },
+    ThemePreset {
+        id: ThemeId::Sunrise,
+        key: 's',
+        label: "Sunrise",
+        theme: &SUNRISE_THEME,
+    },
+    ThemePreset {
+        id: ThemeId::Midnight,
+        key: 'm',
+        label: "Midnight",
+        theme: &MIDNIGHT_THEME,
+    },
+    ThemePreset {
+        id: ThemeId::Forest,
+        key: 'f',
+        label: "Forest",
+        theme: &FOREST_THEME,
+    },
+];
+
+pub fn preset_index(id: ThemeId) -> usize {
+    id as usize
+}
+
+pub fn preset(id: ThemeId) -> &'static ThemePreset {
+    &PRESETS[preset_index(id)]
+}
+
+pub fn preset_by_key(key: char) -> Option<&'static ThemePreset> {
+    PRESETS.iter().find(|preset| preset.key == key)
+}
+
+pub fn set_theme(id: ThemeId) {
+    let preset = preset(id);
+    CURRENT_THEME_PTR.store(theme_ptr(preset.theme), Ordering::Relaxed);
+    CURRENT_THEME_ID.store(id as u8, Ordering::Relaxed);
+}
+
+pub fn current_theme_id() -> ThemeId {
+    match CURRENT_THEME_ID.load(Ordering::Relaxed) {
+        0 => ThemeId::Dark,
+        1 => ThemeId::Light,
+        2 => ThemeId::Pastel,
+        3 => ThemeId::Sunrise,
+        4 => ThemeId::Midnight,
+        5 => ThemeId::Forest,
+        _ => ThemeId::Dark,
+    }
 }

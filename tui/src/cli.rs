@@ -16,18 +16,10 @@ pub enum ThemeArg {
     Forest,
 }
 
-#[derive(Clone, Args)]
+#[derive(Clone, Default, Args)]
 pub struct TuiArgs {
-    #[arg(long, value_enum, default_value_t = ThemeArg::Dark)]
-    pub theme: ThemeArg,
-}
-
-impl Default for TuiArgs {
-    fn default() -> Self {
-        Self {
-            theme: ThemeArg::Dark,
-        }
-    }
+    #[arg(long, value_enum)]
+    pub theme: Option<ThemeArg>,
 }
 
 #[derive(Parser)]
@@ -41,17 +33,34 @@ pub fn parse_args() -> TuiArgs {
     Cli::parse().args
 }
 
-pub async fn run(args: TuiArgs) -> Result<()> {
-    match args.theme {
-        ThemeArg::Dark => theme::set_theme(theme::DARK_THEME),
-        ThemeArg::Light => theme::set_theme(theme::LIGHT_THEME),
-        ThemeArg::Pastel => theme::set_theme(theme::PASTEL_THEME),
-        ThemeArg::Sunrise => theme::set_theme(theme::SUNRISE_THEME),
-        ThemeArg::Midnight => theme::set_theme(theme::MIDNIGHT_THEME),
-        ThemeArg::Forest => theme::set_theme(theme::FOREST_THEME),
+impl From<ThemeArg> for theme::ThemeId {
+    fn from(arg: ThemeArg) -> Self {
+        match arg {
+            ThemeArg::Dark => theme::ThemeId::Dark,
+            ThemeArg::Light => theme::ThemeId::Light,
+            ThemeArg::Pastel => theme::ThemeId::Pastel,
+            ThemeArg::Sunrise => theme::ThemeId::Sunrise,
+            ThemeArg::Midnight => theme::ThemeId::Midnight,
+            ThemeArg::Forest => theme::ThemeId::Forest,
+        }
     }
+}
 
+pub async fn run(args: TuiArgs) -> Result<()> {
     config::init().await;
+
+    let saved_theme = config::get(config::LAST_THEME)
+        .await
+        .and_then(|value| value.parse().ok());
+    let theme_id = args
+        .theme
+        .map(Into::into)
+        .or(saved_theme)
+        .unwrap_or(theme::ThemeId::Dark);
+
+    theme::set_theme(theme_id);
+    config::update(config::LAST_THEME, theme_id.as_str()).await;
+
     logger::init().await;
     color_eyre::install()?;
 

@@ -1,6 +1,6 @@
 ---
 source: tui/tests/entry.rs
-assertion_line: 50
+assertion_line: 89
 expression: text
 snapshot_kind: text
 ---
@@ -18,18 +18,18 @@ snapshot_kind: text
                                           ██  ██   ██                                                                   
                                          ██        ██    ██  ██   ████    █████                                         
                                          ██        ██    ██  ██  ██  ██  ██                                             
-                                         ██  ███   ██    ██  ██  ██████   ████                                          
-                                          ██  ██   ██    ██  ██  ██          ██                                         
-                                           █████  ████    ███ ██  ████   █████                                          
-                                                                                                                        
-                                                                                                                        
-                                         ┌─────────────Open Notes─────────────┐                                         
-                                         │                                    │                                         
-                                         │   [i] Instant                      │                                         
-                                         │   [l] Local                        │                                         
-                                         │   [g] Git                          │                                         
-                                         │   [m] MongoDB                      │                                         
-                                         │   [p] Proxy                        │                                         
+                                         █┌───────────Select Theme───────────┐                                          
+                                          │                                  │█                                         
+                                          │   [d] Dark                       │                                          
+                                          │   [l] Light                      │                                          
+                                          │   [p] Pastel                     │                                          
+                                         ┌│   [s] Sunrise                    │┐                                         
+                                         ││   [m] Midnight                   ││                                         
+                                         ││   [f] Forest                     ││                                         
+                                         ││                                  ││                                         
+                                         ││    [Enter] Apply  [Esc] Cancel   ││                                         
+                                         ││                                  ││                                         
+                                         │└──────────────────────────────────┘│                                         
                                          │   [h] Help                         │                                         
                                          │   [t] Theme                        │                                         
                                          │   [q] Quit                         │                                         

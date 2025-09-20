@@ -1,13 +1,16 @@
 pub mod entry;
 pub mod notebook;
+pub mod theme_selector;
 
+use theme_selector::ThemeSelector;
 use {
     crate::{
         Action,
+        config::{self, LAST_THEME},
         input::{Input, KeyCode, KeyEvent, to_textarea_input},
         log,
         logger::*,
-        theme::THEME,
+        theme::{self, THEME},
     },
     glues_core::transition::VimKeymapKind,
     ratatui::{
@@ -57,6 +60,7 @@ pub struct Context {
     pub confirm: Option<(String, Action)>,
     pub alert: Option<String>,
     pub prompt: Option<ContextPrompt>,
+    pub theme_selector: Option<ThemeSelector>,
     pub last_log: Option<(String, SystemTime)>,
 
     pub help: bool,
@@ -76,6 +80,7 @@ impl Default for Context {
             confirm: None,
             alert: None,
             prompt: None,
+            theme_selector: None,
             last_log: None,
 
             help: false,
@@ -125,6 +130,42 @@ impl Context {
                 }
                 KeyCode::Char('n') => {
                     self.confirm = None;
+                    return Action::None;
+                }
+                _ => return Action::None,
+            }
+        } else if let Some(selector) = self.theme_selector.as_mut() {
+            let key = match input {
+                Input::Key(key) => key,
+                _ => return Action::None,
+            };
+
+            match key.code {
+                KeyCode::Char('j') | KeyCode::Down => {
+                    selector.select_next();
+                    return Action::None;
+                }
+                KeyCode::Char('k') | KeyCode::Up => {
+                    selector.select_previous();
+                    return Action::None;
+                }
+                KeyCode::Enter => {
+                    let preset = selector.selected();
+                    theme::set_theme(preset.id);
+                    config::update(LAST_THEME, preset.id.as_str()).await;
+                    self.theme_selector = None;
+                    return Action::None;
+                }
+                KeyCode::Esc => {
+                    self.theme_selector = None;
+                    return Action::None;
+                }
+                KeyCode::Char(char) => {
+                    if let Some(preset) = selector.select_by_key(char) {
+                        theme::set_theme(preset.id);
+                        config::update(LAST_THEME, preset.id.as_str()).await;
+                        self.theme_selector = None;
+                    }
                     return Action::None;
                 }
                 _ => return Action::None,
