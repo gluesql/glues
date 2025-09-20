@@ -3,7 +3,7 @@ mod tester;
 use tester::Tester;
 
 use color_eyre::Result;
-use ratatui::crossterm::event::KeyCode;
+use glues_tui::input::KeyCode;
 
 #[tokio::test]
 async fn editor_keymap_overlay_in_insert_mode() -> Result<()> {

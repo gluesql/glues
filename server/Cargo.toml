@@ -1,10 +1,20 @@
 [package]
-name = "glues-proxy-server"
+name = "glues-server"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 authors.workspace = true
+description = "Glues HTTP proxy server"
+default-run = "glues-server"
+
+[lib]
+name = "glues_server"
+path = "src/lib.rs"
+
+[[bin]]
+name = "glues-server"
+path = "src/main.rs"
 
 [dependencies]
 glues-core.workspace = true
@@ -12,5 +22,7 @@ tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread", "signal"]
 axum = "0.7"
 clap = { version = "4.5.4", features = ["derive"] }
 color-eyre = "0.6.3"
+tower = "0.5.2"
+tower-http = { version = "0.5", features = ["cors"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }

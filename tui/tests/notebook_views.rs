@@ -3,8 +3,9 @@ mod tester;
 use tester::Tester;
 
 use {
-    color_eyre::Result, glues::context::notebook::ContextState,
-    glues_core::transition::VimKeymapKind, ratatui::crossterm::event::KeyCode,
+    color_eyre::Result,
+    glues_core::transition::VimKeymapKind,
+    glues_tui::{context::notebook::ContextState, input::KeyCode},
     std::time::SystemTime,
 };
 

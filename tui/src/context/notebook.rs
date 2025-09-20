@@ -3,23 +3,22 @@ mod tree_item;
 use {
     crate::{
         action::{Action, TuiAction},
+        input::{Input, KeyCode, KeyEvent, to_textarea_input},
         logger::*,
     },
-    arboard::Clipboard,
     glues_core::{
         NotebookEvent,
         data::Note,
         state::notebook::{DirectoryItem, Tab},
         types::{Id, NoteId},
     },
-    ratatui::{
-        crossterm::event::{Event as Input, KeyCode, KeyEvent, KeyModifiers},
-        text::Line,
-        widgets::ListState,
-    },
+    ratatui::{text::Line, widgets::ListState},
     std::collections::HashMap,
     tui_textarea::TextArea,
 };
+
+#[cfg(not(target_arch = "wasm32"))]
+use arboard::Clipboard;
 
 pub use tree_item::{TreeItem, TreeItemKind};
 
@@ -368,6 +367,7 @@ impl NotebookContext {
     pub fn update_yank(&mut self) {
         let text = self.get_editor().yank_text();
 
+        #[cfg(not(target_arch = "wasm32"))]
         if let Ok(mut clipboard) = Clipboard::new() {
             let _ = clipboard.set_text(&text);
         }
@@ -449,20 +449,24 @@ impl NotebookContext {
             }) => Action::Dispatch(NotebookEvent::ViewNote.into()),
             Input::Key(KeyEvent {
                 code: KeyCode::Char('h'),
-                modifiers: KeyModifiers::CONTROL,
+                modifiers,
                 ..
-            }) => TuiAction::ShowEditorKeymap.into(),
+            }) if modifiers.ctrl => TuiAction::ShowEditorKeymap.into(),
             Input::Key(KeyEvent {
                 code: KeyCode::Char('c' | 'x' | 'w' | 'k' | 'j'),
-                modifiers: KeyModifiers::CONTROL,
+                modifiers,
                 ..
-            }) => {
+            }) if modifiers.ctrl => {
                 self.line_yanked = false;
-                self.get_editor_mut().input(input.clone());
+                if let Some(text_input) = to_textarea_input(input) {
+                    self.get_editor_mut().input(text_input);
+                }
                 Action::None
             }
             _ => {
-                self.get_editor_mut().input(input.clone());
+                if let Some(text_input) = to_textarea_input(input) {
+                    self.get_editor_mut().input(text_input);
+                }
                 Action::None
             }
         }

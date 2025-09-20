@@ -8,14 +8,12 @@ repository.workspace = true
 description = "Headless state management module for Glues Notes"
 
 [dependencies]
-gluesql.workspace = true
 async-recursion.workspace = true
 thiserror = "1.0.61"
 async-trait = "0.1"
 uuid = { version = "1.10", features = ["v7"] }
 strum_macros = "0.26.4"
 serde = { version = "1.0", features = ["derive"] }
-reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
 tokio = { version = "1", features = ["rt", "macros"] }
 
 [dev-dependencies]
@@ -23,3 +21,20 @@ tokio = { version = "1.41.0", features = ["macros", "rt"] }
 axum = "0.7"
 tiny_http = "0.12"
 serde_json = "1.0"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+gluesql = { workspace = true, features = [
+    "gluesql_memory_storage",
+    "gluesql-csv-storage",
+    "gluesql-file-storage",
+    "gluesql-git-storage",
+    "gluesql-mongo-storage",
+] }
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+gluesql = { workspace = true, features = [
+    "gluesql_memory_storage",
+    "gluesql-web-storage",
+] }
+reqwest = { version = "0.12", default-features = false, features = ["json"] }

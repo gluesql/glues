@@ -1,31 +1,63 @@
 [package]
-name = "glues"
+name = "glues-tui"
 authors.workspace = true
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Vim-inspired TUI note-taking app with Git, MongoDB, and proxy support - privacy-focused and sync-enabled"
+description = "TUI and WASM frontends for the Glues note-taking experience"
 readme = "../README.md"
 keywords = ["tui", "note-taking", "vim", "ratatui", "data-privacy"]
-default-run = "glues"
+default-run = "glues-tui"
+
+[lib]
+name = "glues_tui"
+crate-type = ["rlib", "cdylib"]
 
 [dependencies]
 glues-core.workspace = true
-gluesql.workspace = true
 async-recursion.workspace = true
-ratatui = "0.29.0"
 color-eyre = "0.6.3"
 tui-big-text = "0.7.0"
-tui-textarea = "0.7.0"
-home = "0.5.9"
-tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread"] }
-arboard = "3.4.1"
+tui-textarea = { version = "0.7.0", default-features = false, features = ["ratatui"] }
 textwrap = "0.16"
 clap = { version = "4.5.4", features = ["derive"] }
 once_cell = "1.19"
 
+[features]
+default = ["cli"]
+cli = []
+web = []
+
+[[bin]]
+name = "glues-tui"
+path = "src/main.rs"
+required-features = ["cli"]
+
 [dev-dependencies]
 insta = { version = "1", features = ["glob"] }
 
- 
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+gluesql = { workspace = true, features = [
+    "gluesql_memory_storage",
+    "gluesql-csv-storage",
+    "gluesql-file-storage",
+    "gluesql-git-storage",
+    "gluesql-mongo-storage",
+] }
+home = "0.5.9"
+arboard = "3.4.1"
+tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread"] }
+ratatui = { version = "0.29.0", default-features = false, features = ["crossterm"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+gluesql = { workspace = true, features = [
+    "gluesql_memory_storage",
+    "gluesql-web-storage",
+] }
+ratzilla = "0.1.0"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+console_error_panic_hook = "0.1"
+tokio = { version = "1.41.0", features = ["macros", "rt", "sync", "time"] }
+ratatui = { version = "0.29.0", default-features = false }

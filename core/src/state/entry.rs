@@ -14,7 +14,7 @@ impl EntryState {
 
         match event {
             Entry(OpenMemory) => {
-                let mut db = Db::memory(glues.task_tx.clone()).await?;
+                let mut db = memory_backend(glues).await?;
                 let root_id = db.root_id.clone();
                 let note_id = db.add_note(root_id, "Sample Note".to_owned()).await?.id;
                 db.update_note_content(note_id, "Hi :D".to_owned()).await?;
@@ -23,6 +23,7 @@ impl EntryState {
                 glues.state = NotebookState::new(glues).await?.into();
                 Ok(EntryTransition::OpenNotebook)
             }
+            #[cfg(not(target_arch = "wasm32"))]
             Entry(OpenFile(path)) => {
                 let db = Db::file(glues.task_tx.clone(), &path).await?;
                 glues.db = Some(Box::new(db));
@@ -30,6 +31,7 @@ impl EntryState {
 
                 Ok(EntryTransition::OpenNotebook)
             }
+            #[cfg(not(target_arch = "wasm32"))]
             Entry(OpenGit {
                 path,
                 remote,
@@ -41,6 +43,7 @@ impl EntryState {
 
                 Ok(EntryTransition::OpenNotebook)
             }
+            #[cfg(not(target_arch = "wasm32"))]
             Entry(OpenMongo { conn_str, db_name }) => {
                 let db = Db::mongo(glues.task_tx.clone(), &conn_str, &db_name).await?;
                 glues.db = Some(Box::new(db));
@@ -86,4 +89,14 @@ impl EntryState {
             ),
         ]
     }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+async fn memory_backend(glues: &Glues) -> Result<Db> {
+    Db::memory(glues.task_tx.clone()).await
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn memory_backend(_glues: &Glues) -> Result<Db> {
+    Db::memory().await
 }

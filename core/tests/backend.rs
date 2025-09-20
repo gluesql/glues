@@ -1,6 +1,7 @@
 use glues_core::backend::{CoreBackend, local::Db};
 use std::sync::mpsc::channel;
 
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn memory_backend_operations() {
     let (tx, _rx) = channel();

@@ -2,8 +2,7 @@
 mod tester;
 use tester::Tester;
 
-use color_eyre::Result;
-use ratatui::crossterm::event::KeyCode;
+use {color_eyre::Result, glues_tui::input::KeyCode};
 
 #[tokio::test]
 async fn opens_instant_on_enter() -> Result<()> {
@@ -53,6 +52,7 @@ async fn help_overlay_toggles() -> Result<()> {
     Ok(())
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn open_local_prompt() -> Result<()> {
     let mut t = Tester::new().await?;
@@ -71,8 +71,13 @@ async fn proxy_prompt_open() -> Result<()> {
     let mut t = Tester::new().await?;
     t.draw()?;
 
-    // open Proxy prompt via hotkey 5
-    t.press('5').await;
+    // open Proxy prompt via hotkey (5 on native, 2 on wasm)
+    let key = if cfg!(target_arch = "wasm32") {
+        '2'
+    } else {
+        '5'
+    };
+    t.press(key).await;
     t.draw()?;
     snap!(t, "proxy_prompt_open");
 

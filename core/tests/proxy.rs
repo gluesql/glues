@@ -10,6 +10,7 @@ use std::{
 use tiny_http::{Response, Server};
 use tokio::sync::Mutex;
 
+#[cfg(not(target_arch = "wasm32"))]
 #[tokio::test(flavor = "current_thread")]
 async fn proxy_backend_operations() {
     let (tx, _rx) = channel();
