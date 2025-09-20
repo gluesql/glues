@@ -149,6 +149,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
 
     editor.set_cursor_style(cursor_style);
     editor.set_cursor_line_style(cursor_line_style);
+    editor.set_selection_style(Style::default().fg(THEME.accent_text).bg(THEME.accent));
     if show_line_number {
         editor.set_line_number_style(Style::default().fg(THEME.inactive_text));
     } else {
