@@ -8,7 +8,7 @@ use {
     },
     console_error_panic_hook::set_once as set_panic_hook,
     ratzilla::{DomBackend, WebRenderer, web_sys::console},
-    std::rc::Rc,
+    std::{cell::RefCell, rc::Rc},
     tokio::sync::Mutex,
     wasm_bindgen::closure::Closure,
     wasm_bindgen::{JsCast, prelude::*},
@@ -40,7 +40,6 @@ async fn run() -> Result<(), JsValue> {
     let app = Rc::new(Mutex::new(App::new()));
     let ime = init_ime_field()?;
 
-    let draw_app = app.clone();
     let ime_for_keys = ime.clone();
     terminal.on_key_event({
         let app = app.clone();
@@ -67,11 +66,7 @@ async fn run() -> Result<(), JsValue> {
         }
     });
 
-    terminal.draw_web(move |frame| {
-        if let Ok(mut guard) = draw_app.try_lock() {
-            guard.draw(frame);
-        }
-    });
+    start_render_loop(Rc::new(RefCell::new(terminal)), app.clone())?;
 
     attach_ime_listeners(app.clone(), ime);
 
@@ -261,4 +256,43 @@ fn dispatch_key(app: Rc<Mutex<App>>, key_code: KeyCode) {
         let _ = guard.handle_action(action, input).await;
         guard.save().await;
     });
+}
+
+fn start_render_loop(
+    terminal: Rc<RefCell<ratzilla::ratatui::Terminal<DomBackend>>>,
+    app: Rc<Mutex<App>>,
+) -> Result<(), JsValue> {
+    let window = web_sys::window().ok_or_else(|| JsValue::from_str("missing window"))?;
+
+    let raf: Rc<RefCell<Option<Closure<dyn FnMut()>>>> = Rc::new(RefCell::new(None));
+    let raf_clone = raf.clone();
+    let terminal = terminal.clone();
+    let app_for_draw = app.clone();
+    let window_for_loop = window.clone();
+
+    *raf.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+        if let Ok(mut guard) = app_for_draw.try_lock() {
+            if let Err(err) = terminal.borrow_mut().draw(|frame| {
+                guard.draw(frame);
+            }) {
+                console::error_1(&JsValue::from_str(&err.to_string()));
+            }
+        }
+
+        if let Some(callback) = raf_clone.borrow().as_ref() {
+            if let Err(err) =
+                window_for_loop.request_animation_frame(callback.as_ref().unchecked_ref())
+            {
+                console::error_1(&err);
+            }
+        }
+    }) as Box<dyn FnMut()>));
+
+    if let Some(callback) = raf.borrow().as_ref() {
+        if let Err(err) = window.request_animation_frame(callback.as_ref().unchecked_ref()) {
+            console::error_1(&err);
+        }
+    }
+
+    Ok(())
 }
