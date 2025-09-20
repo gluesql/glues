@@ -6,33 +6,47 @@ use color_eyre::Result;
 use glues_tui::input::KeyCode;
 
 #[tokio::test]
-async fn quits_on_esc_then_y() -> Result<()> {
+async fn quits_on_esc_then_q() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
 
     t.open_first_note().await?;
 
-    // Esc then 'y' should quit
+    // Esc then 'q' should quit
     t.key(KeyCode::Esc).await;
-    let quit = t.press('y').await;
+    let quit = t.press('q').await;
     assert!(quit);
 
     Ok(())
 }
 
 #[tokio::test]
-async fn quit_confirm_cancel_from_normal() -> Result<()> {
+async fn quit_menu_cancel_from_normal() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
     t.open_first_note().await?;
 
     t.key(KeyCode::Esc).await;
     t.draw()?;
-    snap!(t, "quit_confirm_open");
+    snap!(t, "quit_menu_open");
 
-    t.press('n').await;
+    t.key(KeyCode::Esc).await;
     t.draw()?;
-    snap!(t, "quit_confirm_closed");
+    snap!(t, "quit_menu_closed");
+    Ok(())
+}
+
+#[tokio::test]
+async fn quit_menu_returns_to_entry() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+
+    t.key(KeyCode::Esc).await;
+    let quit = t.press('m').await;
+    assert!(!quit);
+
+    t.draw()?;
+    snap!(t, "entry_after_quit_menu");
     Ok(())
 }
 

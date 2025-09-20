@@ -2,11 +2,11 @@ use {
     super::{
         App,
         config::{self, LAST_PROXY_URL},
-        context::ContextPrompt,
+        context::{ContextPrompt, QuitMenu},
         logger::*,
     },
     crate::input::{Input, KeyCode},
-    glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey},
+    glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey, state::EntryState},
     ratatui::text::Line,
 };
 
@@ -51,6 +51,10 @@ pub enum TuiAction {
     OpenThemeMenu,
     ShowEditorKeymap,
     SaveAndPassThrough,
+    OpenNotebookQuitMenu {
+        save_before_open: bool,
+    },
+    ReturnToEntry,
     Quit,
 
     OpenFile,
@@ -116,6 +120,25 @@ impl App {
             Action::Tui(TuiAction::SaveAndConfirm { message, action }) => {
                 self.save().await;
                 self.context.confirm = Some((message, *action));
+            }
+            Action::Tui(TuiAction::OpenNotebookQuitMenu { save_before_open }) => {
+                if save_before_open {
+                    self.save().await;
+                }
+
+                let quit_action = Action::Tui(TuiAction::Quit);
+                let menu_action = Action::Tui(TuiAction::ReturnToEntry);
+                self.context.quit_menu = Some(QuitMenu::new(
+                    "Leave the notebook?",
+                    quit_action,
+                    menu_action,
+                ));
+            }
+            Action::Tui(TuiAction::ReturnToEntry) => {
+                self.context = crate::context::Context::default();
+
+                self.glues.db = None;
+                self.glues.state = EntryState.into();
             }
             Action::Tui(TuiAction::Prompt {
                 message,

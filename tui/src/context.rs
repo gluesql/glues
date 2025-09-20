@@ -51,12 +51,29 @@ impl ContextPrompt {
     }
 }
 
+pub struct QuitMenu {
+    pub message: String,
+    pub quit_action: Action,
+    pub menu_action: Action,
+}
+
+impl QuitMenu {
+    pub fn new(message: impl Into<String>, quit_action: Action, menu_action: Action) -> Self {
+        Self {
+            message: message.into(),
+            quit_action,
+            menu_action,
+        }
+    }
+}
+
 pub struct Context {
     pub entry: EntryContext,
     pub notebook: NotebookContext,
 
     pub state: ContextState,
 
+    pub quit_menu: Option<QuitMenu>,
     pub confirm: Option<(String, Action)>,
     pub alert: Option<String>,
     pub prompt: Option<ContextPrompt>,
@@ -77,6 +94,7 @@ impl Default for Context {
             notebook: NotebookContext::default(),
 
             state: ContextState::Entry,
+            quit_menu: None,
             confirm: None,
             alert: None,
             prompt: None,
@@ -116,6 +134,27 @@ impl Context {
             // any key pressed will close the alert
             self.alert = None;
             return Action::None;
+        } else if self.quit_menu.is_some() {
+            let code = match input {
+                Input::Key(key) => key.code,
+                _ => return Action::None,
+            };
+
+            match code {
+                KeyCode::Char('q') => {
+                    let menu = self.quit_menu.take().log_expect("quit menu must be some");
+                    return menu.quit_action;
+                }
+                KeyCode::Char('m') => {
+                    let menu = self.quit_menu.take().log_expect("quit menu must be some");
+                    return menu.menu_action;
+                }
+                KeyCode::Esc => {
+                    self.quit_menu = None;
+                    return Action::None;
+                }
+                _ => return Action::None,
+            }
         } else if self.confirm.is_some() {
             let code = match input {
                 Input::Key(key) => key.code,

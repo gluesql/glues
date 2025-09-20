@@ -1,0 +1,37 @@
+---
+source: tui/tests/editor_normal.rs
+assertion_line: 49
+expression: text
+snapshot_kind: text
+---
+ Glues - TUI note-taking app offering complete data control and flexible storage options               [?] Show keymap 
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                           ████   ███                                                                   
+                                          ██  ██   ██                                                                   
+                                         ██        ██    ██  ██   ████    █████                                         
+                                         ██        ██    ██  ██  ██  ██  ██                                             
+                                         ██  ███   ██    ██  ██  ██████   ████                                          
+                                          ██  ██   ██    ██  ██  ██          ██                                         
+                                           █████  ████    ███ ██  ████   █████                                          
+                                                                                                                        
+                                                                                                                        
+                                         ┌─────────────Open Notes─────────────┐                                         
+                                         │                                    │                                         
+                                         │   [i] Instant                      │                                         
+                                         │   [l] Local                        │                                         
+                                         │   [g] Git                          │                                         
+                                         │   [m] MongoDB                      │                                         
+                                         │   [p] Proxy                        │                                         
+                                         │   [h] Help                         │                                         
+                                         │   [t] Theme                        │                                         
+                                         │   [q] Quit                         │                                         
+                                         │                                    │                                         
+                                         └────────────────────────────────────┘
