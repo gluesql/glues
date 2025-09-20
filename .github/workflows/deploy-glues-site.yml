@@ -11,7 +11,7 @@ jobs:
     name: Deploy glues web bundle
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
 
     steps:
       - name: Checkout glues
@@ -36,27 +36,25 @@ jobs:
           cd tui/web
           trunk build --release
 
-      - name: Checkout gluesql.github.io
-        uses: actions/checkout@v4
-        with:
-          repository: gluesql/gluesql.github.io
-          path: site
+      - name: Clone gluesql.org
+        run: git clone https://github.com/gluesql/gluesql.github.io.git
 
-      - name: Update deployed bundle
+      - name: Prepare glues bundle
         run: |
-          rm -rf site/glues
-          mkdir -p site/glues
-          cp -R tui/web/dist/. site/glues/
+          rm -rf gluesql.github.io/glues
+          mkdir -p gluesql.github.io/glues
+          cp -R tui/web/dist/. gluesql.github.io/glues/
 
-      - name: Commit and push updates
+      - name: Configure git user
         run: |
-          cd site
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "No changes to deploy."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "taehoon.moon@outlook.com"
+          git config --global user.name "Taehoon Moon (Bot)"
+
+      - name: Commit and deploy
+        run: |
+          cd gluesql.github.io
           git add glues
-          git commit -m "Deploy glues web bundle $(date -u '+%Y-%m-%d %H:%M:%S %Z')"
-          git push
+          git diff-index --quiet HEAD || (
+            git commit -m "Deploy glues web bundle" &&
+            git push https://panarch:${{ secrets.GLUESQL_ORG }}@github.com/gluesql/gluesql.github.io.git
+          )
