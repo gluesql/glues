@@ -21,7 +21,7 @@ pub async fn init() {
             .add_column("message TEXT")
             .execute(&mut glue)
             .await
-            .unwrap();
+            .expect("logger should create logs table");
     }
 }
 
@@ -38,7 +38,7 @@ pub async fn log(message: &str) {
             .values(vec![vec![text(message)]])
             .execute(&mut glue)
             .await
-            .unwrap();
+            .expect("logger should insert log entry");
     }
 }
 
