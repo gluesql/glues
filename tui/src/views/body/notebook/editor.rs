@@ -128,7 +128,17 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
 
     let show_line_number = context.notebook.show_line_number;
     let state = context.notebook.state;
-    let mut editor = TextArea::from("Welcome to Glues :D".lines());
+    let sample_note = [
+        "Welcome to Glues!",
+        "",
+        "Press `?` to see keymaps and shortcuts.",
+        "Press `m` in the note tree to create notes or directories.",
+        "Press `Enter` on a note to open it and start writing.",
+        "",
+        "GitHub: https://github.com/gluesql/glues",
+    ];
+
+    let mut editor = TextArea::from(sample_note.iter().copied());
     let editor = if context.notebook.tab_index.is_some() {
         context.notebook.get_editor_mut()
     } else {
