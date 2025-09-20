@@ -6,7 +6,6 @@ snapshot_kind: text
 ---
  Glues - TUI note-taking app offering complete data control and flexible storage options               [?] Show keymap 
                                                                                                                         
-                                                                                                                        
 ┌─────────────────────────────────────────────────────────Help─────────────────────────────────────────────────────────┐
 │                                                                                                                      │
 │  Glues offers various storage options to suit your needs:                                                            │
@@ -36,6 +35,8 @@ snapshot_kind: text
 │  You need to provide the MongoDB connection string and the database name.                                            │
 │  Glues will handle storing and retrieving notes from the specified database.                                         │
 │                                                                                                                      │
+│  Proxy                                                                                                               │
+│  Connects Glues to a remote backend exposed over HTTP.                                                               │
 │                                                                                                                      │
 │                                                                                                                      │
 │                                                Press any key to close                                                │

@@ -13,7 +13,7 @@ pub fn draw(frame: &mut Frame) {
     let [area] = Layout::horizontal([Length(120)])
         .flex(Flex::Center)
         .areas(frame.area());
-    let [area] = Layout::vertical([Length(34)])
+    let [area] = Layout::vertical([Length(36)])
         .flex(Flex::Center)
         .areas(area);
 
@@ -25,7 +25,7 @@ pub fn draw(frame: &mut Frame) {
         .title_alignment(Alignment::Center);
 
     let inner_area = block.inner(area);
-    let [message_area, control_area] = Layout::vertical([Length(27), Length(1)])
+    let [message_area, control_area] = Layout::vertical([Length(29), Length(1)])
         .flex(Flex::SpaceBetween)
         .areas(inner_area);
 
