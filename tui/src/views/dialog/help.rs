@@ -39,6 +39,10 @@ pub fn draw(frame: &mut Frame) {
                 Line::raw("Volatile in-memory storage that resets when Glues exits."),
                 Line::raw("Great for quick scratch notes or testing."),
                 Line::raw(""),
+                Line::from("IndexedDB".fg(THEME.accent_text).bg(THEME.accent)),
+                Line::raw("Keeps notes in the browser across refreshes."),
+                Line::raw("Pick a namespace to isolate multiple notebooks (default: `glues`)."),
+                Line::raw(""),
                 Line::from("Proxy".fg(THEME.accent_text).bg(THEME.accent)),
                 Line::raw("Bridge to a Glues proxy server for persistence."),
                 Line::raw(
