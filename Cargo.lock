@@ -1321,7 +1321,6 @@ version = "0.7.0"
 dependencies = [
  "async-recursion",
  "async-trait",
- "axum",
  "gluesql",
  "reqwest",
  "serde",
@@ -1342,7 +1341,6 @@ dependencies = [
  "color-eyre",
  "glues-core",
  "tokio",
- "tower",
  "tower-http",
  "tracing",
  "tracing-subscriber",
@@ -1361,7 +1359,6 @@ dependencies = [
  "gluesql",
  "home",
  "insta",
- "once_cell",
  "ratatui",
  "ratzilla",
  "textwrap",
