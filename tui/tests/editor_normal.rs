@@ -4,7 +4,6 @@ use tester::Tester;
 
 use color_eyre::Result;
 use glues_tui::input::KeyCode;
-use tui_textarea::TextArea;
 
 #[tokio::test]
 async fn quits_on_esc_then_q() -> Result<()> {
@@ -113,7 +112,7 @@ async fn gateway_moves_cursor_to_top() -> Result<()> {
     t.open_instant().await?;
     t.open_first_note().await?;
 
-    seed_long_note(&mut t);
+    populate_long_note(&mut t).await?;
     t.draw()?;
 
     // Move to bottom so the gateway jump visibly changes the view.
@@ -138,10 +137,12 @@ async fn scroll_commands_update_view() -> Result<()> {
     t.open_instant().await?;
     t.open_first_note().await?;
 
-    seed_long_note(&mut t);
+    populate_long_note(&mut t).await?;
     t.draw()?;
 
     // Start near the middle of the document.
+    t.press('g').await;
+    t.press('g').await;
     for _ in 0..20 {
         t.press('j').await;
     }
@@ -173,21 +174,29 @@ async fn scroll_commands_update_view() -> Result<()> {
     Ok(())
 }
 
-fn seed_long_note(tester: &mut Tester) {
+async fn populate_long_note(tester: &mut Tester) -> Result<()> {
     let lines: Vec<String> = (1..=60)
         .map(|i| format!("Line {i:02} — the quick brown fox jumps over the lazy dog."))
         .collect();
 
-    let context = tester.app.context_mut();
-    if let Some(note_id) = context
-        .notebook
-        .get_opened_note()
-        .map(|note| note.id.clone())
-    {
-        *context.notebook.get_editor_mut() = TextArea::from(lines);
+    tester.press('g').await;
+    tester.press('g').await;
 
-        if let Some(editor) = context.notebook.editors.get_mut(&note_id) {
-            editor.dirty = false;
+    tester.press('d').await;
+    tester.press('d').await;
+
+    tester.press('i').await;
+    for (idx, line) in lines.iter().enumerate() {
+        tester.type_str(line).await;
+        if idx + 1 < lines.len() {
+            tester.key(KeyCode::Enter).await;
         }
     }
+    tester.key(KeyCode::Esc).await;
+
+    tester.key(KeyCode::Tab).await;
+    tester.draw()?;
+    tester.key(KeyCode::Tab).await;
+
+    Ok(())
 }

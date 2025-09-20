@@ -1,33 +1,13 @@
 ---
 source: tui/tests/editor_normal.rs
-assertion_line: 151
+assertion_line: 152
 expression: text
 snapshot_kind: text
 ---
  Note 'Sample Note' normal mode - scroll                                                               [?] Show keymap 
 [Browser]                                   ▐ 󱇗 Sample Note                                                             
- 󰝰 Notes                                    ▐  1 Line 01 — the quick brown fox jumps over the lazy dog.                 
-   󱇗 Sample Note                            ▐  2 Line 02 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐  3 Line 03 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐  4 Line 04 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐  5 Line 05 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐  6 Line 06 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐  7 Line 07 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐  8 Line 08 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐  9 Line 09 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 10 Line 10 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 11 Line 11 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 12 Line 12 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 13 Line 13 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 14 Line 14 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 15 Line 15 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 16 Line 16 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 17 Line 17 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 18 Line 18 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 19 Line 19 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 20 Line 20 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 21 Line 21 — the quick brown fox jumps over the lazy dog.                 
-                                            ▐ 22 Line 22 — the quick brown fox jumps over the lazy dog.                 
+ 󰝰 Notes                                    ▐ 21 Line 21 — the quick brown fox jumps over the lazy dog.                 
+   󱇗 Sample Note                            ▐ 22 Line 22 — the quick brown fox jumps over the lazy dog.                 
                                             ▐ 23 Line 23 — the quick brown fox jumps over the lazy dog.                 
                                             ▐ 24 Line 24 — the quick brown fox jumps over the lazy dog.                 
                                             ▐ 25 Line 25 — the quick brown fox jumps over the lazy dog.                 
@@ -43,4 +23,24 @@ snapshot_kind: text
                                             ▐ 35 Line 35 — the quick brown fox jumps over the lazy dog.                 
                                             ▐ 36 Line 36 — the quick brown fox jumps over the lazy dog.                 
                                             ▐ 37 Line 37 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 38 Line 38 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 39 Line 39 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 40 Line 40 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 41 Line 41 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 42 Line 42 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 43 Line 43 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 44 Line 44 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 45 Line 45 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 46 Line 46 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 47 Line 47 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 48 Line 48 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 49 Line 49 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 50 Line 50 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 51 Line 51 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 52 Line 52 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 53 Line 53 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 54 Line 54 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 55 Line 55 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 56 Line 56 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 57 Line 57 — the quick brown fox jumps over the lazy dog.                 
                                             ▐ NORMAL   󰝰 Notes  󱇗 Sample Note 
