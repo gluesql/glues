@@ -1,5 +1,6 @@
 ---
 source: tui/tests/editor_normal.rs
+assertion_line: 35
 expression: text
 snapshot_kind: text
 ---
@@ -19,15 +20,15 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                        ┌───────────────Confirm────────────────┐                                        
-                                        │                                      │                                        
-                                        │  Do you want to quit?                │                                        
-                                        │                                      │                                        
-                                        │                                      │                                        
-                                        │  [y] Confirm                         │                                        
-                                        │  [n] Cancel                          │                                        
-                                        │                                      │                                        
-                                        └──────────────────────────────────────┘                                        
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           

@@ -6,6 +6,7 @@ mod help;
 mod keymap;
 mod note_actions;
 mod prompt;
+mod quit_menu;
 mod theme;
 mod vim_keymap;
 
@@ -34,6 +35,9 @@ pub fn draw(frame: &mut Frame, state: &State, context: &mut Context) {
         return;
     } else if context.alert.is_some() {
         alert::draw(frame, context);
+        return;
+    } else if context.quit_menu.is_some() {
+        quit_menu::draw(frame, context);
         return;
     } else if context.confirm.is_some() {
         confirm::draw(frame, context);
