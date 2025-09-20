@@ -43,7 +43,7 @@ pub(crate) mod platform {
         let path = home_dir()
             .unwrap_or(std::env::current_dir().expect("failed to get current directory"))
             .join(PATH);
-        let storage = CsvStorage::new(path).unwrap();
+        let storage = CsvStorage::new(path).expect("failed to open CSV config storage");
 
         Glue::new(storage)
     }
@@ -57,7 +57,7 @@ pub(crate) mod platform {
             .add_column("value TEXT NOT NULL")
             .execute(&mut glue)
             .await
-            .unwrap();
+            .expect("config table creation should succeed");
 
         for (key, value) in DEFAULTS {
             let _ = table("config")
@@ -78,7 +78,7 @@ pub(crate) mod platform {
             .set("value", text(value))
             .execute(&mut glue)
             .await
-            .unwrap();
+            .expect("config update should succeed");
     }
 
     pub async fn get(key: &str) -> Option<String> {
@@ -129,7 +129,7 @@ pub(crate) mod platform {
             .add_column("value TEXT NOT NULL")
             .execute(&mut glue)
             .await
-            .unwrap();
+            .expect("config table creation should succeed");
 
         for (key, value) in DEFAULTS {
             let _ = table("config")
@@ -150,7 +150,7 @@ pub(crate) mod platform {
             .set("value", text(value))
             .execute(&mut glue)
             .await
-            .unwrap();
+            .expect("config update should succeed");
     }
 
     pub async fn get(key: &str) -> Option<String> {

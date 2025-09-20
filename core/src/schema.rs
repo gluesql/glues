@@ -55,7 +55,7 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .execute(storage)
         .await?
         .select()
-        .unwrap()
+        .expect("Meta query must yield a result set")
         .count()
         == 0;
 
@@ -75,7 +75,7 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .execute(storage)
         .await?
         .select()
-        .unwrap()
+        .expect("Directory query must yield a result set")
         .count()
         == 0;
 
@@ -95,9 +95,9 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
         .execute(storage)
         .await?
         .select()
-        .unwrap()
+        .expect("Directory query must yield a result set")
         .next()
-        .unwrap()
+        .expect("Root directory row should exist")
         .get("id")
         .map(Deref::deref)
         .map(Into::into)
