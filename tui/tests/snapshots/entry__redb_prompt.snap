@@ -1,6 +1,6 @@
 ---
-source: tui/tests/editor_normal.rs
-assertion_line: 49
+source: tui/tests/entry.rs
+assertion_line: 77
 expression: text
 snapshot_kind: text
 ---
@@ -18,18 +18,18 @@ snapshot_kind: text
                                           ██  ██   ██                                                                   
                                          ██        ██    ██  ██   ████    █████                                         
                                          ██        ██    ██  ██  ██  ██  ██                                             
-                                         ██  ███   ██    ██  ██  ██████   ████                                          
-                                          ██  ██   ██    ██  ██  ██          ██                                         
-                                           █████  ████    ███ ██  ████   █████                                          
-                                                                                                                        
-                                                                                                                        
-                                         ┌─────────────Open Notes─────────────┐                                         
-                                         │                                    │                                         
-                                         │   [i] Instant                      │                                         
-                                         │   [l] Local                        │                                         
-                                         │   [r] redb                         │                                         
-                                         │   [g] Git                          │                                         
-                                         │   [m] MongoDB                      │                                         
+                              ┌──────────────────────────Prompt───────────────────────────┐                             
+                              │                                                           │                             
+                              │  Provide the redb database path:                          │                             
+                              │  Glues will create or reuse the single-file redb          │                             
+                              │  ┌─────────────────────────────────────────────────────┐  │                             
+                              │  │                                                     │  │                             
+                              │  └─────────────────────────────────────────────────────┘  │                             
+                              │                                                           │                             
+                              │  [Enter] Submit                                           │                             
+                              │  [Esc] Cancel                                             │                             
+                              │                                                           │                             
+                              └───────────────────────────────────────────────────────────┘                             
                                          │   [p] Proxy                        │                                         
                                          │   [h] Help                         │                                         
                                          │   [t] Theme                        │                                         

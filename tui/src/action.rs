@@ -22,7 +22,7 @@ use super::theme::THEME;
 #[cfg(not(target_arch = "wasm32"))]
 use super::config::{
     LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE, LAST_MONGO_CONN_STR,
-    LAST_MONGO_DB_NAME,
+    LAST_MONGO_DB_NAME, LAST_REDB_PATH,
 };
 
 #[derive(Clone)]
@@ -61,6 +61,8 @@ pub enum TuiAction {
     Quit,
 
     OpenFile,
+    #[cfg(not(target_arch = "wasm32"))]
+    OpenRedb,
     OpenGit(OpenGitStep),
     OpenMongo(OpenMongoStep),
     OpenProxy,
@@ -285,6 +287,26 @@ impl App {
             Action::Tui(TuiAction::OpenFile)
             | Action::Tui(TuiAction::OpenGit(_))
             | Action::Tui(TuiAction::OpenMongo(_)) => {}
+            #[cfg(not(target_arch = "wasm32"))]
+            Action::Tui(TuiAction::OpenRedb) => {
+                let path = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("redb path prompt must not be none");
+                if path.is_empty() {
+                    self.context.alert = Some("The redb path cannot be empty".to_string());
+                    return false;
+                }
+
+                config::update(LAST_REDB_PATH, &path).await;
+
+                let transition = self
+                    .glues
+                    .dispatch(EntryEvent::OpenRedb(path).into())
+                    .await
+                    .log_unwrap();
+                self.handle_transition(transition).await;
+            }
             #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenFile) => {
                 let path = self
