@@ -1352,7 +1352,6 @@ version = "0.7.0"
 dependencies = [
  "arboard",
  "async-recursion",
- "clap",
  "color-eyre",
  "console_error_panic_hook",
  "glues-core",

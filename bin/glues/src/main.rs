@@ -2,7 +2,7 @@ use {
     clap::{Parser, Subcommand},
     color_eyre::Result,
     glues_server::ServerArgs,
-    glues_tui::cli::{self, TuiArgs},
+    glues_tui::cli,
 };
 
 #[derive(Parser)]
@@ -14,9 +14,6 @@ use {
     propagate_version = true
 )]
 struct Cli {
-    #[command(flatten)]
-    tui: TuiArgs,
-
     #[command(subcommand)]
     command: Option<Command>,
 }
@@ -29,10 +26,10 @@ enum Command {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let Cli { tui, command } = Cli::parse();
+    let Cli { command } = Cli::parse();
 
     match command {
         Some(Command::Server(args)) => glues_server::run(args).await,
-        None => cli::run(tui).await,
+        None => cli::run().await,
     }
 }

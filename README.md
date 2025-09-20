@@ -77,11 +77,8 @@ To produce a static bundle instead, run `trunk build --release` from the same di
 ### Theme Presets
 
 Glues includes several built-in color schemes. The application starts with the
-`dark` palette by default, but you can switch presets with the `--theme` option:
-
-```bash
-glues --theme pastel
-```
+`dark` palette by default, and you can switch presets at runtime through the
+Theme menu in the entry dialog.
 
 The built-in themes are:
 
