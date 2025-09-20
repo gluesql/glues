@@ -32,7 +32,14 @@ pub fn start() -> Result<(), JsValue> {
 async fn run() -> Result<(), JsValue> {
     config::init().await;
     logger::init().await;
-    theme::set_theme(theme::DARK_THEME);
+
+    let saved_theme = config::get(config::LAST_THEME)
+        .await
+        .and_then(|value| value.parse().ok());
+    let theme_id = saved_theme.unwrap_or(theme::ThemeId::Dark);
+
+    theme::set_theme(theme_id);
+    config::update(config::LAST_THEME, theme_id.as_str()).await;
 
     let backend = DomBackend::new().map_err(to_js_error)?;
     let terminal = ratzilla::ratatui::Terminal::new(backend).map_err(to_js_error)?;

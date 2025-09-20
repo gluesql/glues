@@ -48,6 +48,7 @@ pub enum TuiAction {
         default: Option<String>,
     },
     Help,
+    OpenThemeMenu,
     ShowEditorKeymap,
     SaveAndPassThrough,
     Quit,
@@ -98,6 +99,10 @@ impl App {
             }
             Action::Tui(TuiAction::Help) => {
                 self.context.help = true;
+            }
+            Action::Tui(TuiAction::OpenThemeMenu) => {
+                self.context.theme_selector =
+                    Some(crate::context::theme_selector::ThemeSelector::new());
             }
             Action::Tui(TuiAction::ShowEditorKeymap) => {
                 self.context.editor_keymap = true;

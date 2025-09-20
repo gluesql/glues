@@ -28,12 +28,13 @@ pub const PROXY: &str = "[p] Proxy";
 #[cfg(not(target_arch = "wasm32"))]
 pub const PROXY: &str = "[p] Proxy";
 pub const HELP: &str = "[h] Help";
+pub const THEME_MENU: &str = "[t] Theme";
 pub const QUIT: &str = "[q] Quit";
 
 #[cfg(not(target_arch = "wasm32"))]
-pub const MENU_ITEMS: [&str; 7] = [INSTANT, FILE, GIT, MONGO, PROXY, HELP, QUIT];
+pub const MENU_ITEMS: [&str; 8] = [INSTANT, FILE, GIT, MONGO, PROXY, HELP, THEME_MENU, QUIT];
 #[cfg(target_arch = "wasm32")]
-pub const MENU_ITEMS: [&str; 4] = [INSTANT, PROXY, HELP, QUIT];
+pub const MENU_ITEMS: [&str; 5] = [INSTANT, PROXY, HELP, THEME_MENU, QUIT];
 
 pub struct EntryContext {
     pub list_state: ListState,
@@ -120,6 +121,7 @@ impl EntryContext {
             KeyCode::Char('m') => open_mongo().await,
             KeyCode::Char('p') => open_proxy().await,
             KeyCode::Char('h') => TuiAction::Help.into(),
+            KeyCode::Char('t') => TuiAction::OpenThemeMenu.into(),
 
             KeyCode::Enter => {
                 let i = self
@@ -136,6 +138,7 @@ impl EntryContext {
                     MONGO => open_mongo().await,
                     PROXY => open_proxy().await,
                     HELP => TuiAction::Help.into(),
+                    THEME_MENU => TuiAction::OpenThemeMenu.into(),
                     QUIT => TuiAction::Quit.into(),
                     _ => Action::None,
                 }
