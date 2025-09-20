@@ -22,7 +22,6 @@ tui-big-text = "0.7.0"
 tui-textarea = { version = "0.7.0", default-features = false, features = ["ratatui"] }
 textwrap = "0.16"
 clap = { version = "4.5.4", features = ["derive"] }
-once_cell = "1.19"
 
 [features]
 default = ["cli"]
@@ -38,23 +37,14 @@ required-features = ["cli"]
 insta = { version = "1", features = ["glob"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-gluesql = { workspace = true, features = [
-    "gluesql_memory_storage",
-    "gluesql-csv-storage",
-    "gluesql-file-storage",
-    "gluesql-git-storage",
-    "gluesql-mongo-storage",
-] }
+gluesql = { workspace = true, features = ["gluesql-csv-storage"] }
 home = "0.5.9"
 arboard = "3.4.1"
 tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread"] }
 ratatui = { version = "0.29.0", default-features = false, features = ["crossterm"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-gluesql = { workspace = true, features = [
-    "gluesql_memory_storage",
-    "gluesql-web-storage",
-] }
+gluesql = { workspace = true, features = ["gluesql-web-storage"] }
 ratzilla = "0.1.0"
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
