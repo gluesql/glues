@@ -13,7 +13,7 @@ use {
     wasm_bindgen::closure::Closure,
     wasm_bindgen::{JsCast, prelude::*},
     wasm_bindgen_futures::spawn_local,
-    web_sys::{self, CompositionEvent, Event, HtmlTextAreaElement, InputEvent},
+    web_sys::{self, CompositionEvent, Event, HtmlTextAreaElement, InputEvent, KeyboardEvent},
 };
 
 #[wasm_bindgen(start)]
@@ -196,6 +196,26 @@ fn attach_ime_listeners(app: Rc<Mutex<App>>, ime: Rc<HtmlTextAreaElement>) {
         console::error_1(&err);
     }
     handle_composition.forget();
+
+    if let Some(document) = web_sys::window().and_then(|w| w.document()) {
+        let ime_focus = ime.clone();
+        let handle_tab = Closure::<dyn FnMut(KeyboardEvent)>::new(move |event: KeyboardEvent| {
+            if event.key() == "Tab" && !event.ctrl_key() && !event.alt_key() && !event.shift_key() {
+                let _ = ime_focus.focus();
+                event.prevent_default();
+                event.stop_propagation();
+            }
+        });
+
+        if let Err(err) = document.add_event_listener_with_callback_and_bool(
+            "keydown",
+            handle_tab.as_ref().unchecked_ref(),
+            true,
+        ) {
+            console::error_1(&err);
+        }
+        handle_tab.forget();
+    }
 }
 
 fn dispatch_text(app: Rc<Mutex<App>>, text: String) {
