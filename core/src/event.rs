@@ -23,6 +23,10 @@ pub enum Event {
 #[derive(Clone, Debug, Display)]
 pub enum EntryEvent {
     OpenMemory,
+    #[cfg(target_arch = "wasm32")]
+    OpenIndexedDb {
+        namespace: String,
+    },
     OpenFile(String),
     OpenGit {
         path: String,

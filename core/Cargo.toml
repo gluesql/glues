@@ -36,5 +36,6 @@ reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
 gluesql = { workspace = true, features = [
     "gluesql_memory_storage",
     "gluesql-web-storage",
+    "gluesql-idb-storage",
 ] }
 reqwest = { version = "0.12", default-features = false, features = ["json"] }

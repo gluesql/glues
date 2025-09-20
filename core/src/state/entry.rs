@@ -23,6 +23,14 @@ impl EntryState {
                 glues.state = NotebookState::new(glues).await?.into();
                 Ok(EntryTransition::OpenNotebook)
             }
+            #[cfg(target_arch = "wasm32")]
+            Entry(OpenIndexedDb { namespace }) => {
+                let db = indexed_db_backend(glues, namespace).await?;
+                glues.db = Some(Box::new(db));
+                glues.state = NotebookState::new(glues).await?.into();
+
+                Ok(EntryTransition::OpenNotebook)
+            }
             #[cfg(not(target_arch = "wasm32"))]
             Entry(OpenFile(path)) => {
                 let db = Db::file(glues.task_tx.clone(), &path).await?;
@@ -99,4 +107,16 @@ async fn memory_backend(glues: &Glues) -> Result<Db> {
 #[cfg(target_arch = "wasm32")]
 async fn memory_backend(_glues: &Glues) -> Result<Db> {
     Db::memory().await
+}
+
+#[cfg(target_arch = "wasm32")]
+async fn indexed_db_backend(_glues: &Glues, namespace: String) -> Result<Db> {
+    let trimmed = namespace.trim();
+    let namespace = if trimmed.is_empty() {
+        None
+    } else {
+        Some(trimmed.to_owned())
+    };
+
+    Db::indexed_db(namespace).await
 }

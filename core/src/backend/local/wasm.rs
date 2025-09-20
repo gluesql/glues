@@ -3,11 +3,14 @@ use {
     async_trait::async_trait,
     gluesql::{
         core::ast_builder::Build,
-        prelude::{Glue, MemoryStorage, Payload},
+        prelude::{Glue, IdbStorage, MemoryStorage, Payload},
     },
 };
 
-pub type Storage = Glue<MemoryStorage>;
+pub enum Storage {
+    Memory(Glue<MemoryStorage>),
+    IndexedDb(Glue<IdbStorage>),
+}
 
 pub struct Db {
     pub storage: Storage,
@@ -16,7 +19,15 @@ pub struct Db {
 
 impl Db {
     pub async fn memory() -> Result<Self> {
-        let mut storage = Glue::new(MemoryStorage::default());
+        let mut storage = Storage::Memory(Glue::new(MemoryStorage::default()));
+        let root_id = setup(&mut storage).await?;
+
+        Ok(Self { storage, root_id })
+    }
+
+    pub async fn indexed_db(namespace: Option<String>) -> Result<Self> {
+        let idb = IdbStorage::new(namespace).await?;
+        let mut storage = Storage::IndexedDb(Glue::new(idb));
         let root_id = setup(&mut storage).await?;
 
         Ok(Self { storage, root_id })
@@ -42,6 +53,11 @@ where
 {
     async fn execute(self, storage: &mut Storage) -> Result<Payload> {
         let statement = self.build()?;
-        storage.execute_stmt(&statement).await.map_err(Into::into)
+
+        match storage {
+            Storage::Memory(glue) => glue.execute_stmt(&statement).await,
+            Storage::IndexedDb(glue) => glue.execute_stmt(&statement).await,
+        }
+        .map_err(Into::into)
     }
 }

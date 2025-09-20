@@ -10,6 +10,9 @@ use {
     ratatui::{style::Stylize, text::Line, widgets::ListState},
 };
 
+#[cfg(target_arch = "wasm32")]
+use crate::config::LAST_IDB_NAMESPACE;
+
 #[cfg(not(target_arch = "wasm32"))]
 use crate::{
     action::{OpenGitStep, OpenMongoStep},
@@ -17,6 +20,8 @@ use crate::{
 };
 
 pub const INSTANT: &str = "[i] Instant";
+#[cfg(target_arch = "wasm32")]
+pub const INDEXED_DB: &str = "[d] IndexedDB";
 #[cfg(not(target_arch = "wasm32"))]
 pub const FILE: &str = "[l] Local";
 #[cfg(not(target_arch = "wasm32"))]
@@ -34,7 +39,7 @@ pub const QUIT: &str = "[q] Quit";
 #[cfg(not(target_arch = "wasm32"))]
 pub const MENU_ITEMS: [&str; 8] = [INSTANT, FILE, GIT, MONGO, PROXY, HELP, THEME_MENU, QUIT];
 #[cfg(target_arch = "wasm32")]
-pub const MENU_ITEMS: [&str; 4] = [INSTANT, PROXY, HELP, THEME_MENU];
+pub const MENU_ITEMS: [&str; 5] = [INSTANT, INDEXED_DB, PROXY, HELP, THEME_MENU];
 
 pub struct EntryContext {
     pub list_state: ListState,
@@ -59,6 +64,19 @@ impl EntryContext {
                 ],
                 action: Box::new(action.into()),
                 default: config::get(key).await,
+            }
+            .into()
+        };
+
+        #[cfg(target_arch = "wasm32")]
+        let open_indexed_db = || async move {
+            TuiAction::Prompt {
+                message: vec![
+                    Line::raw("Enter the IndexedDB namespace:"),
+                    Line::from("Leave empty to use the default namespace (glues).".fg(THEME.hint)),
+                ],
+                action: Box::new(TuiAction::OpenIndexedDb.into()),
+                default: config::get(LAST_IDB_NAMESPACE).await,
             }
             .into()
         };
@@ -114,6 +132,8 @@ impl EntryContext {
                 Action::None
             }
             KeyCode::Char('i') => EntryEvent::OpenMemory.into(),
+            #[cfg(target_arch = "wasm32")]
+            KeyCode::Char('d') => open_indexed_db().await,
             #[cfg(not(target_arch = "wasm32"))]
             KeyCode::Char('l') => open(LAST_FILE_PATH, TuiAction::OpenFile).await,
             #[cfg(not(target_arch = "wasm32"))]
@@ -131,6 +151,8 @@ impl EntryContext {
                     .log_expect("EntryContext::consume: selected is None. This should not happen.");
                 match MENU_ITEMS[i] {
                     INSTANT => EntryEvent::OpenMemory.into(),
+                    #[cfg(target_arch = "wasm32")]
+                    INDEXED_DB => open_indexed_db().await,
                     #[cfg(not(target_arch = "wasm32"))]
                     FILE => open(LAST_FILE_PATH, TuiAction::OpenFile).await,
                     #[cfg(not(target_arch = "wasm32"))]

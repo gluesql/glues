@@ -1382,6 +1382,7 @@ dependencies = [
  "gluesql-csv-storage",
  "gluesql-file-storage",
  "gluesql-git-storage",
+ "gluesql-idb-storage",
  "gluesql-macros",
  "gluesql-mongo-storage",
  "gluesql-web-storage",
@@ -1458,6 +1459,24 @@ dependencies = [
  "gluesql-file-storage",
  "gluesql-json-storage",
  "strum_macros 0.26.4",
+]
+
+[[package]]
+name = "gluesql-idb-storage"
+version = "0.17.0"
+source = "git+https://github.com/gluesql/gluesql?rev=7960be640defc8083be6751d3324cf2dd809a645#7960be640defc8083be6751d3324cf2dd809a645"
+dependencies = [
+ "async-trait",
+ "futures",
+ "gloo-utils",
+ "gluesql-core",
+ "idb",
+ "send_wrapper",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
@@ -1772,6 +1791,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f31827a206f56af32e590ba56d5d2d085f558508192593743f16b2306495269f"
 dependencies = [
  "cc",
+]
+
+[[package]]
+name = "idb"
+version = "0.6.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3afe8830d5802f769dc0be20a87f9f116798c896650cb6266eb5c19a3c109eed"
+dependencies = [
+ "js-sys",
+ "num-traits",
+ "thiserror 1.0.61",
+ "tokio",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
@@ -3142,12 +3175,32 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
+name = "send_wrapper"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
+dependencies = [
+ "futures-core",
+]
+
+[[package]]
 name = "serde"
 version = "1.0.210"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8e3592472072e6e22e0a54d5904d9febf8508f65fb8552499a1abc7d1078c3a"
 dependencies = [
  "serde_derive",
+]
+
+[[package]]
+name = "serde-wasm-bindgen"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8302e169f0eddcc139c70f139d19d6467353af16f9fce27e8c30158036a1e16b"
+dependencies = [
+ "js-sys",
+ "serde",
+ "wasm-bindgen",
 ]
 
 [[package]]
