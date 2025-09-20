@@ -1,18 +1,18 @@
 ---
 source: tui/tests/notebook_views.rs
-assertion_line: 112
+assertion_line: 128
 expression: text
 snapshot_kind: text
 ---
  Note 'SecondSample Note' selected                                                                     [?] Show keymap 
 [Browser]                                   ▐[Editor]                                                                   
- 󰝰 Notes                                    ▐ 1 Welcome to Glues :D                                                     
-   󰉋 Dir                                    ▐                                                                           
-   󱇗 SecondSample Note                      ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
+ 󰝰 Notes                                    ▐ 1 Welcome to Glues!                                                       
+   󰉋 Dir                                    ▐ 2                                                                         
+   󱇗 SecondSample Note                      ▐ 3 Press `?` to see keymaps and shortcuts.                                 
+                                            ▐ 4 Press `m` in the note tree to create notes or directories.              
+                                            ▐ 5 Press `Enter` on a note to open it and start writing.                   
+                                            ▐ 6                                                                         
+                                            ▐ 7 GitHub: https://github.com/gluesql/glues                                
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           

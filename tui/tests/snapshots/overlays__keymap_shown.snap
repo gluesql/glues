@@ -1,17 +1,18 @@
 ---
 source: tui/tests/overlays.rs
+assertion_line: 15
 expression: text
 snapshot_kind: text
 ---
  Directory 'Notes' selected                                                                            [?] Hide keymap 
 [Browser]                                   ▐[Editor]                                                                   
- 󰝰 Notes                                    ▐ 1 Welcome to Glues :D         General                                     
-   󱇗 Sample Note                            ▐                               [l]       Toggle directory                  
-                                            ▐                               [h]       Close parent directory            
-                                            ▐                               [j]       Select next                       
-                                            ▐                               [k]       Select previous                   
-                                            ▐                               [J]       Select next directory             
-                                            ▐                               [K]       Select previous directory         
+ 󰝰 Notes                                    ▐ 1 Welcome to Glues!           General                                     
+   󱇗 Sample Note                            ▐ 2                             [l]       Toggle directory                  
+                                            ▐ 3 Press `?` to see keymaps a  [h]       Close parent directory            
+                                            ▐ 4 Press `m` in the note tree  [j]       Select next                       
+                                            ▐ 5 Press `Enter` on a note to  [k]       Select previous                   
+                                            ▐ 6                             [J]       Select next directory             
+                                            ▐ 7 GitHub: https://github.com  [K]       Select previous directory         
                                             ▐                               [G]       Select last                       
                                             ▐                               [1-9]     Add steps                         
                                             ▐                               [>]       Expand width                      
