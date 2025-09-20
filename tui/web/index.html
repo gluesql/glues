@@ -7,9 +7,20 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no"
     />
     <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/fira_code.min.css"
+      data-trunk
+      rel="copy-dir"
+      href="static/fonts"
+      data-target="fonts"
     />
+    <style>
+      @font-face {
+        font-family: "D2CodingLigature NF";
+        src: url("fonts/D2CodingLigatureNerdFont-Regular.woff") format("woff");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+    </style>
     <link
       data-trunk
       rel="rust"
@@ -31,9 +42,11 @@
         align-items: center;
         align-content: center;
         background-color: #121212;
+        color: #f9fafb;
+        font-family: "D2CodingLigature NF", sans-serif;
       }
       pre {
-        font-family: "Fira Code", monospace;
+        font-family: "D2CodingLigature NF", monospace;
         font-size: 16px;
         margin: 0px;
       }
