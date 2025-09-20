@@ -1,4 +1,4 @@
-name: Deploy glues Web
+name: Deploy Glues Web
 
 on:
   workflow_dispatch:
