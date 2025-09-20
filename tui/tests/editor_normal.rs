@@ -105,3 +105,98 @@ async fn delete_line_with_dd() -> Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn gateway_moves_cursor_to_top() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+    t.open_first_note().await?;
+
+    populate_long_note(&mut t).await?;
+    t.draw()?;
+
+    // Move to bottom so the gateway jump visibly changes the view.
+    t.press('G').await;
+
+    // First 'g' enters gateway mode.
+    t.press('g').await;
+    t.draw()?;
+    snap!(t, "gateway_prompt");
+
+    // Second 'g' jumps to the top line.
+    t.press('g').await;
+    t.draw()?;
+    snap!(t, "gateway_move_top");
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn scroll_commands_update_view() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+    t.open_first_note().await?;
+
+    populate_long_note(&mut t).await?;
+    t.draw()?;
+
+    // Start near the middle of the document.
+    t.press('g').await;
+    t.press('g').await;
+    for _ in 0..20 {
+        t.press('j').await;
+    }
+
+    t.press('z').await;
+    t.draw()?;
+    snap!(t, "scroll_prompt");
+
+    t.press('t').await;
+    t.draw()?;
+    snap!(t, "scroll_jump_top");
+
+    // Jump to bottom and use 'zb'.
+    t.press('G').await;
+    t.press('z').await;
+    t.press('b').await;
+    t.draw()?;
+    snap!(t, "scroll_jump_bottom");
+
+    // Move back toward the middle and center with 'z.'.
+    for _ in 0..15 {
+        t.press('k').await;
+    }
+    t.press('z').await;
+    t.press('.').await;
+    t.draw()?;
+    snap!(t, "scroll_jump_center");
+
+    Ok(())
+}
+
+async fn populate_long_note(tester: &mut Tester) -> Result<()> {
+    let lines: Vec<String> = (1..=60)
+        .map(|i| format!("Line {i:02} — the quick brown fox jumps over the lazy dog."))
+        .collect();
+
+    tester.press('g').await;
+    tester.press('g').await;
+
+    tester.press('d').await;
+    tester.press('d').await;
+
+    tester.press('i').await;
+    for (idx, line) in lines.iter().enumerate() {
+        tester.type_str(line).await;
+        if idx + 1 < lines.len() {
+            tester.key(KeyCode::Enter).await;
+        }
+    }
+    tester.key(KeyCode::Esc).await;
+
+    tester.key(KeyCode::Tab).await;
+    tester.draw()?;
+    tester.key(KeyCode::Tab).await;
+
+    Ok(())
+}
