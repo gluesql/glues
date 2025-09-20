@@ -372,6 +372,9 @@ impl NotebookContext {
             let _ = clipboard.set_text(&text);
         }
 
+        #[cfg(target_arch = "wasm32")]
+        crate::web::copy_to_clipboard(&text);
+
         self.yank = Some(text);
     }
 
