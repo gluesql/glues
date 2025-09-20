@@ -1,0 +1,62 @@
+name: Deploy glues Web
+
+on:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  deploy:
+    name: Deploy glues web bundle
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout glues
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Ensure wasm target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install trunk
+        run: cargo install trunk --locked --force
+
+      - name: Build web bundle
+        run: |
+          cd tui/web
+          trunk build --release
+
+      - name: Checkout gluesql.github.io
+        uses: actions/checkout@v4
+        with:
+          repository: gluesql/gluesql.github.io
+          path: site
+
+      - name: Update deployed bundle
+        run: |
+          rm -rf site/glues
+          mkdir -p site/glues
+          cp -R tui/web/dist/. site/glues/
+
+      - name: Commit and push updates
+        run: |
+          cd site
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to deploy."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add glues
+          git commit -m "Deploy glues web bundle $(date -u '+%Y-%m-%d %H:%M:%S %Z')"
+          git push
