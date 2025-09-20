@@ -13,7 +13,7 @@ pub fn draw(frame: &mut Frame) {
     let [area] = Layout::horizontal([Length(120)])
         .flex(Flex::Center)
         .areas(frame.area());
-    let [area] = Layout::vertical([Length(36)])
+    let [area] = Layout::vertical([Length(37)])
         .flex(Flex::Center)
         .areas(area);
 
@@ -25,7 +25,7 @@ pub fn draw(frame: &mut Frame) {
         .title_alignment(Alignment::Center);
 
     let inner_area = block.inner(area);
-    let [message_area, control_area] = Layout::vertical([Length(29), Length(1)])
+    let [message_area, control_area] = Layout::vertical([Length(30), Length(1)])
         .flex(Flex::SpaceBetween)
         .areas(inner_area);
 
@@ -42,7 +42,7 @@ pub fn draw(frame: &mut Frame) {
                 Line::from("Proxy".fg(THEME.accent_text).bg(THEME.accent)),
                 Line::raw("Bridge to a Glues proxy server for persistence."),
                 Line::raw(
-                    "Start it with `cargo run -p glues-server` (use `--listen` to change the address).",
+                    "Start it with `glues server memory` (use `--listen` to change the address).",
                 ),
                 Line::raw("Both the web and TUI clients can connect to the same proxy."),
                 Line::raw(""),
@@ -67,7 +67,9 @@ pub fn draw(frame: &mut Frame) {
                 Line::raw(""),
                 Line::from("redb".fg(THEME.accent_text).bg(THEME.accent)),
                 Line::raw("Persist everything inside a single redb database file."),
-                Line::raw("Provide a path and Glues will create or reuse the file for portable storage."),
+                Line::raw(
+                    "Provide a path and Glues will create or reuse the file for portable storage.",
+                ),
                 Line::raw(""),
                 Line::from("Git".fg(THEME.accent_text).bg(THEME.accent)),
                 Line::raw("Git storage requires three inputs: `path`, `remote`, and `branch`."),
@@ -96,7 +98,7 @@ pub fn draw(frame: &mut Frame) {
                 Line::from("Proxy".fg(THEME.accent_text).bg(THEME.accent)),
                 Line::raw("Connects Glues to a remote backend exposed over HTTP."),
                 Line::raw(
-                    "Run `cargo run -p glues-server -- memory` (or file/git/mongo) to start a local proxy.",
+                    "Run `glues server memory` (or file/redb/git/mongo) to start a local proxy.",
                 ),
                 Line::raw(""),
             ]

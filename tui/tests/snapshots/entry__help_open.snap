@@ -37,6 +37,7 @@ snapshot_kind: text
 │                                                                                                                      │
 │  Proxy                                                                                                               │
 │  Connects Glues to a remote backend exposed over HTTP.                                                               │
+│  Run `glues server memory` (or file/redb/git/mongo) to start a local proxy.                                          │
 │                                                                                                                      │
 │                                                                                                                      │
 │                                                Press any key to close                                                │
