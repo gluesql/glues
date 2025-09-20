@@ -112,7 +112,7 @@ fn init_ime_field() -> Result<Rc<HtmlTextAreaElement>, JsValue> {
     let _ = style.set_property("border", "0");
     let _ = style.set_property("resize", "none");
     let _ = style.set_property("pointer-events", "none");
-    let _ = style.set_property("z-index", "1");
+    let _ = style.set_property("z-index", "10000");
 
     textarea.set_value("");
 
