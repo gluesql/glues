@@ -1,0 +1,60 @@
+name: Deploy glues Web
+
+on:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  deploy:
+    name: Deploy glues web bundle
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout glues
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Ensure wasm target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Cache cargo artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install trunk
+        run: cargo install trunk --locked --force
+
+      - name: Build web bundle
+        run: |
+          cd tui/web
+          trunk build --release --public-url /glues/
+
+      - name: Clone gluesql.org
+        run: git clone https://github.com/gluesql/gluesql.github.io.git
+
+      - name: Prepare glues bundle
+        run: |
+          rm -rf gluesql.github.io/glues
+          mkdir -p gluesql.github.io/glues
+          cp -R tui/web/dist/. gluesql.github.io/glues/
+
+      - name: Configure git user
+        run: |
+          git config --global user.email "taehoon.moon@outlook.com"
+          git config --global user.name "Taehoon Moon (Bot)"
+
+      - name: Commit and deploy
+        run: |
+          cd gluesql.github.io
+          git add glues
+          git diff-index --quiet HEAD || (
+            git commit -m "Deploy glues web bundle" &&
+            git push https://panarch:${{ secrets.GLUESQL_ORG }}@github.com/gluesql/gluesql.github.io.git
+          )
