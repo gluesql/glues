@@ -39,8 +39,8 @@ async fn help_overlay_toggles() -> Result<()> {
     let mut t = Tester::new().await?;
     t.draw()?;
 
-    // open help (currently bound to 'a')
-    t.press('a').await;
+    // open help via shortcut
+    t.press('h').await;
     t.draw()?;
     snap!(t, "help_open");
 
@@ -58,8 +58,8 @@ async fn open_local_prompt() -> Result<()> {
     let mut t = Tester::new().await?;
 
     t.draw()?;
-    // open Local storage prompt via hotkey 2
-    t.press('2').await;
+    // open Local storage prompt via hotkey 'l'
+    t.press('l').await;
     t.draw()?;
     snap!(t, "local_prompt");
 
@@ -71,13 +71,8 @@ async fn proxy_prompt_open() -> Result<()> {
     let mut t = Tester::new().await?;
     t.draw()?;
 
-    // open Proxy prompt via hotkey (5 on native, 2 on wasm)
-    let key = if cfg!(target_arch = "wasm32") {
-        '2'
-    } else {
-        '5'
-    };
-    t.press(key).await;
+    // open Proxy prompt via hotkey 'p'
+    t.press('p').await;
     t.draw()?;
     snap!(t, "proxy_prompt_open");
 

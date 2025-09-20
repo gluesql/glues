@@ -25,11 +25,11 @@ snapshot_kind: text
                                                                                                                         
                                          ┌─────────────Open Notes─────────────┐                                         
                                          │                                    │                                         
-                                         │   [1] Instant                      │                                         
-                                         │   [2] Local                        │                                         
-                                         │   [3] Git                          │                                         
-                                         │   [4] MongoDB                      │                                         
-                                         │   [5] Proxy                        │                                         
+                                         │   [i] Instant                      │                                         
+                                         │   [l] Local                        │                                         
+                                         │   [g] Git                          │                                         
+                                         │   [m] MongoDB                      │                                         
+                                         │   [p] Proxy                        │                                         
                                          │   [h] Help                         │                                         
                                          │   [q] Quit                         │                                         
                                          │                                    │                                         

@@ -71,7 +71,7 @@ impl Tester {
     #[allow(dead_code)]
     pub async fn open_instant(&mut self) -> Result<()> {
         self.draw()?;
-        let _ = self.press('1').await;
+        let _ = self.press('i').await;
         self.draw()?;
         Ok(())
     }
