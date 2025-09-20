@@ -133,6 +133,8 @@ fn attach_ime_listeners(app: Rc<Mutex<App>>, ime: Rc<HtmlTextAreaElement>) {
     let ime_for_input = ime.clone();
     let app_for_input = app.clone();
     let handle_input = Closure::<dyn FnMut(InputEvent)>::new(move |event: InputEvent| {
+        event.prevent_default();
+
         if event.is_composing() {
             return;
         }
@@ -161,10 +163,11 @@ fn attach_ime_listeners(app: Rc<Mutex<App>>, ime: Rc<HtmlTextAreaElement>) {
 
     if let Some(window) = web_sys::window() {
         let ime_focus = ime.clone();
-        let handle_mouse = Closure::<dyn FnMut(Event)>::new(move |_| {
+        let handle_mouse = Closure::<dyn FnMut(Event)>::new(move |ev: Event| {
             if let Err(err) = ime_focus.focus() {
                 console::error_1(&err);
             }
+            ev.prevent_default();
         });
 
         if let Err(err) = window
