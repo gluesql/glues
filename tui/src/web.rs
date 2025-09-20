@@ -7,13 +7,16 @@ use {
         logger, theme,
     },
     console_error_panic_hook::set_once as set_panic_hook,
+    js_sys::Reflect,
     ratzilla::{DomBackend, WebRenderer, web_sys::console},
     std::{cell::RefCell, rc::Rc},
     tokio::sync::Mutex,
     wasm_bindgen::closure::Closure,
     wasm_bindgen::{JsCast, prelude::*},
-    wasm_bindgen_futures::spawn_local,
-    web_sys::{self, CompositionEvent, Event, HtmlTextAreaElement, InputEvent, KeyboardEvent},
+    wasm_bindgen_futures::{JsFuture, spawn_local},
+    web_sys::{
+        self, Clipboard, CompositionEvent, Event, HtmlTextAreaElement, InputEvent, KeyboardEvent,
+    },
 };
 
 #[wasm_bindgen(start)]
@@ -262,6 +265,42 @@ fn dispatch_key(app: Rc<Mutex<App>>, key_code: KeyCode) {
         let action = guard.context.consume(&input).await;
         let _ = guard.handle_action(action, input).await;
         guard.save().await;
+    });
+}
+
+pub fn copy_to_clipboard(text: &str) {
+    if text.is_empty() {
+        return;
+    }
+
+    let Some(window) = web_sys::window() else {
+        console::warn_1(&JsValue::from_str(
+            "[web::copy_to_clipboard] missing window",
+        ));
+        return;
+    };
+
+    let navigator = window.navigator();
+
+    if !Reflect::has(&navigator, &JsValue::from_str("clipboard")).unwrap_or(false) {
+        console::warn_1(&JsValue::from_str(
+            "[web::copy_to_clipboard] navigator.clipboard missing (requires https or localhost)",
+        ));
+        return;
+    }
+
+    let clipboard: Clipboard = navigator.clipboard();
+    let text = text.to_owned();
+
+    spawn_local(async move {
+        let promise = clipboard.write_text(&text);
+
+        if let Err(err) = JsFuture::from(promise).await {
+            console::warn_1(&JsValue::from_str(
+                "[web::copy_to_clipboard] clipboard write failed",
+            ));
+            console::warn_1(&err);
+        }
     });
 }
 
