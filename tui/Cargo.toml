@@ -21,7 +21,6 @@ color-eyre = "0.6.3"
 tui-big-text = "0.7.0"
 tui-textarea = { version = "0.7.0", default-features = false, features = ["ratatui"] }
 textwrap = "0.16"
-clap = { version = "4.5.4", features = ["derive"] }
 
 [features]
 default = ["cli"]
