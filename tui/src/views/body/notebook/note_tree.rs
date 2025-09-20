@@ -52,7 +52,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
                     let pad = depth * 2;
                     Line::from(vec![
                         format!("{:pad$}", "").into(),
-                        Span::raw(NOTE_SYMBOL).dim(),
+                        Span::raw(NOTE_SYMBOL).fg(THEME.text_secondary),
                         Span::raw(&note.name),
                     ])
                 }
