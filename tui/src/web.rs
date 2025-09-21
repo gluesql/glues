@@ -54,14 +54,28 @@ async fn run() -> Result<(), JsValue> {
     terminal.on_key_event({
         let app = app.clone();
         move |event| {
-            if !event.ctrl && !event.alt {
-                if matches!(event.code, ratzilla::event::KeyCode::Char(_)) {
-                    return;
-                }
-            }
-
             if let Err(err) = ime_for_keys.focus() {
                 console::error_1(&err);
+            }
+
+            if !event.ctrl && !event.alt {
+                if let ratzilla::event::KeyCode::Char(ch) = event.code {
+                    let ime_active = web_sys::window()
+                        .and_then(|w| w.document())
+                        .and_then(|doc| doc.active_element())
+                        .and_then(|elem| elem.dyn_into::<HtmlTextAreaElement>().ok())
+                        .map(|active| active == *ime_for_keys)
+                        .unwrap_or(false);
+
+                    if !ime_active {
+                        let app = app.clone();
+                        spawn_local(async move {
+                            dispatch_text(app, ch.to_string());
+                        });
+                    }
+
+                    return;
+                }
             }
 
             let app = app.clone();
@@ -181,6 +195,20 @@ fn attach_ime_listeners(app: Rc<Mutex<App>>, ime: Rc<HtmlTextAreaElement>) {
             console::error_1(&err);
         }
         handle_mouse.forget();
+
+        let ime_focus = ime.clone();
+        let handle_focus = Closure::<dyn FnMut(Event)>::new(move |_ev: Event| {
+            if let Err(err) = ime_focus.focus() {
+                console::error_1(&err);
+            }
+        });
+
+        if let Err(err) =
+            window.add_event_listener_with_callback("focus", handle_focus.as_ref().unchecked_ref())
+        {
+            console::error_1(&err);
+        }
+        handle_focus.forget();
     }
 
     let ime_for_composition = ime.clone();
@@ -203,6 +231,26 @@ fn attach_ime_listeners(app: Rc<Mutex<App>>, ime: Rc<HtmlTextAreaElement>) {
     handle_composition.forget();
 
     if let Some(document) = web_sys::window().and_then(|w| w.document()) {
+        let document_for_visibility = document.clone();
+        let ime_focus = ime.clone();
+        let handle_visibility = Closure::<dyn FnMut(Event)>::new(move |_event: Event| {
+            if document_for_visibility.hidden() {
+                return;
+            }
+
+            if let Err(err) = ime_focus.focus() {
+                console::error_1(&err);
+            }
+        });
+
+        if let Err(err) = document.add_event_listener_with_callback(
+            "visibilitychange",
+            handle_visibility.as_ref().unchecked_ref(),
+        ) {
+            console::error_1(&err);
+        }
+        handle_visibility.forget();
+
         let ime_focus = ime.clone();
         let handle_tab = Closure::<dyn FnMut(KeyboardEvent)>::new(move |event: KeyboardEvent| {
             if event.key() == "Tab" && !event.ctrl_key() && !event.alt_key() && !event.shift_key() {
