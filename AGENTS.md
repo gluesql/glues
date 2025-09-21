@@ -20,6 +20,9 @@
 - Finish by updating coverage (`cargo coverage --no-report`).
 - Default to driving scenarios through real input; avoid mutating internal context (`App::context_mut`) from tests unless absolutely necessary.
 
+## Web Builds
+- When modifying WASM-specific code, run `trunk build --release` to verify the web bundle.
+
 ## GitHub Issue Tips
 - Compose multi-line bodies via a heredoc and pass `--body-file` to `gh issue create` / `gh issue edit` to avoid shell parsing issues.
 
