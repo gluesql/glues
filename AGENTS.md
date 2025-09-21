@@ -22,3 +22,6 @@
 
 ## GitHub Issue Tips
 - Compose multi-line bodies via a heredoc and pass `--body-file` to `gh issue create` / `gh issue edit` to avoid shell parsing issues.
+
+## Personal Instructions
+- Store collaborator-specific guidance in `AGENTS.local.md`. This file is gitignored and should remain local to each contributor.
