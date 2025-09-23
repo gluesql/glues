@@ -25,3 +25,6 @@ color-eyre = "0.6.3"
 tower-http = { version = "0.5", features = ["cors"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
+
+[dev-dependencies]
+tower = "0.5"

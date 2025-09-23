@@ -3,7 +3,7 @@ use {
         Json, Router,
         body::Body,
         extract::State,
-        http::{Request, StatusCode, header::AUTHORIZATION},
+        http::{Method, Request, StatusCode, header::AUTHORIZATION},
         middleware::{Next, from_fn},
         response::Response,
         routing::{get, post},
@@ -195,6 +195,10 @@ async fn enforce_bearer(
     req: Request<Body>,
     next: Next,
 ) -> Result<Response, StatusCode> {
+    if req.method() == Method::OPTIONS {
+        return Ok(next.run(req).await);
+    }
+
     let Some(header) = req.headers().get(AUTHORIZATION) else {
         return Err(StatusCode::UNAUTHORIZED);
     };
@@ -209,4 +213,75 @@ async fn enforce_bearer(
     }
 
     Ok(next.run(req).await)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::{Router, routing::get};
+    use tower::ServiceExt;
+
+    async fn ok() -> StatusCode {
+        StatusCode::OK
+    }
+
+    #[tokio::test]
+    async fn options_requests_bypass_auth() {
+        let cors = CorsLayer::new()
+            .allow_origin(Any)
+            .allow_methods(Any)
+            .allow_headers(Any);
+
+        let token = Arc::new("secret".to_owned());
+        let app = Router::new()
+            .route("/", get(ok))
+            .layer(cors)
+            .layer(from_fn(move |req, next| {
+                let token = Arc::clone(&token);
+                async move { enforce_bearer(token, req, next).await }
+            }));
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::OPTIONS)
+                    .uri("/")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .expect("preflight request should succeed");
+
+        assert_ne!(response.status(), StatusCode::UNAUTHORIZED);
+    }
+
+    #[tokio::test]
+    async fn missing_token_still_rejected_for_non_preflight() {
+        let cors = CorsLayer::new()
+            .allow_origin(Any)
+            .allow_methods(Any)
+            .allow_headers(Any);
+
+        let token = Arc::new("secret".to_owned());
+        let app = Router::new()
+            .route("/", get(ok))
+            .layer(cors)
+            .layer(from_fn(move |req, next| {
+                let token = Arc::clone(&token);
+                async move { enforce_bearer(token, req, next).await }
+            }));
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method(Method::GET)
+                    .uri("/")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .expect("request should succeed");
+
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+    }
 }

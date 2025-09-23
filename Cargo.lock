@@ -1384,6 +1384,7 @@ dependencies = [
  "color-eyre",
  "glues-core",
  "tokio",
+ "tower",
  "tower-http",
  "tracing",
  "tracing-subscriber",
