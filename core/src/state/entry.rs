@@ -67,8 +67,8 @@ impl EntryState {
 
                 Ok(EntryTransition::OpenNotebook)
             }
-            Entry(OpenProxy { url }) => {
-                let client = ProxyClient::connect(url).await?;
+            Entry(OpenProxy { url, auth_token }) => {
+                let client = ProxyClient::connect(url, auth_token).await?;
                 glues.db = Some(Box::new(client));
                 glues.state = NotebookState::new(glues).await?.into();
 

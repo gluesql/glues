@@ -52,7 +52,8 @@ Glues offers various storage options to suit your needs:
 * **Proxy**:
   - Point Glues at an HTTP proxy that exposes the same set of operations as the local backend.
   - Run the bundled proxy server with `glues server memory` (replace `memory` with `file`, `redb`, `git`, or `mongo` as needed). The server listens on `127.0.0.1:4000` by default; use `--listen` to change the address.
-  - In the TUI entry menu choose `Proxy` (shortcut `[p]`), enter the proxy URL (e.g. `http://127.0.0.1:4000`), and Glues will talk to the remote backend just like it does locally.
+  - Protect externally reachable servers with an auth token. Set `GLUES_SERVER_TOKEN` or pass `--auth-token <value>` when launching the server. The TUI's Proxy flow will prompt for the token and send it as a `Bearer` header. Leave the field empty to connect to a token-free server on your local machine.
+  - In the TUI entry menu choose `Proxy` (shortcut `[p]`), enter the proxy URL (e.g. `http://127.0.0.1:4000`), provide the token if required, and Glues will talk to the remote backend just like it does locally.
 
 > **Web build:** The browser version of Glues persists configuration through GlueSQL WebStorage (LocalStorage) and currently exposes the **Instant**, **IndexedDB**, and **Proxy** backends. Use IndexedDB to keep notes in-browser across sessions, or point the Proxy option at a running Glues proxy server to keep data outside the browser sandbox.
 

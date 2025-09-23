@@ -7,19 +7,29 @@ use crate::{
     types::{DirectoryId, NoteId},
 };
 use async_trait::async_trait;
-use reqwest::Client;
+use reqwest::{Client, StatusCode};
 
 pub struct ProxyClient {
     url: String,
     client: Client,
     root_id: DirectoryId,
+    auth_token: Option<String>,
 }
 
 impl ProxyClient {
-    pub async fn connect<U: Into<String>>(url: U) -> Result<Self> {
+    pub async fn connect<U: Into<String>>(url: U, auth_token: Option<String>) -> Result<Self> {
         let url = url.into();
         let client = Client::new();
-        let resp = client.post(&url).json(&ProxyRequest::RootId).send().await?;
+        let mut request = client.post(&url).json(&ProxyRequest::RootId);
+        if let Some(token) = auth_token.as_ref() {
+            request = request.bearer_auth(token);
+        }
+        let resp = request.send().await?;
+        if resp.status() == StatusCode::UNAUTHORIZED {
+            return Err(Error::Proxy(
+                "proxy server rejected the authentication token".to_owned(),
+            ));
+        }
         let resp: ProxyResponse = resp.json().await?;
         let root_id = match resp {
             ProxyResponse::Ok(ResultPayload::Id(id)) => id,
@@ -33,11 +43,21 @@ impl ProxyClient {
             url,
             client,
             root_id,
+            auth_token,
         })
     }
 
     async fn rpc(&self, req: ProxyRequest) -> Result<ProxyResponse> {
-        let resp = self.client.post(&self.url).json(&req).send().await?;
+        let mut request = self.client.post(&self.url).json(&req);
+        if let Some(token) = self.auth_token.as_ref() {
+            request = request.bearer_auth(token);
+        }
+        let resp = request.send().await?;
+        if resp.status() == StatusCode::UNAUTHORIZED {
+            return Err(Error::Proxy(
+                "proxy server rejected the authentication token".to_owned(),
+            ));
+        }
         let resp: ProxyResponse = resp.json().await?;
         Ok(resp)
     }

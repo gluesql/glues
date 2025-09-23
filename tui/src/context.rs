@@ -36,7 +36,28 @@ pub struct ContextPrompt {
 
 impl ContextPrompt {
     pub fn new(message: Vec<Line<'static>>, action: Action, default: Option<String>) -> Self {
+        Self::with_mask(message, action, default, None)
+    }
+
+    pub fn new_masked(
+        message: Vec<Line<'static>>,
+        action: Action,
+        default: Option<String>,
+        mask_char: char,
+    ) -> Self {
+        Self::with_mask(message, action, default, Some(mask_char))
+    }
+
+    fn with_mask(
+        message: Vec<Line<'static>>,
+        action: Action,
+        default: Option<String>,
+        mask: Option<char>,
+    ) -> Self {
         let mut widget = TextArea::new(vec![default.unwrap_or_default()]);
+        if let Some(mask_char) = mask {
+            widget.set_mask_char(mask_char);
+        }
         widget.set_cursor_style(Style::default().fg(THEME.accent_text).bg(THEME.accent));
         widget.set_block(
             Block::default()

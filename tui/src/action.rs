@@ -65,7 +65,7 @@ pub enum TuiAction {
     OpenRedb,
     OpenGit(OpenGitStep),
     OpenMongo(OpenMongoStep),
-    OpenProxy,
+    OpenProxy(OpenProxyStep),
     #[cfg(target_arch = "wasm32")]
     OpenIndexedDb,
 
@@ -81,6 +81,12 @@ pub enum TuiAction {
 pub enum OpenMongoStep {
     ConnStr,
     Database { conn_str: String },
+}
+
+#[derive(Clone)]
+pub enum OpenProxyStep {
+    Url,
+    Token { url: String },
 }
 
 #[derive(Clone)]
@@ -243,7 +249,7 @@ impl App {
                     .log_unwrap();
                 self.handle_transition(transition).await;
             }
-            Action::Tui(TuiAction::OpenProxy) => {
+            Action::Tui(TuiAction::OpenProxy(OpenProxyStep::Url)) => {
                 let url = self
                     .context
                     .take_prompt_input()
@@ -251,12 +257,37 @@ impl App {
 
                 config::update(LAST_PROXY_URL, &url).await;
 
-                let transition = self
+                let message = vec![
+                    Line::raw("Enter the authentication token (optional):"),
+                    Line::from("Leave empty to connect without a token.".fg(THEME.hint)),
+                    Line::from(
+                        "Servers without authentication accept empty tokens.".fg(THEME.hint),
+                    ),
+                ];
+                let action = TuiAction::OpenProxy(OpenProxyStep::Token { url }).into();
+                self.context.prompt = Some(ContextPrompt::new_masked(message, action, None, '*'));
+            }
+            Action::Tui(TuiAction::OpenProxy(OpenProxyStep::Token { url })) => {
+                let token_input = self
+                    .context
+                    .take_prompt_input()
+                    .log_expect("proxy token must not be none");
+
+                let token = token_input.trim().to_owned();
+                let auth_token = if token.is_empty() { None } else { Some(token) };
+
+                match self
                     .glues
-                    .dispatch(EntryEvent::OpenProxy { url }.into())
+                    .dispatch(EntryEvent::OpenProxy { url, auth_token }.into())
                     .await
-                    .log_unwrap();
-                self.handle_transition(transition).await;
+                {
+                    Ok(transition) => {
+                        self.handle_transition(transition).await;
+                    }
+                    Err(err) => {
+                        self.context.alert = Some(err.to_string());
+                    }
+                }
             }
             #[cfg(target_arch = "wasm32")]
             Action::Tui(TuiAction::OpenIndexedDb) => {
