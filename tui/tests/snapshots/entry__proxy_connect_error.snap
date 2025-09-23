@@ -1,0 +1,38 @@
+---
+source: tui/tests/entry.rs
+assertion_line: 106
+expression: text
+snapshot_kind: text
+---
+ Glues - TUI note-taking app offering complete data control and flexible storage options               [?] Show keymap 
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                           ████   ███                                                                   
+                                          ██  ██   ██                                                                   
+                                         ██        ██    ██  ██   ████    █████                                         
+                                         ██        ██    ██  ██  ██  ██  ██                                             
+                                         ██  ███   ██    ██  ██  ██████   ████                                          
+                                          ██  ██   ██    ██  ██  ██          ██                                         
+                                      ┌───────────────────Alert───────────────────┐                                     
+                                      │                                           │                                     
+                                      │  reqwest: error sending request for url   │                                     
+                                      │  (http://127.0.0.1:9/)                    │                                     
+                                      │                                           │                                     
+                                      │          Press any key to close           │                                     
+                                      │                                           │                                     
+                                      └───────────────────────────────────────────┘                                     
+                                         │   [g] Git                          │                                         
+                                         │   [m] MongoDB                      │                                         
+                                         │   [p] Proxy                        │                                         
+                                         │   [h] Help                         │                                         
+                                         │   [t] Theme                        │                                         
+                                         │   [q] Quit                         │                                         
+                                         │                                    │                                         
+                                         └────────────────────────────────────┘

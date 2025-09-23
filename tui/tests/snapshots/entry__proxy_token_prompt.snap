@@ -1,0 +1,38 @@
+---
+source: tui/tests/entry.rs
+assertion_line: 96
+expression: text
+snapshot_kind: text
+---
+ Glues - TUI note-taking app offering complete data control and flexible storage options               [?] Show keymap 
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                           ████   ███                                                                   
+                                          ██  ██   ██                                                                   
+                                         ██        ██    ██  ██   ████    █████                                         
+                                         ██        ██    ██  ██  ██  ██  ██                                             
+                              ┌──────────────────────────Prompt───────────────────────────┐                             
+                              │                                                           │                             
+                              │  Enter the authentication token (optional):               │                             
+                              │  Leave empty to connect without a token.                  │                             
+                              │  Servers without authentication accept empty tokens.      │                             
+                              │  ┌─────────────────────────────────────────────────────┐  │                             
+                              │  │                                                     │  │                             
+                              │  └─────────────────────────────────────────────────────┘  │                             
+                              │                                                           │                             
+                              │  [Enter] Submit                                           │                             
+                              │  [Esc] Cancel                                             │                             
+                              │                                                           │                             
+                              └───────────────────────────────────────────────────────────┘                             
+                                         │   [h] Help                         │                                         
+                                         │   [t] Theme                        │                                         
+                                         │   [q] Quit                         │                                         
+                                         │                                    │                                         
+                                         └────────────────────────────────────┘
