@@ -1,6 +1,6 @@
 use {
     crate::{
-        action::{Action, TuiAction},
+        action::{Action, OpenProxyStep, TuiAction},
         config::{self, LAST_PROXY_URL},
         input::KeyCode,
         logger::*,
@@ -133,7 +133,7 @@ impl EntryContext {
                     Line::raw("Enter the proxy server URL:"),
                     Line::from("e.g. http://127.0.0.1:4000".fg(THEME.hint)),
                 ],
-                action: Box::new(TuiAction::OpenProxy.into()),
+                action: Box::new(TuiAction::OpenProxy(OpenProxyStep::Url).into()),
                 default: config::get(LAST_PROXY_URL).await,
             }
             .into()

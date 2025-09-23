@@ -1,8 +1,11 @@
 use {
     axum::{
         Json, Router,
+        body::Body,
         extract::State,
-        http::StatusCode,
+        http::{Request, StatusCode, header::AUTHORIZATION},
+        middleware::{Next, from_fn},
+        response::Response,
         routing::{get, post},
     },
     clap::{Args, Parser, Subcommand},
@@ -27,7 +30,7 @@ use {
     },
     tokio::{net::TcpListener, signal, sync::Mutex as AsyncMutex, time::sleep},
     tower_http::cors::{Any, CorsLayer},
-    tracing::{error, info},
+    tracing::{error, info, warn},
     tracing_subscriber::EnvFilter,
 };
 
@@ -35,6 +38,9 @@ use {
 pub struct ServerArgs {
     #[arg(long, default_value = "127.0.0.1:4000")]
     pub listen: SocketAddr,
+
+    #[arg(long, env = "GLUES_SERVER_TOKEN")]
+    pub auth_token: Option<String>,
 
     #[command(subcommand)]
     pub storage: StorageCommand,
@@ -76,12 +82,18 @@ pub async fn run(args: ServerArgs) -> Result<()> {
         .with_target(false)
         .init();
 
+    let ServerArgs {
+        listen,
+        auth_token,
+        storage,
+    } = args;
+
     let (task_tx, task_rx) = channel();
     let transition_queue = Arc::new(Mutex::new(VecDeque::<Transition>::new()));
     let _task_handle = handle_tasks(task_rx, &transition_queue);
     spawn_transition_drain(Arc::clone(&transition_queue));
 
-    let backend = build_backend(args.storage, task_tx).await?;
+    let backend = build_backend(storage, task_tx).await?;
     let server = Arc::new(AsyncMutex::new(ProxyServer::new(backend)));
 
     let cors = CorsLayer::new()
@@ -89,14 +101,28 @@ pub async fn run(args: ServerArgs) -> Result<()> {
         .allow_methods(Any)
         .allow_headers(Any);
 
-    let app = Router::new()
+    let mut app = Router::new()
         .route("/", post(handle_proxy))
         .route("/health", get(health))
         .with_state(server.clone())
         .layer(cors);
 
-    let listener = TcpListener::bind(args.listen).await?;
-    info!("listening on {}", args.listen);
+    if let Some(token) = auth_token.as_ref() {
+        info!("authentication token required for proxy requests");
+        let token = Arc::new(token.clone());
+        let auth_layer = from_fn(move |req, next| {
+            let token = Arc::clone(&token);
+            async move { enforce_bearer(token, req, next).await }
+        });
+        app = app.layer(auth_layer);
+    } else if !listen.ip().is_loopback() {
+        warn!(
+            "proxy server is listening on {listen} without authentication; set GLUES_SERVER_TOKEN or --auth-token to protect access"
+        );
+    }
+
+    let listener = TcpListener::bind(listen).await?;
+    info!("listening on {}", listen);
 
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
@@ -162,4 +188,25 @@ async fn shutdown_signal() {
     }
 
     info!("shutting down");
+}
+
+async fn enforce_bearer(
+    token: Arc<String>,
+    req: Request<Body>,
+    next: Next,
+) -> Result<Response, StatusCode> {
+    let Some(header) = req.headers().get(AUTHORIZATION) else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+    let Ok(value) = header.to_str() else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+    let Some(provided) = value.strip_prefix("Bearer ").map(str::trim) else {
+        return Err(StatusCode::UNAUTHORIZED);
+    };
+    if provided != token.as_str() {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+
+    Ok(next.run(req).await)
 }

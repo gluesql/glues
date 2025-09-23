@@ -41,6 +41,7 @@ pub enum EntryEvent {
     },
     OpenProxy {
         url: String,
+        auth_token: Option<String>,
     },
 }
 
