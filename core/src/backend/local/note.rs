@@ -51,14 +51,12 @@ impl Db {
     }
 
     pub async fn fetch_notes(&mut self, directory_id: DirectoryId) -> Result<Vec<Note>> {
-        let result = table("Note")
+        let notes = table("Note")
             .select()
-            .filter(col("directory_id").eq(uuid(directory_id.clone())))
+            .filter(col("directory_id").eq(uuid(directory_id)))
             .project(vec!["id", "directory_id", "name"])
             .execute(&mut self.storage)
-            .await?;
-
-        let notes = result
+            .await?
             .rows_as::<NoteRow>()?
             .into_iter()
             .map(Note::from)

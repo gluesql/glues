@@ -51,18 +51,18 @@ impl Db {
     }
 
     pub async fn fetch_directories(&mut self, parent_id: DirectoryId) -> Result<Vec<Directory>> {
-        let result = table("Directory")
+        let directories = table("Directory")
             .select()
             .filter(col("parent_id").eq(uuid(parent_id)))
             .project(vec!["id", "parent_id", "name"])
             .execute(&mut self.storage)
-            .await?;
-
-        Ok(result
+            .await?
             .rows_as::<DirectoryRow>()?
             .into_iter()
             .map(Directory::from)
-            .collect())
+            .collect();
+
+        Ok(directories)
     }
 
     pub async fn add_directory(
