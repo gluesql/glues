@@ -38,23 +38,11 @@ impl DirectoryRow {
             name,
         }
     }
+}
 
-    /// Convert a row while forcing an explicit fallback parent when the stored
-    /// value was NULL. Useful when the caller already has the parent context
-    /// (e.g. `fetch_directories`).
-    fn into_directory_with_parent(self, fallback_parent: &DirectoryId) -> Directory {
-        let DirectoryRow {
-            id,
-            parent_id,
-            name,
-        } = self;
-        let parent_id = parent_id.unwrap_or_else(|| fallback_parent.clone());
-
-        Directory {
-            id,
-            parent_id,
-            name,
-        }
+impl From<DirectoryRow> for Directory {
+    fn from(row: DirectoryRow) -> Self {
+        row.into_directory()
     }
 }
 
@@ -68,13 +56,13 @@ impl Db {
             .await?
             .one_as::<DirectoryRow>()?;
 
-        Ok(row.into_directory())
+        Ok(Directory::from(row))
     }
 
     pub async fn fetch_directories(&mut self, parent_id: DirectoryId) -> Result<Vec<Directory>> {
         let result = table("Directory")
             .select()
-            .filter(col("parent_id").eq(uuid(parent_id.clone())))
+            .filter(col("parent_id").eq(uuid(parent_id)))
             .project(vec!["id", "parent_id", "name"])
             .execute(&mut self.storage)
             .await?;
@@ -82,7 +70,7 @@ impl Db {
         Ok(result
             .rows_as::<DirectoryRow>()?
             .into_iter()
-            .map(|row| row.into_directory_with_parent(&parent_id))
+            .map(Directory::from)
             .collect())
     }
 
