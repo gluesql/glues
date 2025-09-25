@@ -1,4 +1,4 @@
-use thiserror::Error as ThisError;
+use {gluesql::core::row_conversion::RowConversionError, thiserror::Error as ThisError};
 
 #[derive(ThisError, Debug)]
 pub enum Error {
@@ -25,4 +25,7 @@ pub enum Error {
 
     #[error("backend: {0}")]
     BackendError(String),
+
+    #[error("row conversion: {0}")]
+    RowConversion(#[from] RowConversionError),
 }

@@ -1,79 +1,76 @@
 use {
     super::{Db, Execute},
-    crate::{Error, Result, data::Directory, types::DirectoryId},
+    crate::{Result, data::Directory, types::DirectoryId},
     async_recursion::async_recursion,
-    gluesql::core::ast_builder::{col, function::now, table, text, uuid},
-    std::ops::Deref,
+    gluesql::{
+        FromGlueRow,
+        core::{
+            ast_builder::{col, function::now, table, text, uuid},
+            row_conversion::SelectExt,
+        },
+    },
     uuid::Uuid,
 };
 
+#[derive(FromGlueRow)]
+struct DirectoryRow {
+    id: String,
+    parent_id: Option<String>,
+    name: String,
+}
+
 impl Db {
     pub async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Result<Directory> {
-        let result = table("Directory")
+        let row = table("Directory")
             .select()
             .filter(col("id").eq(uuid(directory_id)))
             .project(vec!["id", "parent_id", "name"])
             .execute(&mut self.storage)
-            .await?;
+            .await?
+            .one_as::<DirectoryRow>()?;
 
-        let payload = result
-            .select()
-            .ok_or_else(|| Error::BackendError("expected select payload".into()))?
-            .next()
-            .ok_or_else(|| Error::BackendError("directory not found".into()))?;
+        let DirectoryRow {
+            id,
+            parent_id,
+            name,
+        } = row;
+        let parent_id = parent_id.unwrap_or_else(|| id.clone());
 
-        let directory = Directory {
-            id: payload
-                .get("id")
-                .map(Deref::deref)
-                .ok_or_else(|| Error::BackendError("id missing".into()))?
-                .into(),
-            parent_id: payload
-                .get("parent_id")
-                .map(Deref::deref)
-                .ok_or_else(|| Error::BackendError("parent_id missing".into()))?
-                .into(),
-            name: payload
-                .get("name")
-                .map(Deref::deref)
-                .ok_or_else(|| Error::BackendError("name missing".into()))?
-                .into(),
-        };
-
-        Ok(directory)
+        Ok(Directory {
+            id,
+            parent_id,
+            name,
+        })
     }
 
     pub async fn fetch_directories(&mut self, parent_id: DirectoryId) -> Result<Vec<Directory>> {
         let result = table("Directory")
             .select()
             .filter(col("parent_id").eq(uuid(parent_id.clone())))
-            .project(vec!["id", "name"])
+            .project(vec!["id", "parent_id", "name"])
             .execute(&mut self.storage)
             .await?;
 
-        let rows = result
-            .select()
-            .ok_or_else(|| Error::BackendError("expected select payload".into()))?;
+        let parent_clone = parent_id.clone();
 
-        let directories = rows
-            .map(|payload| {
-                Ok(Directory {
-                    id: payload
-                        .get("id")
-                        .map(Deref::deref)
-                        .ok_or_else(|| Error::BackendError("id missing".into()))?
-                        .into(),
-                    parent_id: parent_id.clone(),
-                    name: payload
-                        .get("name")
-                        .map(Deref::deref)
-                        .ok_or_else(|| Error::BackendError("name missing".into()))?
-                        .into(),
-                })
+        Ok(result
+            .rows_as::<DirectoryRow>()?
+            .into_iter()
+            .map(|row| {
+                let DirectoryRow {
+                    id,
+                    parent_id,
+                    name,
+                } = row;
+                let parent_id = parent_id.unwrap_or_else(|| parent_clone.clone());
+
+                Directory {
+                    id,
+                    parent_id,
+                    name,
+                }
             })
-            .collect::<Result<Vec<_>>>()?;
-
-        Ok(directories)
+            .collect())
     }
 
     pub async fn add_directory(
