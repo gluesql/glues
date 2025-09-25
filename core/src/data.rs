@@ -1,5 +1,7 @@
-use crate::types::{DirectoryId, NoteId};
-use serde::{Deserialize, Serialize};
+use {
+    crate::types::{DirectoryId, NoteId},
+    serde::{Deserialize, Serialize},
+};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Note {

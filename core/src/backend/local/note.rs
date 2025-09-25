@@ -1,64 +1,66 @@
 use {
     super::{Db, Execute},
     crate::{
-        Error, Result,
+        Result,
         data::Note,
         types::{DirectoryId, NoteId},
     },
-    gluesql::core::ast_builder::{col, function::now, table, text, uuid},
-    std::ops::Deref,
+    gluesql::{
+        FromGlueRow,
+        core::{
+            ast_builder::{col, function::now, table, text, uuid},
+            row_conversion::SelectExt,
+        },
+    },
     uuid::Uuid,
 };
 
+#[derive(FromGlueRow)]
+struct NoteRow {
+    id: String,
+    directory_id: String,
+    name: String,
+}
+
+impl From<NoteRow> for Note {
+    fn from(row: NoteRow) -> Self {
+        Self {
+            id: row.id,
+            directory_id: row.directory_id,
+            name: row.name,
+        }
+    }
+}
+
+#[derive(FromGlueRow)]
+struct NoteContentRow {
+    content: String,
+}
+
 impl Db {
     pub async fn fetch_note_content(&mut self, note_id: NoteId) -> Result<String> {
-        let content = table("Note")
+        let row = table("Note")
             .select()
             .filter(col("id").eq(uuid(note_id)))
             .project(col("content"))
             .execute(&mut self.storage)
             .await?
-            .select()
-            .ok_or(Error::NotFound("note not found".to_owned()))?
-            .next()
-            .ok_or(Error::NotFound("note not found".to_owned()))?
-            .get("content")
-            .map(Deref::deref)
-            .ok_or(Error::NotFound("content not found".to_owned()))?
-            .into();
+            .one_as::<NoteContentRow>()?;
 
-        Ok(content)
+        Ok(row.content)
     }
 
     pub async fn fetch_notes(&mut self, directory_id: DirectoryId) -> Result<Vec<Note>> {
-        let result = table("Note")
+        let notes = table("Note")
             .select()
-            .filter(col("directory_id").eq(uuid(directory_id.clone())))
-            .project(vec!["id", "name"])
+            .filter(col("directory_id").eq(uuid(directory_id)))
+            .project(vec!["id", "directory_id", "name"])
             .execute(&mut self.storage)
-            .await?;
-
-        let rows = result
-            .select()
-            .ok_or_else(|| Error::BackendError("expected select payload".into()))?;
-
-        let notes = rows
-            .map(|payload| {
-                Ok(Note {
-                    id: payload
-                        .get("id")
-                        .map(Deref::deref)
-                        .ok_or_else(|| Error::BackendError("id missing".into()))?
-                        .into(),
-                    directory_id: directory_id.clone(),
-                    name: payload
-                        .get("name")
-                        .map(Deref::deref)
-                        .ok_or_else(|| Error::BackendError("name missing".into()))?
-                        .into(),
-                })
-            })
-            .collect::<Result<Vec<_>>>()?;
+            .await?
+            .rows_as::<NoteRow>()?
+            .into_iter()
+            .map(Note::from)
+            .collect();
 
         Ok(notes)
     }

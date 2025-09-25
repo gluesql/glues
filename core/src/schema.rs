@@ -1,12 +1,22 @@
 use {
     crate::{
-        Error, Result,
+        Result,
         backend::local::{Execute, Storage},
         types::DirectoryId,
     },
-    gluesql::core::ast_builder::{col, table, text},
-    std::ops::Deref,
+    gluesql::{
+        FromGlueRow,
+        core::{
+            ast_builder::{col, table, text},
+            row_conversion::SelectExt,
+        },
+    },
 };
+
+#[derive(FromGlueRow)]
+struct RootRow {
+    id: String,
+}
 
 pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
     table("Log")
@@ -88,18 +98,13 @@ pub async fn setup(storage: &mut Storage) -> Result<DirectoryId> {
             .await?;
     }
 
-    table("Directory")
+    let row = table("Directory")
         .select()
         .filter(col("parent_id").is_null())
         .project("id")
         .execute(storage)
         .await?
-        .select()
-        .expect("Directory query must yield a result set")
-        .next()
-        .expect("Root directory row should exist")
-        .get("id")
-        .map(Deref::deref)
-        .map(Into::into)
-        .ok_or(Error::NotFound("empty id".to_owned()))
+        .one_as::<RootRow>()?;
+
+    Ok(row.id)
 }
