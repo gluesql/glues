@@ -20,6 +20,10 @@ struct DirectoryRow {
 }
 
 impl DirectoryRow {
+    /// Convert a raw row into a `Directory`, normalizing a NULL `parent_id`
+    /// (the root entry) so it points back at its own `id`. Downstream logic
+    /// already detects the root via `id` equality checks, so keeping
+    /// `parent_id` populated avoids sprinkling Options everywhere.
     fn into_directory(self) -> Directory {
         let DirectoryRow {
             id,
@@ -35,6 +39,9 @@ impl DirectoryRow {
         }
     }
 
+    /// Convert a row while forcing an explicit fallback parent when the stored
+    /// value was NULL. Useful when the caller already has the parent context
+    /// (e.g. `fetch_directories`).
     fn into_directory_with_parent(self, fallback_parent: &DirectoryId) -> Directory {
         let DirectoryRow {
             id,
