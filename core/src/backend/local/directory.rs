@@ -19,6 +19,38 @@ struct DirectoryRow {
     name: String,
 }
 
+impl DirectoryRow {
+    fn into_directory(self) -> Directory {
+        let DirectoryRow {
+            id,
+            parent_id,
+            name,
+        } = self;
+        let parent_id = parent_id.unwrap_or_else(|| id.clone());
+
+        Directory {
+            id,
+            parent_id,
+            name,
+        }
+    }
+
+    fn into_directory_with_parent(self, fallback_parent: &DirectoryId) -> Directory {
+        let DirectoryRow {
+            id,
+            parent_id,
+            name,
+        } = self;
+        let parent_id = parent_id.unwrap_or_else(|| fallback_parent.clone());
+
+        Directory {
+            id,
+            parent_id,
+            name,
+        }
+    }
+}
+
 impl Db {
     pub async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Result<Directory> {
         let row = table("Directory")
@@ -29,18 +61,7 @@ impl Db {
             .await?
             .one_as::<DirectoryRow>()?;
 
-        let DirectoryRow {
-            id,
-            parent_id,
-            name,
-        } = row;
-        let parent_id = parent_id.unwrap_or_else(|| id.clone());
-
-        Ok(Directory {
-            id,
-            parent_id,
-            name,
-        })
+        Ok(row.into_directory())
     }
 
     pub async fn fetch_directories(&mut self, parent_id: DirectoryId) -> Result<Vec<Directory>> {
@@ -51,25 +72,10 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        let parent_clone = parent_id.clone();
-
         Ok(result
             .rows_as::<DirectoryRow>()?
             .into_iter()
-            .map(|row| {
-                let DirectoryRow {
-                    id,
-                    parent_id,
-                    name,
-                } = row;
-                let parent_id = parent_id.unwrap_or_else(|| parent_clone.clone());
-
-                Directory {
-                    id,
-                    parent_id,
-                    name,
-                }
-            })
+            .map(|row| row.into_directory_with_parent(&parent_id))
             .collect())
     }
 

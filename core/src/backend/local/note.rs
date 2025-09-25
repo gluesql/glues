@@ -22,6 +22,16 @@ struct NoteRow {
     name: String,
 }
 
+impl From<NoteRow> for Note {
+    fn from(row: NoteRow) -> Self {
+        Self {
+            id: row.id,
+            directory_id: row.directory_id,
+            name: row.name,
+        }
+    }
+}
+
 #[derive(FromGlueRow)]
 struct NoteContentRow {
     content: String,
@@ -51,11 +61,7 @@ impl Db {
         Ok(result
             .rows_as::<NoteRow>()?
             .into_iter()
-            .map(|row| Note {
-                id: row.id,
-                directory_id: row.directory_id,
-                name: row.name,
-            })
+            .map(Note::from)
             .collect())
     }
 
