@@ -19,17 +19,13 @@ struct DirectoryRow {
     name: String,
 }
 
-impl DirectoryRow {
-    /// Convert a raw row into a `Directory`, normalizing a NULL `parent_id`
-    /// (the root entry) so it points back at its own `id`. Downstream logic
-    /// already detects the root via `id` equality checks, so keeping
-    /// `parent_id` populated avoids sprinkling Options everywhere.
-    fn into_directory(self) -> Directory {
+impl From<DirectoryRow> for Directory {
+    fn from(row: DirectoryRow) -> Self {
         let DirectoryRow {
             id,
             parent_id,
             name,
-        } = self;
+        } = row;
         let parent_id = parent_id.unwrap_or_else(|| id.clone());
 
         Directory {
@@ -37,12 +33,6 @@ impl DirectoryRow {
             parent_id,
             name,
         }
-    }
-}
-
-impl From<DirectoryRow> for Directory {
-    fn from(row: DirectoryRow) -> Self {
-        row.into_directory()
     }
 }
 
