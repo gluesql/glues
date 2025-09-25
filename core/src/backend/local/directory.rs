@@ -38,15 +38,16 @@ impl From<DirectoryRow> for Directory {
 
 impl Db {
     pub async fn fetch_directory(&mut self, directory_id: DirectoryId) -> Result<Directory> {
-        let row = table("Directory")
+        let directory = table("Directory")
             .select()
             .filter(col("id").eq(uuid(directory_id)))
             .project(vec!["id", "parent_id", "name"])
             .execute(&mut self.storage)
             .await?
-            .one_as::<DirectoryRow>()?;
+            .one_as::<DirectoryRow>()
+            .map(Directory::from)?;
 
-        Ok(Directory::from(row))
+        Ok(directory)
     }
 
     pub async fn fetch_directories(&mut self, parent_id: DirectoryId) -> Result<Vec<Directory>> {

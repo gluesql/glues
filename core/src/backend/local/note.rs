@@ -58,11 +58,13 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(result
+        let notes = result
             .rows_as::<NoteRow>()?
             .into_iter()
             .map(Note::from)
-            .collect())
+            .collect();
+
+        Ok(notes)
     }
 
     pub async fn add_note(&mut self, directory_id: DirectoryId, name: String) -> Result<Note> {
