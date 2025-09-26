@@ -69,9 +69,10 @@ pub async fn open_all<B: CoreBackend + ?Sized>(
             break;
         }
 
-        let parent_id = directory.parent_id;
+        let parent_id = directory.parent_id.clone();
 
         if state.check_opened(&parent_id) {
+            path.push(parent_id);
             break;
         }
 
@@ -82,9 +83,6 @@ pub async fn open_all<B: CoreBackend + ?Sized>(
 
     let mut transition = NotebookTransition::None;
     for id in path {
-        if state.check_opened(&id) {
-            continue;
-        }
         transition = open(db, state, id).await?;
     }
 

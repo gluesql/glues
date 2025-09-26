@@ -37,6 +37,15 @@ impl App {
         Self { glues, context }
     }
 
+    #[doc(hidden)]
+    pub fn glues_mut(&mut self) -> &mut Glues {
+        // Test-only escape hatch. Use this to simulate external backend/state
+        // mutations (e.g. another session creates directories) that cannot be
+        // reproduced through the TUI input pipeline. Production code must go
+        // through the normal event/transition flow.
+        &mut self.glues
+    }
+
     #[cfg(not(target_arch = "wasm32"))]
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> color_eyre::Result<()> {
         use ratatui::crossterm as ct;
