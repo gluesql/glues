@@ -1,15 +1,13 @@
 ---
 source: tui/tests/notebook_breadcrumb_failures.rs
-assertion_line: 133
+assertion_line: 172
 expression: text
 snapshot_kind: text
 ---
- Note 'Moving' normal mode                                                                             [?] Show keymap 
-[Browser]                                   ▐ 󱇗 Sample Note  󱇗 Moving                                                   
- 󰝰 Notes                                    ▐ 1                                                                         
-   󰝰 Src                                    ▐                                                                           
-     󱇗 Moving                               ▐                                                                           
-   󰉋 Dst                                    ▐                                                                           
+ Note 'Sample Note' selected                                                                           [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 Hi :D                                                                   
+   󱇗 Sample Note                            ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -43,4 +41,6 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐ NORMAL   󰝰 Notes  󰝰 Src  󱇗 Moving 
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐          󰝰 Notes  󱇗 Sample Note 
