@@ -20,7 +20,7 @@ pub const DARK_THEME: Theme = Theme {
     error: RED,
     error_text: WHITE,
     inactive_text: GRAY_DIM,
-    inactive_bg: GRAY_DIM,
+    inactive_bg: GRAY_MEDIUM,
     crumb_a: GRAY_A,
     crumb_b: GRAY_B,
     crumb_icon: YELLOW,

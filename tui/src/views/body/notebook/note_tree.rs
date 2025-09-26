@@ -79,12 +79,12 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut NotebookContext) {
         .bg(if note_tree_focused {
             THEME.accent
         } else {
-            THEME.surface
+            THEME.inactive_bg
         })
         .fg(if note_tree_focused {
             THEME.accent_text
         } else {
-            THEME.text
+            THEME.inactive_text
         });
 
     let list = List::new(tree_items)
