@@ -4,9 +4,9 @@ assertion_line: 129
 expression: text
 snapshot_kind: text
 ---
- Note 'Moving' normal mode                                                                             [?] Show keymap 
+ Directory 'Dst' selected                                                                              [?] Show keymap 
 [Browser]                                   ▐ 󱇗 Sample Note  󱇗 Moving                                                   
- 󰝰 Notes                                    ▐ 1                                                                         
+ 󰝰 Notes                                    ▐ 1 Hi :D                                                                   
    󰝰 Src                                    ▐                                                                           
      󱇗 Moving                               ▐                                                                           
    󰉋 Dst                                    ▐                                                                           
@@ -43,4 +43,4 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐ NORMAL   󰝰 Notes  󰝰 Src  󱇗 Moving 
+                                            ▐          󰝰 Notes  󰝰 Dst  󱇗 Sample Note 

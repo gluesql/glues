@@ -64,16 +64,27 @@ pub async fn open_all<B: CoreBackend + ?Sized>(
     loop {
         let directory = db.fetch_directory(current_id.clone()).await?;
         path.push(directory.id.clone());
+
         if state.root.directory.id == directory.id {
             break;
         }
-        current_id = directory.parent_id;
+
+        let parent_id = directory.parent_id;
+
+        if state.check_opened(&parent_id) {
+            break;
+        }
+
+        current_id = parent_id;
     }
 
     path.reverse();
 
     let mut transition = NotebookTransition::None;
     for id in path {
+        if state.check_opened(&id) {
+            continue;
+        }
         transition = open(db, state, id).await?;
     }
 
