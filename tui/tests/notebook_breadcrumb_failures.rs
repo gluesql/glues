@@ -146,14 +146,12 @@ async fn moving_note_into_external_directory_still_panics() -> Result<()> {
 
     let directory_id = {
         let glues = t.app.glues_mut();
-        let mut db = glues.db.take().expect("backend must be initialized");
+        let db = glues.db.as_mut().expect("backend must be initialized");
         let root_id = db.root_id();
-        let directory = db
-            .add_directory(root_id, "External Dir".to_owned())
+        db.add_directory(root_id, "External Dir".to_owned())
             .await
-            .expect("failed to add directory");
-        glues.db = Some(db);
-        directory.id
+            .expect("failed to add directory")
+            .id
     };
 
     t.key(KeyCode::Tab).await;
