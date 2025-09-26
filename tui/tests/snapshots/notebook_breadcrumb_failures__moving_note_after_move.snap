@@ -1,0 +1,46 @@
+---
+source: tui/tests/notebook_breadcrumb_failures.rs
+assertion_line: 129
+expression: text
+snapshot_kind: text
+---
+ Note 'Moving' normal mode                                                                             [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note  󱇗 Moving                                                   
+ 󰝰 Notes                                    ▐ 1                                                                         
+   󰝰 Src                                    ▐                                                                           
+     󱇗 Moving                               ▐                                                                           
+   󰉋 Dst                                    ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󰝰 Src  󱇗 Moving 

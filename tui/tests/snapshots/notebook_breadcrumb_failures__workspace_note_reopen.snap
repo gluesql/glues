@@ -1,0 +1,46 @@
+---
+source: tui/tests/notebook_breadcrumb_failures.rs
+assertion_line: 42
+expression: text
+snapshot_kind: text
+---
+ Note 'Workspace' normal mode                                                                          [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note  󱇗 Workspace                                                
+ 󰝰 Notes                                    ▐ 1                                                                         
+   󰝰 Tmp                                    ▐                                                                           
+     󱇗 Workspace                            ▐                                                                           
+   󱇗 Sample Note                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󰝰 Tmp  󱇗 Workspace 
