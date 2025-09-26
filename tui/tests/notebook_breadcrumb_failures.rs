@@ -136,7 +136,7 @@ async fn moving_note_between_directories_still_panics() -> Result<()> {
 }
 
 #[tokio::test]
-async fn moving_note_into_external_directory_still_panics() -> Result<()> {
+async fn moving_note_into_external_directory_updates_tree() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
 
