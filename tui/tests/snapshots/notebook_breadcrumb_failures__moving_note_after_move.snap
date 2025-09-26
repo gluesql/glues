@@ -1,35 +1,15 @@
 ---
 source: tui/tests/notebook_breadcrumb_failures.rs
-assertion_line: 81
+assertion_line: 129
 expression: text
 snapshot_kind: text
 ---
- Directory actions dialog                                                                              [?] Show keymap 
-[Browser]                                   ▐ 󱇗 Sample Note                                                             
- 󰝰 Notes                                    ▐ 1 Hi :D                                                                   
-   󱇗 Sample Note                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                              ┌──────────────────────────Prompt───────────────────────────┐                             
-                              │                                                           │                             
-                              │  Enter directory name:                                    │                             
-                              │  ┌─────────────────────────────────────────────────────┐  │                             
-                              │  │                                                     │  │                             
-                              │  └─────────────────────────────────────────────────────┘  │                             
-                              │                                                           │                             
-                              │  [Enter] Submit                                           │                             
-                              │  [Esc] Cancel                                             │                             
-                              │                                                           │                             
-                              └───────────────────────────────────────────────────────────┘                             
+ Note 'Moving' normal mode                                                                             [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note  󱇗 Moving                                                   
+ 󰝰 Notes                                    ▐ 1                                                                         
+   󰝰 Src                                    ▐                                                                           
+     󱇗 Moving                               ▐                                                                           
+   󰉋 Dst                                    ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
@@ -43,4 +23,24 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐          󰝰 Notes  󱇗 Sample Note 
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󰝰 Src  󱇗 Moving 

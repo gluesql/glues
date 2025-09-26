@@ -47,11 +47,10 @@ async fn closing_tab_then_reopening_still_panics() -> Result<()> {
 
     t.key(KeyCode::Tab).await;
     t.draw()?;
+
     t.press('k').await;
-    t.press('k').await;
-    t.press('j').await;
-    t.press('h').await;
     t.draw()?;
+
     t.press('l').await;
     t.draw()?;
     snap!(t, "workspace_note_reopen");
@@ -115,16 +114,17 @@ async fn moving_note_between_directories_still_panics() -> Result<()> {
     t.draw()?;
     t.key(KeyCode::Tab).await;
 
-    t.press('k').await;
-    t.press('j').await;
-    t.draw()?;
-
     t.key(KeyCode::Char(' ')).await;
     t.draw()?;
-    t.press('k').await;
     t.press('j').await;
     t.draw()?;
     t.key(KeyCode::Enter).await;
+    t.draw()?;
+
+    t.press('k').await;
+    t.draw()?;
+
+    t.press('l').await;
     t.draw()?;
     snap!(t, "moving_note_after_move");
 
