@@ -82,8 +82,10 @@ pub async fn open_all<B: CoreBackend + ?Sized>(
     path.reverse();
 
     let mut transition = NotebookTransition::None;
-    for id in path {
-        transition = open(db, state, id).await?;
+    for (idx, id) in path.iter().enumerate() {
+        if idx == 0 || !state.check_opened(id) {
+            transition = open(db, state, id.clone()).await?;
+        }
     }
 
     Ok(transition)
