@@ -5,16 +5,16 @@ default-members = ["bin/glues", "tui", "core", "server"]
 
 [workspace.package]
 authors = ["Taehoon Moon <taehoon.moon@outlook.com>"]
-version = "0.8.0"
+version = "0.8.1"
 edition = "2024"
 license = "Apache-2.0"
 repository = "https://github.com/gluesql/glues"
 keywords = ["tui", "note-taking", "vim", "ratatui", "data-privacy"]
 
 [workspace.dependencies]
-glues-core = { path = "./core", version = "0.8.0" }
-glues-tui = { path = "./tui", version = "0.8.0" }
-glues-server = { path = "./server", version = "0.8.0" }
+glues-core = { path = "./core", version = "0.8.1" }
+glues-tui = { path = "./tui", version = "0.8.1" }
+glues-server = { path = "./server", version = "0.8.1" }
 async-recursion = "1.1.1"
 
 [workspace.dependencies.gluesql]
