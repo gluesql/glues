@@ -10,8 +10,8 @@ description = "Unified CLI entry point for the Glues toolkit"
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }
 color-eyre = "0.6.3"
-glues-tui = { path = "../../tui", package = "glues-tui", default-features = false, features = ["cli"] }
-glues-server = { path = "../../server" }
+glues-tui = { workspace = true }
+glues-server = { workspace = true }
 tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread"] }
 
 [features]

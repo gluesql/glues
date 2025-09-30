@@ -12,6 +12,8 @@ repository = "https://github.com/gluesql/glues"
 
 [workspace.dependencies]
 glues-core = { path = "./core", version = "0.8.0" }
+glues-tui = { path = "./tui", version = "0.8.0" }
+glues-server = { path = "./server", version = "0.8.0" }
 async-recursion = "1.1.1"
 
 [workspace.dependencies.gluesql]
