@@ -4,15 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        description: "Version bump increment (major|minor|patch|custom)"
+        description: "Version bump increment (major|minor|patch)"
         required: true
         default: minor
-      custom_version:
-        description: "Explicit version when bump is custom (e.g. 0.8.1)"
-        required: false
-      previous_ref:
-        description: "Reference to compare against (tag/commit). Defaults to last release tag"
-        required: false
 
 jobs:
   prepare:
@@ -26,6 +20,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
+
+      - name: Checkout target ref
+        id: target
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          target="$DEFAULT_BRANCH"
+          git checkout "$target"
+          git pull --ff-only origin "$target"
+          git fetch --tags --force
+
+          sha=$(git rev-parse HEAD)
+          echo "ref=$target" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -39,16 +48,13 @@ jobs:
       - name: Resolve previous reference
         id: refs
         run: |
-          if [ -n "${{ github.event.inputs.previous_ref }}" ]; then
-            echo "previous=${{ github.event.inputs.previous_ref }}" >> "$GITHUB_OUTPUT"
+          if git describe --tags --abbrev=0 >/tmp/last_tag 2>/dev/null; then
+            last_tag=$(cat /tmp/last_tag)
           else
-            if git describe --tags --abbrev=0 >/tmp/last_tag 2>/dev/null; then
-              last_tag=$(cat /tmp/last_tag)
-            else
-              last_tag=$(git rev-list --max-parents=0 HEAD | tail -n 1)
-            fi
-            echo "previous=$last_tag" >> "$GITHUB_OUTPUT"
+            echo "✗ No tags available to determine previous release" >&2
+            exit 1
           fi
+          echo "previous=$last_tag" >> "$GITHUB_OUTPUT"
 
       - name: Determine release version
         id: version
@@ -56,25 +62,16 @@ jobs:
           BUMP: ${{ github.event.inputs.bump }}
           CUSTOM_VERSION: ${{ github.event.inputs.custom_version }}
         run: |
-          if [ "$BUMP" = "custom" ]; then
-            if [ -z "$CUSTOM_VERSION" ]; then
-              echo "custom_version input is required when bump is custom" >&2
+          case "$BUMP" in
+            major|minor|patch) ;;
+            *)
+              echo "bump must be one of major, minor, or patch" >&2
               exit 1
-            fi
-            cargo set-version --workspace "$CUSTOM_VERSION"
-            new_version="$CUSTOM_VERSION"
-          else
-            case "$BUMP" in
-              major|minor|patch) ;;
-              *)
-                echo "bump must be one of major, minor, patch, or custom" >&2
-                exit 1
-                ;;
-            esac
-            cargo set-version --workspace --bump "$BUMP"
-            new_version=$(cargo metadata --no-deps --format-version 1 |
-              python -c 'import json,sys; data=json.load(sys.stdin); print(next(p["version"] for p in data["packages"] if p["name"]=="glues"))')
-          fi
+              ;;
+          esac
+          cargo set-version --workspace --bump "$BUMP"
+          new_version=$(cargo metadata --no-deps --format-version 1 |
+            python -c 'import json,sys; data=json.load(sys.stdin); print(next(p["version"] for p in data["packages"] if p["name"]=="glues"))')
 
           echo "version=$new_version" >> "$GITHUB_OUTPUT"
 
@@ -85,18 +82,46 @@ jobs:
           RELEASE_VERSION: ${{ steps.version.outputs.version }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          compare_ref="$PREVIOUS_REF...HEAD"
           mkdir -p docs/releases
 
           notes_path="docs/releases/v${RELEASE_VERSION}.md"
           printf "# Glues v%s - Release Notes\n\n## What's Changed\n" "$RELEASE_VERSION" > "$notes_path"
 
-          gh api \
-            repos/${{ github.repository }}/compare/${compare_ref} \
-            --paginate \
-            --jq '.commits[].commit.message | split("\n")[0]' |
-            grep '^Merge pull request' |
-            sed 's/^/- /' >> "$notes_path"
+          owner="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY##*/}"
+
+          compare_json=$(gh api repos/${owner}/${repo}/compare/${PREVIOUS_REF}...${{ steps.target.outputs.sha }})
+          commit_shas=$(echo "$compare_json" | jq -r '.commits[].sha')
+
+          pr_lines=""
+          while IFS= read -r sha; do
+            [ -n "$sha" ] || continue
+            prs=$(gh api repos/${owner}/${repo}/commits/${sha}/pulls \
+              -H "Accept: application/vnd.github.groot-preview+json" \
+              --jq '.[] | select(.merged_at != null) | "\(.number)\t\(.title)\t\(.html_url)\t\(.user.login)"')
+            if [ -n "$prs" ]; then
+              pr_lines+="$prs"$'\n'
+            fi
+          done <<< "$commit_shas"
+
+          prs_lines=$(printf '%s' "$pr_lines" | awk 'NF' | sort -u)
+
+          if [ -z "$prs_lines" ]; then
+            echo "✗ No merged pull requests between $PREVIOUS_REF and ${{ steps.target.outputs.sha }}" >&2
+            exit 1
+          fi
+
+          while IFS=$'\t' read -r number title url author; do
+            [ -n "$number" ] || continue
+            [ -n "$title" ] || title="(no title)"
+            [ -n "$url" ] || url="https://github.com/$owner/$repo/pull/$number"
+            if [ -n "$author" ]; then
+              printf '* %s by [@%s](https://github.com/%s) in [#%s](%s)\n' \
+                "$title" "$author" "$author" "$number" "$url" >> "$notes_path"
+            else
+              printf '* %s in [#%s](%s)\n' "$title" "$number" "$url" >> "$notes_path"
+            fi
+          done <<< "$prs_lines"
 
           {
             echo "notes_path=$notes_path"
