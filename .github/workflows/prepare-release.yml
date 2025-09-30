@@ -1,0 +1,148 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        type: choice
+        description: "Version bump increment"
+        default: minor
+        options:
+          - major
+          - minor
+          - patch
+          - custom
+      custom_version:
+        description: "Explicit version when bump is custom (e.g. 0.8.1)"
+        required: false
+      previous_ref:
+        description: "Reference to compare against (tag/commit). Defaults to last release tag"
+        required: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Install cargo-edit
+        run: cargo install cargo-edit
+
+      - name: Resolve previous reference
+        id: refs
+        run: |
+          if [ -n "${{ github.event.inputs.previous_ref }}" ]; then
+            echo "previous=${{ github.event.inputs.previous_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            if git describe --tags --abbrev=0 >/tmp/last_tag 2>/dev/null; then
+              last_tag=$(cat /tmp/last_tag)
+            else
+              last_tag=$(git rev-list --max-parents=0 HEAD | tail -n 1)
+            fi
+            echo "previous=$last_tag" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Determine release version
+        id: version
+        env:
+          BUMP: ${{ github.event.inputs.bump }}
+          CUSTOM_VERSION: ${{ github.event.inputs.custom_version }}
+        run: |
+          if [ "$BUMP" = "custom" ]; then
+            if [ -z "$CUSTOM_VERSION" ]; then
+              echo "custom_version input is required when bump is custom" >&2
+              exit 1
+            fi
+            cargo set-version --workspace "$CUSTOM_VERSION"
+            new_version="$CUSTOM_VERSION"
+          else
+            cargo set-version --workspace --bump "$BUMP"
+            new_version=$(cargo metadata --no-deps --format-version 1 |
+              python -c 'import json,sys; data=json.load(sys.stdin); print(next(p["version"] for p in data["packages"] if p["name"]=="glues"))')
+          fi
+
+          echo "version=$new_version" >> "$GITHUB_OUTPUT"
+
+      - name: Regenerate lockfile
+        run: cargo fetch
+
+      - name: Format and lint
+        run: |
+          cargo fmt
+          cargo clippy --all-targets -- -D warnings
+
+      - name: Run tests
+        run: cargo test
+
+      - name: Generate release notes skeleton
+        id: notes
+        env:
+          PREVIOUS_REF: ${{ steps.refs.outputs.previous }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          compare_ref="$PREVIOUS_REF...HEAD"
+          mkdir -p docs/releases
+
+          notes_path="docs/releases/v${RELEASE_VERSION}.md"
+          cat <<EON > "$notes_path"
+# Glues v${RELEASE_VERSION} - Release Notes
+
+## What's Changed
+EON
+
+          gh api \
+            repos/${{ github.repository }}/compare/${compare_ref} \
+            --paginate \
+            --jq '.commits[].commit.message | split("\n")[0]' |
+            grep '^Merge pull request' |
+            sed 's/^/- /' >> "$notes_path"
+
+          {
+            echo "notes_path=$notes_path"
+            echo "release_branch=release/v${RELEASE_VERSION}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Configure git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create release branch
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: git checkout -b "release/v${RELEASE_VERSION}"
+
+      - name: Commit changes
+        run: |
+          git add -A
+          git commit -m "chore: prepare v${{ steps.version.outputs.version }}"
+
+      - name: Push branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: git push origin HEAD
+
+      - name: Open draft PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "Prepare v${{ steps.version.outputs.version }}" \
+            --body "## Summary
+- bump workspace version to ${{ steps.version.outputs.version }}
+- run fmt, clippy, test
+- add release notes at docs/releases/v${{ steps.version.outputs.version }}.md
+" \
+            --draft
