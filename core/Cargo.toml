@@ -6,6 +6,8 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Headless state management module for Glues Notes"
+readme = "README.md"
+keywords.workspace = true
 
 [dependencies]
 async-recursion.workspace = true

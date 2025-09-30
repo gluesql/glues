@@ -6,6 +6,8 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Glues HTTP proxy server"
+readme = "README.md"
+keywords.workspace = true
 default-run = "glues-server"
 
 [lib]
