@@ -6,6 +6,8 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Unified CLI entry point for the Glues toolkit"
+readme = "../../README.md"
+keywords.workspace = true
 
 [dependencies]
 clap = { version = "4.5.4", features = ["derive"] }

@@ -6,8 +6,8 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "TUI and WASM frontends for the Glues note-taking experience"
-readme = "../README.md"
-keywords = ["tui", "note-taking", "vim", "ratatui", "data-privacy"]
+readme = "README.md"
+keywords.workspace = true
 default-run = "glues-tui"
 
 [lib]
