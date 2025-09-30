@@ -4,14 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       bump:
-        type: choice
-        description: "Version bump increment"
+        description: "Version bump increment (major|minor|patch|custom)"
+        required: true
         default: minor
-        options:
-          - major
-          - minor
-          - patch
-          - custom
       custom_version:
         description: "Explicit version when bump is custom (e.g. 0.8.1)"
         required: false
@@ -69,6 +64,13 @@ jobs:
             cargo set-version --workspace "$CUSTOM_VERSION"
             new_version="$CUSTOM_VERSION"
           else
+            case "$BUMP" in
+              major|minor|patch) ;;
+              *)
+                echo "bump must be one of major, minor, patch, or custom" >&2
+                exit 1
+                ;;
+            esac
             cargo set-version --workspace --bump "$BUMP"
             new_version=$(cargo metadata --no-deps --format-version 1 |
               python -c 'import json,sys; data=json.load(sys.stdin); print(next(p["version"] for p in data["packages"] if p["name"]=="glues"))')
@@ -87,11 +89,7 @@ jobs:
           mkdir -p docs/releases
 
           notes_path="docs/releases/v${RELEASE_VERSION}.md"
-          cat <<EON > "$notes_path"
-# Glues v${RELEASE_VERSION} - Release Notes
-
-## What's Changed
-EON
+          printf "# Glues v%s - Release Notes\n\n## What's Changed\n" "$RELEASE_VERSION" > "$notes_path"
 
           gh api \
             repos/${{ github.repository }}/compare/${compare_ref} \
@@ -107,8 +105,8 @@ EON
 
       - name: Configure git user
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "Taehoon Moon"
+          git config user.email "taehoon.moon@outlook.com"
 
       - name: Create release branch
         env:
@@ -129,10 +127,9 @@ EON
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          release="${{ steps.version.outputs.version }}"
+          body=$(printf '## Summary\n- bump workspace version to %s\n- add release notes at docs/releases/v%s.md\n' "$release" "$release")
           gh pr create \
-            --title "Prepare v${{ steps.version.outputs.version }}" \
-            --body "## Summary
-- bump workspace version to ${{ steps.version.outputs.version }}
-- add release notes at docs/releases/v${{ steps.version.outputs.version }}.md
-" \
+            --title "Prepare v${release}" \
+            --body "$body" \
             --draft
