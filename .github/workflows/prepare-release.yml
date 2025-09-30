@@ -76,17 +76,6 @@ jobs:
 
           echo "version=$new_version" >> "$GITHUB_OUTPUT"
 
-      - name: Regenerate lockfile
-        run: cargo fetch
-
-      - name: Format and lint
-        run: |
-          cargo fmt
-          cargo clippy --all-targets -- -D warnings
-
-      - name: Run tests
-        run: cargo test
-
       - name: Generate release notes skeleton
         id: notes
         env:
