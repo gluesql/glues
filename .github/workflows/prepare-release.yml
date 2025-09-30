@@ -85,18 +85,58 @@ jobs:
           RELEASE_VERSION: ${{ steps.version.outputs.version }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          compare_ref="$PREVIOUS_REF...HEAD"
           mkdir -p docs/releases
 
           notes_path="docs/releases/v${RELEASE_VERSION}.md"
           printf "# Glues v%s - Release Notes\n\n## What's Changed\n" "$RELEASE_VERSION" > "$notes_path"
 
-          gh api \
-            repos/${{ github.repository }}/compare/${compare_ref} \
-            --paginate \
-            --jq '.commits[].commit.message | split("\n")[0]' |
-            grep '^Merge pull request' |
-            sed 's/^/- /' >> "$notes_path"
+          owner="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY##*/}"
+
+          graphql_query=$(cat <<'GRAPHQL'
+          query($owner: String!, $name: String!, $base: String!, $head: String!) {
+            repository(owner: $owner, name: $name) {
+              comparison(base: $base, head: $head) {
+                commits(first: 250) {
+                  nodes {
+                    commit {
+                      associatedPullRequests(first: 20) {
+                        nodes {
+                          number
+                          title
+                          mergedAt
+                          url
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          GRAPHQL
+          )
+
+          prs_json=$(gh api graphql \
+            -f owner="$owner" \
+            -f name="$repo" \
+            -f base="$PREVIOUS_REF" \
+            -f head="${GITHUB_SHA}" \
+            -f query="$graphql_query")
+
+          prs_lines=$(echo "$prs_json" | jq -r '
+            .data.repository.comparison?.commits.nodes[]?.commit.associatedPullRequests.nodes[]? \
+            | select(.mergedAt != null) \
+            | "\(.number)\t\(.title)"' | sort -u)
+
+          if [ -z "$prs_lines" ]; then
+            echo "- _No pull requests were merged in this range._" >> "$notes_path"
+          else
+            while IFS=$'\t' read -r number title; do
+              [ -n "$number" ] || continue
+              printf -- "- PR #%s: %s\n" "$number" "$title" >> "$notes_path"
+            done <<< "$prs_lines"
+          fi
 
           {
             echo "notes_path=$notes_path"
