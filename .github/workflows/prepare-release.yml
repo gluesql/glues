@@ -10,10 +10,6 @@ on:
       custom_version:
         description: "Explicit version when bump is custom (e.g. 0.8.1)"
         required: false
-      target_ref:
-        description: "Branch or commit to base the release on (defaults to main)"
-        required: false
-        default: main
       previous_ref:
         description: "Reference to compare against (tag/commit). Defaults to last release tag"
         required: false
@@ -33,20 +29,13 @@ jobs:
 
       - name: Checkout target ref
         id: target
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          target="${{ github.event.inputs.target_ref }}"
-          if [ -z "$target" ]; then
-            target="${{ github.event.repository.default_branch }}"
-          fi
-
-          if git rev-parse --verify --quiet "$target"; then
-            git checkout "$target"
-          elif git rev-parse --verify --quiet "origin/$target"; then
-            git checkout "origin/$target"
-          else
-            echo "target ref '$target' not found" >&2
-            exit 1
-          fi
+          target="$DEFAULT_BRANCH"
+          git fetch origin "$target" --depth=1
+          git checkout "$target"
+          git pull --ff-only origin "$target"
 
           sha=$(git rev-parse HEAD)
           echo "ref=$target" >> "$GITHUB_OUTPUT"
@@ -126,7 +115,7 @@ jobs:
             [ -n "$sha" ] || continue
             prs=$(gh api repos/${owner}/${repo}/commits/${sha}/pulls \
               -H "Accept: application/vnd.github.groot-preview+json" \
-              --jq '.[] | select(.merged_at != null) | "\(.number)\t\(.title)"')
+              --jq '.[] | select(.merged_at != null) | "\(.number)\t\(.title)\t\(.html_url)\t\(.user.login)"')
             if [ -n "$prs" ]; then
               pr_lines+="$prs"$'\n'
             fi
@@ -137,9 +126,17 @@ jobs:
           if [ -z "$prs_lines" ]; then
             echo "- _No pull requests were merged in this range._" >> "$notes_path"
           else
-            while IFS=$'\t' read -r number title; do
+            while IFS=$'\t' read -r number title url author; do
               [ -n "$number" ] || continue
-              printf -- "- PR #%s: %s\n" "$number" "$title" >> "$notes_path"
+              if [ -z "$url" ]; then
+                url="https://github.com/$owner/$repo/pull/$number"
+              fi
+              if [ -z "$author" ]; then
+                printf -- "- [#%s](%s) %s\n" "$number" "$url" "$title" >> "$notes_path"
+              else
+                printf -- "- [#%s](%s) %s (@[%s](https://github.com/%s))\n" \
+                  "$number" "$url" "$title" "$author" "$author" >> "$notes_path"
+              fi
             done <<< "$prs_lines"
           fi
 
