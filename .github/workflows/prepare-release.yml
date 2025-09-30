@@ -124,20 +124,21 @@ jobs:
           prs_lines=$(printf '%s' "$pr_lines" | awk 'NF' | sort -u)
 
           if [ -z "$prs_lines" ]; then
-            echo "- _No pull requests were merged in this range._" >> "$notes_path"
-          else
-            while IFS=$'\t' read -r number title url author; do
-              [ -n "$number" ] || continue
-              [ -n "$title" ] || title="(no title)"
-              [ -n "$url" ] || url="https://github.com/$owner/$repo/pull/$number"
-              if [ -n "$author" ]; then
-                printf '* %s by [@%s](https://github.com/%s) in [#%s](%s)\n' \
-                  "$title" "$author" "$author" "$number" "$url" >> "$notes_path"
-              else
-                printf '* %s in [#%s](%s)\n' "$title" "$number" "$url" >> "$notes_path"
-              fi
-            done <<< "$prs_lines"
+            echo "✗ No merged pull requests between $PREVIOUS_REF and ${{ steps.target.outputs.sha }}" >&2
+            exit 1
           fi
+
+          while IFS=$'\t' read -r number title url author; do
+            [ -n "$number" ] || continue
+            [ -n "$title" ] || title="(no title)"
+            [ -n "$url" ] || url="https://github.com/$owner/$repo/pull/$number"
+            if [ -n "$author" ]; then
+              printf '* %s by [@%s](https://github.com/%s) in [#%s](%s)\n' \
+                "$title" "$author" "$author" "$number" "$url" >> "$notes_path"
+            else
+              printf '* %s in [#%s](%s)\n' "$title" "$number" "$url" >> "$notes_path"
+            fi
+          done <<< "$prs_lines"
 
           {
             echo "notes_path=$notes_path"
