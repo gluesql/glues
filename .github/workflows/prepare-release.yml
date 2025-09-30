@@ -127,10 +127,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          release="${{ steps.version.outputs.version }}"
+          body=$(printf '## Summary\n- bump workspace version to %s\n- add release notes at docs/releases/v%s.md\n' "$release" "$release")
           gh pr create \
-            --title "Prepare v${{ steps.version.outputs.version }}" \
-            --body "## Summary
-- bump workspace version to ${{ steps.version.outputs.version }}
-- add release notes at docs/releases/v${{ steps.version.outputs.version }}.md
-" \
+            --title "Prepare v${release}" \
+            --body "$body" \
             --draft
