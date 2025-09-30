@@ -13,7 +13,7 @@ Glues is designed with a core architecture that operates independently of the TU
 
 With no reliance on third-party services, Glues ensures that your data remains private and fully under your control. Currently, it ships with Instant (in-memory), Local (file-per-note), redb (single-file), Git, and MongoDB storage options, and we plan to integrate additional backends through [GlueSQL](https://github.com/gluesql/gluesql) for even more flexibility. The core concept behind Glues is to empower users to choose how their data is handled—whether through local files, a redb database file, Git, MongoDB, or future storage options—without any dependence on a central authority. This makes Glues a sync-enabled application that prioritizes user autonomy and privacy.
 
-<img width="1497" alt="image" src="https://github.com/user-attachments/assets/581c0586-67d9-4e13-9200-454b6ae8c50c" />
+<img width="1497" alt="Glues workspace view with theme dialog, keymap overlay, and note tree" src="docs/releases/assets/v0.8.0_workspace.png" />
 
 ## Installation
 
