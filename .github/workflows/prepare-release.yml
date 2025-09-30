@@ -128,14 +128,13 @@ jobs:
           else
             while IFS=$'\t' read -r number title url author; do
               [ -n "$number" ] || continue
-              if [ -z "$url" ]; then
-                url="https://github.com/$owner/$repo/pull/$number"
-              fi
-              if [ -z "$author" ]; then
-                printf -- "- [#%s](%s) %s\n" "$number" "$url" "$title" >> "$notes_path"
+              [ -n "$title" ] || title="(no title)"
+              [ -n "$url" ] || url="https://github.com/$owner/$repo/pull/$number"
+              if [ -n "$author" ]; then
+                printf '* %s by [@%s](https://github.com/%s) in [#%s](%s)\n' \
+                  "$title" "$author" "$author" "$number" "$url" >> "$notes_path"
               else
-                printf -- "- [#%s](%s) %s (@[%s](https://github.com/%s))\n" \
-                  "$number" "$url" "$title" "$author" "$author" >> "$notes_path"
+                printf '* %s in [#%s](%s)\n' "$title" "$number" "$url" >> "$notes_path"
               fi
             done <<< "$prs_lines"
           fi
