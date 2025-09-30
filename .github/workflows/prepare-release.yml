@@ -133,7 +133,6 @@ EON
             --title "Prepare v${{ steps.version.outputs.version }}" \
             --body "## Summary
 - bump workspace version to ${{ steps.version.outputs.version }}
-- run fmt, clippy, test
 - add release notes at docs/releases/v${{ steps.version.outputs.version }}.md
 " \
             --draft
