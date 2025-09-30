@@ -1351,7 +1351,7 @@ dependencies = [
 
 [[package]]
 name = "glues"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "clap",
  "color-eyre",
@@ -1362,7 +1362,7 @@ dependencies = [
 
 [[package]]
 name = "glues-core"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "async-recursion",
  "async-trait",
@@ -1379,7 +1379,7 @@ dependencies = [
 
 [[package]]
 name = "glues-server"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "axum",
  "clap",
@@ -1394,7 +1394,7 @@ dependencies = [
 
 [[package]]
 name = "glues-tui"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "arboard",
  "async-recursion",
