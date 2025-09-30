@@ -93,41 +93,21 @@ jobs:
           owner="${GITHUB_REPOSITORY%%/*}"
           repo="${GITHUB_REPOSITORY##*/}"
 
-          graphql_query=$(cat <<'GRAPHQL'
-          query($owner: String!, $name: String!, $base: String!, $head: String!) {
-            repository(owner: $owner, name: $name) {
-              comparison(base: $base, head: $head) {
-                commits(first: 250) {
-                  nodes {
-                    commit {
-                      associatedPullRequests(first: 20) {
-                        nodes {
-                          number
-                          title
-                          mergedAt
-                          url
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          GRAPHQL
-          )
+          compare_json=$(gh api repos/${owner}/${repo}/compare/${PREVIOUS_REF}...${GITHUB_SHA})
+          commit_shas=$(echo "$compare_json" | jq -r '.commits[].sha')
 
-          prs_json=$(gh api graphql \
-            -f owner="$owner" \
-            -f name="$repo" \
-            -f base="$PREVIOUS_REF" \
-            -f head="${GITHUB_SHA}" \
-            -f query="$graphql_query")
+          pr_lines=""
+          while IFS= read -r sha; do
+            [ -n "$sha" ] || continue
+            prs=$(gh api repos/${owner}/${repo}/commits/${sha}/pulls \
+              -H "Accept: application/vnd.github.groot-preview+json" \
+              --jq '.[] | select(.merged_at != null) | "\(.number)\t\(.title)"')
+            if [ -n "$prs" ]; then
+              pr_lines+="$prs"$'\n'
+            fi
+          done <<< "$commit_shas"
 
-          prs_lines=$(echo "$prs_json" | jq -r '
-            .data.repository.comparison?.commits.nodes[]?.commit.associatedPullRequests.nodes[]? \
-            | select(.mergedAt != null) \
-            | "\(.number)\t\(.title)"' | sort -u)
+          prs_lines=$(printf '%s' "$pr_lines" | awk 'NF' | sort -u)
 
           if [ -z "$prs_lines" ]; then
             echo "- _No pull requests were merged in this range._" >> "$notes_path"
