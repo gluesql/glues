@@ -34,9 +34,12 @@ macro_rules! snap {
 impl Tester {
     pub async fn new() -> Result<Self> {
         let cwd = std::env::current_dir()?;
-        std::fs::create_dir_all(cwd.join(".glues"))?;
+        let test_config_dir = cwd.join(".glues");
+        std::fs::create_dir_all(&test_config_dir)?;
+        // Set GLUES_CONFIG_DIR to isolate test config from user's actual config.
+        // This prevents tests from polluting ~/.glues/ directory.
         unsafe {
-            std::env::set_var("HOME", &cwd);
+            std::env::set_var("GLUES_CONFIG_DIR", &test_config_dir);
         }
         config::init().await;
         logger::init().await;

@@ -41,10 +41,18 @@ pub(crate) mod platform {
 
     const PATH: &str = ".glues/";
 
+    /// Returns a Glue instance with CsvStorage for configuration.
+    ///
+    /// The config directory can be overridden via the `GLUES_CONFIG_DIR` environment variable.
+    /// This is primarily used for test isolation. If not set, defaults to `~/.glues/`.
     pub(crate) fn get_glue() -> Glue<CsvStorage> {
-        let path = home_dir()
-            .unwrap_or(std::env::current_dir().expect("failed to get current directory"))
-            .join(PATH);
+        let path = if let Ok(config_dir) = std::env::var("GLUES_CONFIG_DIR") {
+            std::path::PathBuf::from(config_dir)
+        } else {
+            home_dir()
+                .unwrap_or(std::env::current_dir().expect("failed to get current directory"))
+                .join(PATH)
+        };
         let storage = CsvStorage::new(path).expect("failed to open CSV config storage");
 
         Glue::new(storage)
