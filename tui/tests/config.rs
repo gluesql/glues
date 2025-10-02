@@ -1,4 +1,3 @@
-#[macro_use]
 mod tester;
 use tester::Tester;
 
