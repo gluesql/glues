@@ -81,51 +81,51 @@ jobs:
         run: |
           xz -dc coverage/lcov.info.xz > coverage/lcov.info
           python3 - <<'PY'
-import os
+          import os
 
-lf_hits = 0
-lf_found = 0
-da_hits = 0
-da_found = 0
+          lf_hits = 0
+          lf_found = 0
+          da_hits = 0
+          da_found = 0
 
-with open("coverage/lcov.info") as handle:
-    for raw_line in handle:
-        line = raw_line.strip()
-        if line.startswith("LF:"):
-            try:
-                lf_found += int(line[3:])
-            except ValueError:
-                pass
-        elif line.startswith("LH:"):
-            try:
-                lf_hits += int(line[3:])
-            except ValueError:
-                pass
-        elif line.startswith("DA:"):
-            parts = line[3:].split(",")
-            if len(parts) >= 2:
-                da_found += 1
-                try:
-                    count = int(parts[1])
-                except ValueError:
-                    count = 0
-                if count > 0:
-                    da_hits += 1
+          with open("coverage/lcov.info") as handle:
+              for raw_line in handle:
+                  line = raw_line.strip()
+                  if line.startswith("LF:"):
+                      try:
+                          lf_found += int(line[3:])
+                      except ValueError:
+                          pass
+                  elif line.startswith("LH:"):
+                      try:
+                          lf_hits += int(line[3:])
+                      except ValueError:
+                          pass
+                  elif line.startswith("DA:"):
+                      parts = line[3:].split(",")
+                      if len(parts) >= 2:
+                          da_found += 1
+                          try:
+                              count = int(parts[1])
+                          except ValueError:
+                              count = 0
+                          if count > 0:
+                              da_hits += 1
 
-if lf_found == 0:
-    lf_found, lf_hits = da_found, da_hits
+          if lf_found == 0:
+              lf_found, lf_hits = da_found, da_hits
 
-coverage = 0.0 if lf_found == 0 else (lf_hits / lf_found) * 100.0
+          coverage = 0.0 if lf_found == 0 else (lf_hits / lf_found) * 100.0
 
-env_path = os.environ.get("GITHUB_ENV")
-if env_path:
-    with open(env_path, "a") as env_file:
-        env_file.write(f"LINE_COVERAGE={coverage:.2f}\n")
-        env_file.write(f"LINE_HITS={lf_hits}\n")
-        env_file.write(f"LINE_FOUND={lf_found}\n")
+          env_path = os.environ.get("GITHUB_ENV")
+          if env_path:
+              with open(env_path, "a") as env_file:
+                  env_file.write(f"LINE_COVERAGE={coverage:.2f}\n")
+                  env_file.write(f"LINE_HITS={lf_hits}\n")
+                  env_file.write(f"LINE_FOUND={lf_found}\n")
 
-print(f"Line coverage: {coverage:.2f}% ({lf_hits}/{lf_found})")
-PY
+          print(f"Line coverage: {coverage:.2f}% ({lf_hits}/{lf_found})")
+          PY
 
       - name: Set timestamp
         run: echo "TIMESTAMP=$(date -u +'%Y-%m-%dT%H%M%SZ')" >> $GITHUB_ENV
