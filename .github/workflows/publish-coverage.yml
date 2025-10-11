@@ -149,23 +149,23 @@ jobs:
           script: |
             const prNumber = process.env.PR_NUMBER;
             const url = `https://gluesql.org/coverage/?path=glues/pr/${prNumber}/${process.env.TIMESTAMP}.${process.env.COMMIT_SHA}.lcov.info.xz`;
-            let body = [
-              '### Glues Coverage Report',
-              '',
-              `- **Commit:** \`${process.env.COMMIT_SHA}\``,
-              `- **Timestamp:** \`${process.env.TIMESTAMP}\``,
-              `- **Report:** [View report](${url})`
-            ].join('\n');
             const lineCoverage = process.env.LINE_COVERAGE;
             const lineHits = process.env.LINE_HITS;
             const lineFound = process.env.LINE_FOUND;
+            const lines = [
+              '### Glues Coverage Report',
+              '',
+            ];
             if (lineCoverage) {
-              const coverageLine = `- **Line Coverage:** ${lineCoverage}% (${lineHits}/${lineFound})`;
-              if (!body.includes(coverageLine)) {
-                // Append coverage details once per update
-                body = [body, coverageLine].join('\n');
-              }
+              // Surface coverage stats before the rest of the metadata.
+              lines.push(`- **Line Coverage:** ${lineCoverage}% (${lineHits}/${lineFound})`);
             }
+            lines.push(
+              `- **Commit:** \`${process.env.COMMIT_SHA}\``,
+              `- **Timestamp:** \`${process.env.TIMESTAMP}\``,
+              `- **Report:** [View report](${url})`,
+            );
+            const body = lines.join('\n');
             const comments = await github.paginate(
               github.rest.issues.listComments,
               {
