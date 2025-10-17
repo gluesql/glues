@@ -1,6 +1,6 @@
 use crate::{
     Error, Event, KeyEvent, Result,
-    state::notebook::{InnerState, NotebookState},
+    state::notebook::{EditorState, InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition},
     types::{KeymapGroup, KeymapItem},
 };
@@ -16,7 +16,8 @@ pub fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransi
             ))? + 1;
 
             state.tabs.splice(i.., []);
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             CloseRightTabs(i).into()
         }
@@ -27,12 +28,14 @@ pub fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransi
 
             state.tab_index = Some(0);
             state.tabs.splice(..i, []);
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             CloseLeftTabs(i).into()
         }
         event @ Key(_) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             super::idle::consume(state, event)
         }

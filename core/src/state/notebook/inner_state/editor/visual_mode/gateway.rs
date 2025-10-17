@@ -1,7 +1,7 @@
 use crate::{
     Error, Event, KeyEvent, Result,
     backend::CoreBackend,
-    state::notebook::{InnerState, NotebookState, VimNormalState},
+    state::notebook::{EditorState, InnerState, NotebookState, VimNormalState},
     transition::{NotebookTransition, VisualModeTransition},
     types::{KeymapGroup, KeymapItem},
 };
@@ -16,17 +16,19 @@ pub fn consume<B: CoreBackend + ?Sized>(
 
     match event {
         Key(KeyEvent::G) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             MoveCursorTop.into()
         }
         Key(KeyEvent::Esc) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             Ok(NotebookTransition::None)
         }
         event @ Key(_) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             super::idle::consume(db, state, event)
         }

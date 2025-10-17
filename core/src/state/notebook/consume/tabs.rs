@@ -3,7 +3,8 @@ use {
         Error, NotebookTransition, Result,
         backend::CoreBackend,
         state::notebook::{
-            InnerState, NoteTreeState, NotebookState, SelectedItem, VimNormalState, directory,
+            EditorState, InnerState, NoteTreeState, NotebookState, SelectedItem, VimNormalState,
+            directory,
         },
         transition::NormalModeTransition,
     },
@@ -14,7 +15,7 @@ pub async fn select_prev<B: CoreBackend + ?Sized>(
     db: &mut B,
     state: &mut NotebookState,
 ) -> Result<NotebookTransition> {
-    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+    state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
     let i = state
         .tab_index
@@ -38,7 +39,7 @@ pub async fn select_next<B: CoreBackend + ?Sized>(
     db: &mut B,
     state: &mut NotebookState,
 ) -> Result<NotebookTransition> {
-    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+    state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
     let i = state
         .tab_index
@@ -98,7 +99,7 @@ pub async fn close<B: CoreBackend + ?Sized>(
     db: &mut B,
     state: &mut NotebookState,
 ) -> Result<NotebookTransition> {
-    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+    state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
     let i = state
         .tab_index
         .ok_or(Error::InvalidState("opened note must exist".to_owned()))?;
@@ -134,7 +135,7 @@ pub async fn focus_editor<B: CoreBackend + ?Sized>(
     let note = state.get_editing()?.clone();
     directory::open_all(db, state, note.directory_id.clone()).await?;
 
-    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+    state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
     state.selected = SelectedItem::Note(note);
 
     Ok(NotebookTransition::FocusEditor)

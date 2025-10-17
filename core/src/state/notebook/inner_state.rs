@@ -1,6 +1,4 @@
-mod editing_insert_mode;
-mod editing_normal_mode;
-mod editing_visual_mode;
+mod editor;
 mod note_tree;
 
 use crate::{
@@ -9,17 +7,13 @@ use crate::{
     state::notebook::{NotebookState, note},
     types::KeymapGroup,
 };
-pub use editing_normal_mode::VimNormalState;
-pub use editing_visual_mode::VimVisualState;
+pub use editor::{EditorState, VimNormalState, VimVisualState};
 pub use note_tree::NoteTreeState;
 
 #[derive(Clone, Copy)]
 pub enum InnerState {
     NoteTree(NoteTreeState),
-
-    EditingNormalMode(VimNormalState),
-    EditingVisualMode(VimVisualState),
-    EditingInsertMode,
+    Editor(EditorState),
 }
 
 pub async fn consume<B: CoreBackend + ?Sized>(
@@ -27,27 +21,19 @@ pub async fn consume<B: CoreBackend + ?Sized>(
     state: &mut NotebookState,
     event: Event,
 ) -> Result<NotebookTransition> {
-    use InnerState::*;
-
     if let Event::Notebook(NotebookEvent::UpdateNoteContent { note_id, content }) = event {
         return note::update_content(db, note_id, content).await;
     }
 
-    match &state.inner_state {
-        NoteTree(tree_state) => note_tree::consume(db, state, *tree_state, event).await,
-        EditingNormalMode(vim_state) => {
-            editing_normal_mode::consume(db, state, *vim_state, event).await
-        }
-        EditingVisualMode(vim_state) => editing_visual_mode::consume(db, state, *vim_state, event),
-        EditingInsertMode => editing_insert_mode::consume(db, state, event),
+    match state.inner_state {
+        InnerState::NoteTree(tree_state) => note_tree::consume(db, state, tree_state, event).await,
+        InnerState::Editor(editor_state) => editor::consume(db, state, editor_state, event).await,
     }
 }
 
 pub fn keymap(state: &NotebookState) -> Vec<KeymapGroup> {
     match state.inner_state {
         InnerState::NoteTree(tree_state) => note_tree::keymap(state, tree_state),
-        InnerState::EditingNormalMode(vim_state) => editing_normal_mode::keymap(vim_state),
-        InnerState::EditingVisualMode(vim_state) => editing_visual_mode::keymap(vim_state),
-        InnerState::EditingInsertMode => editing_insert_mode::keymap(),
+        InnerState::Editor(editor_state) => editor::keymap(editor_state),
     }
 }

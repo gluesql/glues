@@ -5,8 +5,8 @@ use {
         backend::CoreBackend,
         data::{Directory, Note},
         state::notebook::{
-            DirectoryItem, InnerState, NoteTreeState, NotebookState, SelectedItem, Tab,
-            VimNormalState,
+            DirectoryItem, EditorState, InnerState, NoteTreeState, NotebookState, SelectedItem,
+            Tab, VimNormalState,
         },
         transition::{MoveModeTransition, NoteTreeTransition},
         types::{DirectoryId, NoteId},
@@ -164,7 +164,7 @@ pub async fn open<B: CoreBackend + ?Sized>(
         state.tab_index = Some(state.tabs.len() - 1);
     }
 
-    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+    state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
@@ -177,7 +177,7 @@ pub async fn open<B: CoreBackend + ?Sized>(
 pub fn view(state: &mut NotebookState) -> Result<NotebookTransition> {
     let note = state.get_editing()?.clone();
 
-    state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+    state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
     Ok(NotebookTransition::ViewMode(note))
 }
