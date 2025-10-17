@@ -2,7 +2,7 @@ use super::VimNormalState;
 use crate::state::notebook::inner_state::VimVisualState;
 use crate::{
     Error, Event, KeyEvent, NotebookEvent, NumKey, Result,
-    state::notebook::{InnerState, NoteTreeState, NotebookState, directory, note},
+    state::notebook::{EditorState, InnerState, NoteTreeState, NotebookState, directory, note},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition},
     types::{KeymapGroup, KeymapItem},
 };
@@ -21,12 +21,12 @@ pub fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransi
             Ok(NotebookTransition::BrowseNoteTree)
         }
         Key(KeyEvent::T) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Toggle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Toggle));
 
             ToggleMode.into()
         }
         Key(KeyEvent::Z) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Scroll);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Scroll));
 
             ScrollMode.into()
         }
@@ -46,75 +46,76 @@ pub fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransi
         Key(KeyEvent::Caret) => MoveCursorLineNonEmptyStart.into(),
         Key(KeyEvent::CapG) => MoveCursorBottom.into(),
         Key(KeyEvent::I) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             InsertAtCursor.into()
         }
         Key(KeyEvent::V) => {
-            state.inner_state = InnerState::EditingVisualMode(VimVisualState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Visual(VimVisualState::Idle));
 
             Ok(NotebookTransition::EditingVisualMode(
                 VisualModeTransition::IdleMode,
             ))
         }
         Key(KeyEvent::CapI) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             InsertAtLineStart.into()
         }
         Key(KeyEvent::A) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             InsertAfterCursor.into()
         }
         Key(KeyEvent::CapA) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             InsertAtLineEnd.into()
         }
         Key(KeyEvent::O) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             InsertNewLineBelow.into()
         }
         Key(KeyEvent::CapO) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             InsertNewLineAbove.into()
         }
         Key(KeyEvent::G) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Gateway);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Gateway));
 
             GatewayMode.into()
         }
         Key(KeyEvent::Y) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Yank(1));
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Yank(1)));
 
             YankMode.into()
         }
         Key(KeyEvent::D) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Delete(1));
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Delete(1)));
 
             DeleteMode.into()
         }
         Key(KeyEvent::C) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Change(1));
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Change(1)));
 
             ChangeMode.into()
         }
         Key(KeyEvent::X) => DeleteChars(1).into(),
         Key(KeyEvent::S) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             DeleteChars(1).into()
         }
         Key(KeyEvent::CapS) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             DeleteLines(1).into()
         }
         Key(KeyEvent::Num(n)) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Numbering(n.into()));
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(VimNormalState::Numbering(n.into())));
 
             NumberingMode.into()
         }

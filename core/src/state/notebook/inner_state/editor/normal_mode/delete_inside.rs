@@ -1,6 +1,6 @@
 use crate::{
     Error, Event, KeyEvent, Result,
-    state::notebook::{InnerState, NotebookState},
+    state::notebook::{EditorState, InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition},
     types::{KeymapGroup, KeymapItem},
 };
@@ -11,12 +11,14 @@ pub fn consume(state: &mut NotebookState, n: usize, event: Event) -> Result<Note
 
     match event {
         Key(KeyEvent::W) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             DeleteInsideWord(n).into()
         }
         event @ Key(_) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             super::idle::consume(state, event)
         }

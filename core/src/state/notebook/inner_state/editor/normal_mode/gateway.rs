@@ -1,7 +1,7 @@
 use super::VimNormalState;
 use crate::{
     Error, Event, KeyEvent, Result,
-    state::notebook::{InnerState, NotebookState},
+    state::notebook::{EditorState, InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition},
     types::{KeymapGroup, KeymapItem},
 };
@@ -12,17 +12,17 @@ pub fn consume(state: &mut NotebookState, event: Event) -> Result<NotebookTransi
 
     match event {
         Key(KeyEvent::G) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             NormalModeTransition::MoveCursorTop.into()
         }
         Key(KeyEvent::Esc) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             IdleMode.into()
         }
         event @ Key(_) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             super::idle::consume(state, event)
         }

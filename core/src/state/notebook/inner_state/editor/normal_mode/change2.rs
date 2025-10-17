@@ -1,6 +1,6 @@
 use crate::{
     Error, Event, KeyEvent, Result,
-    state::notebook::{InnerState, NotebookState},
+    state::notebook::{EditorState, InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind},
     types::{KeymapGroup, KeymapItem},
 };
@@ -18,47 +18,49 @@ pub fn consume(
         Key(KeyEvent::Num(n)) => {
             let n2 = n + n2.saturating_mul(10);
             state.inner_state =
-                InnerState::EditingNormalMode(super::VimNormalState::Change2(n1, n2));
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Change2(n1, n2)));
 
             Ok(NotebookTransition::None)
         }
         Key(KeyEvent::I) => {
             let n = n1.saturating_mul(n2);
             state.inner_state =
-                InnerState::EditingNormalMode(super::VimNormalState::ChangeInside(n));
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::ChangeInside(n)));
 
             ChangeInsideMode.into()
         }
         Key(KeyEvent::C) => {
             let n = n1.saturating_mul(n2);
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
             DeleteLinesAndInsert(n).into()
         }
         Key(KeyEvent::E | KeyEvent::W) => {
             let n = n1.saturating_mul(n2);
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
             DeleteWordEnd(n).into()
         }
         Key(KeyEvent::B) => {
             let n = n1.saturating_mul(n2);
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
             DeleteWordBack(n).into()
         }
         Key(KeyEvent::DollarSign) => {
             let n = n1.saturating_mul(n2);
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
             DeleteLineEnd(n).into()
         }
         Key(KeyEvent::CtrlH) => Ok(NotebookTransition::ShowVimKeymap(
             VimKeymapKind::NormalChange2,
         )),
         Key(KeyEvent::Esc) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             IdleMode.into()
         }
         event @ Key(_) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             super::idle::consume(state, event)
         }

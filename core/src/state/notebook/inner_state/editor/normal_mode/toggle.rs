@@ -1,7 +1,7 @@
 use crate::{
     Error, Event, KeyEvent, Result,
     backend::CoreBackend,
-    state::notebook::{InnerState, NotebookState, tabs},
+    state::notebook::{EditorState, InnerState, NotebookState, tabs},
     transition::{NormalModeTransition, NotebookTransition},
     types::{KeymapGroup, KeymapItem},
 };
@@ -22,22 +22,25 @@ pub async fn consume<B: CoreBackend + ?Sized>(
         Key(KeyEvent::X) => tabs::close(db, state).await,
         Key(KeyEvent::CapX) => {
             state.inner_state =
-                InnerState::EditingNormalMode(super::VimNormalState::ToggleTabClose);
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::ToggleTabClose));
 
             ToggleTabCloseMode.into()
         }
         Key(KeyEvent::N) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             ToggleLineNumbers.into()
         }
         Key(KeyEvent::B) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             ToggleBrowser.into()
         }
         event @ Key(_) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             super::idle::consume(state, event)
         }

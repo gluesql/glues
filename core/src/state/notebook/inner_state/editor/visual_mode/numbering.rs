@@ -1,7 +1,7 @@
 use crate::{
     Error, Event, KeyEvent, Result,
     backend::CoreBackend,
-    state::notebook::{InnerState, NotebookState, VimNormalState},
+    state::notebook::{EditorState, InnerState, NotebookState, VimNormalState},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition},
     types::{KeymapGroup, KeymapItem},
 };
@@ -19,52 +19,60 @@ pub fn consume<B: CoreBackend + ?Sized>(
         Key(KeyEvent::Num(n2)) => {
             let step = n2 + n.saturating_mul(10);
             state.inner_state =
-                InnerState::EditingVisualMode(super::VimVisualState::Numbering(step));
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Numbering(step)));
 
             Ok(NotebookTransition::None)
         }
         Key(KeyEvent::J | KeyEvent::Down) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             MoveCursorDown(n).into()
         }
         Key(KeyEvent::K | KeyEvent::Up) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             MoveCursorUp(n).into()
         }
         Key(KeyEvent::H | KeyEvent::Left) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             NormalModeTransition::MoveCursorBack(n).into()
         }
         Key(KeyEvent::L | KeyEvent::Right) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             MoveCursorForward(n).into()
         }
         Key(KeyEvent::W) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             MoveCursorWordForward(n).into()
         }
         Key(KeyEvent::E) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             MoveCursorWordEnd(n).into()
         }
         Key(KeyEvent::B) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             MoveCursorWordBack(n).into()
         }
         Key(KeyEvent::CapG) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Idle));
 
             MoveCursorToLine(n).into()
         }
         Key(KeyEvent::Esc) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             Ok(NotebookTransition::EditingNormalMode(
                 NormalModeTransition::IdleMode,
@@ -74,7 +82,7 @@ pub fn consume<B: CoreBackend + ?Sized>(
             VimKeymapKind::VisualNumbering,
         )),
         event @ Key(_) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             super::idle::consume(db, state, event)
         }

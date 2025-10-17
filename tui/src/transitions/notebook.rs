@@ -13,7 +13,7 @@ use {
         NotebookEvent,
         state::{
             GetInner, NotebookState,
-            notebook::{InnerState, NoteTreeState, VimNormalState},
+            notebook::{EditorState, InnerState, NoteTreeState, VimNormalState},
         },
         transition::NotebookTransition,
     },
@@ -40,12 +40,14 @@ impl App {
                 ContextState::DirectoryActionsDialog
             }
             InnerState::NoteTree(NoteTreeState::MoveMode) => ContextState::MoveMode,
-            InnerState::EditingNormalMode(VimNormalState::Idle) => {
+            InnerState::Editor(EditorState::Normal(VimNormalState::Idle)) => {
                 ContextState::EditorNormalMode { idle: true }
             }
-            InnerState::EditingNormalMode(_) => ContextState::EditorNormalMode { idle: false },
-            InnerState::EditingVisualMode(_) => ContextState::EditorVisualMode,
-            InnerState::EditingInsertMode => ContextState::EditorInsertMode,
+            InnerState::Editor(EditorState::Normal(_)) => {
+                ContextState::EditorNormalMode { idle: false }
+            }
+            InnerState::Editor(EditorState::Visual(_)) => ContextState::EditorVisualMode,
+            InnerState::Editor(EditorState::Insert) => ContextState::EditorInsertMode,
         };
 
         if self.context.notebook.state != new_state {

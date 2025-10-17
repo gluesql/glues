@@ -1,6 +1,6 @@
 use crate::{
     Error, Event, KeyEvent, NumKey, Result,
-    state::notebook::{InnerState, NotebookState},
+    state::notebook::{EditorState, InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition},
     types::{KeymapGroup, KeymapItem},
 };
@@ -11,23 +11,27 @@ pub fn consume(state: &mut NotebookState, n: usize, event: Event) -> Result<Note
 
     match event {
         Key(KeyEvent::Num(n2)) if !matches!(n2, NumKey::Zero) => {
-            state.inner_state =
-                InnerState::EditingNormalMode(super::VimNormalState::Yank2(n, n2.into()));
+            state.inner_state = InnerState::Editor(EditorState::Normal(
+                super::VimNormalState::Yank2(n, n2.into()),
+            ));
 
             Ok(NotebookTransition::None)
         }
         Key(KeyEvent::Y) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             YankLines(n).into()
         }
         Key(KeyEvent::Esc) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             IdleMode.into()
         }
         event @ Key(_) => {
-            state.inner_state = InnerState::EditingNormalMode(super::VimNormalState::Idle);
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
 
             super::idle::consume(state, event)
         }

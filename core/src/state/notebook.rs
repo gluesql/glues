@@ -13,6 +13,7 @@ use {
 };
 
 pub use inner_state::{
+    EditorState,
     InnerState::{self, *},
     NoteTreeState, VimNormalState, VimVisualState,
 };
@@ -110,32 +111,32 @@ impl NotebookState {
                 }
                 _ => "Move mode".to_owned(),
             },
-            EditingNormalMode(VimNormalState::Idle) => {
+            Editor(EditorState::Normal(VimNormalState::Idle)) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode")
             }
-            EditingNormalMode(VimNormalState::Toggle) => {
+            Editor(EditorState::Normal(VimNormalState::Toggle)) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode - toggle")
             }
-            EditingNormalMode(VimNormalState::ToggleTabClose) => {
+            Editor(EditorState::Normal(VimNormalState::ToggleTabClose)) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode - toggle tab close")
             }
-            EditingNormalMode(VimNormalState::Numbering(n)) => {
+            Editor(EditorState::Normal(VimNormalState::Numbering(n))) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode, steps: '{n}'")
             }
-            EditingNormalMode(VimNormalState::Gateway) => {
+            Editor(EditorState::Normal(VimNormalState::Gateway)) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode - gateway")
             }
-            EditingNormalMode(VimNormalState::Yank(n)) => {
+            Editor(EditorState::Normal(VimNormalState::Yank(n))) => {
                 let name = &self.get_selected_note()?.name;
 
                 let n = if *n >= 2 {
@@ -145,7 +146,7 @@ impl NotebookState {
                 };
                 format!("Note '{name}' normal mode - yank '{n}y'")
             }
-            EditingNormalMode(VimNormalState::Yank2(n1, n2)) => {
+            Editor(EditorState::Normal(VimNormalState::Yank2(n1, n2))) => {
                 let name = &self.get_selected_note()?.name;
                 let n1 = if *n1 >= 2 {
                     format!("{n1}")
@@ -160,7 +161,7 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - yank '{n1}y{n2}'")
             }
-            EditingNormalMode(VimNormalState::Delete(n)) => {
+            Editor(EditorState::Normal(VimNormalState::Delete(n))) => {
                 let name = &self.get_selected_note()?.name;
 
                 let n = if *n >= 2 {
@@ -170,7 +171,7 @@ impl NotebookState {
                 };
                 format!("Note '{name}' normal mode - delete '{n}d'")
             }
-            EditingNormalMode(VimNormalState::Delete2(n1, n2)) => {
+            Editor(EditorState::Normal(VimNormalState::Delete2(n1, n2))) => {
                 let name = &self.get_selected_note()?.name;
                 let n1 = if *n1 >= 2 {
                     format!("{n1}")
@@ -185,7 +186,7 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - delete '{n1}d{n2}'")
             }
-            EditingNormalMode(VimNormalState::DeleteInside(n)) => {
+            Editor(EditorState::Normal(VimNormalState::DeleteInside(n))) => {
                 let name = &self.get_selected_note()?.name;
                 let n = if *n >= 2 {
                     format!("{n}")
@@ -195,7 +196,7 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - delete inside {n}di")
             }
-            EditingNormalMode(VimNormalState::Change(n)) => {
+            Editor(EditorState::Normal(VimNormalState::Change(n))) => {
                 let name = &self.get_selected_note()?.name;
 
                 let n = if *n >= 2 {
@@ -205,7 +206,7 @@ impl NotebookState {
                 };
                 format!("Note '{name}' normal mode - change '{n}c'")
             }
-            EditingNormalMode(VimNormalState::Change2(n1, n2)) => {
+            Editor(EditorState::Normal(VimNormalState::Change2(n1, n2))) => {
                 let name = &self.get_selected_note()?.name;
                 let n1 = if *n1 >= 2 {
                     format!("{n1}")
@@ -220,7 +221,7 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - change '{n1}c{n2}'")
             }
-            EditingNormalMode(VimNormalState::ChangeInside(n)) => {
+            Editor(EditorState::Normal(VimNormalState::ChangeInside(n))) => {
                 let name = &self.get_selected_note()?.name;
                 let n = if *n >= 2 {
                     format!("{n}")
@@ -230,27 +231,27 @@ impl NotebookState {
 
                 format!("Note '{name}' normal mode - change inside {n}ci")
             }
-            EditingNormalMode(VimNormalState::Scroll) => {
+            Editor(EditorState::Normal(VimNormalState::Scroll)) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' normal mode - scroll")
             }
-            EditingVisualMode(VimVisualState::Idle) => {
+            Editor(EditorState::Visual(VimVisualState::Idle)) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' visual mode")
             }
-            EditingVisualMode(VimVisualState::Numbering(n)) => {
+            Editor(EditorState::Visual(VimVisualState::Numbering(n))) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' visual mode, input: '{n}'")
             }
-            EditingVisualMode(VimVisualState::Gateway) => {
+            Editor(EditorState::Visual(VimVisualState::Gateway)) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' visual mode - gateway")
             }
-            EditingInsertMode => {
+            Editor(EditorState::Insert) => {
                 let name = &self.get_selected_note()?.name;
 
                 format!("Note '{name}' insert mode")

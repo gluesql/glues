@@ -1,7 +1,7 @@
 use crate::{
     Error, Event, KeyEvent, NumKey, Result,
     backend::CoreBackend,
-    state::notebook::{InnerState, NotebookState, VimNormalState},
+    state::notebook::{EditorState, InnerState, NotebookState, VimNormalState},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind, VisualModeTransition},
     types::{KeymapGroup, KeymapItem},
 };
@@ -27,51 +27,53 @@ pub fn consume<B: CoreBackend + ?Sized>(
         Key(KeyEvent::Caret) => MoveCursorLineNonEmptyStart.into(),
         Key(KeyEvent::CapG) => MoveCursorBottom.into(),
         Key(KeyEvent::Tilde) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             SwitchCase.into()
         }
         Key(KeyEvent::U) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             ToLowercase.into()
         }
         Key(KeyEvent::CapU) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             ToUppercase.into()
         }
         Key(KeyEvent::D | KeyEvent::X) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             DeleteSelection.into()
         }
 
         Key(KeyEvent::S | KeyEvent::CapS) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             DeleteSelectionAndInsertMode.into()
         }
         Key(KeyEvent::Y) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             YankSelection.into()
         }
         Key(KeyEvent::G) => {
-            state.inner_state = InnerState::EditingVisualMode(super::VimVisualState::Gateway);
+            state.inner_state =
+                InnerState::Editor(EditorState::Visual(super::VimVisualState::Gateway));
 
             GatewayMode.into()
         }
         Key(KeyEvent::Esc) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             Ok(NotebookTransition::EditingNormalMode(
                 NormalModeTransition::IdleMode,
             ))
         }
         Key(KeyEvent::Num(n)) => {
-            state.inner_state =
-                InnerState::EditingVisualMode(super::VimVisualState::Numbering(n.into()));
+            state.inner_state = InnerState::Editor(EditorState::Visual(
+                super::VimVisualState::Numbering(n.into()),
+            ));
 
             NumberingMode.into()
         }

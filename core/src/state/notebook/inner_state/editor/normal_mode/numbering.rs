@@ -1,7 +1,7 @@
 use super::VimNormalState;
 use crate::{
     Error, Event, KeyEvent, Result,
-    state::notebook::{InnerState, NotebookState},
+    state::notebook::{EditorState, InnerState, NotebookState},
     transition::{NormalModeTransition, NotebookTransition, VimKeymapKind},
     types::{KeymapGroup, KeymapItem},
 };
@@ -13,82 +13,83 @@ pub fn consume(state: &mut NotebookState, n: usize, event: Event) -> Result<Note
     match event {
         Key(KeyEvent::Num(n2)) => {
             let step = n2 + n.saturating_mul(10);
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Numbering(step));
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(VimNormalState::Numbering(step)));
 
             Ok(NotebookTransition::None)
         }
         Key(KeyEvent::J | KeyEvent::Down) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             MoveCursorDown(n).into()
         }
         Key(KeyEvent::K | KeyEvent::Up) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             MoveCursorUp(n).into()
         }
         Key(KeyEvent::H | KeyEvent::Left) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             NormalModeTransition::MoveCursorBack(n).into()
         }
         Key(KeyEvent::L | KeyEvent::Right) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             MoveCursorForward(n).into()
         }
         Key(KeyEvent::W) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             MoveCursorWordForward(n).into()
         }
         Key(KeyEvent::E) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             MoveCursorWordEnd(n).into()
         }
         Key(KeyEvent::B) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             MoveCursorWordBack(n).into()
         }
         Key(KeyEvent::CapG) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             MoveCursorToLine(n).into()
         }
         Key(KeyEvent::X) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             DeleteChars(n).into()
         }
         Key(KeyEvent::S) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             DeleteChars(n).into()
         }
         Key(KeyEvent::CapS) => {
-            state.inner_state = InnerState::EditingInsertMode;
+            state.inner_state = InnerState::Editor(EditorState::Insert);
 
             DeleteLines(n).into()
         }
         Key(KeyEvent::Y) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Yank(n));
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Yank(n)));
 
             YankMode.into()
         }
         Key(KeyEvent::D) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Delete(n));
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Delete(n)));
 
             DeleteMode.into()
         }
         Key(KeyEvent::C) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Change(n));
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Change(n)));
 
             ChangeMode.into()
         }
         Key(KeyEvent::Esc) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             IdleMode.into()
         }
@@ -96,7 +97,7 @@ pub fn consume(state: &mut NotebookState, n: usize, event: Event) -> Result<Note
             VimKeymapKind::NormalNumbering,
         )),
         event @ Key(_) => {
-            state.inner_state = InnerState::EditingNormalMode(VimNormalState::Idle);
+            state.inner_state = InnerState::Editor(EditorState::Normal(VimNormalState::Idle));
 
             super::idle::consume(state, event)
         }
