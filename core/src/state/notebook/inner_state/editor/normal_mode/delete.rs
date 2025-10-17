@@ -47,7 +47,7 @@ pub fn consume(state: &mut NotebookState, n: usize, event: Event) -> Result<Note
 
             DeleteWordBack(n).into()
         }
-        Key(KeyEvent::E) => {
+        Key(KeyEvent::E | KeyEvent::W) => {
             state.inner_state =
                 InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
             DeleteWordEnd(n).into()
@@ -103,7 +103,7 @@ pub fn keymap(n: usize) -> Vec<KeymapGroup> {
             KeymapItem::new("d", format!("Delete {n} lines")),
             KeymapItem::new("0", "Delete from start of line"),
             KeymapItem::new("b", "Delete previous word"),
-            KeymapItem::new("e", "Delete to word end"),
+            KeymapItem::new("e/w", "Delete to word end"),
             KeymapItem::new("h", "Delete previous character"),
             KeymapItem::new("l", "Delete next character"),
             KeymapItem::new("$", "Delete to line end"),
