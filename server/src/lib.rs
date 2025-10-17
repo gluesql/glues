@@ -10,25 +10,13 @@ use {
     },
     clap::{Args, Parser, Subcommand},
     color_eyre::Result,
-    glues_core::{
-        Task, Transition,
-        backend::{
-            CoreBackend,
-            local::Db,
-            proxy::{ProxyServer, request::ProxyRequest, response::ProxyResponse},
-        },
-        handle_tasks,
+    glues_core::backend::{
+        CoreBackend,
+        local::Db,
+        proxy::{ProxyServer, request::ProxyRequest, response::ProxyResponse},
     },
-    std::{
-        collections::VecDeque,
-        net::SocketAddr,
-        sync::{
-            Arc, Mutex,
-            mpsc::{Sender, channel},
-        },
-        time::Duration,
-    },
-    tokio::{net::TcpListener, signal, sync::Mutex as AsyncMutex, time::sleep},
+    std::{net::SocketAddr, sync::Arc},
+    tokio::{net::TcpListener, signal, sync::Mutex as AsyncMutex},
     tower_http::cors::{Any, CorsLayer},
     tracing::{error, info, warn},
     tracing_subscriber::EnvFilter,
@@ -88,12 +76,7 @@ pub async fn run(args: ServerArgs) -> Result<()> {
         storage,
     } = args;
 
-    let (task_tx, task_rx) = channel();
-    let transition_queue = Arc::new(Mutex::new(VecDeque::<Transition>::new()));
-    let _task_handle = handle_tasks(task_rx, &transition_queue);
-    spawn_transition_drain(Arc::clone(&transition_queue));
-
-    let backend = build_backend(storage, task_tx).await?;
+    let backend = build_backend(storage).await?;
     let server = Arc::new(AsyncMutex::new(ProxyServer::new(backend)));
 
     let cors = CorsLayer::new()
@@ -135,21 +118,18 @@ pub async fn run_cli() -> Result<()> {
     run(parse_args()).await
 }
 
-async fn build_backend(
-    storage: StorageCommand,
-    task_tx: Sender<Task>,
-) -> Result<Box<dyn CoreBackend + Send>> {
+async fn build_backend(storage: StorageCommand) -> Result<Box<dyn CoreBackend + Send>> {
     let backend: Box<dyn CoreBackend + Send> = match storage {
-        StorageCommand::Memory => Box::new(Db::memory(task_tx.clone()).await?),
-        StorageCommand::File { path } => Box::new(Db::file(task_tx.clone(), &path).await?),
-        StorageCommand::Redb { path } => Box::new(Db::redb(task_tx.clone(), &path).await?),
+        StorageCommand::Memory => Box::new(Db::memory().await?),
+        StorageCommand::File { path } => Box::new(Db::file(&path).await?),
+        StorageCommand::Redb { path } => Box::new(Db::redb(&path).await?),
         StorageCommand::Git {
             path,
             remote,
             branch,
-        } => Box::new(Db::git(task_tx.clone(), &path, remote, branch).await?),
+        } => Box::new(Db::git(&path, remote, branch).await?),
         StorageCommand::Mongo { conn_str, db_name } => {
-            Box::new(Db::mongo(task_tx, &conn_str, &db_name).await?)
+            Box::new(Db::mongo(&conn_str, &db_name).await?)
         }
     };
 
@@ -167,18 +147,6 @@ async fn handle_proxy(
 
 async fn health() -> StatusCode {
     StatusCode::OK
-}
-
-fn spawn_transition_drain(queue: Arc<Mutex<VecDeque<Transition>>>) {
-    tokio::spawn(async move {
-        loop {
-            {
-                let mut guard = queue.lock().expect("transition queue poisoned");
-                guard.clear();
-            }
-            sleep(Duration::from_millis(500)).await;
-        }
-    });
 }
 
 async fn shutdown_signal() {

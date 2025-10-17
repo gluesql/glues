@@ -3,13 +3,18 @@ mod keymap;
 mod notebook;
 
 use {
-    super::App, async_recursion::async_recursion, glues_core::transition::Transition,
+    super::App,
+    async_recursion::async_recursion,
+    glues_core::transition::{
+        MoveModeTransition, NoteTreeTransition, NotebookTransition, Transition,
+    },
     std::time::SystemTime,
 };
 
 impl App {
     #[async_recursion(?Send)]
     pub(super) async fn handle_transition(&mut self, transition: Transition) {
+        let should_sync = transition_requires_sync(&transition);
         match transition {
             Transition::Keymap(transition) => {
                 self.handle_keymap_transition(transition).await;
@@ -29,5 +34,25 @@ impl App {
                 self.context.alert = Some(message);
             }
         }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        if should_sync {
+            self.maybe_schedule_sync();
+        }
     }
+}
+
+fn transition_requires_sync(transition: &Transition) -> bool {
+    matches!(
+        transition,
+        Transition::Notebook(NotebookTransition::NoteTree(
+            NoteTreeTransition::RenameNote(_)
+                | NoteTreeTransition::RenameDirectory(_)
+                | NoteTreeTransition::RemoveNote { .. }
+                | NoteTreeTransition::RemoveDirectory { .. }
+                | NoteTreeTransition::AddNote(_)
+                | NoteTreeTransition::AddDirectory(_)
+                | NoteTreeTransition::MoveMode(MoveModeTransition::Commit)
+        )) | Transition::Notebook(NotebookTransition::UpdateNoteContent(_))
+    )
 }

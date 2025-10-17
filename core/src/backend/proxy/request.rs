@@ -55,4 +55,5 @@ pub enum ProxyRequest {
         category: String,
         message: String,
     },
+    Sync,
 }
