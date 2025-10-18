@@ -1,7 +1,14 @@
 use {
     crate::{context::Context, views},
-    glues_core::Glues,
+    glues_core::{Glues, transition::Transition},
     ratatui::Frame,
+    std::{
+        collections::VecDeque,
+        sync::{
+            Arc, Mutex,
+            atomic::{AtomicBool, Ordering},
+        },
+    },
 };
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -12,15 +19,19 @@ use {
     },
     ratatui::DefaultTerminal,
     std::time::Duration,
+    tokio::{self, task},
 };
 
 #[cfg(target_arch = "wasm32")]
-#[cfg(not(target_arch = "wasm32"))]
 use crate::logger::*;
 
 pub struct App {
     pub(crate) glues: Glues,
     pub(crate) context: Context,
+    bg_transitions: Arc<Mutex<VecDeque<Transition>>>,
+    sync_in_progress: Arc<AtomicBool>,
+    #[cfg(not(target_arch = "wasm32"))]
+    sync_pending: Arc<AtomicBool>,
 }
 
 impl Default for App {
@@ -33,8 +44,19 @@ impl App {
     pub fn new() -> Self {
         let glues = Glues::new();
         let context = Context::default();
+        let bg_transitions = Arc::new(Mutex::new(VecDeque::new()));
+        let sync_in_progress = Arc::new(AtomicBool::new(false));
+        #[cfg(not(target_arch = "wasm32"))]
+        let sync_pending = Arc::new(AtomicBool::new(false));
 
-        Self { glues, context }
+        Self {
+            glues,
+            context,
+            bg_transitions,
+            sync_in_progress,
+            #[cfg(not(target_arch = "wasm32"))]
+            sync_pending,
+        }
     }
 
     #[doc(hidden)]
@@ -60,22 +82,11 @@ impl App {
                 self.context.last_log = None;
             }
 
+            self.process_background().await;
             terminal.draw(|frame| self.draw(frame))?;
 
             if !ct::event::poll(Duration::from_millis(1500))? {
-                let mut transitions = Vec::new();
-                {
-                    let mut queue = self.glues.transition_queue.lock().log_unwrap();
-
-                    while let Some(transition) = queue.pop_front() {
-                        transitions.push(transition);
-                    }
-                }
-
-                for transition in transitions {
-                    self.handle_transition(transition).await;
-                }
-
+                self.process_background().await;
                 self.save().await;
                 continue;
             }
@@ -110,6 +121,8 @@ impl App {
                     }
                 }
             }
+
+            self.process_background().await;
         }
     }
 
@@ -131,5 +144,73 @@ impl App {
 
     pub fn context_mut(&mut self) -> &mut Context {
         &mut self.context
+    }
+
+    async fn process_background(&mut self) {
+        let mut transitions = Vec::new();
+
+        {
+            let mut queue = self.bg_transitions.lock().log_unwrap();
+            while let Some(transition) = queue.pop_front() {
+                transitions.push(transition);
+            }
+        }
+
+        for transition in transitions {
+            self.handle_transition(transition).await;
+        }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        self.flush_pending_sync();
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub(crate) fn maybe_schedule_sync(&mut self) {
+        if self.sync_in_progress.swap(true, Ordering::AcqRel) {
+            self.sync_pending.store(true, Ordering::Release);
+            return;
+        }
+
+        let Some(backend) = self.glues.db.as_mut() else {
+            return;
+        };
+        let Some(job) = backend.sync_job() else {
+            return;
+        };
+
+        self.sync_pending.store(false, Ordering::Release);
+        let queue = Arc::clone(&self.bg_transitions);
+        let flag = Arc::clone(&self.sync_in_progress);
+
+        tokio::spawn(async move {
+            let result = task::spawn_blocking(move || job.run()).await;
+            let transition = match result {
+                Ok(Ok(())) => {
+                    Transition::Log("Sync complete. Your notes are up to date.".to_owned())
+                }
+                Ok(Err(err)) => Transition::Error(err.to_string()),
+                Err(join_err) => Transition::Error(format!("Sync task panicked: {join_err}")),
+            };
+
+            {
+                let mut guard = queue.lock().log_unwrap();
+                guard.push_back(transition);
+            }
+
+            flag.store(false, Ordering::Release);
+        });
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn flush_pending_sync(&mut self) {
+        if self.sync_in_progress.load(Ordering::SeqCst) {
+            return;
+        }
+
+        if !self.sync_pending.swap(false, Ordering::SeqCst) {
+            return;
+        }
+
+        self.maybe_schedule_sync();
     }
 }

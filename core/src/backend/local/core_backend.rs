@@ -1,6 +1,6 @@
 use crate::{
     Result,
-    backend::CoreBackend,
+    backend::{CoreBackend, SyncJob},
     data::{Directory, Note},
     types::{DirectoryId, NoteId},
 };
@@ -73,5 +73,9 @@ impl CoreBackend for Db {
 
     async fn log(&mut self, category: String, message: String) -> Result<()> {
         Db::log(self, category, message).await
+    }
+
+    fn sync_job(&self) -> Option<SyncJob> {
+        Db::sync_job(self)
     }
 }

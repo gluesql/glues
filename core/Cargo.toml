@@ -31,7 +31,8 @@ gluesql = { workspace = true, features = [
     "gluesql-git-storage",
     "gluesql-mongo-storage",
 ] }
-reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+reqwest = { version = "0.12", features = ["json", "rustls-tls", "blocking"] }
+tokio = { version = "1.41.0", features = ["rt"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 gluesql = { workspace = true, features = [

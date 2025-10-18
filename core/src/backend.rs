@@ -1,9 +1,85 @@
 use crate::{
-    Result,
+    Error, Result,
     data::{Directory, Note},
     types::{DirectoryId, NoteId},
 };
 use async_trait::async_trait;
+use std::path::PathBuf;
+
+#[cfg(not(target_arch = "wasm32"))]
+use {
+    gluesql::gluesql_git_storage::{GitStorage, StorageType},
+    reqwest::blocking::Client,
+    std::time::Duration,
+};
+
+#[derive(Clone)]
+pub enum SyncJob {
+    #[cfg(not(target_arch = "wasm32"))]
+    Git {
+        path: PathBuf,
+        remote: String,
+        branch: String,
+    },
+    #[cfg(not(target_arch = "wasm32"))]
+    Proxy {
+        url: String,
+        auth_token: Option<String>,
+    },
+}
+
+impl SyncJob {
+    pub fn run(self) -> Result<()> {
+        #[cfg(not(target_arch = "wasm32"))]
+        match self {
+            SyncJob::Git {
+                path,
+                remote,
+                branch,
+            } => {
+                let mut storage = GitStorage::open(path, StorageType::File)?;
+                storage.set_remote(remote);
+                storage.set_branch(branch);
+                storage.pull()?;
+                storage.push()?;
+            }
+            SyncJob::Proxy { url, auth_token } => {
+                use crate::backend::proxy::{
+                    request::ProxyRequest,
+                    response::{ProxyResponse, ResultPayload},
+                };
+
+                let client = Client::builder().timeout(Duration::from_secs(30)).build()?;
+                let mut request = client.post(&url).json(&ProxyRequest::Sync);
+                if let Some(token) = auth_token.as_ref() {
+                    request = request.bearer_auth(token);
+                }
+
+                let response = request.send()?;
+                if !response.status().is_success() {
+                    return Err(Error::Proxy(format!(
+                        "sync failed with status {}",
+                        response.status()
+                    )));
+                }
+
+                match response.json()? {
+                    ProxyResponse::Ok(ResultPayload::Unit) => {}
+                    ProxyResponse::Ok(_) => {
+                        return Err(Error::InvalidResponse(
+                            "invalid sync response payload".to_owned(),
+                        ));
+                    }
+                    ProxyResponse::Err(message) => {
+                        return Err(Error::Proxy(message));
+                    }
+                }
+            }
+        }
+
+        Ok(())
+    }
+}
 
 #[cfg(target_arch = "wasm32")]
 #[async_trait(?Send)]
@@ -30,6 +106,8 @@ pub trait CoreBackend {
     async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) -> Result<()>;
 
     async fn log(&mut self, category: String, message: String) -> Result<()>;
+
+    fn sync_job(&self) -> Option<SyncJob>;
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -57,6 +135,8 @@ pub trait CoreBackend: Send {
     async fn move_note(&mut self, note_id: NoteId, directory_id: DirectoryId) -> Result<()>;
 
     async fn log(&mut self, category: String, message: String) -> Result<()>;
+
+    fn sync_job(&self) -> Option<SyncJob>;
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -125,6 +205,10 @@ impl CoreBackend for Box<dyn CoreBackend> {
     async fn log(&mut self, category: String, message: String) -> Result<()> {
         (**self).log(category, message).await
     }
+
+    fn sync_job(&self) -> Option<SyncJob> {
+        (**self).sync_job()
+    }
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -193,6 +277,10 @@ impl CoreBackend for Box<dyn CoreBackend + Send> {
     async fn log(&mut self, category: String, message: String) -> Result<()> {
         (**self).log(category, message).await
     }
+
+    fn sync_job(&self) -> Option<SyncJob> {
+        (**self).sync_job()
+    }
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -260,6 +348,10 @@ impl CoreBackend for Box<dyn CoreBackend + Send> {
 
     async fn log(&mut self, category: String, message: String) -> Result<()> {
         (**self).log(category, message).await
+    }
+
+    fn sync_job(&self) -> Option<SyncJob> {
+        (**self).sync_job()
     }
 }
 

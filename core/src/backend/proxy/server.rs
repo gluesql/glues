@@ -1,6 +1,11 @@
 use super::request::ProxyRequest;
 use super::response::{ProxyResponse, ResultPayload};
-use crate::backend::{BackendBox, CoreBackend};
+use crate::{
+    Error,
+    backend::{BackendBox, CoreBackend, SyncJob},
+};
+#[cfg(not(target_arch = "wasm32"))]
+use tokio::task;
 
 pub struct ProxyServer {
     pub db: BackendBox,
@@ -9,6 +14,19 @@ pub struct ProxyServer {
 impl ProxyServer {
     pub fn new(db: BackendBox) -> Self {
         Self { db }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    async fn run_sync_job(job: SyncJob) -> Result<(), Error> {
+        task::spawn_blocking(move || job.run())
+            .await
+            .map_err(|err| Error::BackendError(format!("sync task panicked: {err}")))?
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    async fn run_sync_job(job: SyncJob) -> Result<(), Error> {
+        let _ = job;
+        Ok(())
     }
 
     pub async fn handle(&mut self, req: ProxyRequest) -> ProxyResponse {
@@ -84,6 +102,13 @@ impl ProxyServer {
             Log { category, message } => match self.db.log(category, message).await {
                 Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
                 Err(e) => ProxyResponse::Err(e.to_string()),
+            },
+            Sync => match self.db.sync_job() {
+                Some(job) => match Self::run_sync_job(job).await {
+                    Ok(()) => ProxyResponse::Ok(ResultPayload::Unit),
+                    Err(e) => ProxyResponse::Err(e.to_string()),
+                },
+                None => ProxyResponse::Ok(ResultPayload::Unit),
             },
         }
     }

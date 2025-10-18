@@ -84,7 +84,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        self.sync().map(|()| directory)
+        Ok(directory)
     }
 
     #[cfg_attr(target_arch = "wasm32", async_recursion(?Send))]
@@ -107,7 +107,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        self.sync()
+        Ok(())
     }
 
     pub async fn move_directory(
@@ -123,7 +123,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        self.sync()
+        Ok(())
     }
 
     pub async fn rename_directory(
@@ -139,6 +139,6 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        self.sync()
+        Ok(())
     }
 }
