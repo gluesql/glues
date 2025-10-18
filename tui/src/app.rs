@@ -183,7 +183,7 @@ impl App {
             };
 
             {
-                let mut guard = queue.lock().expect("transition queue poisoned");
+                let mut guard = queue.lock().log_unwrap();
                 guard.push_back(transition);
             }
 
