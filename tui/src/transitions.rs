@@ -3,18 +3,19 @@ mod keymap;
 mod notebook;
 
 use {
-    super::App,
-    async_recursion::async_recursion,
-    glues_core::transition::{
-        MoveModeTransition, NoteTreeTransition, NotebookTransition, Transition,
-    },
+    super::App, async_recursion::async_recursion, glues_core::transition::Transition,
     std::time::SystemTime,
 };
+
+#[cfg(not(target_arch = "wasm32"))]
+use glues_core::transition::{MoveModeTransition, NoteTreeTransition, NotebookTransition};
 
 impl App {
     #[async_recursion(?Send)]
     pub(super) async fn handle_transition(&mut self, transition: Transition) {
+        #[cfg(not(target_arch = "wasm32"))]
         let should_sync = transition_requires_sync(&transition);
+
         match transition {
             Transition::Keymap(transition) => {
                 self.handle_keymap_transition(transition).await;
@@ -42,6 +43,7 @@ impl App {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn transition_requires_sync(transition: &Transition) -> bool {
     matches!(
         transition,
