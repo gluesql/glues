@@ -182,7 +182,6 @@ impl App {
         self.sync_pending.store(false, Ordering::SeqCst);
         let queue = Arc::clone(&self.bg_transitions);
         let flag = Arc::clone(&self.sync_in_progress);
-        let pending = Arc::clone(&self.sync_pending);
 
         tokio::spawn(async move {
             let result = task::spawn_blocking(move || job.run()).await;
@@ -200,9 +199,6 @@ impl App {
             }
 
             flag.store(false, Ordering::SeqCst);
-            if pending.swap(false, Ordering::SeqCst) {
-                pending.store(true, Ordering::SeqCst);
-            }
         });
     }
 
