@@ -166,8 +166,8 @@ impl App {
 
     #[cfg(not(target_arch = "wasm32"))]
     pub(crate) fn maybe_schedule_sync(&mut self) {
-        if self.sync_in_progress.load(Ordering::SeqCst) {
-            self.sync_pending.store(true, Ordering::SeqCst);
+        if self.sync_in_progress.swap(true, Ordering::AcqRel) {
+            self.sync_pending.store(true, Ordering::Release);
             return;
         }
 
@@ -178,8 +178,7 @@ impl App {
             return;
         };
 
-        self.sync_in_progress.store(true, Ordering::SeqCst);
-        self.sync_pending.store(false, Ordering::SeqCst);
+        self.sync_pending.store(false, Ordering::Release);
         let queue = Arc::clone(&self.bg_transitions);
         let flag = Arc::clone(&self.sync_in_progress);
 
@@ -198,7 +197,7 @@ impl App {
                 guard.push_back(transition);
             }
 
-            flag.store(false, Ordering::SeqCst);
+            flag.store(false, Ordering::Release);
         });
     }
 
