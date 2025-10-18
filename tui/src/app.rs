@@ -4,12 +4,12 @@ use {
     ratatui::Frame,
     std::{
         collections::VecDeque,
-        sync::{Arc, Mutex, atomic::AtomicBool},
+        sync::{
+            Arc, Mutex,
+            atomic::{AtomicBool, Ordering},
+        },
     },
 };
-
-#[cfg(not(target_arch = "wasm32"))]
-use std::sync::atomic::Ordering;
 
 #[cfg(not(target_arch = "wasm32"))]
 use {
@@ -30,6 +30,8 @@ pub struct App {
     pub(crate) context: Context,
     bg_transitions: Arc<Mutex<VecDeque<Transition>>>,
     sync_in_progress: Arc<AtomicBool>,
+    #[cfg(not(target_arch = "wasm32"))]
+    sync_pending: Arc<AtomicBool>,
 }
 
 impl Default for App {
@@ -44,12 +46,16 @@ impl App {
         let context = Context::default();
         let bg_transitions = Arc::new(Mutex::new(VecDeque::new()));
         let sync_in_progress = Arc::new(AtomicBool::new(false));
+        #[cfg(not(target_arch = "wasm32"))]
+        let sync_pending = Arc::new(AtomicBool::new(false));
 
         Self {
             glues,
             context,
             bg_transitions,
             sync_in_progress,
+            #[cfg(not(target_arch = "wasm32"))]
+            sync_pending,
         }
     }
 
@@ -153,11 +159,15 @@ impl App {
         for transition in transitions {
             self.handle_transition(transition).await;
         }
+
+        #[cfg(not(target_arch = "wasm32"))]
+        self.flush_pending_sync();
     }
 
     #[cfg(not(target_arch = "wasm32"))]
     pub(crate) fn maybe_schedule_sync(&mut self) {
         if self.sync_in_progress.load(Ordering::SeqCst) {
+            self.sync_pending.store(true, Ordering::SeqCst);
             return;
         }
 
@@ -169,8 +179,10 @@ impl App {
         };
 
         self.sync_in_progress.store(true, Ordering::SeqCst);
+        self.sync_pending.store(false, Ordering::SeqCst);
         let queue = Arc::clone(&self.bg_transitions);
         let flag = Arc::clone(&self.sync_in_progress);
+        let pending = Arc::clone(&self.sync_pending);
 
         tokio::spawn(async move {
             let result = task::spawn_blocking(move || job.run()).await;
@@ -188,6 +200,22 @@ impl App {
             }
 
             flag.store(false, Ordering::SeqCst);
+            if pending.swap(false, Ordering::SeqCst) {
+                pending.store(true, Ordering::SeqCst);
+            }
         });
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn flush_pending_sync(&mut self) {
+        if self.sync_in_progress.load(Ordering::SeqCst) {
+            return;
+        }
+
+        if !self.sync_pending.swap(false, Ordering::SeqCst) {
+            return;
+        }
+
+        self.maybe_schedule_sync();
     }
 }
