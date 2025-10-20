@@ -5,6 +5,7 @@ use {
         action::{Action, TuiAction},
         input::{Input, KeyCode, KeyEvent, to_textarea_input},
         logger::*,
+        theme::THEME,
     },
     glues_core::{
         NotebookEvent,
@@ -12,7 +13,11 @@ use {
         state::notebook::{DirectoryItem, Tab},
         types::{Id, NoteId},
     },
-    ratatui::{text::Line, widgets::ListState},
+    ratatui::{
+        style::Style,
+        text::{Line, Span},
+        widgets::ListState,
+    },
     std::collections::HashMap,
     tui_textarea::TextArea,
 };
@@ -24,20 +29,23 @@ pub use tree_item::{TreeItem, TreeItemKind};
 
 pub const REMOVE_NOTE: &str = "Remove note";
 pub const RENAME_NOTE: &str = "Rename note";
+pub const SHOW_NOTE_INFO: &str = "Show note info";
 
 pub const ADD_NOTE: &str = "Add note";
 pub const ADD_DIRECTORY: &str = "Add directory";
 pub const RENAME_DIRECTORY: &str = "Rename directory";
 pub const REMOVE_DIRECTORY: &str = "Remove directory";
+pub const SHOW_DIRECTORY_INFO: &str = "Show directory info";
 
 pub const CLOSE: &str = "Close";
 
-pub const NOTE_ACTIONS: [&str; 3] = [RENAME_NOTE, REMOVE_NOTE, CLOSE];
-pub const DIRECTORY_ACTIONS: [&str; 5] = [
+pub const NOTE_ACTIONS: [&str; 4] = [RENAME_NOTE, REMOVE_NOTE, SHOW_NOTE_INFO, CLOSE];
+pub const DIRECTORY_ACTIONS: [&str; 6] = [
     ADD_NOTE,
     ADD_DIRECTORY,
     RENAME_DIRECTORY,
     REMOVE_DIRECTORY,
+    SHOW_DIRECTORY_INFO,
     CLOSE,
 ];
 
@@ -501,6 +509,45 @@ impl NotebookContext {
                         action: Box::new(TuiAction::RemoveNote.into()),
                     }
                     .into(),
+                    SHOW_NOTE_INFO => {
+                        let note = match &self.selected().kind {
+                            TreeItemKind::Note { note } => note,
+                            _ => return Action::None,
+                        };
+
+                        let labels = [
+                            "Name",
+                            "Note ID",
+                            "Directory ID",
+                            "Created at",
+                            "Updated at",
+                        ];
+                        let label_width = labels.iter().map(|l| l.len()).max().unwrap_or(0);
+                        let label_style = Style::default().fg(THEME.text_secondary);
+                        let value_style = Style::default().fg(THEME.text);
+                        let build_line = |label: &str, value: &str| {
+                            let padded = format!("{:>width$}: ", label, width = label_width);
+                            Line::from(vec![
+                                Span::styled(padded, label_style),
+                                Span::styled(value.to_owned(), value_style),
+                            ])
+                        };
+
+                        let lines = vec![
+                            build_line("Name", &note.name),
+                            build_line("Note ID", &note.id),
+                            build_line("Directory ID", &note.directory_id),
+                            Line::default(),
+                            build_line("Created at", &note.created_at),
+                            build_line("Updated at", &note.updated_at),
+                        ];
+
+                        TuiAction::ShowInfo {
+                            title: "Note info".to_owned(),
+                            lines,
+                        }
+                        .into()
+                    }
                     CLOSE => Action::Dispatch(NotebookEvent::CloseNoteActionsDialog.into()),
                     _ => Action::None,
                 }
@@ -548,6 +595,51 @@ impl NotebookContext {
                         action: Box::new(TuiAction::RemoveDirectory.into()),
                     }
                     .into(),
+                    SHOW_DIRECTORY_INFO => {
+                        let directory = match &self.selected().kind {
+                            TreeItemKind::Directory { directory, .. } => directory,
+                            _ => return Action::None,
+                        };
+
+                        let parent_display = if directory.id == directory.parent_id {
+                            "(root)".to_owned()
+                        } else {
+                            directory.parent_id.clone()
+                        };
+
+                        let labels = [
+                            "Name",
+                            "Directory ID",
+                            "Parent ID",
+                            "Created at",
+                            "Updated at",
+                        ];
+                        let label_width = labels.iter().map(|l| l.len()).max().unwrap_or(0);
+                        let label_style = Style::default().fg(THEME.text_secondary);
+                        let value_style = Style::default().fg(THEME.text);
+                        let build_line = |label: &str, value: &str| {
+                            let padded = format!("{:>width$}: ", label, width = label_width);
+                            Line::from(vec![
+                                Span::styled(padded, label_style),
+                                Span::styled(value.to_owned(), value_style),
+                            ])
+                        };
+
+                        let lines = vec![
+                            build_line("Name", &directory.name),
+                            build_line("Directory ID", &directory.id),
+                            build_line("Parent ID", &parent_display),
+                            Line::default(),
+                            build_line("Created at", &directory.created_at),
+                            build_line("Updated at", &directory.updated_at),
+                        ];
+
+                        TuiAction::ShowInfo {
+                            title: "Directory info".to_owned(),
+                            lines,
+                        }
+                        .into()
+                    }
                     CLOSE => Action::Dispatch(NotebookEvent::CloseDirectoryActionsDialog.into()),
                     _ => Action::None,
                 }

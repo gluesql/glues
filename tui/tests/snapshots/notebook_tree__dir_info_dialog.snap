@@ -1,10 +1,10 @@
 ---
 source: tui/tests/notebook_tree.rs
-assertion_line: 202
+assertion_line: 301
 expression: text
 snapshot_kind: text
 ---
- Note actions dialog                                                                                   [?] Show keymap 
+ Directory actions dialog                                                                              [?] Show keymap 
 [Browser]                                   ▐[Editor]                                                                   
  󰝰 Notes                                    ▐ 1 Welcome to Glues!                                                       
    󱇗 Sample Note                            ▐ 2                                                                         
@@ -18,18 +18,18 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐ ┌───────Note Actions───────┐                                              
-                                            ▐ │                          │                                              
-                                            ▐ │   Rename note            │                                              
-                                            ▐ │   Remove note            │                                              
-                                            ▐ │   Show note info         │                                              
-                                            ▐ │   Close                  │                                              
-                                            ▐ │                          │                                              
-                                            ▐ └──────────────────────────┘                                              
-                                            ▐                                                                           
-                                            ▐                                                                           
+                              ┌──────────────────────Directory info──────────────────────┐                              
+                              │                                                          │                              
+                              │          Name: Notes                                     │                              
+                              │  Directory ID: 00000000-0000-0000-0000-000000000000      │                              
+                              │     Parent ID: (root)                                    │                              
+                              │                                                          │                              
+                              │    Created at: 1970-01-01T00:00:00.000000Z               │                              
+                              │    Updated at: 1970-01-01T00:00:00.000000Z               │                              
+                              │                                                          │                              
+                              │                    Press Esc to close                    │                              
+                              │                                                          │                              
+                              └──────────────────────────────────────────────────────────┘                              
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           

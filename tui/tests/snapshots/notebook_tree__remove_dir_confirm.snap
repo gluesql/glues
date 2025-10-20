@@ -1,6 +1,6 @@
 ---
 source: tui/tests/notebook_tree.rs
-assertion_line: 230
+assertion_line: 231
 expression: text
 snapshot_kind: text
 ---

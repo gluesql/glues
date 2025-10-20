@@ -1,6 +1,6 @@
 ---
 source: tui/tests/notebook_tree.rs
-assertion_line: 202
+assertion_line: 287
 expression: text
 snapshot_kind: text
 ---
@@ -18,18 +18,18 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐                                                                           
-                                            ▐                                                                           
-                                            ▐ ┌───────Note Actions───────┐                                              
-                                            ▐ │                          │                                              
-                                            ▐ │   Rename note            │                                              
-                                            ▐ │   Remove note            │                                              
-                                            ▐ │   Show note info         │                                              
-                                            ▐ │   Close                  │                                              
-                                            ▐ │                          │                                              
-                                            ▐ └──────────────────────────┘                                              
-                                            ▐                                                                           
-                                            ▐                                                                           
+                              ┌────────────────────────Note info─────────────────────────┐                              
+                              │                                                          │                              
+                              │          Name: Sample Note                               │                              
+                              │       Note ID: 00000000-0000-0000-0000-000000000000      │                              
+                              │  Directory ID: 00000000-0000-0000-0000-000000000000      │                              
+                              │                                                          │                              
+                              │    Created at: 1970-01-01T00:00:00.000000Z               │                              
+                              │    Updated at: 1970-01-01T00:00:00.000000Z               │                              
+                              │                                                          │                              
+                              │                    Press Esc to close                    │                              
+                              │                                                          │                              
+                              └──────────────────────────────────────────────────────────┘                              
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           

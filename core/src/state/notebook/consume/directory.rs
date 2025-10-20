@@ -128,7 +128,7 @@ pub fn select(state: &mut NotebookState, directory: Directory) -> NotebookTransi
 pub async fn rename<B: CoreBackend + ?Sized>(
     db: &mut B,
     state: &mut NotebookState,
-    mut directory: Directory,
+    directory: Directory,
     new_name: String,
 ) -> Result<NotebookTransition> {
     if state.root.directory.id == directory.id {
@@ -148,19 +148,20 @@ pub async fn rename<B: CoreBackend + ?Sized>(
     )
     .await?;
 
-    directory.name = new_name;
+    let updated = db.fetch_directory(directory.id.clone()).await?;
     state
         .root
-        .rename_directory(&directory)
+        .rename_directory(&updated)
         .ok_or(Error::NotFound(
             "[directory::rename] failed to find directory".to_owned(),
         ))?;
+    state.selected = SelectedItem::Directory(updated.clone());
     state.inner_state = InnerState::NoteTree(NoteTreeState::DirectorySelected);
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
     Ok(NotebookTransition::NoteTree(
-        NoteTreeTransition::RenameDirectory(directory),
+        NoteTreeTransition::RenameDirectory(updated),
     ))
 }
 

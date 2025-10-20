@@ -1,6 +1,6 @@
 ---
 source: tui/tests/notebook_tree.rs
-assertion_line: 260
+assertion_line: 262
 expression: text
 snapshot_kind: text
 ---
@@ -20,11 +20,11 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐                                                                           
                                             ▐ ┌───────Note Actions───────┐                                              
                                             ▐ │                          │                                              
                                             ▐ │   Rename note            │                                              
                                             ▐ │   Remove note            │                                              
+                                            ▐ │   Show note info         │                                              
                                             ▐ │   Close                  │                                              
                                             ▐ │                          │                                              
                                             ▐ └──────────────────────────┘                                              

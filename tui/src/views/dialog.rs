@@ -3,6 +3,7 @@ mod confirm;
 mod directory_actions;
 mod editor_keymap;
 mod help;
+mod info;
 mod keymap;
 mod note_actions;
 mod prompt;
@@ -35,6 +36,9 @@ pub fn draw(frame: &mut Frame, state: &State, context: &mut Context) {
         return;
     } else if context.alert.is_some() {
         alert::draw(frame, context);
+        return;
+    } else if context.info.is_some() {
+        info::draw(frame, context);
         return;
     } else if context.quit_menu.is_some() {
         quit_menu::draw(frame, context);

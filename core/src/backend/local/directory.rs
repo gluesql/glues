@@ -17,6 +17,8 @@ struct DirectoryRow {
     id: String,
     parent_id: Option<String>,
     name: String,
+    created_at: String,
+    updated_at: String,
 }
 
 impl From<DirectoryRow> for Directory {
@@ -25,6 +27,8 @@ impl From<DirectoryRow> for Directory {
             id,
             parent_id,
             name,
+            created_at,
+            updated_at,
         } = row;
         let parent_id = parent_id.unwrap_or_else(|| id.clone());
 
@@ -32,6 +36,8 @@ impl From<DirectoryRow> for Directory {
             id,
             parent_id,
             name,
+            created_at,
+            updated_at,
         }
     }
 }
@@ -41,7 +47,7 @@ impl Db {
         let directory = table("Directory")
             .select()
             .filter(col("id").eq(uuid(directory_id)))
-            .project(vec!["id", "parent_id", "name"])
+            .project(vec!["id", "parent_id", "name", "created_at", "updated_at"])
             .execute(&mut self.storage)
             .await?
             .one_as::<DirectoryRow>()
@@ -54,7 +60,7 @@ impl Db {
         let directories = table("Directory")
             .select()
             .filter(col("parent_id").eq(uuid(parent_id)))
-            .project(vec!["id", "parent_id", "name"])
+            .project(vec!["id", "parent_id", "name", "created_at", "updated_at"])
             .execute(&mut self.storage)
             .await?
             .rows_as::<DirectoryRow>()?
@@ -71,12 +77,6 @@ impl Db {
         name: String,
     ) -> Result<Directory> {
         let id = Uuid::now_v7().to_string();
-        let directory = Directory {
-            id: id.clone(),
-            parent_id: parent_id.clone(),
-            name: name.clone(),
-        };
-
         table("Directory")
             .insert()
             .columns(vec!["id", "parent_id", "name"])
@@ -84,7 +84,7 @@ impl Db {
             .execute(&mut self.storage)
             .await?;
 
-        Ok(directory)
+        self.fetch_directory(id).await
     }
 
     #[cfg_attr(target_arch = "wasm32", async_recursion(?Send))]

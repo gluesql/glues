@@ -20,6 +20,8 @@ struct NoteRow {
     id: String,
     directory_id: String,
     name: String,
+    created_at: String,
+    updated_at: String,
 }
 
 impl From<NoteRow> for Note {
@@ -28,6 +30,8 @@ impl From<NoteRow> for Note {
             id: row.id,
             directory_id: row.directory_id,
             name: row.name,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
         }
     }
 }
@@ -54,7 +58,13 @@ impl Db {
         let notes = table("Note")
             .select()
             .filter(col("directory_id").eq(uuid(directory_id)))
-            .project(vec!["id", "directory_id", "name"])
+            .project(vec![
+                "id",
+                "directory_id",
+                "name",
+                "created_at",
+                "updated_at",
+            ])
             .execute(&mut self.storage)
             .await?
             .rows_as::<NoteRow>()?
@@ -67,20 +77,27 @@ impl Db {
 
     pub async fn add_note(&mut self, directory_id: DirectoryId, name: String) -> Result<Note> {
         let id = Uuid::now_v7().to_string();
-        let note = Note {
-            id: id.clone(),
-            directory_id: directory_id.clone(),
-            name: name.clone(),
-        };
-
         table("Note")
             .insert()
             .columns(vec!["id", "directory_id", "name"])
-            .values(vec![vec![uuid(id), uuid(directory_id), text(name)]])
+            .values(vec![vec![uuid(id.clone()), uuid(directory_id), text(name)]])
             .execute(&mut self.storage)
             .await?;
 
-        Ok(note)
+        Ok(table("Note")
+            .select()
+            .filter(col("id").eq(uuid(id)))
+            .project(vec![
+                "id",
+                "directory_id",
+                "name",
+                "created_at",
+                "updated_at",
+            ])
+            .execute(&mut self.storage)
+            .await?
+            .one_as::<NoteRow>()
+            .map(Note::from)?)
     }
 
     pub async fn remove_note(&mut self, note_id: NoteId) -> Result<()> {

@@ -143,9 +143,16 @@ impl App {
 
                 self.context.notebook.tree_width = width;
             }
-            NoteTreeTransition::GatewayMode
-            | NoteTreeTransition::ShowNoteActionsDialog(_)
-            | NoteTreeTransition::ShowDirectoryActionsDialog(_) => {}
+            NoteTreeTransition::GatewayMode => {}
+            NoteTreeTransition::ShowNoteActionsDialog(_) => {
+                self.context.notebook.note_actions_state.select(Some(0));
+            }
+            NoteTreeTransition::ShowDirectoryActionsDialog(_) => {
+                self.context
+                    .notebook
+                    .directory_actions_state
+                    .select(Some(0));
+            }
         }
 
         fn get_select_event(selected: &TreeItem) -> Event {
