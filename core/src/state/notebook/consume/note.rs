@@ -30,7 +30,7 @@ pub fn select(state: &mut NotebookState, note: Note) -> NotebookTransition {
 pub async fn rename<B: CoreBackend + ?Sized>(
     db: &mut B,
     state: &mut NotebookState,
-    mut note: Note,
+    note: Note,
     new_name: String,
 ) -> Result<NotebookTransition> {
     db.rename_note(note.id.clone(), new_name.clone()).await?;
@@ -40,22 +40,34 @@ pub async fn rename<B: CoreBackend + ?Sized>(
     )
     .await?;
 
-    note.name = new_name;
-    state.root.rename_note(&note).ok_or(Error::NotFound(
+    let notes = db.fetch_notes(note.directory_id.clone()).await?;
+    let updated = notes
+        .iter()
+        .find(|updated| updated.id == note.id)
+        .cloned()
+        .ok_or(Error::NotFound(
+            "[note::rename] failed to fetch updated note".to_owned(),
+        ))?;
+
+    state.root.rename_note(&updated).ok_or(Error::NotFound(
         "[note::rename] failed to find parent directory".to_owned(),
     ))?;
 
-    for tab in state.tabs.iter_mut().filter(|tab| tab.note.id == note.id) {
-        tab.note.name.clone_from(&note.name);
+    for tab in state
+        .tabs
+        .iter_mut()
+        .filter(|tab| tab.note.id == updated.id)
+    {
+        tab.note = updated.clone();
     }
 
-    state.selected = SelectedItem::Note(note.clone());
+    state.selected = SelectedItem::Note(updated.clone());
     state.inner_state = InnerState::NoteTree(NoteTreeState::NoteSelected);
 
     breadcrumb::update_breadcrumbs(db, state).await?;
 
     Ok(NotebookTransition::NoteTree(
-        NoteTreeTransition::RenameNote(note),
+        NoteTreeTransition::RenameNote(updated),
     ))
 }
 

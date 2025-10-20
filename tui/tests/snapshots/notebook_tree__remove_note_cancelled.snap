@@ -20,11 +20,11 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐                                                                           
                                             ▐ ┌───────Note Actions───────┐                                              
                                             ▐ │                          │                                              
                                             ▐ │   Rename note            │                                              
                                             ▐ │   Remove note            │                                              
+                                            ▐ │   Show note info         │                                              
                                             ▐ │   Close                  │                                              
                                             ▐ │                          │                                              
                                             ▐ └──────────────────────────┘                                              

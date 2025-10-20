@@ -2,7 +2,7 @@ use {
     super::{
         App,
         config::{self, LAST_PROXY_URL},
-        context::{ContextPrompt, QuitMenu},
+        context::{ContextPrompt, InfoDialog, QuitMenu},
         logger::*,
     },
     crate::input::{Input, KeyCode},
@@ -75,6 +75,10 @@ pub enum TuiAction {
     AddDirectory,
     RenameDirectory,
     RemoveDirectory,
+    ShowInfo {
+        title: String,
+        lines: Vec<Line<'static>>,
+    },
 }
 
 #[derive(Clone)]
@@ -123,6 +127,9 @@ impl App {
             }
             Action::Tui(TuiAction::ShowEditorKeymap) => {
                 self.context.editor_keymap = true;
+            }
+            Action::Tui(TuiAction::ShowInfo { title, lines }) => {
+                self.context.info = Some(InfoDialog::new(title, lines));
             }
             Action::Tui(TuiAction::Alert(message)) => {
                 self.context.alert = Some(message);

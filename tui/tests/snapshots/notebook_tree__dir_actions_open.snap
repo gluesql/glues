@@ -1,6 +1,6 @@
 ---
 source: tui/tests/notebook_tree.rs
-assertion_line: 278
+assertion_line: 314
 expression: text
 snapshot_kind: text
 ---
@@ -19,13 +19,13 @@ snapshot_kind: text
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
-                                            ▐                                                                           
                                             ▐ ┌────Directory Actions─────┐                                              
                                             ▐ │                          │                                              
                                             ▐ │   Add note               │                                              
                                             ▐ │   Add directory          │                                              
                                             ▐ │   Rename directory       │                                              
                                             ▐ │   Remove directory       │                                              
+                                            ▐ │   Show directory info    │                                              
                                             ▐ │   Close                  │                                              
                                             ▐ │                          │                                              
                                             ▐ └──────────────────────────┘                                              

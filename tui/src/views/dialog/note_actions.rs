@@ -15,7 +15,7 @@ pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
     let [area] = Layout::horizontal([Length(28)])
         .flex(Flex::Center)
         .areas(frame.area());
-    let [area] = Layout::vertical([Length(7)]).flex(Flex::Center).areas(area);
+    let [area] = Layout::vertical([Length(8)]).flex(Flex::Center).areas(area);
 
     let block = Block::bordered()
         .bg(THEME.surface)

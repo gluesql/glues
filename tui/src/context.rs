@@ -88,6 +88,20 @@ impl QuitMenu {
     }
 }
 
+pub struct InfoDialog {
+    pub title: String,
+    pub lines: Vec<Line<'static>>,
+}
+
+impl InfoDialog {
+    pub fn new(title: impl Into<String>, lines: Vec<Line<'static>>) -> Self {
+        Self {
+            title: title.into(),
+            lines,
+        }
+    }
+}
+
 pub struct Context {
     pub entry: EntryContext,
     pub notebook: NotebookContext,
@@ -97,6 +111,7 @@ pub struct Context {
     pub quit_menu: Option<QuitMenu>,
     pub confirm: Option<(String, Action)>,
     pub alert: Option<String>,
+    pub info: Option<InfoDialog>,
     pub prompt: Option<ContextPrompt>,
     pub theme_selector: Option<ThemeSelector>,
     pub last_log: Option<(String, SystemTime)>,
@@ -118,6 +133,7 @@ impl Default for Context {
             quit_menu: None,
             confirm: None,
             alert: None,
+            info: None,
             prompt: None,
             theme_selector: None,
             last_log: None,
@@ -154,6 +170,19 @@ impl Context {
         } else if self.alert.is_some() {
             // any key pressed will close the alert
             self.alert = None;
+            return Action::None;
+        } else if self.info.is_some() {
+            let Input::Key(key) = input else {
+                return Action::None;
+            };
+
+            match key.code {
+                KeyCode::Esc | KeyCode::Enter => {
+                    self.info = None;
+                }
+                _ => {}
+            }
+
             return Action::None;
         } else if self.quit_menu.is_some() {
             let code = match input {

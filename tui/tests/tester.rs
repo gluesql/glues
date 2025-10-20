@@ -5,7 +5,9 @@ use {
         input::{Input, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
         logger,
     },
+    once_cell::sync::Lazy,
     ratatui::{Terminal, backend::TestBackend},
+    regex::Regex,
 };
 
 pub struct Tester {
@@ -21,12 +23,20 @@ fn key_press(code: KeyCode, modifiers: KeyModifiers) -> Input {
     })
 }
 
-// Bring a concise snapshot macro into test files.
-// Usage: snap!(t, "name");
+// Bring concise snapshot macros into test files.
+// Usage: snap!(t, "name") or snap_sanitized!(t, "name");
 #[allow(unused_macros)]
 macro_rules! snap {
     ($t:expr, $name:expr) => {{
         let text = $t.snapshot_text();
+        insta::assert_snapshot!($name, text);
+    }};
+}
+
+#[allow(unused_macros)]
+macro_rules! snap_sanitized {
+    ($t:expr, $name:expr) => {{
+        let text = $t.snapshot_text_sanitized();
         insta::assert_snapshot!($name, text);
     }};
 }
@@ -106,6 +116,11 @@ impl Tester {
         buffer_lines(&self.term).join("\n")
     }
 
+    #[allow(dead_code)]
+    pub fn snapshot_text_sanitized(&self) -> String {
+        sanitize_snapshot(&self.snapshot_text())
+    }
+
     async fn handle_input(&mut self, input: Input) -> bool {
         if !matches!(
             input,
@@ -143,4 +158,52 @@ fn buffer_lines(term: &Terminal<TestBackend>) -> Vec<String> {
         lines.push(line);
     }
     lines
+}
+
+#[allow(dead_code)]
+fn sanitize_snapshot(text: &str) -> String {
+    static GAP_BEFORE_PIPE: Lazy<Regex> = Lazy::new(|| Regex::new(r"[ ]{2,}│$").unwrap());
+
+    let mut sanitized = text.to_owned();
+
+    static NOTE_ID: Lazy<Regex> = Lazy::new(|| Regex::new(r"(Note ID: )[0-9A-Fa-f-]+").unwrap());
+    sanitized = NOTE_ID
+        .replace_all(&sanitized, "${1}00000000-0000-0000-0000-000000000000")
+        .into_owned();
+
+    static DIRECTORY_ID: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r"(Directory ID: )[0-9A-Fa-f-]+").unwrap());
+    sanitized = DIRECTORY_ID
+        .replace_all(&sanitized, "${1}00000000-0000-0000-0000-000000000000")
+        .into_owned();
+
+    static PARENT_ID: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r"(Parent ID: )[0-9A-Fa-f-]+").unwrap());
+    sanitized = PARENT_ID
+        .replace_all(&sanitized, "${1}00000000-0000-0000-0000-000000000000")
+        .into_owned();
+
+    static CREATED_AT: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r"(Created at: )[0-9T:.-]+Z").unwrap());
+    sanitized = CREATED_AT
+        .replace_all(&sanitized, "${1}1970-01-01T00:00:00.000000Z")
+        .into_owned();
+
+    static UPDATED_AT: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r"(Updated at: )[0-9T:.-]+Z").unwrap());
+    sanitized = UPDATED_AT
+        .replace_all(&sanitized, "${1}1970-01-01T00:00:00.000000Z")
+        .into_owned();
+
+    // remove trailing spaces so snapshots stay stable across environments
+    sanitized = sanitized
+        .lines()
+        .map(|line| {
+            let trimmed = line.trim_end();
+            GAP_BEFORE_PIPE.replace(trimmed, " │").into_owned()
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    sanitized
 }

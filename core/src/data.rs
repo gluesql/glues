@@ -8,6 +8,8 @@ pub struct Note {
     pub id: NoteId,
     pub directory_id: DirectoryId,
     pub name: String,
+    pub created_at: String,
+    pub updated_at: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -15,4 +17,6 @@ pub struct Directory {
     pub id: DirectoryId,
     pub parent_id: DirectoryId,
     pub name: String,
+    pub created_at: String,
+    pub updated_at: String,
 }

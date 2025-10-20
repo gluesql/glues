@@ -196,6 +196,9 @@ async fn remove_note_confirm_cancel_then_accept() -> Result<()> {
     t.key(KeyCode::Enter).await;
     t.press('y').await;
     t.draw()?;
+    // ensure any remaining dialogs are closed before snapshotting final state
+    t.key(KeyCode::Esc).await;
+    t.draw()?;
     snap!(t, "note_removed");
 
     Ok(())
@@ -223,8 +226,9 @@ async fn remove_directory_confirm_cancel_then_accept() -> Result<()> {
 
     // open directory actions and choose Remove directory
     t.press('m').await;
-    t.press('j').await; // Add directory -> Rename directory
-    t.press('j').await; // Rename directory -> Remove directory
+    for _ in 0..3 {
+        t.press('j').await;
+    }
     t.key(KeyCode::Enter).await;
     t.draw()?;
     snap!(t, "remove_dir_confirm");
@@ -236,8 +240,9 @@ async fn remove_directory_confirm_cancel_then_accept() -> Result<()> {
 
     // confirm remove
     t.press('m').await;
-    t.press('j').await;
-    t.press('j').await;
+    for _ in 0..3 {
+        t.press('j').await;
+    }
     t.key(KeyCode::Enter).await;
     t.press('y').await;
     t.draw()?;
@@ -263,6 +268,40 @@ async fn note_actions_dialog_toggles() -> Result<()> {
     t.key(KeyCode::Esc).await;
     t.draw()?;
     snap!(t, "note_actions_closed");
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn note_info_dialog_shows_metadata() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+
+    t.press('j').await;
+    t.press('m').await;
+    t.draw()?;
+    t.press('j').await;
+    t.press('j').await;
+    t.key(KeyCode::Enter).await;
+    t.draw()?;
+    snap_sanitized!(t, "note_info_dialog");
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn directory_info_dialog_shows_metadata() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+
+    t.press('m').await;
+    t.draw()?;
+    for _ in 0..4 {
+        t.press('j').await;
+    }
+    t.key(KeyCode::Enter).await;
+    t.draw()?;
+    snap_sanitized!(t, "dir_info_dialog");
 
     Ok(())
 }
