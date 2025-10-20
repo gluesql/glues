@@ -2,7 +2,7 @@ use super::request::ProxyRequest;
 use super::response::{ProxyResponse, ResultPayload};
 use crate::{
     Error, Result,
-    backend::CoreBackend,
+    backend::{CoreBackend, SyncJob},
     data::{Directory, Note},
     types::{DirectoryId, NoteId},
 };
@@ -216,6 +216,21 @@ impl CoreBackend for ProxyClient {
             ProxyResponse::Ok(ResultPayload::Unit) => Ok(()),
             ProxyResponse::Err(e) => Err(Error::Proxy(e)),
             ProxyResponse::Ok(_) => Err(Error::InvalidResponse("invalid response".to_owned())),
+        }
+    }
+
+    fn sync_job(&self) -> Option<SyncJob> {
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            Some(SyncJob::Proxy {
+                url: self.url.clone(),
+                auth_token: self.auth_token.clone(),
+            })
+        }
+
+        #[cfg(target_arch = "wasm32")]
+        {
+            None
         }
     }
 }

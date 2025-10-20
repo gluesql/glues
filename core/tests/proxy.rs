@@ -6,19 +6,14 @@ use glues_core::{
         proxy::{ProxyClient, ProxyServer, request::ProxyRequest},
     },
 };
-use std::{
-    io::ErrorKind,
-    net::TcpListener,
-    sync::{Arc, mpsc::channel},
-};
+use std::{io::ErrorKind, net::TcpListener, sync::Arc};
 use tiny_http::{Response, Server};
 use tokio::sync::Mutex;
 
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test(flavor = "current_thread")]
 async fn proxy_backend_operations() {
-    let (tx, _rx) = channel();
-    let db = Db::memory(tx)
+    let db = Db::memory()
         .await
         .expect("in-memory proxy database should initialize");
     let server = ProxyServer::new(Box::new(db));
@@ -164,8 +159,7 @@ async fn proxy_backend_operations() {
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::test(flavor = "current_thread")]
 async fn proxy_backend_requires_token() {
-    let (tx, _rx) = channel();
-    let db = Db::memory(tx)
+    let db = Db::memory()
         .await
         .expect("in-memory proxy database should initialize");
     let server = ProxyServer::new(Box::new(db));

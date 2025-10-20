@@ -33,8 +33,8 @@ impl Db {
         Ok(Self { storage, root_id })
     }
 
-    pub fn sync(&self) -> Result<()> {
-        Ok(())
+    pub fn sync_job(&self) -> Option<crate::backend::SyncJob> {
+        None
     }
 }
 
