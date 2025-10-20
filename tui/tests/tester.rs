@@ -162,6 +162,8 @@ fn buffer_lines(term: &Terminal<TestBackend>) -> Vec<String> {
 
 #[allow(dead_code)]
 fn sanitize_snapshot(text: &str) -> String {
+    static GAP_BEFORE_PIPE: Lazy<Regex> = Lazy::new(|| Regex::new(r"[ ]{2,}│$").unwrap());
+
     let mut sanitized = text.to_owned();
 
     static NOTE_ID: Lazy<Regex> = Lazy::new(|| Regex::new(r"(Note ID: )[0-9A-Fa-f-]+").unwrap());
@@ -196,7 +198,10 @@ fn sanitize_snapshot(text: &str) -> String {
     // remove trailing spaces so snapshots stay stable across environments
     sanitized = sanitized
         .lines()
-        .map(|line| line.trim_end().to_owned())
+        .map(|line| {
+            let trimmed = line.trim_end();
+            GAP_BEFORE_PIPE.replace(trimmed, " │").into_owned()
+        })
         .collect::<Vec<_>>()
         .join("\n");
 
