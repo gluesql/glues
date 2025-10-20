@@ -193,5 +193,12 @@ fn sanitize_snapshot(text: &str) -> String {
         .replace_all(&sanitized, "${1}1970-01-01T00:00:00.000000Z")
         .into_owned();
 
+    // remove trailing spaces so snapshots stay stable across environments
+    sanitized = sanitized
+        .lines()
+        .map(|line| line.trim_end().to_owned())
+        .collect::<Vec<_>>()
+        .join("\n");
+
     sanitized
 }
