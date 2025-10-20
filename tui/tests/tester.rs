@@ -184,13 +184,13 @@ fn sanitize_snapshot(text: &str) -> String {
         .into_owned();
 
     static CREATED_AT: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r"(Created at: )[0-9T:\\.-]+Z").unwrap());
+        Lazy::new(|| Regex::new(r"(Created at: )[0-9T:.-]+Z").unwrap());
     sanitized = CREATED_AT
         .replace_all(&sanitized, "${1}1970-01-01T00:00:00.000000Z")
         .into_owned();
 
     static UPDATED_AT: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r"(Updated at: )[0-9T:\\.-]+Z").unwrap());
+        Lazy::new(|| Regex::new(r"(Updated at: )[0-9T:.-]+Z").unwrap());
     sanitized = UPDATED_AT
         .replace_all(&sanitized, "${1}1970-01-01T00:00:00.000000Z")
         .into_owned();
