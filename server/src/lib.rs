@@ -1,3 +1,9 @@
+mod args;
+mod proxy_access;
+pub mod state;
+
+pub use args::{ServerArgs, StorageCommand, parse_args};
+
 use {
     axum::{
         Json, Router,
@@ -8,60 +14,20 @@ use {
         response::Response,
         routing::{get, post},
     },
-    clap::{Args, Parser, Subcommand},
     color_eyre::Result,
     glues_core::backend::{
         CoreBackend,
         local::Db,
         proxy::{ProxyServer, request::ProxyRequest, response::ProxyResponse},
     },
-    std::{net::SocketAddr, sync::Arc},
-    tokio::{net::TcpListener, signal, sync::Mutex as AsyncMutex},
+    std::sync::Arc,
+    tokio::{net::TcpListener, signal},
     tower_http::cors::{Any, CorsLayer},
     tracing::{error, info, warn},
     tracing_subscriber::EnvFilter,
 };
 
-#[derive(Clone, Args)]
-pub struct ServerArgs {
-    #[arg(long, default_value = "127.0.0.1:4000")]
-    pub listen: SocketAddr,
-
-    #[arg(long, env = "GLUES_SERVER_TOKEN")]
-    pub auth_token: Option<String>,
-
-    #[command(subcommand)]
-    pub storage: StorageCommand,
-}
-
-#[derive(Parser)]
-#[command(author, version, about = "Glues proxy server")]
-struct Cli {
-    #[command(flatten)]
-    args: ServerArgs,
-}
-
-#[derive(Subcommand, Clone)]
-pub enum StorageCommand {
-    /// In-memory storage (data resets on restart)
-    Memory,
-    /// File storage backend rooted at the given path
-    File { path: String },
-    /// redb single-file storage backend
-    Redb { path: String },
-    /// Git storage backend
-    Git {
-        path: String,
-        remote: String,
-        branch: String,
-    },
-    /// MongoDB storage backend
-    Mongo { conn_str: String, db_name: String },
-}
-
-pub fn parse_args() -> ServerArgs {
-    Cli::parse().args
-}
+use state::ServerState;
 
 pub async fn run(args: ServerArgs) -> Result<()> {
     color_eyre::install()?;
@@ -73,11 +39,13 @@ pub async fn run(args: ServerArgs) -> Result<()> {
     let ServerArgs {
         listen,
         auth_token,
+        allowed_directory,
         storage,
     } = args;
 
     let backend = build_backend(storage).await?;
-    let server = Arc::new(AsyncMutex::new(ProxyServer::new(backend)));
+    let server = ProxyServer::new(backend);
+    let state = Arc::new(ServerState::new(server, allowed_directory).await?);
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
@@ -87,7 +55,7 @@ pub async fn run(args: ServerArgs) -> Result<()> {
     let mut app = Router::new()
         .route("/", post(handle_proxy))
         .route("/health", get(health))
-        .with_state(server.clone())
+        .with_state(state.clone())
         .layer(cors);
 
     if let Some(token) = auth_token.as_ref() {
@@ -137,11 +105,10 @@ async fn build_backend(storage: StorageCommand) -> Result<Box<dyn CoreBackend + 
 }
 
 async fn handle_proxy(
-    State(server): State<Arc<AsyncMutex<ProxyServer>>>,
+    State(state): State<Arc<ServerState>>,
     Json(request): Json<ProxyRequest>,
 ) -> (StatusCode, Json<ProxyResponse>) {
-    let mut server = server.lock_owned().await;
-    let response = server.handle(request).await;
+    let response = state.handle(request).await;
     (StatusCode::OK, Json(response))
 }
 
