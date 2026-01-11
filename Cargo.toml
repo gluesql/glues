@@ -18,7 +18,7 @@ glues-server = { path = "./server", version = "0.8.1" }
 async-recursion = "1.1.1"
 
 [workspace.dependencies.gluesql]
-version = "0.18"
+version = "0.19"
 default-features = false
 
 [profile.release]
