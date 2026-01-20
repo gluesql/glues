@@ -107,6 +107,52 @@ async fn delete_line_with_dd() -> Result<()> {
 }
 
 #[tokio::test]
+async fn delete_word_with_dw() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+    t.open_first_note().await?;
+
+    // Insert some text with multiple words
+    t.press('i').await;
+    t.type_str("Hello world test").await;
+    t.key(KeyCode::Esc).await;
+
+    // Move to beginning of line
+    t.press('0').await;
+
+    // Delete word with 'dw'
+    t.press('d').await;
+    t.press('w').await;
+    t.draw()?;
+    snap!(t, "after_delete_word_dw");
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn delete_word_with_de() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+    t.open_first_note().await?;
+
+    // Insert some text with multiple words
+    t.press('i').await;
+    t.type_str("Hello world test").await;
+    t.key(KeyCode::Esc).await;
+
+    // Move to beginning of line
+    t.press('0').await;
+
+    // Delete word with 'de'
+    t.press('d').await;
+    t.press('e').await;
+    t.draw()?;
+    snap!(t, "after_delete_word_de");
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn gateway_moves_cursor_to_top() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;
