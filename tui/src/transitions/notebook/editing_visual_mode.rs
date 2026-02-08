@@ -1,6 +1,15 @@
 use {
-    super::textarea::*, crate::App, glues_core::transition::VisualModeTransition,
-    tui_textarea::CursorMove,
+    super::textarea::{switch_case_selection, transform_selection},
+    crate::App,
+    edtui::{
+        EditorMode,
+        actions::{
+            ChangeSelection, CopySelection, MoveBackward, MoveDown, MoveForward, MoveToEndOfLine,
+            MoveToFirst, MoveToStartOfLine, MoveUp, MoveWordBackward, MoveWordForward,
+            MoveWordForwardToEndOfWord, SwitchMode, motion::MoveToFirstRow, motion::MoveToLastRow,
+        },
+    },
+    glues_core::transition::VisualModeTransition,
 };
 
 impl App {
@@ -9,141 +18,124 @@ impl App {
 
         match transition {
             IdleMode => {
-                self.context.notebook.get_editor_mut().start_selection();
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(SwitchMode(EditorMode::Visual));
             }
             NumberingMode | GatewayMode => {}
             MoveCursorDown(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                let cursor_move = cursor_move_down(editor, n);
-
-                editor.move_cursor(cursor_move);
+                self.context.notebook.get_editor_mut().execute(MoveDown(n));
             }
             MoveCursorUp(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                let cursor_move = cursor_move_up(editor, n);
-
-                editor.move_cursor(cursor_move);
+                self.context.notebook.get_editor_mut().execute(MoveUp(n));
             }
             MoveCursorBack(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                let (row, col) = editor.cursor();
-                let cursor_move = if col < n {
-                    CursorMove::Head
-                } else {
-                    CursorMove::Jump(row as u16, (col - n) as u16)
-                };
-
-                editor.move_cursor(cursor_move);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveBackward(n));
             }
             MoveCursorForward(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                let cursor_move = cursor_move_forward(editor, n);
-
-                editor.move_cursor(cursor_move);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveForward(n));
             }
             MoveCursorWordForward(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-
-                for _ in 0..n {
-                    editor.move_cursor(CursorMove::WordForward);
-                }
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveWordForward(n));
             }
             MoveCursorWordEnd(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-
-                for _ in 0..n {
-                    editor.move_cursor(CursorMove::WordEnd);
-                }
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveWordForwardToEndOfWord(n));
             }
             MoveCursorWordBack(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-
-                for _ in 0..n {
-                    editor.move_cursor(CursorMove::WordBack);
-                }
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveWordBackward(n));
             }
             MoveCursorLineStart => {
                 self.context
                     .notebook
                     .get_editor_mut()
-                    .move_cursor(CursorMove::Head);
+                    .execute(MoveToStartOfLine());
             }
             MoveCursorLineEnd => {
                 self.context
                     .notebook
                     .get_editor_mut()
-                    .move_cursor(CursorMove::End);
+                    .execute(MoveToEndOfLine());
             }
             MoveCursorLineNonEmptyStart => {
-                move_cursor_to_line_non_empty_start(self.context.notebook.get_editor_mut());
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveToFirst());
             }
             MoveCursorBottom => {
                 self.context
                     .notebook
                     .get_editor_mut()
-                    .move_cursor(CursorMove::Bottom);
+                    .execute(MoveToLastRow());
             }
             MoveCursorTop => {
                 self.context
                     .notebook
                     .get_editor_mut()
-                    .move_cursor(CursorMove::Top);
+                    .execute(MoveToFirstRow());
             }
             MoveCursorToLine(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.move_cursor(CursorMove::Jump((n - 1) as u16, 0));
-                editor.move_cursor(CursorMove::WordForward);
+                let target_row = n.saturating_sub(1);
+                // In visual mode, moving cursor updates selection automatically via edtui
+                if target_row < editor.cursor.row {
+                    editor.execute(MoveUp(editor.cursor.row - target_row));
+                } else if target_row > editor.cursor.row {
+                    editor.execute(MoveDown(target_row - editor.cursor.row));
+                }
+                editor.execute(MoveToFirst());
             }
             YankSelection => {
                 let editor = self.context.notebook.get_editor_mut();
-                reselect_for_yank(editor);
-                editor.copy();
+                editor.execute(CopySelection);
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.update_yank();
             }
             DeleteSelection => {
                 let editor = self.context.notebook.get_editor_mut();
-                reselect_for_yank(editor);
-                editor.cut();
+                editor.execute(edtui::actions::DeleteSelection);
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteSelectionAndInsertMode => {
                 let editor = self.context.notebook.get_editor_mut();
-                reselect_for_yank(editor);
-                editor.cut();
+                editor.execute(ChangeSelection);
+                editor.execute(SwitchMode(EditorMode::Insert));
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             SwitchCase => {
                 let editor = self.context.notebook.get_editor_mut();
-                switch_case(editor);
-
+                switch_case_selection(editor);
                 self.context.notebook.mark_dirty();
             }
             ToLowercase => {
                 let editor = self.context.notebook.get_editor_mut();
-                let yank = editor.yank_text();
-                reselect_for_yank(editor);
-                editor.cut();
-
-                let changed = editor.yank_text().as_str().to_lowercase();
-
-                editor.insert_str(changed);
-                editor.set_yank_text(yank);
+                transform_selection(editor, |c| c.to_lowercase().next().unwrap_or(c));
+                self.context.notebook.mark_dirty();
             }
             ToUppercase => {
                 let editor = self.context.notebook.get_editor_mut();
-                let yank = editor.yank_text();
-                reselect_for_yank(editor);
-                editor.cut();
-
-                let changed = editor.yank_text().as_str().to_uppercase();
-
-                editor.insert_str(changed);
-                editor.set_yank_text(yank);
+                transform_selection(editor, |c| c.to_uppercase().next().unwrap_or(c));
+                self.context.notebook.mark_dirty();
             }
         }
     }

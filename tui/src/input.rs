@@ -1,5 +1,3 @@
-use tui_textarea::Input as TextAreaInput;
-
 #[derive(Clone, Debug)]
 pub enum Input {
     Key(KeyEvent),
@@ -162,42 +160,5 @@ mod wasm {
                 kind: KeyEventKind::Press,
             }
         }
-    }
-}
-
-pub fn to_textarea_input(input: &Input) -> Option<TextAreaInput> {
-    match input {
-        Input::Key(key) => Some(key_to_textarea_input(key)),
-        _ => None,
-    }
-}
-
-pub fn key_to_textarea_input(key: &KeyEvent) -> TextAreaInput {
-    use tui_textarea::Key;
-
-    let key_code = match key.code {
-        KeyCode::Char(c) => Key::Char(c),
-        KeyCode::F(n) => Key::F(n),
-        KeyCode::Backspace => Key::Backspace,
-        KeyCode::Enter => Key::Enter,
-        KeyCode::Left => Key::Left,
-        KeyCode::Right => Key::Right,
-        KeyCode::Up => Key::Up,
-        KeyCode::Down => Key::Down,
-        KeyCode::Tab => Key::Tab,
-        KeyCode::Delete => Key::Delete,
-        KeyCode::Home => Key::Home,
-        KeyCode::End => Key::End,
-        KeyCode::PageUp => Key::PageUp,
-        KeyCode::PageDown => Key::PageDown,
-        KeyCode::Esc => Key::Esc,
-        KeyCode::Null => Key::Null,
-    };
-
-    TextAreaInput {
-        key: key_code,
-        ctrl: key.modifiers.ctrl,
-        alt: key.modifiers.alt,
-        shift: key.modifiers.shift,
     }
 }

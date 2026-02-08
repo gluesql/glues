@@ -1011,6 +1011,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "edtui"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e49905ece098e793ca21a019598e9efc9a66459ad1d76bd7619e771a42dae2fc"
+dependencies = [
+ "crossterm",
+ "edtui-jagged",
+ "enum_dispatch",
+ "ratatui-core",
+ "ratatui-widgets",
+ "unicode-width",
+]
+
+[[package]]
+name = "edtui-jagged"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6818b2d6b8b3da52f7491b6331e27d45ae34e5baaffeb1edfde43911fe63dd6"
+
+[[package]]
 name = "either"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1041,6 +1061,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "enum_dispatch"
+version = "0.3.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa18ce2bc66555b3218614519ac839ddb759a7d6720732f979ef8d13be147ecd"
+dependencies = [
+ "once_cell",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.102",
 ]
 
 [[package]]
@@ -1428,6 +1460,7 @@ dependencies = [
  "async-recursion",
  "color-eyre",
  "console_error_panic_hook",
+ "edtui",
  "getrandom 0.2.12",
  "glues-core",
  "gluesql",
@@ -1442,7 +1475,6 @@ dependencies = [
  "tokio",
  "tui-big-text",
  "tui-input",
- "tui-textarea",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -4257,15 +4289,6 @@ version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79c1ee964298f136020f5f69e0e601f4d3a1f610a7baf1af9fcb96152e8a2c45"
 dependencies = [
- "unicode-width",
-]
-
-[[package]]
-name = "tui-textarea"
-version = "0.7.0"
-source = "git+https://github.com/0xferrous/tui-textarea.git?branch=update-ratatui#a5086767ee0831e319aec9432aaef495d8f280c4"
-dependencies = [
- "ratatui",
  "unicode-width",
 ]
 

@@ -28,6 +28,21 @@ async fn editor_keymap_overlay_in_insert_mode() -> Result<()> {
 }
 
 #[tokio::test]
+async fn insert_tab() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+    t.open_first_note().await?;
+
+    t.press('i').await;
+    t.key(KeyCode::Tab).await;
+    t.type_str("indented").await;
+    t.draw()?;
+    snap!(t, "insert_tab");
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn insert_typing_and_escape() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;

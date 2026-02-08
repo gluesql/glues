@@ -20,8 +20,8 @@ async-recursion.workspace = true
 color-eyre = "0.6.3"
 tui-big-text = "0.8.2"
 tui-input = { version = "0.15.0", default-features = false }
-tui-textarea = { git = "https://github.com/0xferrous/tui-textarea.git", branch = "update-ratatui", default-features = false, features = ["ratatui"] }
 textwrap = "0.16"
+edtui = { version = "0.11", default-features = false }
 
 [features]
 default = ["cli"]

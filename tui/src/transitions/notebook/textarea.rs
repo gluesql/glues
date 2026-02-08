@@ -1,98 +1,76 @@
-use tui_textarea::{CursorMove, TextArea};
+use edtui::{EditorMode, EditorState, Index2, RowIndex, actions::SwitchMode};
 
-pub(super) fn cursor_move_forward(editor: &TextArea, n: usize) -> CursorMove {
-    let (row, col) = editor.cursor();
-    if col + n >= editor.lines()[row].len() {
-        CursorMove::End
-    } else {
-        CursorMove::Jump(row as u16, (col + n) as u16)
+/// Creates a selection on the editor spanning from `start` to `end`.
+///
+/// Since `edtui::Selection` is not publicly constructible (private module),
+/// we use `SwitchMode(Visual)` to create a selection at the cursor, then
+/// patch the public `start`/`end` fields to the desired range.
+pub(super) fn set_selection(editor: &mut EditorState, start: Index2, end: Index2) {
+    let saved_mode = editor.mode;
+    editor.execute(SwitchMode(EditorMode::Visual));
+    if let Some(sel) = &mut editor.selection {
+        sel.start = start;
+        sel.end = end;
     }
+    editor.mode = saved_mode;
 }
 
-pub(super) fn cursor_move_back(editor: &TextArea, n: usize) -> CursorMove {
-    let (row, col) = editor.cursor();
-    if col < n {
-        CursorMove::Head
-    } else {
-        CursorMove::Jump(row as u16, (col - n) as u16)
-    }
-}
+pub(super) fn switch_case(editor: &mut EditorState) {
+    let row = editor.cursor.row;
+    let col = editor.cursor.col;
 
-pub(super) fn cursor_move_down(editor: &TextArea, n: usize) -> CursorMove {
-    let num_lines = editor.lines().len();
-    let (row, col) = editor.cursor();
-    if row + n >= num_lines {
-        CursorMove::Bottom
-    } else {
-        CursorMove::Jump((row + n) as u16, col as u16)
-    }
-}
-
-pub(super) fn cursor_move_up(editor: &TextArea, n: usize) -> CursorMove {
-    let (row, col) = editor.cursor();
-    if row < n {
-        CursorMove::Top
-    } else {
-        CursorMove::Jump((row - n) as u16, col as u16)
-    }
-}
-
-pub(super) fn move_cursor_to_line_non_empty_start(editor: &mut TextArea) {
-    editor.move_cursor(CursorMove::Head);
-
-    let (row, _) = editor.cursor();
-    let is_whitespace_at_first = editor.lines()[row]
-        .chars()
-        .next()
-        .map(|c| c.is_whitespace())
-        .unwrap_or(false);
-    if is_whitespace_at_first {
-        editor.move_cursor(CursorMove::WordForward);
-    }
-}
-
-pub(super) fn move_cursor_word_end(editor: &mut TextArea, n: usize) {
-    for _ in 0..n {
-        editor.move_cursor(CursorMove::WordEnd);
-    }
-}
-
-pub(super) fn move_cursor_word_back(editor: &mut TextArea, n: usize) {
-    for _ in 0..n {
-        editor.move_cursor(CursorMove::WordBack);
-    }
-}
-
-pub(super) fn reselect_for_yank(editor: &mut TextArea) {
-    let (begin, end) = match editor.selection_range() {
-        None => return,
-        Some(range) => range,
+    let Some(ch) = editor.lines.get(Index2::new(row, col)) else {
+        return;
     };
 
-    editor.cancel_selection();
-    editor.move_cursor(CursorMove::Jump(begin.0 as u16, begin.1 as u16));
-    editor.start_selection();
-    editor.move_cursor(CursorMove::Jump(end.0 as u16, end.1 as u16));
-    editor.move_cursor(CursorMove::Forward);
+    let changed: char = if ch.is_uppercase() {
+        ch.to_lowercase().next().unwrap_or(*ch)
+    } else {
+        ch.to_uppercase().next().unwrap_or(*ch)
+    };
+
+    if let Some(cell) = editor.lines.get_mut(Index2::new(row, col)) {
+        *cell = changed;
+    }
 }
 
-pub(super) fn switch_case(editor: &mut TextArea) {
-    let yank = editor.yank_text();
-    reselect_for_yank(editor);
-    editor.cut();
+pub(super) fn switch_case_selection(editor: &mut EditorState) {
+    transform_selection(editor, |c| {
+        if c.is_uppercase() {
+            c.to_lowercase().next().unwrap_or(c)
+        } else {
+            c.to_uppercase().next().unwrap_or(c)
+        }
+    });
+}
 
-    let changed = editor
-        .yank_text()
-        .chars()
-        .map(|c| {
-            if c.is_uppercase() {
-                c.to_lowercase().to_string()
-            } else {
-                c.to_uppercase().to_string()
+pub(super) fn transform_selection(editor: &mut EditorState, transform: fn(char) -> char) {
+    let selection = match &editor.selection {
+        Some(s) => s.clone(),
+        None => return,
+    };
+
+    let start = selection.start();
+    let end = selection.end();
+
+    for row in start.row..=end.row {
+        let Some(line) = editor.lines.get(RowIndex::new(row)) else {
+            continue;
+        };
+
+        let start_col = if row == start.row { start.col } else { 0 };
+        let end_col = if row == end.row {
+            end.col
+        } else {
+            line.len().saturating_sub(1)
+        };
+
+        for col in start_col..=end_col {
+            if let Some(cell) = editor.lines.get_mut(Index2::new(row, col)) {
+                *cell = transform(*cell);
             }
-        })
-        .collect::<String>();
+        }
+    }
 
-    editor.insert_str(changed);
-    editor.set_yank_text(yank);
+    editor.selection = None;
 }

@@ -1,11 +1,20 @@
 use {
-    super::textarea::*,
+    super::textarea::{set_selection, switch_case},
     crate::{App, logger::*},
+    edtui::{
+        EditorMode, Index2,
+        actions::{
+            AppendNewline, ChangeInnerWord, CopyLine, CopySelection, DeleteLine, DeleteSelection,
+            DeleteToFirstCharOfLine, InsertNewline, MoveBackward, MoveDown, MoveForward,
+            MoveToEndOfLine, MoveToFirst, MoveToStartOfLine, MoveUp, MoveWordBackward,
+            MoveWordForward, MoveWordForwardToEndOfWord, RemoveChar, SwitchMode,
+            delete::DeleteToEndOfLine, motion::MoveToFirstRow, motion::MoveToLastRow,
+        },
+    },
     glues_core::{
         state::{GetInner, NotebookState},
         transition::NormalModeTransition,
     },
-    tui_textarea::{CursorMove, Scrolling},
 };
 
 impl App {
@@ -15,7 +24,9 @@ impl App {
 
         match transition {
             IdleMode => {
-                self.context.notebook.get_editor_mut().cancel_selection();
+                let editor = self.context.notebook.get_editor_mut();
+                editor.selection = None;
+                editor.execute(SwitchMode(EditorMode::Normal));
             }
             ToggleMode | ToggleTabCloseMode | NumberingMode | GatewayMode | YankMode
             | DeleteMode | DeleteInsideMode | ChangeMode | ChangeInsideMode | ScrollMode => {}
@@ -47,313 +58,273 @@ impl App {
                 self.context.notebook.show_browser = !self.context.notebook.show_browser;
             }
             MoveCursorDown(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                let cursor_move = cursor_move_down(editor, n);
-
-                editor.move_cursor(cursor_move);
+                self.context.notebook.get_editor_mut().execute(MoveDown(n));
             }
             MoveCursorUp(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                let cursor_move = cursor_move_up(editor, n);
-
-                editor.move_cursor(cursor_move);
+                self.context.notebook.get_editor_mut().execute(MoveUp(n));
             }
             MoveCursorBack(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                let cursor_move = cursor_move_back(editor, n);
-
-                editor.move_cursor(cursor_move);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveBackward(n));
             }
             MoveCursorForward(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                let cursor_move = cursor_move_forward(editor, n);
-
-                editor.move_cursor(cursor_move);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveForward(n));
             }
             MoveCursorWordForward(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-
-                for _ in 0..n {
-                    editor.move_cursor(CursorMove::WordForward);
-                }
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveWordForward(n));
             }
             MoveCursorWordEnd(n) => {
-                move_cursor_word_end(self.context.notebook.get_editor_mut(), n);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveWordForwardToEndOfWord(n));
             }
             MoveCursorWordBack(n) => {
-                move_cursor_word_back(self.context.notebook.get_editor_mut(), n);
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveWordBackward(n));
             }
             MoveCursorLineStart => {
                 self.context
                     .notebook
                     .get_editor_mut()
-                    .move_cursor(CursorMove::Head);
+                    .execute(MoveToStartOfLine());
             }
             MoveCursorLineEnd => {
                 self.context
                     .notebook
                     .get_editor_mut()
-                    .move_cursor(CursorMove::End);
+                    .execute(MoveToEndOfLine());
             }
             MoveCursorLineNonEmptyStart => {
-                move_cursor_to_line_non_empty_start(self.context.notebook.get_editor_mut());
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(MoveToFirst());
             }
             MoveCursorTop => {
                 self.context
                     .notebook
                     .get_editor_mut()
-                    .move_cursor(CursorMove::Top);
+                    .execute(MoveToFirstRow());
             }
             MoveCursorBottom => {
                 self.context
                     .notebook
                     .get_editor_mut()
-                    .move_cursor(CursorMove::Bottom);
+                    .execute(MoveToLastRow());
             }
             MoveCursorToLine(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.move_cursor(CursorMove::Jump((n - 1) as u16, 0));
-                editor.move_cursor(CursorMove::WordForward);
+                editor.cursor = Index2::new(n.saturating_sub(1), 0);
+                editor.execute(MoveToFirst());
             }
             InsertNewLineBelow => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.move_cursor(CursorMove::End);
-                editor.insert_newline();
+                editor.execute(AppendNewline(1));
+                editor.execute(SwitchMode(EditorMode::Insert));
             }
             InsertNewLineAbove => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.move_cursor(CursorMove::Head);
-                editor.insert_newline();
-                editor.move_cursor(CursorMove::Up);
+                editor.execute(InsertNewline(1));
+                editor.execute(SwitchMode(EditorMode::Insert));
             }
-            InsertAtCursor => {}
-            InsertAtLineStart => {
+            InsertAtCursor => {
                 self.context
                     .notebook
                     .get_editor_mut()
-                    .move_cursor(CursorMove::Head);
+                    .execute(SwitchMode(EditorMode::Insert));
+            }
+            InsertAtLineStart => {
+                let editor = self.context.notebook.get_editor_mut();
+                editor.execute(SwitchMode(EditorMode::Insert));
+                editor.execute(MoveToStartOfLine());
             }
             InsertAfterCursor => {
                 let editor = self.context.notebook.get_editor_mut();
-                let cursor_move = cursor_move_forward(editor, 1);
-
-                editor.move_cursor(cursor_move);
+                editor.execute(SwitchMode(EditorMode::Insert));
+                editor.execute(MoveForward(1));
             }
             InsertAtLineEnd => {
-                self.context
-                    .notebook
-                    .get_editor_mut()
-                    .move_cursor(CursorMove::End);
+                let editor = self.context.notebook.get_editor_mut();
+                editor.execute(SwitchMode(EditorMode::Insert));
+                editor.execute(MoveToEndOfLine());
             }
             DeleteChars(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.start_selection();
-                let cursor_move = cursor_move_forward(editor, n);
-
-                editor.move_cursor(cursor_move);
-                editor.cut();
+                editor.execute(RemoveChar(n));
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteCharsBack(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.start_selection();
-                let cursor_move = cursor_move_back(editor, n);
-
-                editor.move_cursor(cursor_move);
-                editor.cut();
+                for _ in 0..n {
+                    editor.execute(MoveBackward(1));
+                    editor.execute(RemoveChar(1));
+                }
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             Paste => {
-                let line_yanked = self.context.notebook.line_yanked;
                 let editor = self.context.notebook.get_editor_mut();
-                if line_yanked {
-                    editor.move_cursor(CursorMove::End);
-                    editor.insert_newline();
-                    editor.paste();
-                    move_cursor_to_line_non_empty_start(editor);
-                } else {
-                    editor.paste();
-                }
-
+                editor.execute(edtui::actions::Paste);
                 self.context.notebook.mark_dirty();
             }
             Undo => {
-                self.context.notebook.get_editor_mut().undo();
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(edtui::actions::Undo);
                 self.context.notebook.mark_dirty();
             }
             Redo => {
-                self.context.notebook.get_editor_mut().redo();
+                self.context
+                    .notebook
+                    .get_editor_mut()
+                    .execute(edtui::actions::Redo);
                 self.context.notebook.mark_dirty();
             }
             YankLines(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                let cursor = editor.cursor();
-                editor.move_cursor(CursorMove::Head);
-                editor.start_selection();
-                let cursor_move = cursor_move_down(editor, n - 1);
-                editor.move_cursor(cursor_move);
-                editor.move_cursor(CursorMove::End);
-                editor.copy();
-                editor.cancel_selection();
-                editor.move_cursor(CursorMove::Jump(cursor.0 as u16, cursor.1 as u16));
+                if n == 1 {
+                    editor.execute(CopyLine);
+                } else {
+                    let cursor = editor.cursor;
+                    // Select from start of current line to end of (n-1)th line below
+                    let start = Index2::new(cursor.row, 0);
+                    let end_row = (cursor.row + n - 1).min(editor.lines.len().saturating_sub(1));
+                    let end_col = editor.lines.len_col(end_row).unwrap_or(0).saturating_sub(1);
+                    let end = Index2::new(end_row, end_col);
+                    set_selection(editor, start, end);
+                    editor.execute(CopySelection);
+                    // Prepend \n so paste knows it's a line-mode yank
+                    let clip = self.context.notebook.get_clipboard();
+                    let text = clip.get_text();
+                    clip.set_text(String::from('\n') + &text);
+                    self.context.notebook.get_editor_mut().cursor = cursor;
+                }
                 self.context.notebook.line_yanked = true;
                 self.context.notebook.update_yank();
             }
             DeleteLines(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                let (row, _) = editor.cursor();
-
-                editor.move_cursor(CursorMove::Head);
-                editor.start_selection();
-                let cursor_move = cursor_move_down(editor, n - 1);
-                editor.move_cursor(cursor_move);
-                editor.move_cursor(CursorMove::End);
-                editor.cut();
-
-                if row == 0 {
-                    editor.move_cursor(CursorMove::Down);
-                    editor.move_cursor(CursorMove::Head);
-                    editor.delete_char();
-                } else {
-                    editor.delete_char();
-                    editor.move_cursor(CursorMove::Down);
+                for _ in 0..n {
+                    editor.execute(DeleteLine(1));
                 }
-
-                move_cursor_to_line_non_empty_start(editor);
+                editor.execute(MoveToFirst());
                 self.context.notebook.line_yanked = true;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteLinesUp(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                let (row, _) = editor.cursor();
-
+                let (row, _) = (editor.cursor.row, editor.cursor.col);
                 let start_row = row.saturating_sub(n - 1);
-                editor.move_cursor(CursorMove::Jump(start_row as u16, 0));
-                editor.start_selection();
-                let cursor_move = cursor_move_down(editor, n - 1);
-                editor.move_cursor(cursor_move);
-                editor.move_cursor(CursorMove::End);
-                editor.cut();
-
-                editor.move_cursor(CursorMove::Jump(start_row as u16, 0));
-                move_cursor_to_line_non_empty_start(editor);
+                editor.cursor = Index2::new(start_row, 0);
+                for _ in 0..n {
+                    editor.execute(DeleteLine(1));
+                }
+                editor.execute(MoveToFirst());
                 self.context.notebook.line_yanked = true;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteLinesAndInsert(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.move_cursor(CursorMove::Head);
-                editor.start_selection();
-                let cursor_move = cursor_move_down(editor, n - 1);
-                editor.move_cursor(cursor_move);
-                editor.move_cursor(CursorMove::End);
-                editor.cut();
+                // Delete n lines but keep cursor on the empty line for insert mode
+                editor.execute(MoveToStartOfLine());
+                // Select from head to end of nth line
+                let cursor = editor.cursor;
+                let end_row = (cursor.row + n - 1).min(editor.lines.len().saturating_sub(1));
+                let end_col = editor.lines.len_col(end_row).unwrap_or(0);
+                let end = Index2::new(end_row, end_col.saturating_sub(1));
+                set_selection(editor, Index2::new(cursor.row, 0), end);
+                editor.execute(DeleteSelection);
+                editor.execute(SwitchMode(EditorMode::Insert));
                 self.context.notebook.line_yanked = true;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteInsideWord(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                let cursor = editor.cursor();
-                editor.move_cursor(CursorMove::WordBack);
-                editor.move_cursor(CursorMove::WordEnd);
-                let cursor_be = editor.cursor();
-                editor.move_cursor(CursorMove::Jump(cursor.0 as u16, cursor.1 as u16));
-
-                if cursor_be >= cursor {
-                    editor.move_cursor(CursorMove::WordBack);
+                for _ in 0..n {
+                    editor.execute(ChangeInnerWord);
                 }
-
-                editor.start_selection();
-                move_cursor_word_end(editor, n);
-                editor.move_cursor(CursorMove::Forward);
-                editor.cut();
-
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteWordEnd(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.start_selection();
-                move_cursor_word_end(editor, n);
-                editor.move_cursor(CursorMove::Forward);
-                editor.cut();
-
+                let start = editor.cursor;
+                editor.execute(MoveWordForwardToEndOfWord(n));
+                editor.execute(MoveForward(1));
+                let end = editor.cursor;
+                set_selection(editor, start, end);
+                editor.execute(DeleteSelection);
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteWordBack(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.start_selection();
-                move_cursor_word_back(editor, n);
-                editor.cut();
-
+                let end = editor.cursor;
+                editor.execute(MoveWordBackward(n));
+                let start = editor.cursor;
+                set_selection(editor, start, end);
+                editor.execute(DeleteSelection);
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteLineStart => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.start_selection();
-                editor.move_cursor(CursorMove::Head);
-                editor.cut();
-
+                editor.execute(DeleteToFirstCharOfLine);
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteLineEnd(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.start_selection();
-                let cursor_move = cursor_move_down(editor, n - 1);
-                editor.move_cursor(cursor_move);
-                editor.move_cursor(CursorMove::End);
-                editor.cut();
-
+                if n == 1 {
+                    editor.execute(DeleteToEndOfLine);
+                } else {
+                    let start = editor.cursor;
+                    editor.execute(MoveDown(n - 1));
+                    editor.execute(MoveToEndOfLine());
+                    let end = editor.cursor;
+                    set_selection(editor, start, end);
+                    editor.execute(DeleteSelection);
+                }
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             SwitchCase => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.start_selection();
                 switch_case(editor);
-
                 self.context.notebook.mark_dirty();
             }
             ScrollCenter => {
-                let height = self.context.notebook.editor_height;
-                let editor = self.context.notebook.get_editor_mut();
-                let (row, col) = editor.cursor();
-                editor.scroll((i16::MIN / 2, 0));
-                editor.scroll(Scrolling::Delta {
-                    rows: (row as i16 - height as i16 / 2),
-                    cols: 0,
-                });
-                editor.move_cursor(CursorMove::Jump(row as u16, col as u16));
+                self.context.notebook.pending_scroll =
+                    Some(crate::context::notebook::ScrollRequest::Center);
             }
             ScrollTop => {
-                let editor = self.context.notebook.get_editor_mut();
-                let (row, col) = editor.cursor();
-                editor.move_cursor(CursorMove::Top);
-                editor.scroll(Scrolling::Delta {
-                    rows: row as i16,
-                    cols: 0,
-                });
-                editor.move_cursor(CursorMove::Head);
-                editor.move_cursor(CursorMove::Jump(row as u16, col as u16));
+                self.context.notebook.pending_scroll =
+                    Some(crate::context::notebook::ScrollRequest::Top);
             }
             ScrollBottom => {
-                let editor = self.context.notebook.get_editor_mut();
-                let (row, col) = editor.cursor();
-                editor.scroll((i16::MIN / 2, 0));
-                editor.move_cursor(CursorMove::Jump(row as u16, col as u16));
+                self.context.notebook.pending_scroll =
+                    Some(crate::context::notebook::ScrollRequest::Bottom);
             }
         };
     }

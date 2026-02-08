@@ -1,12 +1,14 @@
+mod clipboard;
 mod tree_item;
 
 use {
     crate::{
         action::{Action, TuiAction},
-        input::{Input, KeyCode, KeyEvent, to_textarea_input},
+        input::{Input, KeyCode, KeyEvent},
         logger::*,
         theme::THEME,
     },
+    edtui::{EditorState as EdtuiState, Lines},
     glues_core::{
         NotebookEvent,
         data::Note,
@@ -19,7 +21,6 @@ use {
         widgets::ListState,
     },
     std::collections::HashMap,
-    tui_textarea::TextArea,
 };
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -97,10 +98,21 @@ pub struct NotebookContext {
     pub show_browser: bool,
     pub line_yanked: bool,
     pub yank: Option<String>,
+
+    /// Pending scroll request to be applied at render time.
+    pub pending_scroll: Option<ScrollRequest>,
+}
+
+#[derive(Clone, Copy)]
+pub enum ScrollRequest {
+    Center,
+    Top,
+    Bottom,
 }
 
 pub struct EditorItem {
-    pub editor: TextArea<'static>,
+    pub editor: EdtuiState,
+    pub clipboard: clipboard::ClipboardHandle,
     pub dirty: bool,
 }
 
@@ -124,6 +136,7 @@ impl Default for NotebookContext {
             show_browser: true,
             line_yanked: false,
             yank: None,
+            pending_scroll: None,
         }
     }
 }
@@ -135,7 +148,7 @@ impl NotebookContext {
             .map(|t| &t.note)
     }
 
-    pub fn get_editor(&self) -> &TextArea<'static> {
+    pub fn get_editor(&self) -> &EdtuiState {
         let note_id = &self
             .tab_index
             .and_then(|i| self.tabs.get(i))
@@ -150,7 +163,7 @@ impl NotebookContext {
             .editor
     }
 
-    pub fn get_editor_mut(&mut self) -> &mut TextArea<'static> {
+    pub fn get_editor_mut(&mut self) -> &mut EdtuiState {
         let note_id = &self
             .tab_index
             .and_then(|i| self.tabs.get(i))
@@ -163,6 +176,21 @@ impl NotebookContext {
             .get_mut(note_id)
             .log_expect("[NotebookContext::get_editor_mut] editor not found")
             .editor
+    }
+
+    pub fn get_clipboard(&self) -> &clipboard::ClipboardHandle {
+        let note_id = &self
+            .tab_index
+            .and_then(|i| self.tabs.get(i))
+            .log_expect("[NotebookContext::get_clipboard] no opened note")
+            .note
+            .id;
+
+        &self
+            .editors
+            .get(note_id)
+            .log_expect("[NotebookContext::get_clipboard] editor not found")
+            .clipboard
     }
 
     pub fn mark_dirty(&mut self) {
@@ -354,8 +382,13 @@ impl NotebookContext {
     }
 
     pub fn open_note(&mut self, note_id: NoteId, content: String) {
+        let clipboard = clipboard::ClipboardHandle::default();
+        let mut editor = EdtuiState::new(Lines::from(content.as_str()));
+        editor.set_clipboard(clipboard.clone());
+
         let item = EditorItem {
-            editor: TextArea::from(content.lines()),
+            editor,
+            clipboard,
             dirty: false,
         };
 
@@ -368,12 +401,12 @@ impl NotebookContext {
         }
 
         if let Some(yank) = self.yank.as_ref().cloned() {
-            self.get_editor_mut().set_yank_text(yank);
+            self.get_clipboard().set_text(yank);
         }
     }
 
     pub fn update_yank(&mut self) {
-        let text = self.get_editor().yank_text();
+        let text = self.get_clipboard().get_text();
 
         #[cfg(not(target_arch = "wasm32"))]
         if let Ok(mut clipboard) = Clipboard::new() {
@@ -452,6 +485,14 @@ impl NotebookContext {
     }
 
     fn consume_on_editor_insert(&mut self, input: &Input) -> Action {
+        use edtui::actions::{
+            DeleteChar, DeleteCharForward, InsertChar, LineBreak, MoveBackward, MoveDown,
+            MoveForward, MoveToEndOfLine, MoveToStartOfLine, MoveUp, MoveWordBackward,
+            MoveWordForward, Paste, Redo,
+            delete::{DeleteToEndOfLine, DeleteToFirstCharOfLine},
+            motion::{MoveToFirstRow, MoveToLastRow},
+        };
+
         match input {
             Input::Key(KeyEvent {
                 code: KeyCode::Esc, ..
@@ -462,22 +503,101 @@ impl NotebookContext {
                 ..
             }) if modifiers.ctrl => TuiAction::ShowEditorKeymap.into(),
             Input::Key(KeyEvent {
-                code: KeyCode::Char('c' | 'x' | 'w' | 'k' | 'j'),
-                modifiers,
-                ..
-            }) if modifiers.ctrl => {
-                self.line_yanked = false;
-                if let Some(text_input) = to_textarea_input(input) {
-                    self.get_editor_mut().input(text_input);
+                code, modifiers, ..
+            }) => {
+                let editor = self.get_editor_mut();
+                match code {
+                    // Ctrl keybindings
+                    KeyCode::Char('f') if modifiers.ctrl => {
+                        editor.execute(MoveForward(1));
+                    }
+                    KeyCode::Char('b') if modifiers.ctrl => {
+                        editor.execute(MoveBackward(1));
+                    }
+                    KeyCode::Char('p') if modifiers.ctrl => {
+                        editor.execute(MoveUp(1));
+                    }
+                    KeyCode::Char('n') if modifiers.ctrl => {
+                        editor.execute(MoveDown(1));
+                    }
+                    KeyCode::Char('a') if modifiers.ctrl => {
+                        editor.execute(MoveToStartOfLine());
+                    }
+                    KeyCode::Char('e') if modifiers.ctrl => {
+                        editor.execute(MoveToEndOfLine());
+                    }
+                    KeyCode::Char('k') if modifiers.ctrl => {
+                        editor.execute(DeleteToEndOfLine);
+                    }
+                    KeyCode::Char('u') if modifiers.ctrl => {
+                        editor.execute(DeleteToFirstCharOfLine);
+                    }
+                    KeyCode::Char('d') if modifiers.ctrl => {
+                        editor.execute(DeleteCharForward(1));
+                    }
+                    KeyCode::Char('j') if modifiers.ctrl => {
+                        editor.execute(LineBreak(1));
+                    }
+                    KeyCode::Char('r') if modifiers.ctrl => {
+                        editor.execute(Redo);
+                    }
+                    KeyCode::Char('y') if modifiers.ctrl => {
+                        editor.execute(Paste);
+                    }
+                    // Alt keybindings
+                    KeyCode::Char('f') if modifiers.alt => {
+                        editor.execute(MoveWordForward(1));
+                    }
+                    KeyCode::Char('b') if modifiers.alt => {
+                        editor.execute(MoveWordBackward(1));
+                    }
+                    KeyCode::Char('<') if modifiers.alt => {
+                        editor.execute(MoveToFirstRow());
+                    }
+                    KeyCode::Char('>') if modifiers.alt => {
+                        editor.execute(MoveToLastRow());
+                    }
+                    // Ignore other Ctrl/Alt combinations
+                    KeyCode::Char(_) if modifiers.ctrl || modifiers.alt => {}
+                    // Regular keys
+                    KeyCode::Char(c) => {
+                        editor.execute(InsertChar(*c));
+                    }
+                    KeyCode::Tab => {
+                        editor.execute(InsertChar('\t'));
+                    }
+                    KeyCode::Backspace => {
+                        editor.execute(DeleteChar(1));
+                    }
+                    KeyCode::Delete => {
+                        editor.execute(DeleteCharForward(1));
+                    }
+                    KeyCode::Enter => {
+                        editor.execute(LineBreak(1));
+                    }
+                    KeyCode::Left => {
+                        editor.execute(MoveBackward(1));
+                    }
+                    KeyCode::Right => {
+                        editor.execute(MoveForward(1));
+                    }
+                    KeyCode::Up => {
+                        editor.execute(MoveUp(1));
+                    }
+                    KeyCode::Down => {
+                        editor.execute(MoveDown(1));
+                    }
+                    KeyCode::Home => {
+                        editor.execute(MoveToStartOfLine());
+                    }
+                    KeyCode::End => {
+                        editor.execute(MoveToEndOfLine());
+                    }
+                    _ => {}
                 }
                 Action::None
             }
-            _ => {
-                if let Some(text_input) = to_textarea_input(input) {
-                    self.get_editor_mut().input(text_input);
-                }
-                Action::None
-            }
+            _ => Action::None,
         }
     }
 

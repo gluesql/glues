@@ -107,6 +107,48 @@ async fn delete_line_with_dd() -> Result<()> {
 }
 
 #[tokio::test]
+async fn delete_inside_word() -> Result<()> {
+    let mut t = Tester::new().await?;
+    t.open_instant().await?;
+    t.open_first_note().await?;
+
+    // replace default content with multi-word text
+    t.press('d').await;
+    t.press('d').await;
+    t.press('i').await;
+    t.type_str("hello world foo bar").await;
+    t.key(KeyCode::Esc).await;
+
+    // move to "world" (w w)
+    t.press('0').await;
+    t.press('w').await;
+    t.draw()?;
+    snap!(t, "diw_before");
+
+    // diw — delete "world"
+    t.press('d').await;
+    t.press('i').await;
+    t.press('w').await;
+    t.draw()?;
+    snap!(t, "diw_after");
+
+    // undo and move back to "world" for 2diw test
+    t.press('u').await;
+    t.press('0').await;
+    t.press('w').await;
+
+    // 2diw — delete two words
+    t.press('2').await;
+    t.press('d').await;
+    t.press('i').await;
+    t.press('w').await;
+    t.draw()?;
+    snap!(t, "2diw_after");
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn gateway_moves_cursor_to_top() -> Result<()> {
     let mut t = Tester::new().await?;
     t.open_instant().await?;

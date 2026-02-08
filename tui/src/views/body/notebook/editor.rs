@@ -1,32 +1,88 @@
 use {
     crate::{
-        context::{Context, notebook::ContextState},
+        context::{
+            Context,
+            notebook::{ContextState, ScrollRequest},
+        },
         theme::THEME,
     },
+    edtui::{EditorState, EditorTheme, EditorView, Index2, LineNumbers, Lines},
     ratatui::{
         Frame,
+        buffer::Buffer,
         layout::Rect,
         style::{Style, Stylize},
         text::{Line, Span},
-        widgets::{Block, Padding},
+        widgets::{Block, Padding, Widget},
     },
-    tui_textarea::TextArea,
 };
 
 const NOTE_SYMBOL: &str = "󱇗 ";
-const SAMPLE_NOTE: [&str; 7] = [
-    "Welcome to Glues!",
-    "",
-    "Press `?` to see keymaps and shortcuts.",
-    "Press `m` in the note tree to create notes or directories.",
-    "Press `Enter` on a note to open it and start writing.",
-    "",
-    "GitHub: https://github.com/gluesql/glues",
-];
+const SAMPLE_NOTE: &str = r#"Welcome to Glues!
+
+Press `?` to see keymaps and shortcuts.
+Press `m` in the note tree to create notes or directories.
+Press `Enter` on a note to open it and start writing.
+
+GitHub: https://github.com/gluesql/glues"#;
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     context.notebook.editor_height = area.height - 2;
 
+    let block = build_block(context);
+    let show_line_number = context.notebook.show_line_number;
+    let state = context.notebook.state;
+
+    let cursor_style = match state {
+        ContextState::EditorNormalMode { .. }
+        | ContextState::EditorInsertMode
+        | ContextState::EditorVisualMode => Style::default().fg(THEME.accent_text).bg(THEME.accent),
+        _ => Style::default(),
+    };
+
+    let line_numbers = if show_line_number {
+        LineNumbers::Absolute
+    } else {
+        LineNumbers::None
+    };
+
+    let theme = EditorTheme::default()
+        .base(Style::default().fg(THEME.text).bg(THEME.background))
+        .block(block)
+        .cursor_style(cursor_style)
+        .selection_style(Style::default().fg(THEME.accent_text).bg(THEME.accent))
+        .line_numbers_style(
+            Style::default()
+                .fg(THEME.inactive_text)
+                .bg(THEME.background),
+        )
+        .hide_status_line();
+
+    if context.notebook.tab_index.is_some() {
+        let scroll_shift = prepare_scroll_viewport(context, area);
+
+        let editor = context.notebook.get_editor_mut();
+        EditorView::new(editor)
+            .theme(theme)
+            .wrap(false)
+            .line_numbers(line_numbers)
+            .render(area, frame.buffer_mut());
+
+        if scroll_shift > 0 {
+            apply_scroll_shift(frame.buffer_mut(), area, scroll_shift);
+        }
+    } else {
+        let mut sample_state = EditorState::new(Lines::from(SAMPLE_NOTE));
+        let theme = theme.hide_cursor();
+        EditorView::new(&mut sample_state)
+            .theme(theme)
+            .wrap(false)
+            .line_numbers(line_numbers)
+            .render(area, frame.buffer_mut());
+    };
+}
+
+fn build_block(context: &Context) -> Block<'static> {
     let (title, mut bottom_left) = if let Some(tab_index) = context.notebook.tab_index {
         let mut title = vec![];
         for (i, tab) in context.notebook.tabs.iter().enumerate() {
@@ -109,7 +165,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
 
     let bottom_left = Line::from(bottom_left);
     let block = Block::new().title(title).title_bottom(bottom_left);
-    let block = match (
+    match (
         context.last_log.as_ref(),
         context.notebook.editors.iter().any(|(_, item)| item.dirty),
     ) {
@@ -129,41 +185,96 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
     }
     .fg(THEME.text)
     .bg(THEME.background)
-    .padding(if context.notebook.show_line_number {
-        Padding::ZERO
-    } else {
-        Padding::left(1)
-    });
+    .padding(Padding::left(1))
+}
 
-    let show_line_number = context.notebook.show_line_number;
-    let state = context.notebook.state;
-    let mut editor = TextArea::from(SAMPLE_NOTE);
-    let editor = if context.notebook.tab_index.is_some() {
-        context.notebook.get_editor_mut()
-    } else {
-        &mut editor
+/// Positions edtui's internal viewport for a pending scroll request (zt/zz/zb).
+///
+/// Because edtui doesn't expose viewport controls, we use two "pre-renders"
+/// to a scratch buffer to nudge the viewport into the desired position.
+/// Returns the number of rows to shift the buffer content up after the real
+/// render, to handle the case where the desired viewport extends past the
+/// end of the document.
+fn prepare_scroll_viewport(context: &mut Context, area: Rect) -> usize {
+    let Some(scroll) = context.notebook.pending_scroll.take() else {
+        return 0;
     };
 
-    editor.set_block(block);
+    let editor = context.notebook.get_editor_mut();
+    let cursor_row = editor.cursor.row;
+    let visible_height = (area.height as usize).saturating_sub(2);
+    let total_lines = editor.lines.len();
 
-    let (cursor_style, cursor_line_style) = match state {
-        ContextState::EditorNormalMode { .. }
-        | ContextState::EditorInsertMode
-        | ContextState::EditorVisualMode => (
-            Style::default().fg(THEME.accent_text).bg(THEME.accent),
-            Style::default().underlined(),
-        ),
-        _ => (Style::default(), Style::default()),
+    let desired_viewport_start = match scroll {
+        ScrollRequest::Top => cursor_row,
+        ScrollRequest::Center => cursor_row.saturating_sub(visible_height / 2),
+        ScrollRequest::Bottom => cursor_row.saturating_sub(visible_height.saturating_sub(1)),
     };
 
-    editor.set_cursor_style(cursor_style);
-    editor.set_cursor_line_style(cursor_line_style);
-    editor.set_selection_style(Style::default().fg(THEME.accent_text).bg(THEME.accent));
-    if show_line_number {
-        editor.set_line_number_style(Style::default().fg(THEME.inactive_text));
-    } else {
-        editor.remove_line_number();
+    // When the desired viewport extends past the end of the document,
+    // edtui won't scroll that far. Compute the gap so we can shift the
+    // rendered buffer after the real render.
+    let desired_bottom = desired_viewport_start + visible_height.saturating_sub(1);
+    let clamped_bottom = desired_bottom.min(total_lines.saturating_sub(1));
+    let actual_viewport_start = clamped_bottom.saturating_sub(visible_height.saturating_sub(1));
+    let shift = desired_viewport_start.saturating_sub(actual_viewport_start);
+
+    let real_cursor = editor.cursor;
+    let scratch_theme = || {
+        EditorTheme::default()
+            .block(Block::bordered())
+            .hide_status_line()
+    };
+
+    // Pre-render 1: reset viewport to top
+    editor.cursor = Index2::new(0, 0);
+    let mut scratch = Buffer::empty(area);
+    EditorView::new(editor)
+        .theme(scratch_theme())
+        .wrap(false)
+        .render(area, &mut scratch);
+
+    // Pre-render 2: scroll viewport to best possible position
+    let editor = context.notebook.get_editor_mut();
+    editor.cursor = Index2::new(clamped_bottom, 0);
+    let mut scratch = Buffer::empty(area);
+    EditorView::new(editor)
+        .theme(scratch_theme())
+        .wrap(false)
+        .render(area, &mut scratch);
+
+    // Restore cursor
+    let editor = context.notebook.get_editor_mut();
+    editor.cursor = real_cursor;
+
+    shift
+}
+
+/// Shifts rendered content rows up to simulate scrolling past the document end.
+fn apply_scroll_shift(buf: &mut Buffer, area: Rect, shift: usize) {
+    let inner_y = (area.y + 1) as usize;
+    let inner_height = (area.height as usize).saturating_sub(2);
+
+    // Shift content rows up
+    for row in 0..inner_height.saturating_sub(shift) {
+        for col in 0..area.width as usize {
+            let x = area.x + col as u16;
+            let src_y = (inner_y + row + shift) as u16;
+            let dst_y = (inner_y + row) as u16;
+            let cell = buf[(x, src_y)].clone();
+            buf[(x, dst_y)] = cell;
+        }
     }
 
-    frame.render_widget(&*editor, area);
+    // Fill vacated bottom rows with background
+    let bg_style = Style::default().fg(THEME.text).bg(THEME.background);
+    for row in inner_height.saturating_sub(shift)..inner_height {
+        for col in 0..area.width as usize {
+            let x = area.x + col as u16;
+            let y = (inner_y + row) as u16;
+            let cell = &mut buf[(x, y)];
+            cell.reset();
+            cell.set_style(bg_style);
+        }
+    }
 }

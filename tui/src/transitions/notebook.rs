@@ -108,7 +108,7 @@ impl App {
 
             let event = NotebookEvent::UpdateNoteContent {
                 note_id: note_id.clone(),
-                content: item.editor.lines().join("\n"),
+                content: item.editor.lines.to_string(),
             }
             .into();
 
