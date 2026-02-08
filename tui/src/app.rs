@@ -4,7 +4,6 @@ use {
     ratatui::Frame,
 };
 
-#[cfg(not(target_arch = "wasm32"))]
 use {
     crate::{
         input::{Input, KeyCode, KeyEvent, KeyEventKind},
@@ -26,11 +25,8 @@ use {
 pub struct App {
     pub(crate) glues: Glues,
     pub(crate) context: Context,
-    #[cfg(not(target_arch = "wasm32"))]
     bg_transitions: Arc<Mutex<VecDeque<Transition>>>,
-    #[cfg(not(target_arch = "wasm32"))]
     sync_in_progress: Arc<AtomicBool>,
-    #[cfg(not(target_arch = "wasm32"))]
     sync_pending: Arc<AtomicBool>,
 }
 
@@ -44,21 +40,15 @@ impl App {
     pub fn new() -> Self {
         let glues = Glues::new();
         let context = Context::default();
-        #[cfg(not(target_arch = "wasm32"))]
         let bg_transitions = Arc::new(Mutex::new(VecDeque::new()));
-        #[cfg(not(target_arch = "wasm32"))]
         let sync_in_progress = Arc::new(AtomicBool::new(false));
-        #[cfg(not(target_arch = "wasm32"))]
         let sync_pending = Arc::new(AtomicBool::new(false));
 
         Self {
             glues,
             context,
-            #[cfg(not(target_arch = "wasm32"))]
             bg_transitions,
-            #[cfg(not(target_arch = "wasm32"))]
             sync_in_progress,
-            #[cfg(not(target_arch = "wasm32"))]
             sync_pending,
         }
     }
@@ -72,7 +62,6 @@ impl App {
         &mut self.glues
     }
 
-    #[cfg(not(target_arch = "wasm32"))]
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> color_eyre::Result<()> {
         use ratatui::crossterm as ct;
 
@@ -150,7 +139,6 @@ impl App {
         &mut self.context
     }
 
-    #[cfg(not(target_arch = "wasm32"))]
     async fn process_background(&mut self) {
         let mut transitions = Vec::new();
 
@@ -165,11 +153,9 @@ impl App {
             self.handle_transition(transition).await;
         }
 
-        #[cfg(not(target_arch = "wasm32"))]
         self.flush_pending_sync();
     }
 
-    #[cfg(not(target_arch = "wasm32"))]
     pub(crate) fn maybe_schedule_sync(&mut self) {
         if self.sync_in_progress.swap(true, Ordering::AcqRel) {
             self.sync_pending.store(true, Ordering::Release);
@@ -206,7 +192,6 @@ impl App {
         });
     }
 
-    #[cfg(not(target_arch = "wasm32"))]
     fn flush_pending_sync(&mut self) {
         if self.sync_in_progress.load(Ordering::SeqCst) {
             return;

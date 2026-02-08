@@ -1,28 +1,17 @@
 use {
     super::{
         App,
-        config::{self, LAST_PROXY_URL},
+        config::{
+            self, LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE,
+            LAST_MONGO_CONN_STR, LAST_MONGO_DB_NAME, LAST_PROXY_URL, LAST_REDB_PATH,
+        },
         context::{ContextPrompt, InfoDialog, QuitMenu},
         logger::*,
+        theme::THEME,
     },
     crate::input::{Input, KeyCode},
     glues_core::{EntryEvent, Event, KeyEvent, NotebookEvent, NumKey, state::EntryState},
-    ratatui::text::Line,
-};
-
-#[cfg(target_arch = "wasm32")]
-use super::config::LAST_IDB_NAMESPACE;
-
-#[cfg_attr(target_arch = "wasm32", allow(unused_imports))]
-use ratatui::style::Stylize;
-
-#[cfg_attr(target_arch = "wasm32", allow(unused_imports))]
-use super::theme::THEME;
-
-#[cfg(not(target_arch = "wasm32"))]
-use super::config::{
-    LAST_FILE_PATH, LAST_GIT_BRANCH, LAST_GIT_PATH, LAST_GIT_REMOTE, LAST_MONGO_CONN_STR,
-    LAST_MONGO_DB_NAME, LAST_REDB_PATH,
+    ratatui::{style::Stylize, text::Line},
 };
 
 #[derive(Clone)]
@@ -61,13 +50,10 @@ pub enum TuiAction {
     Quit,
 
     OpenFile,
-    #[cfg(not(target_arch = "wasm32"))]
     OpenRedb,
     OpenGit(OpenGitStep),
     OpenMongo(OpenMongoStep),
     OpenProxy(OpenProxyStep),
-    #[cfg(target_arch = "wasm32")]
-    OpenIndexedDb,
 
     RenameNote,
     RemoveNote,
@@ -167,7 +153,6 @@ impl App {
             }) => {
                 self.context.prompt = Some(ContextPrompt::new(message, *action, default));
             }
-            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenGit(OpenGitStep::Path)) => {
                 let path = self
                     .context
@@ -184,7 +169,6 @@ impl App {
                 let action = TuiAction::OpenGit(OpenGitStep::Remote { path }).into();
                 self.context.prompt = Some(ContextPrompt::new(message, action, default));
             }
-            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenGit(OpenGitStep::Remote { path })) => {
                 let remote = self
                     .context
@@ -202,7 +186,6 @@ impl App {
                 let action = TuiAction::OpenGit(OpenGitStep::Branch { path, remote }).into();
                 self.context.prompt = Some(ContextPrompt::new(message, action, default));
             }
-            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenGit(OpenGitStep::Branch { path, remote })) => {
                 let branch = self
                     .context
@@ -222,7 +205,6 @@ impl App {
                     .log_unwrap();
                 self.handle_transition(transition).await;
             }
-            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenMongo(OpenMongoStep::ConnStr)) => {
                 let conn_str = self
                     .context
@@ -240,7 +222,6 @@ impl App {
                 let action = TuiAction::OpenMongo(OpenMongoStep::Database { conn_str }).into();
                 self.context.prompt = Some(ContextPrompt::new(message, action, default));
             }
-            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenMongo(OpenMongoStep::Database { conn_str })) => {
                 let db_name = self
                     .context
@@ -296,36 +277,6 @@ impl App {
                     }
                 }
             }
-            #[cfg(target_arch = "wasm32")]
-            Action::Tui(TuiAction::OpenIndexedDb) => {
-                let namespace_input = self
-                    .context
-                    .take_prompt_input()
-                    .log_expect("IndexedDB namespace must not be none");
-
-                let namespace = {
-                    let trimmed = namespace_input.trim();
-                    if trimmed.is_empty() {
-                        "glues".to_owned()
-                    } else {
-                        trimmed.to_owned()
-                    }
-                };
-
-                config::update(LAST_IDB_NAMESPACE, &namespace).await;
-
-                let transition = self
-                    .glues
-                    .dispatch(EntryEvent::OpenIndexedDb { namespace }.into())
-                    .await
-                    .log_unwrap();
-                self.handle_transition(transition).await;
-            }
-            #[cfg(target_arch = "wasm32")]
-            Action::Tui(TuiAction::OpenFile)
-            | Action::Tui(TuiAction::OpenGit(_))
-            | Action::Tui(TuiAction::OpenMongo(_)) => {}
-            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenRedb) => {
                 let path = self
                     .context
@@ -345,7 +296,6 @@ impl App {
                     .log_unwrap();
                 self.handle_transition(transition).await;
             }
-            #[cfg(not(target_arch = "wasm32"))]
             Action::Tui(TuiAction::OpenFile) => {
                 let path = self
                     .context

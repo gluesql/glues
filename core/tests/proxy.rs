@@ -10,7 +10,6 @@ use std::{io::ErrorKind, net::TcpListener, sync::Arc};
 use tiny_http::{Response, Server};
 use tokio::sync::Mutex;
 
-#[cfg(not(target_arch = "wasm32"))]
 #[tokio::test(flavor = "current_thread")]
 async fn proxy_backend_operations() {
     let db = Db::memory()
@@ -156,7 +155,6 @@ async fn proxy_backend_operations() {
         .expect("proxy server thread should finish cleanly");
 }
 
-#[cfg(not(target_arch = "wasm32"))]
 #[tokio::test(flavor = "current_thread")]
 async fn proxy_backend_requires_token() {
     let db = Db::memory()

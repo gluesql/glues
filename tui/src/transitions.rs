@@ -7,13 +7,11 @@ use {
     std::time::SystemTime,
 };
 
-#[cfg(not(target_arch = "wasm32"))]
 use glues_core::transition::{MoveModeTransition, NoteTreeTransition, NotebookTransition};
 
 impl App {
     #[async_recursion(?Send)]
     pub(super) async fn handle_transition(&mut self, transition: Transition) {
-        #[cfg(not(target_arch = "wasm32"))]
         let should_sync = transition_requires_sync(&transition);
 
         match transition {
@@ -36,14 +34,12 @@ impl App {
             }
         }
 
-        #[cfg(not(target_arch = "wasm32"))]
         if should_sync {
             self.maybe_schedule_sync();
         }
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
 fn transition_requires_sync(transition: &Transition) -> bool {
     matches!(
         transition,

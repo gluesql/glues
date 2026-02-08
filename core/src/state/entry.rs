@@ -14,7 +14,7 @@ impl EntryState {
 
         match event {
             Entry(OpenMemory) => {
-                let mut db = memory_backend().await?;
+                let mut db = Db::memory().await?;
                 let root_id = db.root_id.clone();
                 let note_id = db.add_note(root_id, "Sample Note".to_owned()).await?.id;
                 db.update_note_content(note_id, "Hi :D".to_owned()).await?;
@@ -23,15 +23,6 @@ impl EntryState {
                 glues.state = NotebookState::new(glues).await?.into();
                 Ok(EntryTransition::OpenNotebook)
             }
-            #[cfg(target_arch = "wasm32")]
-            Entry(OpenIndexedDb { namespace }) => {
-                let db = indexed_db_backend(namespace).await?;
-                glues.db = Some(Box::new(db));
-                glues.state = NotebookState::new(glues).await?.into();
-
-                Ok(EntryTransition::OpenNotebook)
-            }
-            #[cfg(not(target_arch = "wasm32"))]
             Entry(OpenFile(path)) => {
                 let db = Db::file(&path).await?;
                 glues.db = Some(Box::new(db));
@@ -39,7 +30,6 @@ impl EntryState {
 
                 Ok(EntryTransition::OpenNotebook)
             }
-            #[cfg(not(target_arch = "wasm32"))]
             Entry(OpenRedb(path)) => {
                 let db = Db::redb(&path).await?;
                 glues.db = Some(Box::new(db));
@@ -47,7 +37,6 @@ impl EntryState {
 
                 Ok(EntryTransition::OpenNotebook)
             }
-            #[cfg(not(target_arch = "wasm32"))]
             Entry(OpenGit {
                 path,
                 remote,
@@ -59,7 +48,6 @@ impl EntryState {
 
                 Ok(EntryTransition::OpenNotebook)
             }
-            #[cfg(not(target_arch = "wasm32"))]
             Entry(OpenMongo { conn_str, db_name }) => {
                 let db = Db::mongo(&conn_str, &db_name).await?;
                 glues.db = Some(Box::new(db));
@@ -105,26 +93,4 @@ impl EntryState {
             ),
         ]
     }
-}
-
-#[cfg(not(target_arch = "wasm32"))]
-async fn memory_backend() -> Result<Db> {
-    Db::memory().await
-}
-
-#[cfg(target_arch = "wasm32")]
-async fn memory_backend() -> Result<Db> {
-    Db::memory().await
-}
-
-#[cfg(target_arch = "wasm32")]
-async fn indexed_db_backend(namespace: String) -> Result<Db> {
-    let trimmed = namespace.trim();
-    let namespace = if trimmed.is_empty() {
-        None
-    } else {
-        Some(trimmed.to_owned())
-    };
-
-    Db::indexed_db(namespace).await
 }

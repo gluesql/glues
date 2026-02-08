@@ -4,7 +4,6 @@ use crate::{
     Error,
     backend::{BackendBox, CoreBackend, SyncJob},
 };
-#[cfg(not(target_arch = "wasm32"))]
 use tokio::task;
 
 pub struct ProxyServer {
@@ -16,17 +15,10 @@ impl ProxyServer {
         Self { db }
     }
 
-    #[cfg(not(target_arch = "wasm32"))]
     async fn run_sync_job(job: SyncJob) -> Result<(), Error> {
         task::spawn_blocking(move || job.run())
             .await
             .map_err(|err| Error::BackendError(format!("sync task panicked: {err}")))?
-    }
-
-    #[cfg(target_arch = "wasm32")]
-    async fn run_sync_job(job: SyncJob) -> Result<(), Error> {
-        let _ = job;
-        Ok(())
     }
 
     pub async fn handle(&mut self, req: ProxyRequest) -> ProxyResponse {

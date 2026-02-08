@@ -55,28 +55,6 @@ Glues offers various storage options to suit your needs:
   - Protect externally reachable servers with an auth token. Set `GLUES_SERVER_TOKEN` or pass `--auth-token <value>` when launching the server. The TUI's Proxy flow will prompt for the token and send it as a `Bearer` header. Leave the field empty to connect to a token-free server on your local machine.
   - In the TUI entry menu choose `Proxy` (shortcut `[p]`), enter the proxy URL (e.g. `http://127.0.0.1:4000`), provide the token if required, and Glues will talk to the remote backend just like it does locally.
 
-> **Web build:** The browser version of Glues persists configuration through GlueSQL WebStorage (LocalStorage) and currently exposes the **Instant**, **IndexedDB**, and **Proxy** backends. Use IndexedDB to keep notes in-browser across sessions, or point the Proxy option at a running Glues proxy server to keep data outside the browser sandbox.
-
-### Web Build
-
-Try the hosted demo at https://gluesql.org/glues (Instant, IndexedDB, or Proxy storage).
-
-Glues ships with a [Ratzilla](https://github.com/orhun/ratzilla)-powered web frontend that reuses the TUI logic.
-
-1. Install prerequisites:
-   ```bash
-   rustup target add wasm32-unknown-unknown
-   cargo install trunk
-   ```
-2. Start the web app:
-   ```bash
-   cd tui/web
-   trunk serve --release
-   ```
-3. Open [http://localhost:8080](http://localhost:8080) in your browser. Use **Instant** for ephemeral notes, **IndexedDB** for browser-local persistence, or connect to a running proxy server via the **Proxy** option.
-
-To produce a static bundle instead, run `trunk build --release` from the same directory; the optimized artifacts will be emitted under `dist/`.
-
 ### Theme Presets
 
 Glues includes several built-in color schemes. The application starts with the

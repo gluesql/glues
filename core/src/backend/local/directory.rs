@@ -87,8 +87,7 @@ impl Db {
         self.fetch_directory(id).await
     }
 
-    #[cfg_attr(target_arch = "wasm32", async_recursion(?Send))]
-    #[cfg_attr(not(target_arch = "wasm32"), async_recursion)]
+    #[async_recursion]
     pub async fn remove_directory(&mut self, directory_id: DirectoryId) -> Result<()> {
         table("Note")
             .delete()

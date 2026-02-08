@@ -1,5 +1,3 @@
-#![cfg(not(target_arch = "wasm32"))]
-
 use {
     crate::{App, config, logger, theme},
     color_eyre::Result,

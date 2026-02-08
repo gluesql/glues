@@ -63,8 +63,7 @@ impl ProxyClient {
     }
 }
 
-#[cfg_attr(target_arch = "wasm32", async_trait(?Send))]
-#[cfg_attr(not(target_arch = "wasm32"), async_trait)]
+#[async_trait]
 impl CoreBackend for ProxyClient {
     fn root_id(&self) -> DirectoryId {
         self.root_id.clone()
@@ -220,17 +219,9 @@ impl CoreBackend for ProxyClient {
     }
 
     fn sync_job(&self) -> Option<SyncJob> {
-        #[cfg(not(target_arch = "wasm32"))]
-        {
-            Some(SyncJob::Proxy {
-                url: self.url.clone(),
-                auth_token: self.auth_token.clone(),
-            })
-        }
-
-        #[cfg(target_arch = "wasm32")]
-        {
-            None
-        }
+        Some(SyncJob::Proxy {
+            url: self.url.clone(),
+            auth_token: self.auth_token.clone(),
+        })
     }
 }

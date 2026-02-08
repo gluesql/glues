@@ -302,32 +302,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
-name = "beamterm-data"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1bf74a7c20e83a40e542c032c918f1b5653ad4a137b49b7063e61030983ce243"
-dependencies = [
- "compact_str",
- "miniz_oxide 0.8.9",
-]
-
-[[package]]
-name = "beamterm-renderer"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c27cc93582c7ce0f7350adcd2e0ffe21237687ba6bfb67cdea15e6e37001d19f"
-dependencies = [
- "beamterm-data",
- "compact_str",
- "console_error_panic_hook",
- "js-sys",
- "thiserror 2.0.18",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
-]
-
-[[package]]
 name = "bigdecimal"
 version = "0.4.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -663,16 +637,6 @@ dependencies = [
  "libc",
  "once_cell",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "console_error_panic_hook"
-version = "0.1.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a06aeb73f470f66dcdbf7223caeebb85984942f22f1adb2a088cf9668146bbbc"
-dependencies = [
- "cfg-if",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -1382,34 +1346,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gloo-storage"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fbc8031e8c92758af912f9bc08fbbadd3c6f3cfcbf6b64cdf3d6a81f0139277a"
-dependencies = [
- "gloo-utils",
- "js-sys",
- "serde",
- "serde_json",
- "thiserror 1.0.61",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "gloo-utils"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b5555354113b18c547c1d3a98fbf7fb32a9ff4f6fa112ce823a21641a0ba3aa"
-dependencies = [
- "js-sys",
- "serde",
- "serde_json",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
 name = "glues"
 version = "0.8.1"
 dependencies = [
@@ -1459,25 +1395,18 @@ dependencies = [
  "arboard",
  "async-recursion",
  "color-eyre",
- "console_error_panic_hook",
  "edtui",
- "getrandom 0.2.12",
  "glues-core",
  "gluesql",
  "home",
  "insta",
- "js-sys",
  "once_cell",
  "ratatui",
- "ratzilla",
  "regex",
  "textwrap",
  "tokio",
  "tui-big-text",
  "tui-input",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
 ]
 
 [[package]]
@@ -1490,11 +1419,9 @@ dependencies = [
  "gluesql-csv-storage",
  "gluesql-file-storage",
  "gluesql-git-storage",
- "gluesql-idb-storage",
  "gluesql-macros",
  "gluesql-mongo-storage",
  "gluesql-redb-storage",
- "gluesql-web-storage",
  "gluesql_memory_storage",
 ]
 
@@ -1575,25 +1502,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gluesql-idb-storage"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9bd58903be732e18dbe4e55d94a127384298a792802feb6d1c7010d91a8f6557"
-dependencies = [
- "async-trait",
- "futures",
- "gloo-utils",
- "gluesql-core",
- "idb",
- "send_wrapper",
- "serde",
- "serde-wasm-bindgen",
- "serde_json",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
 name = "gluesql-json-storage"
 version = "0.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1669,21 +1577,6 @@ dependencies = [
  "futures",
  "indexmap 1.9.3",
  "pin-project",
-]
-
-[[package]]
-name = "gluesql-web-storage"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a91c297768f4fac2530d076e1c1a5c60ec48b016eb4939f771995371e5d8c539"
-dependencies = [
- "async-trait",
- "futures",
- "gloo-storage",
- "gluesql-core",
- "serde",
- "uuid",
- "web-sys",
 ]
 
 [[package]]
@@ -1936,20 +1829,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f31827a206f56af32e590ba56d5d2d085f558508192593743f16b2306495269f"
 dependencies = [
  "cc",
-]
-
-[[package]]
-name = "idb"
-version = "0.6.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3afe8830d5802f769dc0be20a87f9f116798c896650cb6266eb5c19a3c109eed"
-dependencies = [
- "js-sys",
- "num-traits",
- "thiserror 1.0.61",
- "tokio",
- "wasm-bindgen",
- "web-sys",
 ]
 
 [[package]]
@@ -2967,22 +2846,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ratzilla"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfc729362a3a8714b512f330c8dfaa03979813e9491e21b8e49b81e1e5d78014"
-dependencies = [
- "beamterm-renderer",
- "bitvec",
- "compact_str",
- "console_error_panic_hook",
- "ratatui",
- "thiserror 2.0.18",
- "unicode-width",
- "web-sys",
-]
-
-[[package]]
 name = "redb"
 version = "2.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3423,15 +3286,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
-name = "send_wrapper"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd0b0ec5f1c1ca621c432a25813d8d60c88abe6d3e08a3eb9cf37d97a0fe3d73"
-dependencies = [
- "futures-core",
-]
-
-[[package]]
 name = "serde"
 version = "1.0.228"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3439,17 +3293,6 @@ checksum = "9a8e94ea7f378bd32cbbd37198a4a91436180c5bb472411e48b5ec2e2124ae9e"
 dependencies = [
  "serde_core",
  "serde_derive",
-]
-
-[[package]]
-name = "serde-wasm-bindgen"
-version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8302e169f0eddcc139c70f139d19d6467353af16f9fce27e8c30158036a1e16b"
-dependencies = [
- "js-sys",
- "serde",
- "wasm-bindgen",
 ]
 
 [[package]]

@@ -1,6 +1,5 @@
 use glues_core::backend::{CoreBackend, local::Db};
 
-#[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn memory_backend_operations() {
     let mut db = Db::memory()

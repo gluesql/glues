@@ -70,7 +70,6 @@ impl Default for KeyModifiers {
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
 mod native {
     use super::*;
     use ratatui::crossterm::event as ct;
@@ -123,41 +122,6 @@ mod native {
                 code,
                 modifiers,
                 kind,
-            }
-        }
-    }
-}
-
-#[cfg(target_arch = "wasm32")]
-mod wasm {
-    use super::*;
-    use ratzilla::event as rz;
-
-    impl From<rz::KeyEvent> for KeyEvent {
-        fn from(event: rz::KeyEvent) -> Self {
-            let code = match event.code {
-                rz::KeyCode::Char(c) => KeyCode::Char(c),
-                rz::KeyCode::F(n) => KeyCode::F(n),
-                rz::KeyCode::Backspace => KeyCode::Backspace,
-                rz::KeyCode::Enter => KeyCode::Enter,
-                rz::KeyCode::Left => KeyCode::Left,
-                rz::KeyCode::Right => KeyCode::Right,
-                rz::KeyCode::Up => KeyCode::Up,
-                rz::KeyCode::Down => KeyCode::Down,
-                rz::KeyCode::Tab => KeyCode::Tab,
-                rz::KeyCode::Delete => KeyCode::Delete,
-                rz::KeyCode::Home => KeyCode::Home,
-                rz::KeyCode::End => KeyCode::End,
-                rz::KeyCode::PageUp => KeyCode::PageUp,
-                rz::KeyCode::PageDown => KeyCode::PageDown,
-                rz::KeyCode::Esc => KeyCode::Esc,
-                rz::KeyCode::Unidentified => KeyCode::Null,
-            };
-
-            KeyEvent {
-                code,
-                modifiers: KeyModifiers::new(event.ctrl, event.alt, event.shift),
-                kind: KeyEventKind::Press,
             }
         }
     }

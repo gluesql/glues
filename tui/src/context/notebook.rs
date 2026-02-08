@@ -23,7 +23,6 @@ use {
     std::collections::HashMap,
 };
 
-#[cfg(not(target_arch = "wasm32"))]
 use arboard::Clipboard;
 
 pub use tree_item::{TreeItem, TreeItemKind};
@@ -408,13 +407,9 @@ impl NotebookContext {
     pub fn update_yank(&mut self) {
         let text = self.get_clipboard().get_text();
 
-        #[cfg(not(target_arch = "wasm32"))]
         if let Ok(mut clipboard) = Clipboard::new() {
             let _ = clipboard.set_text(&text);
         }
-
-        #[cfg(target_arch = "wasm32")]
-        crate::web::copy_to_clipboard(&text);
 
         self.yank = Some(text);
     }

@@ -55,7 +55,6 @@ async fn help_overlay_toggles() -> Result<()> {
     Ok(())
 }
 
-#[cfg(not(target_arch = "wasm32"))]
 #[tokio::test]
 async fn open_local_prompt() -> Result<()> {
     let mut t = Tester::new().await?;
