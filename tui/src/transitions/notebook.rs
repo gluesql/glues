@@ -56,6 +56,7 @@ impl App {
 
         if &self.context.notebook.tab_index != tab_index {
             self.context.notebook.tab_index = *tab_index;
+            self.context.notebook.scroll_anchor = None;
         }
 
         match transition {
