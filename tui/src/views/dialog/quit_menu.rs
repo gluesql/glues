@@ -21,8 +21,7 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .bg(THEME.surface)
         .fg(THEME.text)
         .padding(Padding::new(2, 2, 1, 1))
-        .title("Notebook")
-        .title_alignment(Alignment::Center);
+        .title(Line::from("Notebook").centered());
     let inner_area = block.inner(area);
     let [message_area, options_area] = Layout::vertical([Length(4), Length(4)])
         .flex(Flex::SpaceBetween)

@@ -8,6 +8,7 @@ use {
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
         style::{Style, Stylize},
+        text::Line,
         widgets::{Block, Clear, Padding, Paragraph, Wrap},
     },
 };
@@ -32,8 +33,7 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .bg(THEME.surface)
         .fg(THEME.text)
         .padding(Padding::new(2, 2, 1, 1))
-        .title("Prompt")
-        .title_alignment(Alignment::Center);
+        .title(Line::from("Prompt").centered());
     let inner_area = block.inner(area);
     let [message_area, input_area, _, control_area] =
         Layout::vertical([Length(num_lines), Length(3), Length(1), Length(2)]).areas(inner_area);

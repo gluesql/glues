@@ -5,8 +5,9 @@ use {
     },
     ratatui::{
         Frame,
-        layout::{Alignment, Constraint::Length, Flex, Layout, Rect},
+        layout::{Constraint::Length, Flex, Layout, Rect},
         style::{Style, Stylize},
+        text::Line,
         widgets::{Block, HighlightSpacing, List, ListDirection, Padding},
     },
     tui_big_text::BigText,
@@ -29,8 +30,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut EntryContext) {
     let block = Block::bordered()
         .fg(THEME.text)
         .padding(Padding::new(2, 2, 1, 1))
-        .title("Open Notes")
-        .title_alignment(Alignment::Center);
+        .title(Line::from("Open Notes").centered());
 
     let items = MENU_ITEMS.into_iter().map(|name| name.fg(THEME.menu));
     let list = List::new(items)

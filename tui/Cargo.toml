@@ -18,8 +18,8 @@ crate-type = ["rlib", "cdylib"]
 glues-core.workspace = true
 async-recursion.workspace = true
 color-eyre = "0.6.3"
-tui-big-text = "0.7.0"
-tui-textarea = { version = "0.7.0", default-features = false, features = ["ratatui"] }
+tui-big-text = "0.8.2"
+tui-textarea = { git = "https://github.com/0xferrous/tui-textarea.git", branch = "update-ratatui", default-features = false, features = ["ratatui"] }
 textwrap = "0.16"
 
 [features]
@@ -42,7 +42,7 @@ gluesql = { workspace = true, features = ["gluesql-csv-storage"] }
 home = "0.5.9"
 arboard = "3.4.1"
 tokio = { version = "1.41.0", features = ["macros", "rt-multi-thread"] }
-ratatui = { version = "0.29.0", default-features = false, features = ["crossterm"] }
+ratatui = { version = "0.30.0", default-features = false, features = ["crossterm"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 gluesql = { workspace = true, features = ["gluesql-web-storage"] }
@@ -51,7 +51,7 @@ wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 console_error_panic_hook = "0.1"
 tokio = { version = "1.41.0", features = ["macros", "rt", "sync", "time"] }
-ratatui = { version = "0.29.0", default-features = false }
+ratatui = { version = "0.30.0", default-features = false }
 web-sys = { version = "0.3", features = [
     "CssStyleDeclaration",
     "Document",

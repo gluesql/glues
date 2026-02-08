@@ -4,6 +4,7 @@ use {
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout},
         style::{Style, Stylize},
+        text::Line,
         widgets::{Block, Clear, Padding, Paragraph, Wrap},
     },
 };
@@ -18,8 +19,7 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .bg(THEME.surface)
         .fg(THEME.text)
         .padding(Padding::new(2, 2, 1, 1))
-        .title("Confirm")
-        .title_alignment(Alignment::Center);
+        .title(Line::from("Confirm").centered());
     let inner_area = block.inner(area);
     let [message_area, control_area] = Layout::vertical([Length(4), Length(2)])
         .flex(Flex::SpaceBetween)

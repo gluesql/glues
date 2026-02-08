@@ -5,8 +5,9 @@ use {
     },
     ratatui::{
         Frame,
-        layout::{Alignment, Constraint::Length, Flex, Layout},
+        layout::{Constraint::Length, Flex, Layout},
         style::{Style, Stylize},
+        text::Line,
         widgets::{Block, Clear, HighlightSpacing, List, ListDirection, Padding},
     },
 };
@@ -23,8 +24,7 @@ pub fn draw(frame: &mut Frame, context: &mut NotebookContext) {
         .bg(THEME.surface)
         .fg(THEME.text)
         .padding(Padding::new(2, 2, 1, 1))
-        .title("Directory Actions")
-        .title_alignment(Alignment::Center);
+        .title(Line::from("Directory Actions").centered());
     let list = List::new(DIRECTORY_ACTIONS)
         .block(block)
         .highlight_style(Style::new().fg(THEME.accent_text).bg(THEME.accent))

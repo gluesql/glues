@@ -298,8 +298,7 @@ pub fn draw(frame: &mut Frame, keymap_kind: VimKeymapKind) {
         .fg(THEME.text)
         .bg(THEME.surface)
         .padding(Padding::new(2, 2, 1, 1))
-        .title(title.fg(THEME.success_text).bg(THEME.success))
-        .title_alignment(Alignment::Center);
+        .title(Line::from(title.fg(THEME.success_text).bg(THEME.success)).centered());
 
     let inner_area = block.inner(area);
     let [message_area, control_area] = Layout::vertical([Length(height - 5), Length(1)])

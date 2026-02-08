@@ -4,6 +4,7 @@ use {
         Frame,
         layout::{Alignment, Constraint::Length, Flex, Layout, Rect},
         style::{Style, Stylize},
+        text::Line,
         widgets::{Block, Clear, HighlightSpacing, List, ListItem, Padding, Paragraph},
     },
 };
@@ -19,8 +20,7 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .bg(THEME.surface)
         .fg(THEME.text)
         .padding(Padding::new(2, 2, 1, 1))
-        .title("Select Theme")
-        .title_alignment(Alignment::Center);
+        .title(Line::from("Select Theme").centered());
     let inner = block.inner(area);
 
     let presets = selector.presets();

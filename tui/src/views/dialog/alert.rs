@@ -19,8 +19,7 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .fg(THEME.text)
         .bg(THEME.surface)
         .padding(Padding::new(2, 2, 1, 1))
-        .title("Alert")
-        .title_alignment(Alignment::Center);
+        .title(Line::from("Alert").centered());
 
     let inner_area = block.inner(area);
     let [message_area, control_area] = Layout::vertical([Length(3), Length(1)])

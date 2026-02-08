@@ -21,8 +21,7 @@ pub fn draw(frame: &mut Frame) {
         .fg(THEME.text)
         .bg(THEME.surface)
         .padding(Padding::new(2, 2, 1, 1))
-        .title("Editor Keymap")
-        .title_alignment(Alignment::Center);
+        .title(Line::from("Editor Keymap").centered());
 
     let inner_area = block.inner(area);
     let [message_area, control_area] = Layout::vertical([Length(33), Length(1)])
