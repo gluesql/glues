@@ -27,7 +27,7 @@ Press `Enter` on a note to open it and start writing.
 GitHub: https://github.com/gluesql/glues"#;
 
 pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
-    context.notebook.editor_height = area.height - 2;
+    context.notebook.editor_height = area.height.saturating_sub(2);
 
     let block = build_block(context);
     let show_line_number = context.notebook.show_line_number;
