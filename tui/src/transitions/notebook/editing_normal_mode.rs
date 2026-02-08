@@ -125,7 +125,10 @@ impl App {
             }
             MoveCursorToLine(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                editor.cursor = Index2::new(n.saturating_sub(1), 0);
+                let target_row = n
+                    .saturating_sub(1)
+                    .min(editor.lines.len().saturating_sub(1));
+                editor.cursor = Index2::new(target_row, 0);
                 editor.execute(MoveToFirst());
             }
             InsertNewLineBelow => {
