@@ -1,0 +1,44 @@
+---
+source: tui/tests/editor_toggle.rs
+expression: text
+---
+ Note 'Sample Note' normal mode - toggle                                                               [?] Hide keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 Hi :D                       Tabs                                        
+   󱇗 Sample Note                            ▐                               [h]       select left tab                   
+                                            ▐                               [l]       select right tab                  
+                                            ▐                               [H]       Move current tab to left          
+                                            ▐                               [L]       Move current tab to right         
+                                            ▐                               [x]       Close current tab                 
+                                            ▐                               [X]       Enter tab close mode              
+                                            ▐                               Options                                     
+                                            ▐                               [b]       Toggle browser                    
+                                            ▐                               [n]       Toggle editor line number         
+                                            ▐                               [s]       Toggle syntax highlighting        
+                                            ▐                               [Esc]     Cancel                            
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󱇗 Sample

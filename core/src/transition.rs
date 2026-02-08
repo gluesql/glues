@@ -149,6 +149,7 @@ pub enum NormalModeTransition {
     MoveTabPrev(usize),
     ToggleLineNumbers,
     ToggleBrowser,
+    ToggleSyntaxHighlight,
 
     // toggle tab close mode
     CloseRightTabs(usize),

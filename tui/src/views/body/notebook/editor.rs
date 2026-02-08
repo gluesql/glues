@@ -58,8 +58,15 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         )
         .hide_status_line();
 
-    let syntax_theme = syntect_theme_name(current_theme_id());
-    let new_highlighter = || SyntaxHighlighter::new(syntax_theme, "md").ok();
+    let show_syntax = context.notebook.show_syntax_highlight;
+    let new_highlighter = || {
+        if show_syntax {
+            let syntax_theme = syntect_theme_name(current_theme_id());
+            SyntaxHighlighter::new(syntax_theme, "md").ok()
+        } else {
+            None
+        }
+    };
 
     if context.notebook.tab_index.is_some() {
         let scroll_shift = prepare_scroll_viewport(context, area);

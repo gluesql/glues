@@ -95,6 +95,7 @@ pub struct NotebookContext {
 
     pub show_line_number: bool,
     pub show_browser: bool,
+    pub show_syntax_highlight: bool,
     pub line_yanked: bool,
     pub yank: Option<String>,
 
@@ -133,6 +134,7 @@ impl Default for NotebookContext {
 
             show_line_number: true,
             show_browser: true,
+            show_syntax_highlight: true,
             line_yanked: false,
             yank: None,
             pending_scroll: None,

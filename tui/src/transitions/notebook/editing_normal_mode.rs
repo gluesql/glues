@@ -57,6 +57,10 @@ impl App {
             ToggleBrowser => {
                 self.context.notebook.show_browser = !self.context.notebook.show_browser;
             }
+            ToggleSyntaxHighlight => {
+                self.context.notebook.show_syntax_highlight =
+                    !self.context.notebook.show_syntax_highlight;
+            }
             MoveCursorDown(n) => {
                 self.context.notebook.get_editor_mut().execute(MoveDown(n));
             }

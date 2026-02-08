@@ -38,6 +38,12 @@ pub async fn consume<B: CoreBackend + ?Sized>(
 
             ToggleBrowser.into()
         }
+        Key(KeyEvent::S) => {
+            state.inner_state =
+                InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
+
+            ToggleSyntaxHighlight.into()
+        }
         event @ Key(_) => {
             state.inner_state =
                 InnerState::Editor(EditorState::Normal(super::VimNormalState::Idle));
@@ -68,6 +74,7 @@ pub fn keymap() -> Vec<KeymapGroup> {
             vec![
                 KeymapItem::new("b", "Toggle browser"),
                 KeymapItem::new("n", "Toggle editor line number"),
+                KeymapItem::new("s", "Toggle syntax highlighting"),
                 KeymapItem::new("Esc", "Cancel"),
             ],
         ),
