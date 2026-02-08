@@ -233,60 +233,60 @@ pub(super) fn move_word_backward(editor: &mut EditorState, n: usize) {
 }
 
 fn move_word_backward_once(editor: &mut EditorState) {
-    let cur = editor.cursor;
-    if cur.row == 0 && cur.col == 0 {
-        return;
-    }
-    if cur.col == 0 {
-        // Move to end of previous line, then fall through to find word start
-        let prev_row = cur.row - 1;
-        editor.cursor.row = prev_row;
-        editor.cursor.col = editor
-            .lines
-            .len_col(prev_row)
-            .unwrap_or(0)
-            .saturating_sub(1);
-        // Recursively find the word start on the previous line
-        move_word_backward_once(editor);
-        return;
-    }
-
-    let mut idx = Index2::new(cur.row, cur.col - 1);
-    // Skip whitespace backward
-    skip_ws_rev(&editor.lines, &mut idx);
-
-    // If we backed up to col 0 and it's still whitespace, cross to previous line
-    if let Some(ch) = editor.lines.get(idx)
-        && ch.is_whitespace()
-        && idx.row > 0
-    {
-        editor.cursor = idx;
-        move_word_backward_once(editor);
-        return;
-    }
-
-    let start_class = match editor.lines.get(idx) {
-        Some(ch) => char_class(ch),
-        None => {
-            editor.cursor = idx;
-            return;
-        }
-    };
-
-    // Walk backward while same class
     loop {
-        if idx.col == 0 {
-            editor.cursor = idx;
+        let cur = editor.cursor;
+        if cur.row == 0 && cur.col == 0 {
             return;
         }
-        let prev = Index2::new(idx.row, idx.col - 1);
-        match editor.lines.get(prev) {
-            Some(ch) if char_class(ch) == start_class => idx = prev,
-            _ => break,
+        if cur.col == 0 {
+            // Move to end of previous line, then loop to find word start
+            let prev_row = cur.row - 1;
+            editor.cursor.row = prev_row;
+            editor.cursor.col = editor
+                .lines
+                .len_col(prev_row)
+                .unwrap_or(0)
+                .saturating_sub(1);
+            continue;
         }
-    }
 
-    editor.cursor = idx;
+        let mut idx = Index2::new(cur.row, cur.col - 1);
+        // Skip whitespace backward
+        skip_ws_rev(&editor.lines, &mut idx);
+
+        // If we backed up to col 0 and it's still whitespace, cross to previous line
+        if let Some(ch) = editor.lines.get(idx)
+            && ch.is_whitespace()
+            && idx.row > 0
+        {
+            editor.cursor = idx;
+            continue;
+        }
+
+        let start_class = match editor.lines.get(idx) {
+            Some(ch) => char_class(ch),
+            None => {
+                editor.cursor = idx;
+                return;
+            }
+        };
+
+        // Walk backward while same class
+        loop {
+            if idx.col == 0 {
+                editor.cursor = idx;
+                return;
+            }
+            let prev = Index2::new(idx.row, idx.col - 1);
+            match editor.lines.get(prev) {
+                Some(ch) if char_class(ch) == start_class => idx = prev,
+                _ => break,
+            }
+        }
+
+        editor.cursor = idx;
+        return;
+    }
 }
 
 /// Move the cursor forward to the end of the current/next word by `n` times (vim `e`).
