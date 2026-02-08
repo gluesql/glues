@@ -261,6 +261,7 @@ impl App {
                 let editor = self.context.notebook.get_editor_mut();
                 for _ in 0..n {
                     editor.execute(ChangeInnerWord);
+                    editor.execute(SwitchMode(EditorMode::Normal));
                 }
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
