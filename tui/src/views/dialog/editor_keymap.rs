@@ -44,8 +44,6 @@ pub fn draw(frame: &mut Frame) {
 | `Ctrl+N`, `↓`            | Move cursor down by one line               |
 | `Ctrl+A`, `Home`         | Move cursor to the head of line            |
 | `Ctrl+E`, `End`          | Move cursor to the end of line             |
-| `Alt+F`                  | Move cursor forward by word                |
-| `Alt+B`                  | Move cursor backward by word               |
 | `Alt+<`                  | Move cursor to top of lines                |
 | `Alt+>`                  | Move cursor to bottom of lines             |
 "

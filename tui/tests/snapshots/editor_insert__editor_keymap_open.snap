@@ -1,7 +1,6 @@
 ---
 source: tui/tests/editor_insert.rs
 expression: text
-snapshot_kind: text
 ---
  Note 'Sample Note' insert mode                                                                   [Ctrl+h] Show keymap 
 [Browser]                                   ▐ 󱇗 Sample Note                                                             
@@ -28,10 +27,10 @@ snapshot_kind: text
                     │  | `Ctrl+N`, `↓`            | Move cursor down by one line               |   │                    
                     │  | `Ctrl+A`, `Home`         | Move cursor to the head of line            |   │                    
                     │  | `Ctrl+E`, `End`          | Move cursor to the end of line             |   │                    
-                    │  | `Alt+F`                  | Move cursor forward by word                |   │                    
-                    │  | `Alt+B`                  | Move cursor backward by word               |   │                    
                     │  | `Alt+<`                  | Move cursor to top of lines                |   │                    
                     │  | `Alt+>`                  | Move cursor to bottom of lines             |   │                    
+                    │                                                                              │                    
+                    │                                                                              │                    
                     │                                                                              │                    
                     │                                                                              │                    
                     │                            Press any key to close                            │                    

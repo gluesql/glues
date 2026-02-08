@@ -112,6 +112,22 @@ impl Tester {
     }
 
     #[allow(dead_code)]
+    pub fn cursor(&mut self) -> (usize, usize) {
+        let editor = self.app.context_mut().notebook.get_editor();
+        (editor.cursor.row, editor.cursor.col)
+    }
+
+    #[allow(dead_code)]
+    pub fn editor_text(&mut self) -> String {
+        self.app
+            .context_mut()
+            .notebook
+            .get_editor()
+            .lines
+            .to_string()
+    }
+
+    #[allow(dead_code)]
     pub fn snapshot_text(&self) -> String {
         buffer_lines(&self.term).join("\n")
     }

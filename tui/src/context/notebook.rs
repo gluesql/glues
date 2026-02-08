@@ -484,8 +484,7 @@ impl NotebookContext {
     fn consume_on_editor_insert(&mut self, input: &Input) -> Action {
         use edtui::actions::{
             DeleteChar, DeleteCharForward, InsertChar, LineBreak, MoveBackward, MoveDown,
-            MoveForward, MoveToEndOfLine, MoveToStartOfLine, MoveUp, MoveWordBackward,
-            MoveWordForward, Paste, Redo,
+            MoveForward, MoveToEndOfLine, MoveToStartOfLine, MoveUp, Paste, Redo,
             delete::{DeleteToEndOfLine, DeleteToFirstCharOfLine},
             motion::{MoveToFirstRow, MoveToLastRow},
         };
@@ -542,12 +541,6 @@ impl NotebookContext {
                         editor.execute(Paste);
                     }
                     // Alt keybindings
-                    KeyCode::Char('f') if modifiers.alt => {
-                        editor.execute(MoveWordForward(1));
-                    }
-                    KeyCode::Char('b') if modifiers.alt => {
-                        editor.execute(MoveWordBackward(1));
-                    }
                     KeyCode::Char('<') if modifiers.alt => {
                         editor.execute(MoveToFirstRow());
                     }

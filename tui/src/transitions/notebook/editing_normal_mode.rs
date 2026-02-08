@@ -1,13 +1,15 @@
 use {
-    super::textarea::{set_selection, switch_case},
+    super::textarea::{
+        move_word_backward, move_word_forward, move_word_forward_to_end, select_inner_word,
+        set_selection, switch_case,
+    },
     crate::{App, logger::*},
     edtui::{
         EditorMode, Index2,
         actions::{
-            AppendNewline, ChangeInnerWord, CopyLine, CopySelection, DeleteLine, DeleteSelection,
+            AppendNewline, CopyLine, CopySelection, DeleteLine, DeleteSelection,
             DeleteToFirstCharOfLine, InsertNewline, MoveBackward, MoveDown, MoveForward,
-            MoveToEndOfLine, MoveToFirst, MoveToStartOfLine, MoveUp, MoveWordBackward,
-            MoveWordForward, MoveWordForwardToEndOfWord, RemoveChar, SwitchMode,
+            MoveToEndOfLine, MoveToFirst, MoveToStartOfLine, MoveUp, RemoveChar, SwitchMode,
             delete::DeleteToEndOfLine, motion::MoveToFirstRow, motion::MoveToLastRow,
         },
     },
@@ -80,22 +82,13 @@ impl App {
                     .execute(MoveForward(n));
             }
             MoveCursorWordForward(n) => {
-                self.context
-                    .notebook
-                    .get_editor_mut()
-                    .execute(MoveWordForward(n));
+                move_word_forward(self.context.notebook.get_editor_mut(), n);
             }
             MoveCursorWordEnd(n) => {
-                self.context
-                    .notebook
-                    .get_editor_mut()
-                    .execute(MoveWordForwardToEndOfWord(n));
+                move_word_forward_to_end(self.context.notebook.get_editor_mut(), n);
             }
             MoveCursorWordBack(n) => {
-                self.context
-                    .notebook
-                    .get_editor_mut()
-                    .execute(MoveWordBackward(n));
+                move_word_backward(self.context.notebook.get_editor_mut(), n);
             }
             MoveCursorLineStart => {
                 self.context
@@ -264,8 +257,8 @@ impl App {
             DeleteInsideWord(n) => {
                 let editor = self.context.notebook.get_editor_mut();
                 for _ in 0..n {
-                    editor.execute(ChangeInnerWord);
-                    editor.execute(SwitchMode(EditorMode::Normal));
+                    select_inner_word(editor);
+                    editor.execute(DeleteSelection);
                 }
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
@@ -274,8 +267,7 @@ impl App {
             DeleteWordEnd(n) => {
                 let editor = self.context.notebook.get_editor_mut();
                 let start = editor.cursor;
-                editor.execute(MoveWordForwardToEndOfWord(n));
-                editor.execute(MoveForward(1));
+                move_word_forward_to_end(editor, n);
                 let end = editor.cursor;
                 set_selection(editor, start, end);
                 editor.execute(DeleteSelection);
@@ -285,11 +277,25 @@ impl App {
             }
             DeleteWordBack(n) => {
                 let editor = self.context.notebook.get_editor_mut();
-                let end = editor.cursor;
-                editor.execute(MoveWordBackward(n));
-                let start = editor.cursor;
-                set_selection(editor, start, end);
-                editor.execute(DeleteSelection);
+                let orig = editor.cursor;
+                move_word_backward(editor, n);
+                let target = editor.cursor;
+                // b is exclusive in vim: don't include the char at original cursor
+                if target < orig {
+                    if orig.col > 0 {
+                        set_selection(editor, target, Index2::new(orig.row, orig.col - 1));
+                    } else {
+                        // Cross-line: orig at col 0, select to end of prev row
+                        let prev_row = orig.row - 1;
+                        let last = editor
+                            .lines
+                            .len_col(prev_row)
+                            .unwrap_or(0)
+                            .saturating_sub(1);
+                        set_selection(editor, target, Index2::new(prev_row, last));
+                    }
+                    editor.execute(DeleteSelection);
+                }
                 self.context.notebook.line_yanked = false;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();

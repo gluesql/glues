@@ -1,12 +1,15 @@
 use {
-    super::textarea::{switch_case_selection, transform_selection},
+    super::textarea::{
+        move_word_backward, move_word_forward, move_word_forward_to_end, switch_case_selection,
+        transform_selection,
+    },
     crate::App,
     edtui::{
         EditorMode,
         actions::{
             ChangeSelection, CopySelection, MoveBackward, MoveDown, MoveForward, MoveToEndOfLine,
-            MoveToFirst, MoveToStartOfLine, MoveUp, MoveWordBackward, MoveWordForward,
-            MoveWordForwardToEndOfWord, SwitchMode, motion::MoveToFirstRow, motion::MoveToLastRow,
+            MoveToFirst, MoveToStartOfLine, MoveUp, SwitchMode, motion::MoveToFirstRow,
+            motion::MoveToLastRow,
         },
     },
     glues_core::transition::VisualModeTransition,
@@ -43,22 +46,13 @@ impl App {
                     .execute(MoveForward(n));
             }
             MoveCursorWordForward(n) => {
-                self.context
-                    .notebook
-                    .get_editor_mut()
-                    .execute(MoveWordForward(n));
+                move_word_forward(self.context.notebook.get_editor_mut(), n);
             }
             MoveCursorWordEnd(n) => {
-                self.context
-                    .notebook
-                    .get_editor_mut()
-                    .execute(MoveWordForwardToEndOfWord(n));
+                move_word_forward_to_end(self.context.notebook.get_editor_mut(), n);
             }
             MoveCursorWordBack(n) => {
-                self.context
-                    .notebook
-                    .get_editor_mut()
-                    .execute(MoveWordBackward(n));
+                move_word_backward(self.context.notebook.get_editor_mut(), n);
             }
             MoveCursorLineStart => {
                 self.context
