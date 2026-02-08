@@ -1,15 +1,16 @@
 use crate::{
-    Error, Result,
+    Result,
     data::{Directory, Note},
     types::{DirectoryId, NoteId},
 };
 use async_trait::async_trait;
-use std::path::PathBuf;
 
 #[cfg(not(target_arch = "wasm32"))]
 use {
+    crate::Error,
     gluesql::gluesql_git_storage::{GitStorage, StorageType},
     reqwest::blocking::Client,
+    std::path::PathBuf,
     std::time::Duration,
 };
 

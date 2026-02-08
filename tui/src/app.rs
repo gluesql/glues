@@ -1,14 +1,7 @@
 use {
     crate::{context::Context, views},
-    glues_core::{Glues, transition::Transition},
+    glues_core::Glues,
     ratatui::Frame,
-    std::{
-        collections::VecDeque,
-        sync::{
-            Arc, Mutex,
-            atomic::{AtomicBool, Ordering},
-        },
-    },
 };
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -17,18 +10,25 @@ use {
         input::{Input, KeyCode, KeyEvent, KeyEventKind},
         logger::*,
     },
+    glues_core::transition::Transition,
     ratatui::DefaultTerminal,
-    std::time::Duration,
+    std::{
+        collections::VecDeque,
+        sync::{
+            Arc, Mutex,
+            atomic::{AtomicBool, Ordering},
+        },
+        time::Duration,
+    },
     tokio::{self, task},
 };
-
-#[cfg(target_arch = "wasm32")]
-use crate::logger::*;
 
 pub struct App {
     pub(crate) glues: Glues,
     pub(crate) context: Context,
+    #[cfg(not(target_arch = "wasm32"))]
     bg_transitions: Arc<Mutex<VecDeque<Transition>>>,
+    #[cfg(not(target_arch = "wasm32"))]
     sync_in_progress: Arc<AtomicBool>,
     #[cfg(not(target_arch = "wasm32"))]
     sync_pending: Arc<AtomicBool>,
@@ -44,7 +44,9 @@ impl App {
     pub fn new() -> Self {
         let glues = Glues::new();
         let context = Context::default();
+        #[cfg(not(target_arch = "wasm32"))]
         let bg_transitions = Arc::new(Mutex::new(VecDeque::new()));
+        #[cfg(not(target_arch = "wasm32"))]
         let sync_in_progress = Arc::new(AtomicBool::new(false));
         #[cfg(not(target_arch = "wasm32"))]
         let sync_pending = Arc::new(AtomicBool::new(false));
@@ -52,7 +54,9 @@ impl App {
         Self {
             glues,
             context,
+            #[cfg(not(target_arch = "wasm32"))]
             bg_transitions,
+            #[cfg(not(target_arch = "wasm32"))]
             sync_in_progress,
             #[cfg(not(target_arch = "wasm32"))]
             sync_pending,
@@ -146,6 +150,7 @@ impl App {
         &mut self.context
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     async fn process_background(&mut self) {
         let mut transitions = Vec::new();
 

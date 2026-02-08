@@ -1,5 +1,3 @@
-#![cfg(target_arch = "wasm32")]
-
 use {
     crate::{
         App, config,
@@ -58,24 +56,25 @@ async fn run() -> Result<(), JsValue> {
                 console::error_1(&err);
             }
 
-            if !event.ctrl && !event.alt {
-                if let ratzilla::event::KeyCode::Char(ch) = event.code {
-                    let ime_active = web_sys::window()
-                        .and_then(|w| w.document())
-                        .and_then(|doc| doc.active_element())
-                        .and_then(|elem| elem.dyn_into::<HtmlTextAreaElement>().ok())
-                        .map(|active| active == *ime_for_keys)
-                        .unwrap_or(false);
+            if !event.ctrl
+                && !event.alt
+                && let ratzilla::event::KeyCode::Char(ch) = event.code
+            {
+                let ime_active = web_sys::window()
+                    .and_then(|w| w.document())
+                    .and_then(|doc| doc.active_element())
+                    .and_then(|elem| elem.dyn_into::<HtmlTextAreaElement>().ok())
+                    .map(|active| active == *ime_for_keys)
+                    .unwrap_or(false);
 
-                    if !ime_active {
-                        let app = app.clone();
-                        spawn_local(async move {
-                            dispatch_text(app, ch.to_string());
-                        });
-                    }
-
-                    return;
+                if !ime_active {
+                    let app = app.clone();
+                    spawn_local(async move {
+                        dispatch_text(app, ch.to_string());
+                    });
                 }
+
+                return;
             }
 
             let app = app.clone();
@@ -358,34 +357,34 @@ fn start_render_loop(
 ) -> Result<(), JsValue> {
     let window = web_sys::window().ok_or_else(|| JsValue::from_str("missing window"))?;
 
-    let raf: Rc<RefCell<Option<Closure<dyn FnMut()>>>> = Rc::new(RefCell::new(None));
+    type RafHandle = Rc<RefCell<Option<Closure<dyn FnMut()>>>>;
+    let raf: RafHandle = Rc::new(RefCell::new(None));
     let raf_clone = raf.clone();
     let terminal = terminal.clone();
     let app_for_draw = app.clone();
     let window_for_loop = window.clone();
 
     *raf.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-        if let Ok(mut guard) = app_for_draw.try_lock() {
-            if let Err(err) = terminal.borrow_mut().draw(|frame| {
+        if let Ok(mut guard) = app_for_draw.try_lock()
+            && let Err(err) = terminal.borrow_mut().draw(|frame| {
                 guard.draw(frame);
-            }) {
-                console::error_1(&JsValue::from_str(&err.to_string()));
-            }
+            })
+        {
+            console::error_1(&JsValue::from_str(&err.to_string()));
         }
 
-        if let Some(callback) = raf_clone.borrow().as_ref() {
-            if let Err(err) =
+        if let Some(callback) = raf_clone.borrow().as_ref()
+            && let Err(err) =
                 window_for_loop.request_animation_frame(callback.as_ref().unchecked_ref())
-            {
-                console::error_1(&err);
-            }
+        {
+            console::error_1(&err);
         }
     }) as Box<dyn FnMut()>));
 
-    if let Some(callback) = raf.borrow().as_ref() {
-        if let Err(err) = window.request_animation_frame(callback.as_ref().unchecked_ref()) {
-            console::error_1(&err);
-        }
+    if let Some(callback) = raf.borrow().as_ref()
+        && let Err(err) = window.request_animation_frame(callback.as_ref().unchecked_ref())
+    {
+        console::error_1(&err);
     }
 
     Ok(())
