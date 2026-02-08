@@ -59,10 +59,18 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         .hide_status_line();
 
     let show_syntax = context.notebook.show_syntax_highlight;
+    let extension: String = context
+        .notebook
+        .tab_index
+        .and_then(|i| context.notebook.tabs[i].note.name.rsplit_once('.'))
+        .map(|(_, ext)| ext.to_owned())
+        .unwrap_or_else(|| "md".to_owned());
     let new_highlighter = || {
         if show_syntax {
             let syntax_theme = syntect_theme_name(current_theme_id());
-            SyntaxHighlighter::new(syntax_theme, "md").ok()
+            SyntaxHighlighter::new(syntax_theme, &extension)
+                .or_else(|_| SyntaxHighlighter::new(syntax_theme, "md"))
+                .ok()
         } else {
             None
         }
