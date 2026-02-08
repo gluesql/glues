@@ -4,9 +4,9 @@ use {
             Context,
             notebook::{ContextState, ScrollRequest},
         },
-        theme::THEME,
+        theme::{THEME, current_theme_id, syntect_theme_name},
     },
-    edtui::{EditorState, EditorTheme, EditorView, Index2, LineNumbers, Lines},
+    edtui::{EditorState, EditorTheme, EditorView, Index2, LineNumbers, Lines, SyntaxHighlighter},
     ratatui::{
         Frame,
         buffer::Buffer,
@@ -58,12 +58,16 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         )
         .hide_status_line();
 
+    let syntax_theme = syntect_theme_name(current_theme_id());
+    let new_highlighter = || SyntaxHighlighter::new(syntax_theme, "md").ok();
+
     if context.notebook.tab_index.is_some() {
         let scroll_shift = prepare_scroll_viewport(context, area);
 
         let editor = context.notebook.get_editor_mut();
         EditorView::new(editor)
             .theme(theme)
+            .syntax_highlighter(new_highlighter())
             .wrap(true)
             .line_numbers(line_numbers)
             .render(area, frame.buffer_mut());
@@ -76,6 +80,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         let theme = theme.hide_cursor();
         EditorView::new(&mut sample_state)
             .theme(theme)
+            .syntax_highlighter(new_highlighter())
             .wrap(true)
             .line_numbers(line_numbers)
             .render(area, frame.buffer_mut());

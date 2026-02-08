@@ -173,6 +173,17 @@ pub fn set_theme(id: ThemeId) {
     CURRENT_THEME_ID.store(id as u8, Ordering::Relaxed);
 }
 
+pub fn syntect_theme_name(id: ThemeId) -> &'static str {
+    match id {
+        ThemeId::Dark => "axar",
+        ThemeId::Light => "bbedit",
+        ThemeId::Pastel => "OneHalfLight",
+        ThemeId::Sunrise => "base16-atelierdune-light",
+        ThemeId::Midnight => "ayu-dark",
+        ThemeId::Forest => "boron",
+    }
+}
+
 pub fn current_theme_id() -> ThemeId {
     match CURRENT_THEME_ID.load(Ordering::Relaxed) {
         0 => ThemeId::Dark,
