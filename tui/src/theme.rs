@@ -178,7 +178,7 @@ pub fn syntect_theme_name(id: ThemeId) -> &'static str {
         ThemeId::Dark => "axar",
         ThemeId::Light => "bbedit",
         ThemeId::Pastel => "OneHalfLight",
-        ThemeId::Sunrise => "base16-atelierdune-light",
+        ThemeId::Sunrise => "gruvbox-light",
         ThemeId::Midnight => "ayu-dark",
         ThemeId::Forest => "boron",
     }
