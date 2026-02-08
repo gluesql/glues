@@ -6,16 +6,19 @@ use {
     },
     ratatui::{
         Frame,
-        layout::{Alignment, Constraint::Length, Flex, Layout},
+        layout::{Alignment, Constraint::Length, Flex, Layout, Position},
         style::{Style, Stylize},
         text::Line,
-        widgets::{Block, Clear, Padding, Paragraph, Wrap},
+        widgets::{Block, Borders, Clear, Padding, Paragraph, Wrap},
     },
 };
 
 pub fn draw(frame: &mut Frame, context: &mut Context) {
     let ContextPrompt {
-        message, widget, ..
+        message,
+        input,
+        mask,
+        ..
     } = context
         .prompt
         .as_ref()
@@ -51,9 +54,29 @@ pub fn draw(frame: &mut Frame, context: &mut Context) {
         .style(Style::default())
         .alignment(Alignment::Left);
 
+    let input_block = Block::default()
+        .border_style(Style::default())
+        .borders(Borders::ALL);
+    let input_inner = input_block.inner(input_area);
+    let width = input_inner.width.max(1) as usize;
+    let scroll = input.visual_scroll(width);
+
+    let display_text = if let Some(mask_char) = mask {
+        mask_char.to_string().repeat(input.value().len())
+    } else {
+        input.value().to_string()
+    };
+    let input_widget = Paragraph::new(display_text.as_str())
+        .scroll((0, scroll as u16))
+        .block(input_block);
+
     frame.render_widget(Clear, area);
     frame.render_widget(block, area);
     frame.render_widget(message, message_area);
-    frame.render_widget(widget, input_area);
+    frame.render_widget(input_widget, input_area);
     frame.render_widget(control, control_area);
+
+    let cursor_x = input_inner.x + (input.visual_cursor().max(scroll) - scroll) as u16;
+    let cursor_y = input_inner.y;
+    frame.set_cursor_position(Position::new(cursor_x, cursor_y));
 }

@@ -4,10 +4,10 @@ assertion_line: 170
 expression: text
 snapshot_kind: text
 ---
- Note 'RenamedSample Note' selected                                                                    [?] Show keymap 
+ Note 'Renamed' selected                                                                               [?] Show keymap 
 [Browser]                                   ▐[Editor]                                                                   
  󰝰 Notes                                    ▐ 1 Welcome to Glues!                                                       
-   󱇗 RenamedSample Note                     ▐ 2                                                                         
+   󱇗 Renamed                                ▐ 2                                                                         
                                             ▐ 3 Press `?` to see keymaps and shortcuts.                                 
                                             ▐ 4 Press `m` in the note tree to create notes or directories.              
                                             ▐ 5 Press `Enter` on a note to open it and start writing.                   

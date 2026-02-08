@@ -7,19 +7,15 @@ use {
     crate::{
         Action,
         config::{self, LAST_THEME},
-        input::{Input, KeyCode, KeyEvent, to_textarea_input},
+        input::{Input, KeyCode, KeyEvent},
         log,
         logger::*,
-        theme::{self, THEME},
+        theme,
     },
     glues_core::transition::VimKeymapKind,
-    ratatui::{
-        style::Style,
-        text::Line,
-        widgets::{Block, Borders},
-    },
+    ratatui::text::Line,
     std::time::SystemTime,
-    tui_textarea::TextArea,
+    tui_input::InputRequest,
 };
 pub use {entry::EntryContext, notebook::NotebookContext};
 
@@ -29,7 +25,8 @@ pub enum ContextState {
 }
 
 pub struct ContextPrompt {
-    pub widget: TextArea<'static>,
+    pub input: tui_input::Input,
+    pub mask: Option<char>,
     pub message: Vec<Line<'static>>,
     pub action: Action,
 }
@@ -54,18 +51,10 @@ impl ContextPrompt {
         default: Option<String>,
         mask: Option<char>,
     ) -> Self {
-        let mut widget = TextArea::new(vec![default.unwrap_or_default()]);
-        if let Some(mask_char) = mask {
-            widget.set_mask_char(mask_char);
-        }
-        widget.set_cursor_style(Style::default().fg(THEME.accent_text).bg(THEME.accent));
-        widget.set_block(
-            Block::default()
-                .border_style(Style::default())
-                .borders(Borders::ALL),
-        );
+        let input = tui_input::Input::new(default.unwrap_or_default());
         Self {
-            widget,
+            input,
+            mask,
             message,
             action,
         }
@@ -149,12 +138,7 @@ impl Default for Context {
 
 impl Context {
     pub fn take_prompt_input(&mut self) -> Option<String> {
-        self.prompt
-            .take()?
-            .widget
-            .lines()
-            .first()
-            .map(ToOwned::to_owned)
+        Some(self.prompt.take()?.input.value().to_owned())
     }
 
     pub async fn consume(&mut self, input: &Input) -> Action {
@@ -275,12 +259,12 @@ impl Context {
                     return Action::None;
                 }
                 _ => {
-                    if let Some(text_input) = to_textarea_input(input) {
+                    if let Some(req) = to_input_request(input) {
                         self.prompt
                             .as_mut()
                             .log_expect("prompt must be some")
-                            .widget
-                            .input(text_input);
+                            .input
+                            .handle(req);
                     }
 
                     return Action::None;
@@ -295,5 +279,21 @@ impl Context {
             },
             ContextState::Notebook => self.notebook.consume(input),
         }
+    }
+}
+
+fn to_input_request(input: &Input) -> Option<InputRequest> {
+    match input {
+        Input::Key(key) => match (key.code, key.modifiers.ctrl) {
+            (KeyCode::Char(c), false) => Some(InputRequest::InsertChar(c)),
+            (KeyCode::Backspace, _) => Some(InputRequest::DeletePrevChar),
+            (KeyCode::Delete, _) => Some(InputRequest::DeleteNextChar),
+            (KeyCode::Left, _) => Some(InputRequest::GoToPrevChar),
+            (KeyCode::Right, _) => Some(InputRequest::GoToNextChar),
+            (KeyCode::Home, _) => Some(InputRequest::GoToStart),
+            (KeyCode::End, _) => Some(InputRequest::GoToEnd),
+            _ => None,
+        },
+        _ => None,
     }
 }

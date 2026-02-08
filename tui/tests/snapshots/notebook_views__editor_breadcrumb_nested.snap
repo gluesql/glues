@@ -1,14 +1,14 @@
 ---
 source: tui/tests/notebook_views.rs
-assertion_line: 118
+assertion_line: 123
 expression: text
 snapshot_kind: text
 ---
- Note 'SecondSample Note' normal mode                                                                  [?] Show keymap 
-[Browser]                                   ▐ 󱇗 SecondSample Note                                                       
+ Note 'Sample NoteSecond' normal mode                                                                  [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample NoteSecond                                                       
  󰝰 Notes                                    ▐ 1 XHted                                                                   
    󰉋 Dir                                    ▐ 2 jl :D                                                                   
-   󱇗 SecondSample Note                      ▐                                                                           
+   󱇗 Sample NoteSecond                      ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
                                             ▐                                                                           
