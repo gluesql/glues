@@ -1,5 +1,5 @@
 ---
-source: tui/tests/editor_normal.rs
+source: tui/tests/editor_viewport.rs
 assertion_line: 155
 expression: text
 snapshot_kind: text

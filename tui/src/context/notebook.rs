@@ -101,6 +101,9 @@ pub struct NotebookContext {
 
     /// Pending scroll request to be applied at render time.
     pub pending_scroll: Option<ScrollRequest>,
+
+    /// Persistent anchor for maintaining buffer shift across frames.
+    pub scroll_anchor: Option<ScrollAnchor>,
 }
 
 #[derive(Clone, Copy)]
@@ -108,6 +111,14 @@ pub enum ScrollRequest {
     Center,
     Top,
     Bottom,
+}
+
+#[derive(Clone, Copy)]
+pub struct ScrollAnchor {
+    /// Desired top row of the virtual viewport
+    pub desired_top: usize,
+    /// The actual viewport.y set by the initial pre-renders (edtui's clamped position)
+    pub actual_viewport_y: usize,
 }
 
 pub struct EditorItem {
@@ -138,6 +149,7 @@ impl Default for NotebookContext {
             line_yanked: false,
             yank: None,
             pending_scroll: None,
+            scroll_anchor: None,
         }
     }
 }

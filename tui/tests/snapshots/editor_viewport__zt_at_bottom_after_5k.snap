@@ -1,0 +1,44 @@
+---
+source: tui/tests/editor_viewport.rs
+expression: text
+---
+ Note 'Sample Note' normal mode                                                                        [?] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 55 Line 55 — the quick brown fox jumps over the lazy dog.                 
+   󱇗 Sample Note                            ▐ 56 Line 56 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 57 Line 57 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 58 Line 58 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 59 Line 59 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐ 60 Line 60 — the quick brown fox jumps over the lazy dog.                 
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ NORMAL   󰝰 Notes  󱇗 Sample Note 

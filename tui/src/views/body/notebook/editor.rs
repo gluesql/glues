@@ -2,7 +2,7 @@ use {
     crate::{
         context::{
             Context,
-            notebook::{ContextState, ScrollRequest},
+            notebook::{ContextState, ScrollAnchor, ScrollRequest},
         },
         theme::{THEME, current_theme_id, syntect_theme_name},
     },
@@ -215,59 +215,92 @@ fn build_block(context: &Context) -> Block<'static> {
 /// Returns the number of rows to shift the buffer content up after the real
 /// render, to handle the case where the desired viewport extends past the
 /// end of the document.
+///
+/// The scroll anchor persists across frames so that j/k movements after a
+/// scroll command do not cause the viewport to snap back.
 fn prepare_scroll_viewport(context: &mut Context, area: Rect) -> usize {
-    let Some(scroll) = context.notebook.pending_scroll.take() else {
-        return 0;
-    };
+    // Case A: new scroll command
+    if let Some(scroll) = context.notebook.pending_scroll.take() {
+        let editor = context.notebook.get_editor_mut();
+        let cursor_row = editor.cursor.row;
+        let visible_height = (area.height as usize).saturating_sub(2);
+        let total_lines = editor.lines.len();
 
-    let editor = context.notebook.get_editor_mut();
-    let cursor_row = editor.cursor.row;
-    let visible_height = (area.height as usize).saturating_sub(2);
-    let total_lines = editor.lines.len();
+        let desired_top = match scroll {
+            ScrollRequest::Top => cursor_row,
+            ScrollRequest::Center => cursor_row.saturating_sub(visible_height / 2),
+            ScrollRequest::Bottom => cursor_row.saturating_sub(visible_height.saturating_sub(1)),
+        };
 
-    let desired_viewport_start = match scroll {
-        ScrollRequest::Top => cursor_row,
-        ScrollRequest::Center => cursor_row.saturating_sub(visible_height / 2),
-        ScrollRequest::Bottom => cursor_row.saturating_sub(visible_height.saturating_sub(1)),
-    };
+        let desired_bottom = desired_top + visible_height.saturating_sub(1);
+        let clamped_bottom = desired_bottom.min(total_lines.saturating_sub(1));
+        let actual_viewport_start = clamped_bottom.saturating_sub(visible_height.saturating_sub(1));
+        let shift = desired_top.saturating_sub(actual_viewport_start);
 
-    // When the desired viewport extends past the end of the document,
-    // edtui won't scroll that far. Compute the gap so we can shift the
-    // rendered buffer after the real render.
-    let desired_bottom = desired_viewport_start + visible_height.saturating_sub(1);
-    let clamped_bottom = desired_bottom.min(total_lines.saturating_sub(1));
-    let actual_viewport_start = clamped_bottom.saturating_sub(visible_height.saturating_sub(1));
-    let shift = desired_viewport_start.saturating_sub(actual_viewport_start);
+        let real_cursor = editor.cursor;
+        let scratch_theme = || {
+            EditorTheme::default()
+                .block(Block::bordered())
+                .hide_status_line()
+        };
 
-    let real_cursor = editor.cursor;
-    let scratch_theme = || {
-        EditorTheme::default()
-            .block(Block::bordered())
-            .hide_status_line()
-    };
+        // Pre-render 1: reset viewport to top
+        editor.cursor = Index2::new(0, 0);
+        let mut scratch = Buffer::empty(area);
+        EditorView::new(editor)
+            .theme(scratch_theme())
+            .wrap(true)
+            .render(area, &mut scratch);
 
-    // Pre-render 1: reset viewport to top
-    editor.cursor = Index2::new(0, 0);
-    let mut scratch = Buffer::empty(area);
-    EditorView::new(editor)
-        .theme(scratch_theme())
-        .wrap(true)
-        .render(area, &mut scratch);
+        // Pre-render 2: scroll viewport to best possible position
+        let editor = context.notebook.get_editor_mut();
+        editor.cursor = Index2::new(clamped_bottom, 0);
+        let mut scratch = Buffer::empty(area);
+        EditorView::new(editor)
+            .theme(scratch_theme())
+            .wrap(true)
+            .render(area, &mut scratch);
 
-    // Pre-render 2: scroll viewport to best possible position
-    let editor = context.notebook.get_editor_mut();
-    editor.cursor = Index2::new(clamped_bottom, 0);
-    let mut scratch = Buffer::empty(area);
-    EditorView::new(editor)
-        .theme(scratch_theme())
-        .wrap(true)
-        .render(area, &mut scratch);
+        // Restore cursor
+        let editor = context.notebook.get_editor_mut();
+        editor.cursor = real_cursor;
 
-    // Restore cursor
-    let editor = context.notebook.get_editor_mut();
-    editor.cursor = real_cursor;
+        // Save anchor only when shift > 0 (document too short for full scroll)
+        context.notebook.scroll_anchor = if shift > 0 {
+            Some(ScrollAnchor {
+                desired_top,
+                actual_viewport_y: actual_viewport_start,
+            })
+        } else {
+            None
+        };
 
-    shift
+        return shift;
+    }
+
+    // Case B: persistent anchor from a previous scroll command
+    if let Some(anchor) = context.notebook.scroll_anchor {
+        let editor = context.notebook.get_editor_mut();
+        let cursor_row = editor.cursor.row;
+
+        // Clamp desired_top so cursor stays visible (when moving up with k)
+        let effective_top = anchor.desired_top.min(cursor_row);
+        let shift = effective_top.saturating_sub(anchor.actual_viewport_y);
+
+        if shift == 0 {
+            context.notebook.scroll_anchor = None;
+        } else {
+            context.notebook.scroll_anchor = Some(ScrollAnchor {
+                desired_top: effective_top,
+                actual_viewport_y: anchor.actual_viewport_y,
+            });
+        }
+
+        return shift;
+    }
+
+    // Case C: no scroll state
+    0
 }
 
 /// Shifts rendered content rows up to simulate scrolling past the document end.
