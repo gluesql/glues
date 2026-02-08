@@ -1,0 +1,44 @@
+---
+source: tui/tests/editor_wrap.rs
+expression: text
+---
+ Note 'Sample Note' insert mode                                                                   [Ctrl+h] Show keymap 
+[Browser]                                   ▐ 󱇗 Sample Note                                                             
+ 󰝰 Notes                                    ▐ 1 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXINSERTEDXXXXXXXXXXXXXX
+   󱇗 Sample Note                            ▐   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX                                    
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐                                                                           
+                                            ▐ INSERT   󰝰 Notes  󱇗 Sample Note                           󰔚 Saving...

@@ -64,7 +64,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         let editor = context.notebook.get_editor_mut();
         EditorView::new(editor)
             .theme(theme)
-            .wrap(false)
+            .wrap(true)
             .line_numbers(line_numbers)
             .render(area, frame.buffer_mut());
 
@@ -76,7 +76,7 @@ pub fn draw(frame: &mut Frame, area: Rect, context: &mut Context) {
         let theme = theme.hide_cursor();
         EditorView::new(&mut sample_state)
             .theme(theme)
-            .wrap(false)
+            .wrap(true)
             .line_numbers(line_numbers)
             .render(area, frame.buffer_mut());
     };
@@ -231,7 +231,7 @@ fn prepare_scroll_viewport(context: &mut Context, area: Rect) -> usize {
     let mut scratch = Buffer::empty(area);
     EditorView::new(editor)
         .theme(scratch_theme())
-        .wrap(false)
+        .wrap(true)
         .render(area, &mut scratch);
 
     // Pre-render 2: scroll viewport to best possible position
@@ -240,7 +240,7 @@ fn prepare_scroll_viewport(context: &mut Context, area: Rect) -> usize {
     let mut scratch = Buffer::empty(area);
     EditorView::new(editor)
         .theme(scratch_theme())
-        .wrap(false)
+        .wrap(true)
         .render(area, &mut scratch);
 
     // Restore cursor
