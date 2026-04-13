@@ -49,7 +49,11 @@
           # Respect the project's rust-toolchain.toml (channel 1.93, plus
           # rustfmt / clippy / llvm-tools-preview). A single source of
           # truth for the Rust version used by package, checks and shell.
-          rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+          # rust-src is layered on top so RUST_SRC_PATH in the dev shell
+          # actually resolves (rust-analyzer uses it for std-lib sources).
+          rustToolchain = (pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml).override {
+            extensions = [ "rustfmt" "clippy" "llvm-tools-preview" "rust-src" ];
+          };
 
           craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rustToolchain;
 
@@ -109,11 +113,11 @@
             inherit cargoArtifacts;
 
             pname = "glues";
-            # Build every workspace binary (glues, glues-tui, glues-server).
-            cargoExtraArgs = "--workspace --bins";
+            # The default install ships only the client binaries. The HTTP
+            # proxy server lives in its own package below so users who
+            # never run a remote backend don't install an unused daemon.
+            cargoExtraArgs = "--bin glues --bin glues-tui";
 
-            # Tests run in a dedicated nextest check below; `nix build`
-            # stays focused on producing the binaries.
             doCheck = false;
 
             meta = {
@@ -125,6 +129,24 @@
               platforms = lib.platforms.unix;
             };
           });
+
+          glues-server = craneLib.buildPackage (commonArgs // {
+            inherit cargoArtifacts;
+
+            pname = "glues-server";
+            cargoExtraArgs = "--bin glues-server";
+
+            doCheck = false;
+
+            meta = {
+              description = "Glues HTTP proxy server";
+              homepage = workspaceCargoToml.workspace.package.repository;
+              changelog = "${workspaceCargoToml.workspace.package.repository}/releases";
+              license = lib.licenses.asl20;
+              mainProgram = "glues-server";
+              platforms = lib.platforms.unix;
+            };
+          });
         in
         {
           # Share the overlay-augmented pkgs with sibling flake-parts
@@ -133,12 +155,18 @@
 
           packages = {
             default = glues;
-            glues = glues;
+            inherit glues glues-server;
           };
 
-          apps.default = {
-            type = "app";
-            program = lib.getExe glues;
+          apps = {
+            default = {
+              type = "app";
+              program = lib.getExe glues;
+            };
+            glues-server = {
+              type = "app";
+              program = lib.getExe glues-server;
+            };
           };
 
           devShells.default = pkgs.mkShell {
@@ -157,6 +185,9 @@
               cargo-audit
               cargo-deny
               cargo-nextest
+              # Standalone TOML formatter referenced in the comments below
+              # (treefmt deliberately doesn't wire it in as a flake check).
+              taplo
               # Nix ergonomics
               nil
               config.treefmt.build.wrapper
