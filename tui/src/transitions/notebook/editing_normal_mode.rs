@@ -5,7 +5,7 @@ use {
     },
     crate::{App, logger::*},
     edtui::{
-        EditorMode, Index2,
+        EditorMode, EditorState, Index2, RowIndex,
         actions::{
             AppendNewline, CopyLine, CopySelection, DeleteLine, DeleteSelection,
             DeleteToFirstCharOfLine, InsertNewline, MoveBackward, MoveDown, MoveForward,
@@ -216,24 +216,27 @@ impl App {
                 self.context.notebook.update_yank();
             }
             DeleteLines(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                for _ in 0..n {
-                    editor.execute(DeleteLine(1));
-                }
-                editor.execute(MoveToFirst());
+                let deleted_text = {
+                    let editor = self.context.notebook.get_editor_mut();
+                    delete_lines_and_collect(editor, n)
+                };
+
+                self.context.notebook.get_clipboard().set_text(deleted_text);
                 self.context.notebook.line_yanked = true;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
             }
             DeleteLinesUp(n) => {
-                let editor = self.context.notebook.get_editor_mut();
-                let (row, _) = (editor.cursor.row, editor.cursor.col);
-                let start_row = row.saturating_sub(n - 1);
-                editor.cursor = Index2::new(start_row, 0);
-                for _ in 0..n {
-                    editor.execute(DeleteLine(1));
-                }
-                editor.execute(MoveToFirst());
+                let deleted_text = {
+                    let editor = self.context.notebook.get_editor_mut();
+                    let (row, _) = (editor.cursor.row, editor.cursor.col);
+                    let start_row = row.saturating_sub(n.saturating_sub(1));
+
+                    editor.cursor = Index2::new(start_row, 0);
+                    delete_lines_and_collect(editor, n)
+                };
+
+                self.context.notebook.get_clipboard().set_text(deleted_text);
                 self.context.notebook.line_yanked = true;
                 self.context.notebook.mark_dirty();
                 self.context.notebook.update_yank();
@@ -342,4 +345,27 @@ impl App {
             }
         };
     }
+}
+
+fn delete_lines_and_collect(editor: &mut EditorState, n: usize) -> String {
+    let mut deleted_lines = Vec::new();
+
+    for _ in 0..n {
+        let Some(line) = editor
+            .lines
+            .get(RowIndex::new(editor.cursor.row))
+            .map(|line| line.iter().collect::<String>())
+        else {
+            break;
+        };
+
+        deleted_lines.push(line);
+        editor.execute(DeleteLine(1));
+    }
+
+    editor.execute(MoveToFirst());
+
+    let mut text = String::from('\n');
+    text.push_str(&deleted_lines.join("\n"));
+    text
 }

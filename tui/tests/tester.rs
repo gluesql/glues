@@ -128,6 +128,11 @@ impl Tester {
     }
 
     #[allow(dead_code)]
+    pub fn clipboard_text(&mut self) -> String {
+        self.app.context_mut().notebook.get_clipboard().get_text()
+    }
+
+    #[allow(dead_code)]
     pub fn snapshot_text(&self) -> String {
         buffer_lines(&self.term).join("\n")
     }
