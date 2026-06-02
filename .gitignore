@@ -1,5 +1,6 @@
 .DS_Store
 .glues
+.notes
 /target
 tui/web/dist/
 AGENTS.local.md
