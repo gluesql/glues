@@ -20,3 +20,4 @@ coverage-clean = [
     "llvm-cov",
     "clean"
 ]
+visual-test = "test -p glues-gui --features visual-tests --test visual"

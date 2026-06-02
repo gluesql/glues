@@ -1,0 +1,45 @@
+[package]
+name = "glues-gui"
+authors.workspace = true
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "GPUI frontend for the Glues note-taking experience"
+keywords.workspace = true
+default-run = "glues-gui"
+
+[lib]
+name = "glues_gui"
+crate-type = ["rlib"]
+
+[features]
+visual-tests = ["gpui/test-support", "gpui_macos/test-support"]
+
+[dependencies]
+glues-core.workspace = true
+anyhow = "1"
+color-eyre = "0.6.3"
+# Keep the Zed GPUI source aligned with gpui-component's upstream manifest.
+# The repository pin is Cargo.lock's precise Zed commit:
+# de14e3fcad093c2fc74409d2839321bbc6417bdc.
+gpui = { git = "https://github.com/zed-industries/zed" }
+gpui-component = { git = "https://github.com/longbridge/gpui-component", rev = "2d2524d89efc47270e9a0ee18f10fa72cd573eff", package = "gpui-component" }
+gpui-component-assets = { git = "https://github.com/longbridge/gpui-component", rev = "2d2524d89efc47270e9a0ee18f10fa72cd573eff", package = "gpui-component-assets" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1.41.0", features = ["rt-multi-thread"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# Kept on the same Cargo.lock-pinned Zed commit as gpui.
+gpui_macos = { git = "https://github.com/zed-industries/zed", features = ["font-kit", "runtime_shaders"] }
+
+[[bin]]
+name = "glues-gui"
+path = "src/main.rs"
+
+[[test]]
+name = "visual"
+path = "tests/visual.rs"
+harness = false
+required-features = ["visual-tests"]
