@@ -1,0 +1,180 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 0.8.1)"
+        required: true
+      dry_run:
+        description: "Run cargo publish --workspace --dry-run"
+        type: boolean
+        default: true
+      skip_publish:
+        description: "Skip publishing packages and only refresh release notes"
+        type: boolean
+        default: false
+
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      VERSION: ${{ github.event.inputs.version }}
+      DRY_RUN: ${{ github.event.inputs.dry_run }}
+      SKIP_PUBLISH: ${{ github.event.inputs.skip_publish }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Ensure latest default branch
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if [ -z "$VERSION" ]; then
+            echo "::error ::version input is required" >&2
+            exit 1
+          fi
+
+          git checkout "$DEFAULT_BRANCH"
+          git pull --ff-only origin "$DEFAULT_BRANCH"
+          git fetch --tags --force
+
+          if git ls-remote --exit-code --heads origin "release/v${VERSION}" >/tmp/release_branch 2>/dev/null; then
+            release_sha=$(awk 'NR==1 {print $1}' /tmp/release_branch)
+            if git merge-base --is-ancestor "$release_sha" "origin/$DEFAULT_BRANCH"; then
+              echo "release/v${VERSION} branch is already merged into ${DEFAULT_BRANCH}"
+            else
+              echo "::error ::release/v${VERSION} branch is not merged into ${DEFAULT_BRANCH}" >&2
+              exit 1
+            fi
+          else
+            echo "release/v${VERSION} branch not found on origin (already deleted is fine)"
+          fi
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Populate Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: publish
+
+      - name: Validate release artifacts
+        id: validate
+        run: |
+          notes_path="docs/releases/v${VERSION}.md"
+          if [ ! -f "$notes_path" ]; then
+            echo "::error ::release notes file missing: $notes_path" >&2
+            exit 1
+          fi
+
+          metadata=$(cargo metadata --no-deps --format-version 1 --locked)
+          workspace_version=$(python3 -c 'import json,sys; data=json.load(sys.stdin); print(next(p["version"] for p in data["packages"] if p["name"]=="glues"))' <<<"$metadata")
+
+          if [ "$workspace_version" != "$VERSION" ]; then
+            echo "::error ::workspace version ($workspace_version) does not match input ($VERSION)" >&2
+            exit 1
+          fi
+
+          title=$(python3 - <<'PY'
+import os
+version = os.environ["VERSION"]
+parts = version.split('.')
+if len(parts) < 3:
+    raise SystemExit('Version must follow major.minor.patch format')
+patch = parts[2]
+title = f"Glues v{version}"
+if patch.isdigit() and int(patch) == 0:
+    title += ' 🌈'
+print(title)
+PY
+)
+
+          echo "notes_path=$notes_path" >> "$GITHUB_OUTPUT"
+          echo "release_title=$title" >> "$GITHUB_OUTPUT"
+
+      - name: Cargo publish dry run
+        if: ${{ env.DRY_RUN == 'true' }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish --workspace --dry-run
+
+      - name: Cargo publish
+        if: ${{ env.DRY_RUN == 'false' && env.SKIP_PUBLISH != 'true' }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish --workspace
+
+      - name: Create tag v${{ env.VERSION }}
+        if: ${{ env.DRY_RUN == 'false' && env.SKIP_PUBLISH != 'true' }}
+        env:
+          VERSION: ${{ env.VERSION }}
+        run: |
+          if git rev-parse "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            echo "::error ::tag v${VERSION} already exists" >&2
+            exit 1
+          fi
+          git tag -a "v${VERSION}" -m "Glues v${VERSION}"
+          git push origin "refs/tags/v${VERSION}"
+
+      - name: Ensure draft release
+        if: ${{ env.SKIP_PUBLISH == 'true' || env.DRY_RUN == 'false' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NOTES_PATH: ${{ steps.validate.outputs.notes_path }}
+          RELEASE_TITLE: ${{ steps.validate.outputs.release_title }}
+          VERSION: ${{ env.VERSION }}
+        run: |
+          set -euo pipefail
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            echo "Updating existing release as draft"
+            gh release edit "v${VERSION}" --draft --prerelease=false --title "$RELEASE_TITLE" --notes-file "$NOTES_PATH"
+          else
+            echo "Creating draft release"
+            gh release create "v${VERSION}" --draft --title "$RELEASE_TITLE" --notes-file "$NOTES_PATH"
+          fi
+
+          asset_dir="docs/releases/assets"
+          if [ -d "$asset_dir" ]; then
+            mapfile -t assets < <(find "$asset_dir" -maxdepth 1 -type f -name "v${VERSION}_*" -print)
+            if [ "${#assets[@]}" -gt 0 ]; then
+              echo "Uploading release assets"
+              gh release upload "v${VERSION}" "${assets[@]}" --clobber
+            fi
+          fi
+
+      - name: Summarize outcome
+        env:
+          VERSION: ${{ env.VERSION }}
+          DRY_RUN: ${{ env.DRY_RUN }}
+          SKIP_PUBLISH: ${{ env.SKIP_PUBLISH }}
+          RELEASE_TITLE: ${{ steps.validate.outputs.release_title }}
+          NOTES_PATH: ${{ steps.validate.outputs.notes_path }}
+        run: |
+          release_url="https://github.com/${GITHUB_REPOSITORY}/releases/tag/v${VERSION}"
+          if [ "${SKIP_PUBLISH}" = 'true' ] || [ "${DRY_RUN}" = 'false' ]; then
+            release_ready='yes'
+          else
+            release_ready='no'
+          fi
+          {
+            echo "### Publish Release Summary"
+            echo "- Title: ${RELEASE_TITLE}"
+            echo "- Release notes file: ${NOTES_PATH}"
+            echo "- Dry run: ${DRY_RUN}"
+            echo "- Skip publish: ${SKIP_PUBLISH}"
+            echo "- Draft release updated: ${release_ready}"
+            echo "- Release URL: ${release_url}"
+          } >> "$GITHUB_STEP_SUMMARY"
